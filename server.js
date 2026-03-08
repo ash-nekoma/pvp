@@ -12,7 +12,9 @@ const io = new Server(server);
 app.use(express.static('public'));
 app.use(express.json());
 
-// --- MONGODB SCHEMAS ---
+// ==========================================
+// 1. MONGODB SCHEMAS 
+// ==========================================
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, lowercase: true },
     displayName: { type: String, required: true }, 
@@ -34,7 +36,9 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB Vault Connected'))
     .catch(err => console.error('❌ MongoDB Error:', err));
 
-// --- GLOBAL GAME STATE ---
+// ==========================================
+// 2. GLOBAL GAME STATE
+// ==========================================
 const state = {
     p1: null, p2: null,
     p1Score: 0, p2Score: 0,
@@ -43,36 +47,57 @@ const state = {
     tempData: {}
 };
 
-// --- WEBSOCKETS ---
+// ==========================================
+// 3. WEBSOCKET LOGIC
+// ==========================================
 io.on('connection', (socket) => {
     console.log(`🔌 Connected: ${socket.id}`);
 
-    // 1. AUTHENTICATION (Login & Registration)
-    socket.on('auth-attempt', async (data) => {
+    // --- PROPER REGISTRATION ---
+    socket.on('register-attempt', async (data) => {
         const { username, password } = data;
         if(username.length < 3 || username.length > 12) return socket.emit('auth-error', 'Username must be 3-12 chars.');
+        if(password.length < 4) return socket.emit('auth-error', 'Password too short.');
         
         try {
-            let user = await User.findOne({ username: username.toLowerCase() });
-            if (!user) {
-                const hashed = await bcrypt.hash(password, 10);
-                // Make the first registered user an Admin automatically for testing
-                const isFirst = (await User.countDocuments()) === 0; 
-                user = await User.create({ username: username.toLowerCase(), displayName: username, password: hashed, role: isFirst ? 'admin' : 'player' });
-            } else {
-                const isMatch = await bcrypt.compare(password, user.password);
-                if (!isMatch) return socket.emit('auth-error', 'INVALID PASSWORD.');
-            }
-            socket.username = user.displayName;
-            socket.role = user.role;
-            socket.emit('auth-success', { name: user.displayName, wallet: user.wallet_tc, role: user.role });
-            socket.emit('game-state-update', state); // Send current board
+            const existingUser = await User.findOne({ username: username.toLowerCase() });
+            if (existingUser) return socket.emit('auth-error', 'USERNAME ALREADY TAKEN.');
+
+            const hashed = await bcrypt.hash(password, 10);
+            const isFirst = (await User.countDocuments()) === 0; // First account is Admin
+            await User.create({ 
+                username: username.toLowerCase(), 
+                displayName: username, 
+                password: hashed, 
+                role: isFirst ? 'admin' : 'player' 
+            });
+
+            socket.emit('auth-error', 'ACCOUNT CREATED. PLEASE LOG IN.'); // Acts as success text
         } catch (err) {
-            socket.emit('auth-error', 'SERVER ERROR.');
+            socket.emit('auth-error', 'REGISTRATION ERROR.');
         }
     });
 
-    // 2. BANK SYSTEM
+    // --- PROPER LOGIN ---
+    socket.on('login-attempt', async (data) => {
+        const { username, password } = data;
+        try {
+            const user = await User.findOne({ username: username.toLowerCase() });
+            if (!user) return socket.emit('auth-error', 'USER NOT FOUND.');
+
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) return socket.emit('auth-error', 'INVALID PASSWORD.');
+
+            socket.username = user.displayName;
+            socket.role = user.role;
+            socket.emit('auth-success', { name: user.displayName, wallet: user.wallet_tc, role: user.role });
+            socket.emit('game-state-update', state);
+        } catch (err) {
+            socket.emit('auth-error', 'LOGIN ERROR.');
+        }
+    });
+
+    // --- BANK SYSTEM ---
     socket.on('request-bank-tx', async (data) => {
         if (!socket.username) return;
         if (data.type === 'withdraw') {
@@ -114,13 +139,13 @@ io.on('connection', (socket) => {
         socket.emit('admin-bank-queue-update', await BankRequest.find({ status: 'pending' }));
     });
 
-    // 3. CHAT
+    // --- CHAT SYSTEM ---
     socket.on('send-chat', (text) => {
         if(!socket.username) return;
         io.emit('chat-message', { sender: socket.username, text, role: socket.role });
     });
 
-    // 4. GAME SYSTEM (Seating & Turn Logic)
+    // --- GAME ENGINE (DICE) ---
     socket.on('take-seat', (seat) => {
         if(seat === 1 && !state.p1 && socket.username !== state.p2) state.p1 = socket.username;
         if(seat === 2 && !state.p2 && socket.username !== state.p1) state.p2 = socket.username;
@@ -138,7 +163,6 @@ io.on('connection', (socket) => {
         if(state.turn === 1 && socket.username !== state.p1) return;
         if(state.turn === 2 && socket.username !== state.p2) return;
 
-        // Simplistic Dice Logic Example
         const roll = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
         
         if(state.turn === 1) {
