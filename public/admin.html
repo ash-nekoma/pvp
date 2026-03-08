@@ -42,7 +42,7 @@
     const socket = io();
     
     function loginAdmin() {
-        socket.emit('auth-attempt', { username: document.getElementById('adminUser').value, password: document.getElementById('adminPass').value });
+        socket.emit('login-attempt', { username: document.getElementById('adminUser').value, password: document.getElementById('adminPass').value });
     }
 
     socket.on('auth-error', msg => document.getElementById('loginErr').innerText = msg);
