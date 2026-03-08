@@ -3,110 +3,112 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs'); // For encrypting passwords
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Serve your HTML, CSS, and client-side JS from the 'public' folder
 app.use(express.static('public'));
 app.use(express.json());
 
-// --- MONGODB SCHEMA ---
+// ==========================================
+// 1. MONGODB SCHEMAS (The Database Blueprints)
+// ==========================================
+
+// The Player Profile
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true, lowercase: true },
-    displayName: { type: String, required: true },
-    wallet_tc: { type: Number, default: 0 }
+    // username is forced to lowercase to prevent "User1" vs "user1" exploits
+    username: { type: String, required: true, unique: true, lowercase: true }, 
+    displayName: { type: String, required: true }, // Keeps their original uppercase/lowercase typing
+    password: { type: String, required: true },
+    wallet_tc: { type: Number, default: 0 },
+    role: { type: String, default: 'player' }, // 'admin' or 'player'
+    isBanned: { type: Boolean, default: false }
 });
 const User = mongoose.model('User', userSchema);
 
+// The Bank Queue
+const bankSchema = new mongoose.Schema({
+    username: String,
+    type: String, // 'deposit' or 'withdraw'
+    amount: Number,
+    status: { type: String, default: 'pending' }, // Admin changes this to 'approved'
+    timestamp: { type: Date, default: Date.now }
+});
+const BankRequest = mongoose.model('BankRequest', bankSchema);
+
+// Connect to the Vault
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ MongoDB Connected'))
+    .then(() => console.log('✅ MongoDB Vault Connected'))
     .catch(err => console.error('❌ MongoDB Error:', err));
 
-// --- SERVER GAME STATE ---
-const room = {
-    p1: null, p2: null, 
-    p1Score: 0, p2Score: 0, 
-    target: 1, game: 'dice', 
-    pot: 0, status: 'waiting', turn: 1, 
-    p1Roll: 0, spectators: {}
-};
+
+// ==========================================
+// 2. SOCKET CONNECTIONS & AUTHENTICATION
+// ==========================================
 
 io.on('connection', (socket) => {
-    console.log(`🔌 Connected: ${socket.id}`);
-    
-    // Auto-login for testing (Bypassing password for now to map your UI)
-    socket.on('auth', async (username) => {
-        let user = await User.findOne({ username: username.toLowerCase() });
-        if(!user) user = await User.create({ username: username.toLowerCase(), displayName: username });
-        socket.username = user.displayName;
-        socket.emit('auth-success', { name: user.displayName, wallet: user.wallet_tc });
-        socket.emit('room-update', room);
-    });
+    console.log(`🔌 New Connection Detected: ${socket.id}`);
 
-    // Chat
-    socket.on('send-chat', (text) => {
-        io.emit('chat-message', { sender: socket.username, text });
-    });
-
-    // Taking a Seat
-    socket.on('take-seat', (seatNum) => {
-        if(seatNum === 1 && !room.p1) room.p1 = socket.username;
-        if(seatNum === 2 && !room.p2) room.p2 = socket.username;
+    // Listen for login attempts from the HTML
+    socket.on('auth-attempt', async (data) => {
+        const { username, password } = data;
         
-        if(room.p1 && room.p2) {
-            room.status = 'playing';
-            io.emit('system-msg', "MATCH STARTED! P1 TURN.");
+        // Basic length validation before hitting the database
+        if (!username || username.length < 3 || username.length > 12) {
+            return socket.emit('auth-error', 'Username must be 3-12 characters.');
         }
-        io.emit('room-update', room);
+        if (!password || password.length < 4) {
+            return socket.emit('auth-error', 'Password too short.');
+        }
+
+        try {
+            // Find user case-insensitively
+            let user = await User.findOne({ username: username.toLowerCase() });
+            
+            if (!user) {
+                // REGISTRATION: Create a new account if they don't exist
+                const hashedPassword = await bcrypt.hash(password, 10);
+                user = await User.create({ 
+                    username: username.toLowerCase(), 
+                    displayName: username, 
+                    password: hashedPassword 
+                });
+                console.log(`👤 New User Registered: ${user.displayName}`);
+            } else {
+                // LOGIN: Verify existing user
+                if (user.isBanned) return socket.emit('auth-error', 'ACCOUNT BANNED.');
+                
+                const isMatch = await bcrypt.compare(password, user.password);
+                if (!isMatch) return socket.emit('auth-error', 'INVALID PASSWORD.');
+            }
+
+            // Lock the session to this specific socket
+            socket.username = user.displayName;
+            socket.role = user.role;
+            
+            // Tell the HTML the login worked and send their real wallet balance
+            socket.emit('auth-success', { 
+                name: user.displayName, 
+                wallet: user.wallet_tc, 
+                role: user.role 
+            });
+
+        } catch (err) {
+            console.error("Auth Error:", err);
+            socket.emit('auth-error', 'CRITICAL SERVER ERROR.');
+        }
     });
 
-    // Game Logic (Dice Template)
-    socket.on('play-turn', async (action) => {
-        if(room.status !== 'playing') return;
-        if(room.turn === 1 && socket.username !== room.p1) return;
-        if(room.turn === 2 && socket.username !== room.p2) return;
-
-        if(room.game === 'dice' && action === 'roll') {
-            const roll = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
-            
-            if(room.turn === 1) {
-                room.p1Roll = roll;
-                room.turn = 2;
-                io.emit('game-event', { type: 'dice-roll', p: 1, val: roll });
-                io.emit('system-msg', `P1 rolled ${roll}. P2 Turn.`);
-            } else {
-                io.emit('game-event', { type: 'dice-roll', p: 2, val: roll });
-                
-                // Calculate Winner
-                setTimeout(() => {
-                    if(room.p1Roll > roll) {
-                        room.p1Score++;
-                        io.emit('system-msg', `P1 wins the round!`);
-                    } else if (roll > room.p1Roll) {
-                        room.p2Score++;
-                        io.emit('system-msg', `P2 wins the round!`);
-                    } else {
-                        io.emit('system-msg', `DRAW!`);
-                    }
-                    
-                    // Check Match Win
-                    if(room.p1Score >= room.target) {
-                        room.status = 'game-over';
-                        io.emit('match-over', { winner: room.p1 });
-                    } else if (room.p2Score >= room.target) {
-                        room.status = 'game-over';
-                        io.emit('match-over', { winner: room.p2 });
-                    } else {
-                        room.turn = 1; // Reset for next round
-                    }
-                    io.emit('room-update', room);
-                }, 1000);
-            }
-            io.emit('room-update', room);
-        }
+    // Disconnect cleanup
+    socket.on('disconnect', () => {
+        console.log(`🔌 Disconnected: ${socket.username || socket.id}`);
+        // Future logic: Remove player from seat if they disconnect mid-game
     });
 });
 
+// Boot up the server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 DUEL ARENA Live on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 DUEL ARENA Server Live on Port ${PORT}`));
