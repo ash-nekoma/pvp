@@ -119,7 +119,7 @@ let gameStats = {
     shared_bj: { total: 0, Win: 0, Lose: 0, Push: 0 }
 };
 
-// ================= SHARED BLACKJACK ENGINE =================
+// ================= LIVE BLACKJACK STATE MACHINE =================
 let sharedBJ = {
     status: 'WAITING', // WAITING, BETTING, DEALING, ACTION, DEALER_TURN, RESOLVING
     activeSeatIndex: -1,
@@ -215,7 +215,7 @@ function startBjTurnTimer() {
     
     let hand = seat.hands[seat.currentHandIndex];
     
-    // Auto-advance if dealt a 21
+    // Auto-advance if dealt a natural 21 to keep game flying
     if (getBJScore(hand) >= 21) {
         if (seat.currentHandIndex < seat.hands.length - 1) { 
             seat.currentHandIndex++; 
@@ -258,95 +258,99 @@ function nextBjTurn() {
     resolveDealerTurn();
 }
 
-function resolveDealerTurn() {
+async function resolveDealerTurn() {
     sharedBJ.status = 'DEALER_TURN'; 
     io.to('shared_bj').emit('sharedBjSync', sharedBJ);
     
-    setTimeout(async () => {
-        while (getBJScore(sharedBJ.dealerHand) < 17) { 
-            sharedBJ.dealerHand.push(drawCard()); 
-            io.to('shared_bj').emit('sharedBjSync', sharedBJ); 
-            await new Promise(r => setTimeout(r, 800)); 
-        }
-        
-        sharedBJ.status = 'RESOLVING'; 
-        io.to('shared_bj').emit('sharedBjSync', sharedBJ);
-        
-        let dScore = getBJScore(sharedBJ.dealerHand);
-        let dResStr = dScore > 21 ? `DEALER BUSTS (${dScore})` : `DEALER (${dScore})`;
-        
-        let playerResults = {}; 
-        let houseWin = 0, houseLoss = 0, pushCount = 0;
-        
-        for (let i = 0; i < 5; i++) {
-            let seat = sharedBJ.seats[i];
-            if (seat && seat.totalBet > 0) {
-                let payout = 0, wonProfit = 0, lostBet = 0;
+    // 1-second delay for the hole card reveal
+    await new Promise(r => setTimeout(r, 1000));
+    
+    // Sequential Dealer Draw for tension and smoothness
+    while (getBJScore(sharedBJ.dealerHand) < 17) { 
+        sharedBJ.dealerHand.push(drawCard()); 
+        io.to('shared_bj').emit('sharedBjSync', sharedBJ); 
+        await new Promise(r => setTimeout(r, 1000)); // Pause between hits
+    }
+    
+    sharedBJ.status = 'RESOLVING'; 
+    io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+    
+    let dScore = getBJScore(sharedBJ.dealerHand);
+    let dResStr = dScore > 21 ? `DEALER BUSTS (${dScore})` : `DEALER (${dScore})`;
+    
+    let playerResults = {}; 
+    let houseWin = 0, houseLoss = 0, pushCount = 0;
+    
+    for (let i = 0; i < 5; i++) {
+        let seat = sharedBJ.seats[i];
+        if (seat && seat.totalBet > 0) {
+            let payout = 0, wonProfit = 0, lostBet = 0;
+            
+            seat.hands.forEach((hand, hIdx) => {
+                let pScore = getBJScore(hand); 
+                let betForThisHand = seat.bets[hIdx];
+                let isNatural = (hand.length === 2 && pScore === 21 && seat.hands.length === 1);
                 
-                seat.hands.forEach((hand, hIdx) => {
-                    let pScore = getBJScore(hand); 
-                    let betForThisHand = seat.bets[hIdx];
-                    let isNatural = (hand.length === 2 && pScore === 21 && seat.hands.length === 1);
-                    
-                    if (pScore > 21) { 
-                        lostBet += betForThisHand; 
-                        houseWin++; 
-                    } else if (dScore > 21 || pScore > dScore) { 
-                        let winAmt = formatTC(betForThisHand * (isNatural ? 2.5 : 2)); 
-                        payout += winAmt; 
-                        wonProfit += (winAmt - betForThisHand); 
-                        houseLoss++; 
-                    } else if (pScore === dScore) { 
-                        payout += betForThisHand; 
-                        pushCount++; 
-                    } else { 
-                        lostBet += betForThisHand; 
-                        houseWin++; 
-                    }
-                });
-                
-                playerResults[seat.socketId] = { payout, totalBet: seat.totalBet, handsCount: seat.hands.length, wonProfit, lostBet };
-
-                if (payout > 0) { 
-                    let user = await User.findById(seat.userId); 
-                    if (user) { 
-                        user.credits = formatTC(user.credits + payout); 
-                        await user.save(); 
-                        await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(payout - seat.totalBet), details: `Live Blackjack` }).save(); 
-                    } 
-                } else if (payout === 0 && seat.totalBet > 0) { 
-                    let user = await User.findById(seat.userId); 
-                    if (user) await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-seat.totalBet), details: `Live Blackjack` }).save(); 
+                if (pScore > 21) { 
+                    lostBet += betForThisHand; 
+                    houseWin++; 
+                } else if (dScore > 21 || pScore > dScore) { 
+                    let winAmt = formatTC(betForThisHand * (isNatural ? 2.5 : 2)); 
+                    payout += winAmt; 
+                    wonProfit += (winAmt - betForThisHand); 
+                    houseLoss++; 
+                } else if (pScore === dScore) { 
+                    payout += betForThisHand; 
+                    pushCount++; 
+                } else { 
+                    lostBet += betForThisHand; 
+                    houseWin++; 
                 }
-                
-                seat.totalBet = 0; 
-                seat.baseBet = 0; 
-                seat.bets = []; 
-                seat.hands = [[]]; 
-                seat.currentHandIndex = 0; 
-                seat.status = 'waiting';
-            }
-        }
-        
-        io.to('shared_bj').emit('sharedResults', { room: 'shared_bj', dScore, dealerHand: sharedBJ.dealerHand, playerResults, resStr: dResStr });
-        logGlobalResult('shared_bj', dResStr);
-        
-        gameStats.shared_bj.total++;
-        if(houseLoss > houseWin) gameStats.shared_bj.Win++; 
-        else if(houseWin > houseLoss) gameStats.shared_bj.Lose++; 
-        else gameStats.shared_bj.Push++;
-        checkResetStats('shared_bj');
+            });
+            
+            playerResults[seat.socketId] = { payout, totalBet: seat.totalBet, handsCount: seat.hands.length, wonProfit, lostBet };
 
-        setTimeout(() => {
-            sharedBJ.dealerHand = []; 
-            let hasPlayers = sharedBJ.seats.some(s => s !== null);
-            sharedBJ.status = (hasPlayers && sharedTables.status === 'BETTING') ? 'BETTING' : 'WAITING';
-            io.to('shared_bj').emit('sharedBjSync', sharedBJ);
-        }, 5000);
-    }, 1000);
+            if (payout > 0) { 
+                let user = await User.findById(seat.userId); 
+                if (user) { 
+                    user.credits = formatTC(user.credits + payout); 
+                    await user.save(); 
+                    await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(payout - seat.totalBet), details: `Live Blackjack` }).save(); 
+                } 
+            } else if (payout === 0 && seat.totalBet > 0) { 
+                let user = await User.findById(seat.userId); 
+                if (user) await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-seat.totalBet), details: `Live Blackjack` }).save(); 
+            }
+            
+            // Wipe seat bets for next round but keep the player sitting
+            seat.totalBet = 0; 
+            seat.baseBet = 0; 
+            seat.bets = []; 
+            seat.hands = [[]]; 
+            seat.currentHandIndex = 0; 
+            seat.status = 'waiting';
+        }
+    }
+    
+    // Broadcast specific results and log global history
+    io.to('shared_bj').emit('sharedResults', { room: 'shared_bj', dScore, dealerHand: sharedBJ.dealerHand, playerResults, resStr: dResStr });
+    logGlobalResult('shared_bj', dResStr);
+    
+    gameStats.shared_bj.total++;
+    if(houseLoss > houseWin) gameStats.shared_bj.Win++; 
+    else if(houseWin > houseLoss) gameStats.shared_bj.Lose++; 
+    else gameStats.shared_bj.Push++;
+    checkResetStats('shared_bj');
+
+    setTimeout(() => {
+        sharedBJ.dealerHand = []; 
+        let hasPlayers = sharedBJ.seats.some(s => s !== null);
+        sharedBJ.status = (hasPlayers && sharedTables.status === 'BETTING') ? 'BETTING' : 'WAITING';
+        io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+    }, 5000);
 }
 
-// ================= GAME UTILITIES =================
+// ================= UTILITIES =================
 function logGlobalResult(game, resultStr) {
     if(globalResults[game]) { 
         globalResults[game].unshift({ result: resultStr, time: new Date() }); 
@@ -385,23 +389,24 @@ function getBJScore(hand) {
     return score; 
 }
 
-// ================= THE GLOBAL CASINO TICKER =================
+// ================= GLOBAL CASINO TICKER =================
 setInterval(() => {
     if (sharedTables.status === 'BETTING') {
         sharedTables.time--;
         io.emit('timerUpdate', sharedTables.time);
 
-        // Sync BJ state to Betting if people are waiting
+        // Sync BJ state to Betting if people are sitting and waiting
         if (sharedBJ.status === 'WAITING' && sharedTables.time > 0 && sharedBJ.seats.some(s => s !== null)) { 
             sharedBJ.status = 'BETTING'; 
             io.to('shared_bj').emit('sharedBjSync', sharedBJ); 
         }
 
+        // Global Bet Lock
         if (sharedTables.time <= 0) {
             sharedTables.status = 'RESOLVING';
             io.emit('lockBets');
 
-            // --- 1. Resolve Simple Shared Games ---
+            // --- 1. Resolve Fire-and-Forget Games ---
             setTimeout(async () => {
                 let dtD = drawCard(), dtT = drawCard();
                 let dtWin = dtD.dtVal > dtT.dtVal ? 'Dragon' : (dtT.dtVal > dtD.dtVal ? 'Tiger' : 'Tie');
@@ -490,7 +495,7 @@ setInterval(() => {
 
             }, 500);
 
-            // --- 2. Trigger Blackjack Phase ---
+            // --- 2. Trigger Live Blackjack Deal ---
             if (sharedBJ.status === 'BETTING') {
                 let bjHasBets = sharedBJ.seats.some(s => s && s.totalBet > 0);
                 if (bjHasBets) {
@@ -507,7 +512,7 @@ setInterval(() => {
                     setTimeout(() => {
                         sharedBJ.status = 'ACTION';
                         sharedBJ.activeSeatIndex = -1;
-                        nextBjTurn();
+                        nextBjTurn(); // Kicks off the sequential flow
                     }, 2000);
                 } else {
                     sharedBJ.status = 'WAITING';
