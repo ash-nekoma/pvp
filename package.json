@@ -1,7 +1,7 @@
 {
-  "name": "duel-arena",
+  "name": "duel-arena-live",
   "version": "1.0.0",
-  "description": "Real-time PvP Casino",
+  "description": "Real-time PvP Casino Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
