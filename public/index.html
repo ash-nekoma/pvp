@@ -411,6 +411,10 @@
         .sbj-seat.occupied { border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); cursor: default; background: rgba(0, 15, 35, 0.8); }
         .sbj-seat.active-turn { box-shadow: 0 0 35px rgba(0, 230, 118, 0.3), inset 0 0 15px rgba(0, 230, 118, 0.1); border-color: var(--success); transform: translateY(-15px) scale(1.05); z-index: 20;}
         
+        /* Seat Timer Elements */
+        .seat-timer-bar { position: absolute; bottom: 0; left: 0; height: 6px; background: var(--success); width: 100%; border-radius: 0 0 12px 12px; transition: width 1s linear; }
+        .seat-timer-text { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: rgba(0, 5, 15, 0.9); border: 1px solid var(--success); color: var(--success); font-weight: 900; font-size: 0.85rem; padding: 2px 10px; border-radius: 10px; z-index: 30; box-shadow: 0 5px 10px rgba(0,0,0,0.8); }
+
         .sbj-username { font-weight: 900; font-size: 0.9rem; color: white; text-transform: uppercase; margin-top: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); z-index: 5; white-space: nowrap; max-width: 90%; overflow: hidden; text-overflow: ellipsis;}
         .sbj-bet { background: var(--credits); color: black; font-weight: 900; padding: 3px 10px; border-radius: 4px; font-size: 0.85rem; margin-top: 5px; z-index: 5; box-shadow: 0 5px 10px rgba(0,0,0,0.5);}
         
@@ -427,7 +431,8 @@
         .sbj-status { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 5, 15, 0.9); border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 8px; font-size: 1.2rem; font-weight: 900; text-transform: uppercase; z-index: 30; backdrop-filter: blur(5px); white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
         
         /* Fanned Cards Overlap Dynamic */
-        .sbj-fan-card + .sbj-fan-card { margin-left: -35px; } 
+        .sbj-fan-card { box-shadow: -2px 0px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); } 
+        .sbj-fan-card + .sbj-fan-card { margin-left: -20px; } /* Desktop overlap */
 
         /* ================= MOBILE UI / MEDIA QUERIES ================= */
         #chat-floating-btn { display: none; }
@@ -477,7 +482,8 @@
             .sbj-username { font-size: 0.65rem; margin-top: 5px;}
             .sbj-bet { font-size: 0.65rem; padding: 1px 4px; }
             .sbj-score-bubble { width: 22px; height: 22px; font-size: 0.7rem; right: -15px; top: -10px;}
-            .sbj-fan-card + .sbj-fan-card { margin-left: -22px; } /* Mobile dynamic overlap */
+            
+            .sbj-fan-card + .sbj-fan-card { margin-left: -15px; } /* Mobile dynamic overlap */
         }
         
         .rules-text { text-align: left; padding-left: 20px; }
@@ -1179,6 +1185,45 @@
 
     document.addEventListener('click', function(e) { if (!e.target.closest('.dropdown-wrapper')) { document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.add('hidden')); } });
 
+    // ================= CHAT & ACTIVE PLAYERS LOGIC (RESTORED) =================
+    function sendChat() {
+        let input = document.getElementById('chat-input');
+        let msg = input.value.trim();
+        if (msg && window.activeSharedGame) {
+            socket.emit('sendChat', { msg: msg });
+            input.value = '';
+        }
+    }
+
+    socket.on('chatMessage', (data) => {
+        let cb = document.getElementById('sg-chat');
+        if (cb) {
+            let html = data.sys 
+                ? `<div class="chat-msg chat-sys">${data.text}</div>` 
+                : `<div class="chat-msg"><div class="chat-user">${data.user}</div><div>${data.text}</div></div>`;
+            cb.insertAdjacentHTML('beforeend', html);
+            cb.scrollTop = cb.scrollHeight;
+        }
+    });
+
+    function fetchActivePlayers(e) {
+        toggleCustomDropdown('ap-popover', e);
+        if (!document.getElementById('ap-popover').classList.contains('hidden') && window.activeSharedGame) {
+            socket.emit('getRoomPlayers', window.activeSharedGame);
+        }
+    }
+
+    socket.on('roomPlayersList', (players) => {
+        document.getElementById('sg-active-players').innerText = players.length;
+        document.querySelectorAll('.ap-count').forEach(el => el.innerText = players.length);
+        let list = document.getElementById('ap-list-container');
+        if (list) {
+            if(players.length === 0) list.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:10px;">No one here.</div>';
+            else list.innerHTML = players.map(p => `<div style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); color:white; font-weight:800;"><i class="fas fa-user" style="color:var(--ps-glow); margin-right:8px;"></i> ${p}</div>`).join('');
+        }
+    });
+
+    // ================= NOTIFICATIONS =================
     function renderNotifs() {
         const list = document.getElementById('notif-list-popover'); const badge = document.getElementById('notif-badge-display'); const clearBtn = document.getElementById('btn-clear-notifs'); list.innerHTML = '';
         let unreadCount = myNotifications.filter(n => !n.read).length;
@@ -1539,6 +1584,7 @@
         }
     });
 
+    // ================= SHARED GAMES CONFIG & LOGIC =================
     const sConf = {
       'perya': {
         title: 'Color Game', 
@@ -1920,6 +1966,8 @@
     }
 
     function wipeTableVisually() {
+        if (window.activeSharedGame === 'shared_bj') return; // FIX: Never wipe Blackjack table via Global Timer
+        
         let o = document.getElementById('sg-overlay'); 
         if (o) { o.classList.remove('show'); setTimeout(() => { o.style.display = 'none'; }, 300); } 
         
@@ -1944,6 +1992,10 @@
 
     socket.on('timerUpdate', (t) => { 
       sState.time = t; 
+      
+      // FIX: Do not update global top-left timer during Blackjack Action Phase
+      if (window.activeSharedGame === 'shared_bj' && sharedBJ && sharedBJ.status !== 'BETTING' && sharedBJ.status !== 'WAITING') return;
+
       let r = document.getElementById('sg-timer-box'), s = document.getElementById('sg-timer');
       if (sState.status === 'BETTING') {
           if (s) s.innerText = t; 
@@ -1958,6 +2010,8 @@
     const disableInputs = (disabled) => { document.querySelectorAll(".bet-btn").forEach(el => { el.disabled = disabled; }); }
 
     socket.on('lockBets', () => { 
+        if (window.activeSharedGame === 'shared_bj') return; // FIX: Blackjack handles its own locks
+
         sState.status = 'RESOLVING'; 
         let r = document.getElementById('sg-timer-box'); 
         if (r) { r.classList.remove('closing'); r.style.color = 'var(--danger)'; r.style.borderColor = 'var(--danger)'; } 
@@ -1990,13 +2044,18 @@
         
         if (window.activeSharedGame) {
             let cb = document.getElementById('sg-chat');
-            if (cb) { cb.insertAdjacentHTML('beforeend', `<div class="chat-msg chat-sys">Place your bets!</div>`); cb.scrollTop = cb.scrollHeight; }
+            if (cb && window.activeSharedGame !== 'shared_bj') { 
+                cb.insertAdjacentHTML('beforeend', `<div class="chat-msg chat-sys">Place your bets!</div>`); 
+                cb.scrollTop = cb.scrollHeight; 
+            }
             wipeTableVisually();
         }
-        disableInputs(false);
+        if (window.activeSharedGame !== 'shared_bj') disableInputs(false);
     });
 
     // --- SHARED BLACKJACK CLIENT LOGIC ---
+    let sharedBJ = { status: 'WAITING' }; // Client-side state tracking
+
     window.placeSharedBjBet = function() {
         if (sState.status !== 'BETTING') return;
         let input = document.getElementById('sg-bet-input');
@@ -2025,16 +2084,37 @@
     };
 
     socket.on('sharedBjTimer', (t) => {
-        let timerDisplay = document.getElementById('sg-timer');
-        let timerBox = document.getElementById('sg-timer-box');
-        if (timerDisplay) timerDisplay.innerText = t;
-        if (t <= 5 && timerBox) timerBox.classList.add('closing');
-        else if (timerBox) timerBox.classList.remove('closing');
+        // Update specific active seat timer visually
+        let st = document.getElementById('active-seat-timer');
+        let sb = document.getElementById('active-seat-bar');
+        
+        if (st) {
+            st.innerText = t + 's';
+            if (t <= 3) {
+                st.style.color = 'var(--danger)';
+                st.style.borderColor = 'var(--danger)';
+            }
+        }
+        if (sb) {
+            let pct = (t / 10) * 100;
+            sb.style.width = pct + '%';
+            if (t <= 3) sb.style.background = 'var(--danger)';
+        }
+
+        // Keep Top-Left Box Synced during betting
+        if (sharedBJ.status === 'BETTING') {
+            let timerDisplay = document.getElementById('sg-timer');
+            let timerBox = document.getElementById('sg-timer-box');
+            if (timerDisplay) timerDisplay.innerText = t;
+            if (t <= 5 && timerBox) timerBox.classList.add('closing');
+            else if (timerBox) timerBox.classList.remove('closing');
+        }
     });
 
     socket.on('sharedBjSync', (state) => {
         if (window.activeSharedGame !== 'shared_bj') return;
-        
+        sharedBJ = state; // Keep local copy for global timer block
+
         // 1. Render the Dealer
         const dHandContainer = document.getElementById('sbj-d-hand');
         if (dHandContainer) {
@@ -2043,11 +2123,10 @@
                 if (card.hidden) {
                     dhHtml += `<div class="play-card card-back" style="flex-shrink:0;">?</div>`;
                 } else {
-                    dhHtml += `<div class="play-card" style="flex-shrink:0;"><div class="val">${card.raw}</div><div class="suit">${card.suitHtml}</div></div>`;
+                    dhHtml += `<div class="play-card anim-deal" style="flex-shrink:0;"><div class="val">${card.raw}</div><div class="suit">${card.suitHtml}</div></div>`;
                 }
             });
             if (dHandContainer.innerHTML !== dhHtml) { dHandContainer.innerHTML = dhHtml; sfx.deal(); }
-            
             document.getElementById('sbj-d-score').innerText = (state.status === 'DEALER_TURN' || state.status === 'RESOLVING') ? getBJScore(state.dealerHand) : (state.dealerHand.length > 0 ? state.dealerHand[0].bjVal : '0');
         }
 
@@ -2081,6 +2160,14 @@
                     newClass += 'occupied';
                     if (isActive) newClass += ' active-turn';
 
+                    // Seat Timer Injection
+                    let timerHtml = '';
+                    if (isActive && state.status === 'ACTION') {
+                        let tColor = state.turnTime <= 3 ? 'var(--danger)' : 'var(--success)';
+                        let wPct = (state.turnTime / 10) * 100;
+                        timerHtml = `<div class="seat-timer-text" id="active-seat-timer" style="color:${tColor}; border-color:${tColor};">${state.turnTime}s</div><div class="seat-timer-bar" id="active-seat-bar" style="width:${wPct}%; background:${tColor};"></div>`;
+                    }
+
                     // Fan Cards & Add Score Bubbles
                     let cardsHtml = seat.hands.map((hand, hIdx) => {
                         let isHandActive = (isActive && seat.currentHandIndex === hIdx);
@@ -2108,6 +2195,7 @@
                     let statusHtml = statusText !== '' ? `<div class="sbj-status">${statusText}</div>` : '';
 
                     newHtml = `
+                        ${timerHtml}
                         <div class="sbj-cards" style="flex-direction: column;">${cardsHtml}</div>
                         ${statusHtml}
                         <div class="sbj-username" style="${seat.socketId === socket.id ? 'color:var(--ps-glow);' : ''}">${seat.username}</div>
@@ -2115,7 +2203,6 @@
                     `;
                 }
 
-                // ONLY update the DOM if the HTML actually changed (Stops the flashing!)
                 if (seatEl.innerHTML !== newHtml || seatEl.className !== newClass) {
                     seatEl.className = newClass;
                     seatEl.innerHTML = newHtml;
@@ -2132,7 +2219,6 @@
                     let betBtn = betControls.querySelector('button');
                     let betInput = document.getElementById('sg-bet-input');
                     
-                    // Keep locked if they already bet
                     if(iAmSeated && myTotalBetForRound > 0) {
                         if(betInput) betInput.disabled = true;
                         if(betBtn) { 
@@ -2147,6 +2233,7 @@
                             betBtn.disabled = !iAmSeated; 
                             betBtn.innerText = "PLACE BET"; 
                             betBtn.style.background = "var(--ps-glow)";
+                            betBtn.style.color = "black";
                         }
                     }
                 }
