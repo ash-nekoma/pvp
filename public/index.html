@@ -42,7 +42,6 @@
             -webkit-tap-highlight-color: transparent; 
         }
         
-        /* MOBILE VIEWPORT FIX: 100dvh instead of 100vh */
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
             background-size: 200% 200%; 
@@ -259,23 +258,25 @@
         .live-dot { width: 12px; height: 12px; background-color: var(--danger); border-radius: 50%; animation: pulseRed 1.5s infinite; }
         .active-players { position: absolute; top: 15px; left: 15px; color: var(--success); font-size: 0.9rem; font-weight: 800; z-index: 10; display: flex; align-items: center; gap: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
-        .game-wrapper { width: 100%; max-width: 1300px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: center; flex-shrink: 0;}
+        .game-wrapper { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: center; flex-shrink: 0;}
         
         /* ================= IN-GAME UI PANELS ================= */
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; width: 100%; position: relative; flex-shrink: 0;}
         .glass-header { background: rgba(0,0,0,0.7); padding: 15px 20px; border-bottom: 1px solid var(--glass-border); color: white; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
         .glass-header h2 { margin:0; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1; }
 
-        .game-box { display: flex; flex-direction: column; width: 100%; max-width: 850px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden; height: 600px; flex-shrink: 0; position: relative;} 
+        /* ================= GAME BOARD SIZING (Fixing the empty space) ================= */
+        .shared-layout { display: flex; gap: 20px; width: 100%; max-width: 1400px; height: 750px; align-items: stretch; justify-content: center; flex-shrink: 0;}
+        .shared-layout .main-panel { max-width: 1050px; width: 100%; flex: 1; }
+        
+        .game-box { display: flex; flex-direction: column; width: 100%; max-width: 1050px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden; height: 750px; flex-shrink: 0; position: relative;} 
+        
         .main-panel { display: flex; flex-direction: column; height: 100%; position: relative;}
         .game-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; perspective: 1000px; padding: 20px;}
         
         .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto;} 
         .controls-full { display: flex; gap: 15px; justify-content: center; width: 100%; }
 
-        .shared-layout { display: flex; gap: 20px; width: 100%; max-width: 1200px; height: 600px; align-items: stretch; justify-content: center; flex-shrink: 0;}
-        .shared-layout .main-panel { max-width: 850px; width: 100%; flex: 1; }
-        
         .chat-panel { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; height: 100%; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .chat-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;}
         .chat-msg { background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border-left: 3px solid var(--ps-light-blue); animation: popIn 0.2s ease-out; flex-shrink: 0;}
@@ -397,30 +398,36 @@
         .sbj-arena { display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; width: 100%; padding: 20px; perspective: 1200px; }
         .sbj-table { flex: 1; display: flex; flex-direction: column; width: 100%; position: relative; transform: rotateX(20deg); transform-style: preserve-3d; }
         
-        .sbj-felt-rules { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: rgba(255,255,255,0.2); font-weight: 900; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px; pointer-events: none; z-index: 1; width: 100%; line-height: 1.5; }
-        .sbj-felt-rules span { color: rgba(0, 162, 255, 0.3); font-size: 1.2rem; }
+        .sbj-felt-rules { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: rgba(255,255,255,0.2); font-weight: 900; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 3px; pointer-events: none; z-index: 1; width: 100%; line-height: 1.5; }
+        .sbj-felt-rules span { color: rgba(0, 162, 255, 0.3); font-size: 1.4rem; }
 
         .sbj-dealer { display: flex; flex-direction: column; align-items: center; padding: 15px; z-index: 5; margin-bottom: 20px;}
         .sbj-dealer .play-card { transform: scale(1.2); margin: 0 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.9);}
 
-        .sbj-seats-container { display: flex; justify-content: center; gap: 20px; width: 100%; margin-top: auto; z-index: 5; transform: translateZ(30px); }
-        .sbj-seat { width: 130px; height: 150px; background: rgba(0, 15, 35, 0.6); border: 2px dashed rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; transition: 0.3s; padding-bottom: 10px; backdrop-filter: blur(5px);}
+        /* Seat Expansion & Positioning Fixes */
+        .sbj-seats-container { display: flex; justify-content: center; gap: 25px; width: 100%; margin-top: auto; z-index: 5; transform: translateZ(30px); }
+        .sbj-seat { width: 150px; height: 180px; background: rgba(0, 15, 35, 0.6); border: 2px dashed rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; transition: 0.3s; padding-bottom: 15px; backdrop-filter: blur(5px);}
         .sbj-seat.empty:hover { background: rgba(255,255,255,0.1); border-color: var(--ps-glow); cursor: pointer; }
         .sbj-seat.occupied { border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); cursor: default; background: rgba(0, 15, 35, 0.8); }
-        .sbj-seat.active-turn { box-shadow: 0 0 25px rgba(0, 230, 118, 0.3), inset 0 0 15px rgba(0, 230, 118, 0.1); border-color: var(--success); transform: translateY(-15px) scale(1.05); z-index: 20;}
+        .sbj-seat.active-turn { box-shadow: 0 0 35px rgba(0, 230, 118, 0.3), inset 0 0 15px rgba(0, 230, 118, 0.1); border-color: var(--success); transform: translateY(-15px) scale(1.05); z-index: 20;}
         
-        .sbj-username { font-weight: 900; font-size: 0.85rem; color: white; text-transform: uppercase; margin-top: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); z-index: 5; white-space: nowrap; max-width: 90%; overflow: hidden; text-overflow: ellipsis;}
-        .sbj-bet { background: var(--credits); color: black; font-weight: 900; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-top: 5px; z-index: 5; box-shadow: 0 5px 10px rgba(0,0,0,0.5);}
+        .sbj-username { font-weight: 900; font-size: 0.9rem; color: white; text-transform: uppercase; margin-top: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); z-index: 5; white-space: nowrap; max-width: 90%; overflow: hidden; text-overflow: ellipsis;}
+        .sbj-bet { background: var(--credits); color: black; font-weight: 900; padding: 3px 10px; border-radius: 4px; font-size: 0.85rem; margin-top: 5px; z-index: 5; box-shadow: 0 5px 10px rgba(0,0,0,0.5);}
         
-        /* Fanned Cards & Bubbles */
-        .sbj-hand-wrap { position: absolute; top: -50px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; width: auto; z-index: 10; }
-        .sbj-hand-wrap.split-hand-0 { top: -70px; transform: translateX(-80%) scale(0.85); }
-        .sbj-hand-wrap.split-hand-1 { top: -30px; transform: translateX(0%) scale(0.85); z-index: 11; }
+        /* Fixed Overlaps by anchoring to Bottom */
+        .sbj-hand-wrap { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; width: auto; z-index: 10; }
+        .sbj-hand-wrap.split-hand-0 { bottom: 90px; transform: translateX(-60%) scale(0.85); }
+        .sbj-hand-wrap.split-hand-1 { bottom: 40px; transform: translateX(10%) scale(0.85); z-index: 11; }
         
-        .sbj-score-bubble { position: absolute; top: -15px; right: -25px; width: 30px; height: 30px; background: rgba(0,0,0,0.9); border: 2px solid white; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.9rem; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .sbj-score-bubble { position: absolute; top: -15px; right: -25px; width: 32px; height: 32px; background: rgba(0,0,0,0.9); border: 2px solid white; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.95rem; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
         .sbj-score-bubble.bj { border-color: var(--credits); color: var(--credits); box-shadow: 0 0 15px var(--credits); }
         .sbj-score-bubble.bust { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 15px var(--danger); }
-        .sbj-status { position: absolute; top: 40%; font-size: 1.5rem; font-weight: 900; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.9); z-index: 15; }
+        
+        /* Status Pill Fix (Stops text overlap) */
+        .sbj-status { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 5, 15, 0.9); border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 8px; font-size: 1.2rem; font-weight: 900; text-transform: uppercase; z-index: 30; backdrop-filter: blur(5px); white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        
+        /* Fanned Cards Overlap Dynamic */
+        .sbj-fan-card + .sbj-fan-card { margin-left: -35px; } 
 
         /* ================= MOBILE UI / MEDIA QUERIES ================= */
         #chat-floating-btn { display: none; }
@@ -465,10 +472,12 @@
             .sbj-seat.active-turn { transform: translateY(-20px) scale(1.1); }
             .play-card { width: 45px; height: 65px; border-radius: 4px; }
             .play-card .val { font-size: 1.2rem; } .play-card .suit { font-size: 1.2rem; }
-            .sbj-hand-wrap { top: -30px; }
+            
+            .sbj-hand-wrap { bottom: 40px; }
             .sbj-username { font-size: 0.65rem; margin-top: 5px;}
             .sbj-bet { font-size: 0.65rem; padding: 1px 4px; }
             .sbj-score-bubble { width: 22px; height: 22px; font-size: 0.7rem; right: -15px; top: -10px;}
+            .sbj-fan-card + .sbj-fan-card { margin-left: -22px; } /* Mobile dynamic overlap */
         }
         
         .rules-text { text-align: left; padding-left: 20px; }
@@ -1999,6 +2008,16 @@
         
         socket.emit('placeSharedBjBet', amt);
         
+        // INSTANT UI LOCK
+        input.disabled = true;
+        let betBtn = document.querySelector('#sbj-betting-controls button');
+        if(betBtn) { 
+            betBtn.disabled = true; 
+            betBtn.innerText = "BET PLACED"; 
+            betBtn.style.background = "var(--success)";
+            betBtn.style.color = "black";
+        }
+        
         if(myPlayable >= amt) { myPlayable -= amt; } 
         else { let rem = amt - myPlayable; myPlayable = 0; myCredits -= rem; }
         updateMyBalance({credits: myCredits, playable: myPlayable});
@@ -2036,6 +2055,7 @@
         const seatsWrapper = document.getElementById('sbj-seats-wrapper');
         if (seatsWrapper) {
             let iAmSeated = false, myTurn = false;
+            let myTotalBetForRound = 0;
 
             // Build the 5 empty seat containers if they don't exist yet
             if(seatsWrapper.children.length !== 5) {
@@ -2054,7 +2074,7 @@
                     seatEl.onclick = () => socket.emit('takeBjSeat', i);
                 } else {
                     seatEl.onclick = null;
-                    if (seat.socketId === socket.id) { iAmSeated = true; }
+                    if (seat.socketId === socket.id) { iAmSeated = true; myTotalBetForRound = seat.totalBet; }
                     let isActive = (state.activeSeatIndex === i);
                     if (isActive && seat.socketId === socket.id) myTurn = true;
                     
@@ -2078,17 +2098,18 @@
 
                         let cHtml = hand.map((c, idx) => {
                             let glow = isHandActive ? 'box-shadow: 0 0 10px var(--ps-glow); border-color: var(--ps-glow);' : '';
-                            return `<div class="play-card" style="flex-shrink:0; margin-left: ${idx > 0 ? '-35px' : '0px'}; ${glow}; z-index: ${idx + 2};"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`;
+                            return `<div class="play-card sbj-fan-card anim-deal" style="flex-shrink:0; z-index: ${idx + 2}; ${glow}"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`;
                         }).join('');
                         
-                        return `<div class="sbj-hand-wrap split-hand-${hIdx}" style="position:relative; display:flex;">${cHtml}${bubbleHtml}</div>`;
+                        return `<div class="sbj-hand-wrap split-hand-${hIdx}">${cHtml}${bubbleHtml}</div>`;
                     }).join('');
 
-                    let statusText = seat.status === 'busted' ? '<span style="color:var(--danger); text-shadow: 0 2px 10px rgba(0,0,0,0.9);">BUST</span>' : (seat.status === 'stood' ? '<span style="color:white; text-shadow: 0 2px 10px rgba(0,0,0,0.9);">STOOD</span>' : '');
+                    let statusText = seat.status === 'busted' ? '<span style="color:var(--danger);">BUSTED</span>' : (seat.status === 'stood' ? '<span style="color:white;">STOOD</span>' : '');
+                    let statusHtml = statusText !== '' ? `<div class="sbj-status">${statusText}</div>` : '';
 
                     newHtml = `
                         <div class="sbj-cards" style="flex-direction: column;">${cardsHtml}</div>
-                        <div class="sbj-status" style="z-index: 20;">${statusText}</div>
+                        ${statusHtml}
                         <div class="sbj-username" style="${seat.socketId === socket.id ? 'color:var(--ps-glow);' : ''}">${seat.username}</div>
                         ${seat.totalBet > 0 ? `<div class="sbj-bet">${seat.totalBet} TC</div>` : ''}
                     `;
@@ -2109,7 +2130,25 @@
                 if(betControls) {
                     betControls.classList.remove('hidden');
                     let betBtn = betControls.querySelector('button');
-                    if (betBtn) betBtn.disabled = !iAmSeated;
+                    let betInput = document.getElementById('sg-bet-input');
+                    
+                    // Keep locked if they already bet
+                    if(iAmSeated && myTotalBetForRound > 0) {
+                        if(betInput) betInput.disabled = true;
+                        if(betBtn) { 
+                            betBtn.disabled = true; 
+                            betBtn.innerText = "BET PLACED"; 
+                            betBtn.style.background = "var(--success)";
+                            betBtn.style.color = "black";
+                        }
+                    } else {
+                        if(betInput) betInput.disabled = !iAmSeated;
+                        if(betBtn) { 
+                            betBtn.disabled = !iAmSeated; 
+                            betBtn.innerText = "PLACE BET"; 
+                            betBtn.style.background = "var(--ps-glow)";
+                        }
+                    }
                 }
                 if(actionControls) actionControls.classList.add('hidden');
             } else {
