@@ -13,12 +13,12 @@
         body { background-color: var(--bg-dark); background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 20px 20px; color: var(--text); font-family: 'Press Start 2P', cursive; margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; display: flex; }
         .custom-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: transparent transparent; }
         .custom-scroll::-webkit-scrollbar { width: 6px; } .custom-scroll::-webkit-scrollbar-thumb { background-color: #555; border-radius: 3px; }
+        
         .main-wrapper { display: flex; width: 100%; height: 100%; padding: 20px; gap: 20px; display: none; /* Hidden until login */ }
         .game-section { flex-grow: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; }
         .social-sidebar { width: var(--sidebar-width); min-width: var(--sidebar-width); display: flex; flex-direction: column; gap: 15px; height: 100%; }
         .top-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 4px solid #333; padding-bottom: 15px; }
         h1 { color: var(--accent); font-size: 20px; text-shadow: 3px 3px 0 #000; margin: 0; }
-        .settings-group { display: flex; gap: 10px; align-items: center; }
         .game-selector { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; background: #000; padding: 10px; border: 2px solid #333; border-radius: 8px; }
         .game-tab { background: #333; border: 2px solid #555; color: #aaa; padding: 10px 15px; font-size: 10px; font-family: 'Press Start 2P'; cursor: pointer; }
         .game-tab.active { background: var(--accent); color: #000; border-color: #fff; box-shadow: 0 0 10px var(--accent); }
@@ -59,7 +59,12 @@
         <h1 style="color: var(--accent); margin-bottom: 20px;">DUEL ARENA</h1>
         <input type="text" id="loginUser" class="input-retro" placeholder="USERNAME (3-12 CHARS)">
         <input type="password" id="loginPass" class="input-retro" placeholder="PASSWORD">
-        <button class="btn-retro" onclick="attemptLogin()">ENTER ARENA</button>
+        
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="btn-retro" style="background: var(--p2-color); color: #fff;" onclick="attemptLogin()">LOG IN</button>
+            <button class="btn-retro" style="background: var(--p1-color); color: #fff;" onclick="attemptRegister()">SIGN UP</button>
+        </div>
+        
         <div id="loginError" style="color: var(--p1-color); font-size: 10px; margin-top: 15px;"></div>
     </div>
 </div>
@@ -128,8 +133,11 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    // Anti-Cheat (Prevents casual snooping, but the server handles real security)
+    // --- ANTI CHEAT ---
     document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function(e) { 
+        if(e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || (e.ctrlKey && e.keyCode === 85)) return false; 
+    };
 
     const socket = io();
     let myName = "";
@@ -149,10 +157,19 @@
 
     // --- AUTHENTICATION ---
     function attemptLogin() {
-        socket.emit('auth-attempt', { username: DOM.user.value, password: DOM.pass.value });
+        socket.emit('login-attempt', { username: DOM.user.value, password: DOM.pass.value });
     }
 
-    socket.on('auth-error', msg => DOM.err.innerText = msg);
+    function attemptRegister() {
+        socket.emit('register-attempt', { username: DOM.user.value, password: DOM.pass.value });
+    }
+
+    socket.on('auth-error', msg => {
+        DOM.err.innerText = msg;
+        if(msg.includes('CREATED')) DOM.err.style.color = 'var(--success)';
+        else DOM.err.style.color = 'var(--p1-color)';
+    });
+
     socket.on('auth-success', data => {
         myName = data.name;
         DOM.wallet.innerText = `${data.wallet} TC`;
