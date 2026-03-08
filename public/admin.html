@@ -6,120 +6,71 @@
     <title>ARENA COMMAND - ADMIN</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #121216; --bg-panel: #1e1e24;
-            --p1-color: #ff4757; --accent: #feca57; --success: #2ecc71;
-            --text: #ffffff; --grid-line: rgba(255, 255, 255, 0.05);
-        }
-        * { box-sizing: border-box; font-family: 'Press Start 2P', cursive; }
-        body { background-color: var(--bg-dark); color: var(--text); height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 20px 20px; }
-        
-        /* UI Components */
-        .neon-box { background: var(--bg-panel); border: 2px solid var(--accent); padding: 30px; text-align: center; box-shadow: 0 0 20px rgba(254, 202, 87, 0.1); width: 100%; max-width: 900px; }
-        .input-retro { background: #000; border: 2px solid #555; color: #fff; padding: 15px; margin: 10px 0; width: 100%; font-size: 12px; outline: none; }
-        .input-retro:focus { border-color: var(--accent); }
-        .btn-retro { background: var(--accent); color: #000; border: none; padding: 15px 20px; font-size: 14px; cursor: pointer; margin-top: 15px; width: 100%; text-transform: uppercase; box-shadow: 4px 4px 0 #000; transition: 0.1s; }
-        .btn-retro:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #000; }
-        
-        /* Dashboard specific */
-        .dashboard-container { display: none; width: 100%; height: 100%; padding: 20px; gap: 20px; align-items: flex-start; justify-content: flex-start; flex-direction: row; }
-        .admin-sidebar { width: 250px; border-right: 2px solid var(--accent); padding: 20px; background: rgba(0,0,0,0.9); height: 100%; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: 'Rajdhani', sans-serif; font-size: 18px; text-align: left; }
-        .data-table th, .data-table td { border: 1px solid #444; padding: 12px; }
-        .data-table th { background: #222; color: var(--accent); font-family: 'Press Start 2P', cursive; font-size: 10px; }
-        .btn-small { padding: 8px 12px; font-size: 10px; margin: 0; width: auto; box-shadow: 2px 2px 0 #000; }
+        :root { --bg-dark: #121216; --bg-panel: #1e1e24; --accent: #feca57; --success: #2ecc71; --danger: #ff4757; }
+        * { box-sizing: border-box; font-family: 'Press Start 2P', cursive; color: #fff; }
+        body { background: var(--bg-dark); height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; }
+        .neon-box { background: var(--bg-panel); border: 2px solid var(--accent); padding: 30px; text-align: center; width: 100%; max-width: 900px; }
+        .input-retro { background: #000; border: 2px solid #555; padding: 15px; margin: 10px 0; width: 100%; font-size: 12px; }
+        .btn-retro { background: var(--accent); color: #000; border: none; padding: 15px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .dashboard { display: none; width: 100%; height: 100%; padding: 20px; gap: 20px; flex-direction: row; align-items: flex-start; }
+        table { width: 100%; border-collapse: collapse; font-family: 'Rajdhani', sans-serif; font-size: 18px; text-align: left; margin-top: 20px;}
+        th, td { border: 1px solid #444; padding: 12px; } th { background: #222; color: var(--accent); font-size: 10px; font-family: 'Press Start 2P'; }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" class="neon-box" style="max-width: 400px; border-color: var(--p1-color);">
-        <h1 style="color: var(--p1-color); margin-bottom: 20px; font-size: 20px;">RESTRICTED ACCESS</h1>
-        <p style="font-size: 10px; color: #aaa; margin-bottom: 20px;">ADMINISTRATOR LOGIN</p>
-        
-        <input type="text" id="adminUser" class="input-retro" placeholder="ADMIN USERNAME">
-        <input type="password" id="adminPass" class="input-retro" placeholder="PASSWORD">
-        
-        <button class="btn-retro" style="background: var(--p1-color); color: #fff;" onclick="loginAdmin()">AUTHORIZE</button>
-        <div id="loginError" style="color: var(--p1-color); font-size: 10px; margin-top: 15px;"></div>
+<div id="loginScreen" class="neon-box" style="max-width: 400px; border-color: var(--danger);">
+    <h1 style="color: var(--danger); margin-bottom: 20px; font-size: 20px;">RESTRICTED</h1>
+    <input type="text" id="adminUser" class="input-retro" placeholder="ADMIN USERNAME">
+    <input type="password" id="adminPass" class="input-retro" placeholder="PASSWORD">
+    <button class="btn-retro" style="background: var(--danger); color: #fff;" onclick="loginAdmin()">AUTHORIZE</button>
+    <div id="loginErr" style="color: var(--danger); font-size: 10px; margin-top: 15px;"></div>
+</div>
+
+<div id="dashboardScreen" class="dashboard">
+    <div class="neon-box" style="flex-grow: 1; text-align: left;">
+        <h2 style="color: var(--success); margin-bottom: 10px;">PENDING BANK TRANSACTIONS</h2>
+        <table>
+            <thead><tr><th>PLAYER</th><th>TYPE</th><th>AMOUNT</th><th>ACTIONS</th></tr></thead>
+            <tbody id="bankQueue"><tr><td colspan="4" style="text-align:center; color:#666;">Waiting...</td></tr></tbody>
+        </table>
     </div>
+</div>
 
-    <div id="dashboardScreen" class="dashboard-container">
-        <div class="admin-sidebar">
-            <h2 style="color: var(--accent); font-size: 14px; margin-bottom: 30px;">COMMAND CENTER</h2>
-            <button class="btn-retro" style="margin-bottom: 10px;">BANK REQUESTS</button>
-            <button class="btn-retro" style="margin-bottom: 10px; background: #333; color: #aaa;">USER DATABASE</button>
-            <button class="btn-retro" style="margin-top: 50px; background: var(--p1-color); color: #fff;" onclick="location.reload()">LOGOUT</button>
-        </div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    
+    function loginAdmin() {
+        socket.emit('auth-attempt', { username: document.getElementById('adminUser').value, password: document.getElementById('adminPass').value });
+    }
 
-        <div class="neon-box" style="flex-grow: 1; text-align: left;">
-            <h2 style="color: var(--success); margin-bottom: 10px;">PENDING TRANSACTIONS</h2>
-            <p style="font-size: 10px; color: #888;">Review and approve player TradeCash (TC) requests.</p>
-            
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>PLAYER</th>
-                        <th>TYPE</th>
-                        <th>AMOUNT</th>
-                        <th>ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody id="bankQueue">
-                    <tr><td colspan="4" style="text-align: center; color: #666;">Waiting for database connection...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    socket.on('auth-error', msg => document.getElementById('loginErr').innerText = msg);
+    socket.on('auth-success', data => {
+        if(data.role !== 'admin') { document.getElementById('loginErr').innerText = 'ACCESS DENIED: NOT ADMIN.'; return; }
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').style.display = 'flex';
+        document.body.style.alignItems = 'flex-start';
+        socket.emit('admin-fetch-bank-queue');
+    });
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-
-        function loginAdmin() {
-            const user = document.getElementById('adminUser').value;
-            if(user.trim() === "") {
-                document.getElementById('loginError').innerText = "CREDENTIALS REQUIRED.";
-                return;
-            }
-            
-            // For testing purposes, we bypass real auth and just emit the admin connect
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboardScreen').style.display = 'flex';
-            document.body.style.alignItems = 'flex-start';
-            document.body.style.justifyContent = 'flex-start';
-            
-            // Ask server for bank queue
-            socket.emit('admin-fetch-bank-queue');
-        }
-
-        // Listen for Bank updates from the server
-        socket.on('admin-bank-queue-update', (requests) => {
-            const queueBody = document.getElementById('bankQueue');
-            queueBody.innerHTML = '';
-            
-            if(!requests || requests.length === 0) {
-                queueBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #666;">No pending requests.</td></tr>`;
-                return;
-            }
-
-            requests.forEach(req => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="font-weight: bold; color: #fff;">${req.username}</td>
-                    <td style="color: var(--success);">${req.type.toUpperCase()}</td>
-                    <td style="color: var(--accent);">${req.amount} TC</td>
-                    <td>
-                        <button class="btn-retro btn-small" style="background: var(--success);" onclick="processBank('${req._id}', 'approve')">APPROVE</button>
-                        <button class="btn-retro btn-small" style="background: var(--p1-color); color: #fff;" onclick="processBank('${req._id}', 'deny')">DENY</button>
-                    </td>
-                `;
-                queueBody.appendChild(row);
-            });
+    socket.on('admin-bank-queue-update', (requests) => {
+        const queue = document.getElementById('bankQueue'); queue.innerHTML = '';
+        if(requests.length === 0) return queue.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">No pending requests.</td></tr>`;
+        requests.forEach(req => {
+            queue.innerHTML += `<tr>
+                <td style="font-weight:bold;">${req.username}</td>
+                <td style="color: ${req.type==='deposit'?'var(--success)':'var(--danger)'};">${req.type.toUpperCase()}</td>
+                <td style="color: var(--accent);">${req.amount} TC</td>
+                <td>
+                    <button style="background:var(--success); color:#000; padding:5px; cursor:pointer;" onclick="process('${req._id}', 'approve')">APPROVE</button>
+                    <button style="background:var(--danger); color:#fff; padding:5px; cursor:pointer;" onclick="process('${req._id}', 'deny')">DENY</button>
+                </td>
+            </tr>`;
         });
+    });
 
-        function processBank(requestId, action) {
-            socket.emit('admin-process-bank', { requestId, action });
-        }
-    </script>
+    function process(id, action) { socket.emit('admin-process-bank', { requestId: id, action }); }
+</script>
 </body>
 </html>
