@@ -36,7 +36,11 @@
             --playable: #b366ff; 
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            font-family: 'Outfit', sans-serif; outline: none; 
+            -webkit-tap-highlight-color: transparent; 
+        }
         
         /* MOBILE VIEWPORT FIX: 100dvh instead of 100vh */
         body { 
@@ -265,6 +269,7 @@
         .game-box { display: flex; flex-direction: column; width: 100%; max-width: 850px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden; height: 600px; flex-shrink: 0; position: relative;} 
         .main-panel { display: flex; flex-direction: column; height: 100%; position: relative;}
         .game-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; perspective: 1000px; padding: 20px;}
+        
         .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto;} 
         .controls-full { display: flex; gap: 15px; justify-content: center; width: 100%; }
 
@@ -510,6 +515,7 @@
   </div>
 
   <div id="app-container">
+      
       <header class="topbar">
       <div class="topbar-inner">
         <div class="brand" onclick="backToHub()" title="Return to Lobby">
@@ -576,9 +582,11 @@
             </div>
         </div>
       </div>
-    </header>
+      </header>
+
       <div class="main-wrapper">
         <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()"><i class="fas fa-arrow-left" style="margin-right: 8px;"></i> <span id="back-btn-text">BACK TO MODES</span></button>
+        
         <div class="content">
           <div id="view-casino" class="view-container">
             <div class="lobby-wrapper" id="lobby-modes">
@@ -796,20 +804,28 @@
           <div id="view-shared-game" class="view-container hidden">
             <div class="game-wrapper">
                 <div class="shared-layout">
+                  
                   <div class="main-panel glass-panel">
                     <div class="glass-header">
                       <h2 id="sg-title" style="margin:0; line-height:1;">Table</h2>
                       <div style="display:flex; align-items:center; gap:8px; position: relative;">
-                          <div class="timer-box" id="sg-timer-box"><i class="fas fa-clock"></i> <div style="display:flex; align-items:baseline;"><span id="sg-timer">15</span><span class="timer-sec">s</span></div></div>
+                          <div class="timer-box" id="sg-timer-box">
+                              <i class="fas fa-clock"></i> 
+                              <div style="display:flex; align-items:baseline;"><span id="sg-timer">15</span><span class="timer-sec">s</span></div>
+                          </div>
                           <button class="btn-rules" onclick="toggleRules(window.activeSharedGame, event)" title="How to Play"><i class="fas fa-info-circle"></i></button>
-                          <div class="dropdown-wrapper"><button class="btn-rules" onclick="toggleHistory(window.activeSharedGame, event)" title="History"><i class="fas fa-list-alt"></i></button></div>
+                          <div class="dropdown-wrapper">
+                              <button class="btn-rules" onclick="toggleHistory(window.activeSharedGame, event)" title="History"><i class="fas fa-list-alt"></i></button>
+                          </div>
                       </div>
                     </div>
+                    
                     <div class="game-display">
                         <div id="sg-display" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;"></div>
                         <div id="flash-shared" class="local-flash"></div>
                         <div class="result-overlay-shared" id="sg-overlay"><div class="res-title" id="sg-res-title"></div><div class="res-payout" id="sg-res-payout" style="display:none"></div></div>
                     </div>
+                    
                     <div class="controls-grid" style="padding:25px; border-top: 1px solid var(--glass-border);" id="sg-controls-container"></div>
                   </div>
                   
@@ -837,6 +853,7 @@
                         <input type="text" id="chat-input" class="input-control" placeholder="Say something..." onkeypress="if(event.key==='Enter'){sendChat();}">
                     </div>
                   </div>
+                  
                 </div>
             </div>
           </div>
@@ -1347,8 +1364,7 @@
                 }); 
             }
         }
-        document.getElementById('stat-percentages').innerHTML = statsHtml; 
-        updateHistoryUI(data.game);
+        document.getElementById('stat-percentages').innerHTML = statsHtml; updateHistoryUI(data.game);
     });
 
     function switchView(viewId) { 
@@ -1392,6 +1408,7 @@
     }
     
     function backToSoloLobby() { switchView('casino'); openLobbyMode('indiv'); }
+    
     function backToSharedLobby() { 
         if (window.activeSharedGame && window.activeSharedGame !== 'shared_bj' && mySBets && Object.values(mySBets).reduce((a,b)=>a+b,0) > 0 && sState.status === 'BETTING') { showLocalFlash('shared', "Wait for round to finish.", "error"); return; } 
         if (window.activeSharedGame === 'shared_bj') socket.emit('leaveBjSeat'); 
@@ -1799,7 +1816,6 @@
     
     function placeSharedBet(c) { 
       if (sState.status !== 'BETTING') { showLocalFlash('shared', "Bets are closed!", "error"); return; } 
-      
       let i = document.getElementById('sg-bet-input'); 
       if (!i) return; 
       let a = parseFloat(i.value); 
@@ -1948,7 +1964,7 @@
     socket.on('sharedResults', (data) => {
         if(window.activeSharedGame === data.room && sConf[data.room]) { sConf[data.room].animateResult(data); }
         
-        // Handle Shared Blackjack Results
+        // Handle Shared Blackjack Results Locally
         if (data.room === 'shared_bj' && window.activeSharedGame === 'shared_bj') {
             let myRes = data.playerResults[socket.id];
             if (myRes) {
@@ -1989,6 +2005,14 @@
         triggerBetAnim();
     };
 
+    socket.on('sharedBjTimer', (t) => {
+        let timerDisplay = document.getElementById('sg-timer');
+        let timerBox = document.getElementById('sg-timer-box');
+        if (timerDisplay) timerDisplay.innerText = t;
+        if (t <= 5 && timerBox) timerBox.classList.add('closing');
+        else if (timerBox) timerBox.classList.remove('closing');
+    });
+
     socket.on('sharedBjSync', (state) => {
         if (window.activeSharedGame !== 'shared_bj') return;
         
@@ -1997,7 +2021,7 @@
         if (dHandContainer) {
             let dhHtml = '';
             state.dealerHand.forEach((card, index) => {
-                if (index === 1 && state.status !== 'DEALER_TURN' && state.status !== 'RESOLVING') {
+                if (card.hidden) {
                     dhHtml += `<div class="play-card card-back" style="flex-shrink:0;">?</div>`;
                 } else {
                     dhHtml += `<div class="play-card" style="flex-shrink:0;"><div class="val">${card.raw}</div><div class="suit">${card.suitHtml}</div></div>`;
@@ -2012,9 +2036,8 @@
         const seatsWrapper = document.getElementById('sbj-seats-wrapper');
         if (seatsWrapper) {
             let iAmSeated = false, myTurn = false;
-            let myTotalBetForRound = 0;
 
-            // Ensure seats container has exactly 5 slots built
+            // Build the 5 empty seat containers if they don't exist yet
             if(seatsWrapper.children.length !== 5) {
                 seatsWrapper.innerHTML = `<div class="sbj-seat" id="sbj-seat-0"></div><div class="sbj-seat" id="sbj-seat-1"></div><div class="sbj-seat" id="sbj-seat-2"></div><div class="sbj-seat" id="sbj-seat-3"></div><div class="sbj-seat" id="sbj-seat-4"></div>`;
             }
@@ -2024,7 +2047,6 @@
                 let seatEl = document.getElementById(`sbj-seat-${i}`);
                 let newHtml = '';
                 let newClass = 'sbj-seat ';
-                let newStyle = '';
 
                 if (!seat) {
                     newClass += 'empty';
@@ -2032,15 +2054,14 @@
                     seatEl.onclick = () => socket.emit('takeBjSeat', i);
                 } else {
                     seatEl.onclick = null;
-                    if (seat.socketId === socket.id) { iAmSeated = true; myTotalBetForRound = seat.totalBet; }
+                    if (seat.socketId === socket.id) { iAmSeated = true; }
                     let isActive = (state.activeSeatIndex === i);
                     if (isActive && seat.socketId === socket.id) myTurn = true;
                     
                     newClass += 'occupied';
                     if (isActive) newClass += ' active-turn';
-                    newStyle = isActive ? 'border-color: var(--success);' : 'border-color: var(--glass-border);';
 
-                    // Fan Cards Logic
+                    // Fan Cards & Add Score Bubbles
                     let cardsHtml = seat.hands.map((hand, hIdx) => {
                         let isHandActive = (isActive && seat.currentHandIndex === hIdx);
                         let score = getBJScore(hand);
@@ -2057,10 +2078,10 @@
 
                         let cHtml = hand.map((c, idx) => {
                             let glow = isHandActive ? 'box-shadow: 0 0 10px var(--ps-glow); border-color: var(--ps-glow);' : '';
-                            return `<div class="play-card" style="flex-shrink:0; margin-left: ${idx > 0 ? '-35px' : '0px'}; ${glow}"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`;
+                            return `<div class="play-card" style="flex-shrink:0; margin-left: ${idx > 0 ? '-35px' : '0px'}; ${glow}; z-index: ${idx + 2};"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`;
                         }).join('');
                         
-                        return `<div class="sbj-hand-wrap split-hand-${hIdx}" style="display:flex; justify-content:center; position:relative;">${cHtml}${bubbleHtml}</div>`;
+                        return `<div class="sbj-hand-wrap split-hand-${hIdx}" style="position:relative; display:flex;">${cHtml}${bubbleHtml}</div>`;
                     }).join('');
 
                     let statusText = seat.status === 'busted' ? '<span style="color:var(--danger); text-shadow: 0 2px 10px rgba(0,0,0,0.9);">BUST</span>' : (seat.status === 'stood' ? '<span style="color:white; text-shadow: 0 2px 10px rgba(0,0,0,0.9);">STOOD</span>' : '');
@@ -2073,14 +2094,14 @@
                     `;
                 }
 
+                // ONLY update the DOM if the HTML actually changed (Stops the flashing!)
                 if (seatEl.innerHTML !== newHtml || seatEl.className !== newClass) {
                     seatEl.className = newClass;
-                    seatEl.style.cssText = newStyle;
                     seatEl.innerHTML = newHtml;
                 }
             }
 
-            // 3. Conditional Button Rendering
+            // 3. Conditional Button Rendering (Smart UI)
             let betControls = document.getElementById('sbj-betting-controls');
             let actionControls = document.getElementById('sbj-action-controls');
             
@@ -2107,7 +2128,7 @@
                         let hasFunds = (myCredits + myPlayable) >= mySeat.baseBet;
                         
                         if(dBtn) dBtn.style.display = (activeHand.length === 2 && hasFunds) ? 'block' : 'none';
-                        if(sBtn) sBtn.style.display = (activeHand.length === 2 && activeHand[0].raw === activeHand[1].raw && hasFunds) ? 'block' : 'none';
+                        if(sBtn) sBtn.style.display = (activeHand.length === 2 && activeHand[0].bjVal === activeHand[1].bjVal && hasFunds) ? 'block' : 'none';
                     }
                 }
             }
