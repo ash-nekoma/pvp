@@ -1,16 +1,15 @@
 {
-  "name": "duel-arena-live",
+  "name": "stick-n-trade-casino",
   "version": "1.0.0",
-  "description": "Real-time PvP Casino Platform",
+  "description": "Real-time multiplayer casino backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "mongoose": "^8.3.2",
-    "socket.io": "^4.7.5"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.4.1",
+    "socket.io": "^4.7.2"
   }
 }
