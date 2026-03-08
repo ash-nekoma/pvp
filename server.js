@@ -102,7 +102,7 @@ const adminLogSchema = new mongoose.Schema({
 });
 const AdminLog = mongoose.model('AdminLog', adminLogSchema);
 
-// ================= GLOBAL STATE =================
+// ================= GLOBAL CASINO STATE =================
 let rooms = { baccarat: 0, perya: 0, dt: 0, sicbo: 0, shared_bj: 0 };
 let sharedTables = { time: 15, status: 'BETTING', bets: [] };
 let connectedUsers = {}; 
@@ -119,136 +119,92 @@ let gameStats = {
     shared_bj: { total: 0, Win: 0, Lose: 0, Push: 0 }
 };
 
-// ================= LIVE BLACKJACK STATE MACHINE =================
+// ================= LIVE BLACKJACK ENGINE =================
 let sharedBJ = {
     status: 'WAITING', // WAITING, BETTING, DEALING, ACTION, DEALER_TURN, RESOLVING
     activeSeatIndex: -1,
+    turnTime: 10,
     seats: [null, null, null, null, null], 
     dealerHand: []
 };
 
-let bjTurnTimer = null;
+let bjTurnInterval = null;
 
-async function processBjAction(seat, action, socket) {
-    clearTimeout(bjTurnTimer);
-    let hand = seat.hands[seat.currentHandIndex];
+function drawCard() {
+    const vs = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+    const ss = ['♠','♣','♥','♦'];
+    let v = vs[crypto.randomInt(vs.length)];
+    let s = ss[crypto.randomInt(ss.length)];
+    let bac = isNaN(parseInt(v)) ? (v === 'A' ? 1 : 0) : (v === '10' ? 0 : parseInt(v));
+    let bj = isNaN(parseInt(v)) ? (v === 'A' ? 11 : 10) : parseInt(v);
+    let dt = v === 'A' ? 1 : (v === 'K' ? 13 : (v === 'Q' ? 12 : (v === 'J' ? 11 : parseInt(v))));
+    let suitHtml = (s === '♥' || s === '♦') ? `<span class="card-red">${s}</span>` : s;
+    return { val: v, suit: s, bacVal: bac, bjVal: bj, dtVal: dt, raw: v, suitHtml: suitHtml };
+}
 
-    if (action === 'hit') {
-        hand.push(drawCard());
-        if (getBJScore(hand) >= 21) {
-            // Auto advance if 21 or Bust
-            if (seat.currentHandIndex < seat.hands.length - 1) { 
-                seat.currentHandIndex++; 
-                startBjTurnTimer(); 
-            } else { 
-                seat.status = getBJScore(hand) > 21 ? 'busted' : 'stood'; 
-                nextBjTurn(); 
-            }
-        } else { 
-            startBjTurnTimer(); 
-        }
-    } else if (action === 'stand') {
-        if (seat.currentHandIndex < seat.hands.length - 1) { 
-            seat.currentHandIndex++; 
-            startBjTurnTimer(); 
-        } else { 
-            seat.status = 'stood'; 
-            nextBjTurn(); 
-        }
-    } else if (action === 'double') {
-        if (hand.length !== 2) return startBjTurnTimer(); 
-        
-        let user = await User.findById(seat.userId);
-        let deduction = await deductBet(user, seat.baseBet);
-        if (!deduction.success) { 
-            socket.emit('localGameError', { msg: 'INSUFFICIENT TC FOR DOUBLE', game: 'shared_bj' }); 
-            return startBjTurnTimer(); 
-        }
-        await user.save();
-        
-        seat.bets[seat.currentHandIndex] += seat.baseBet; 
-        seat.totalBet += seat.baseBet;
-        seat.fromPlayable += deduction.fromPlayable; 
-        seat.fromMain += deduction.fromMain;
-        
-        hand.push(drawCard()); 
-        
-        if (seat.currentHandIndex < seat.hands.length - 1) { 
-            seat.currentHandIndex++; 
-            startBjTurnTimer(); 
-        } else { 
-            seat.status = getBJScore(hand) > 21 ? 'busted' : 'stood'; 
-            nextBjTurn(); 
-        }
-    } else if (action === 'split') {
-        if (hand.length !== 2 || hand[0].raw !== hand[1].raw) { 
-            socket.emit('localGameError', { msg: 'MUST HAVE A PAIR TO SPLIT', game: 'shared_bj' }); 
-            return startBjTurnTimer(); 
-        }
-        
-        let user = await User.findById(seat.userId);
-        let deduction = await deductBet(user, seat.baseBet);
-        if (!deduction.success) { 
-            socket.emit('localGameError', { msg: 'INSUFFICIENT TC FOR SPLIT', game: 'shared_bj' }); 
-            return startBjTurnTimer(); 
-        }
-        await user.save();
-        
-        seat.bets.push(seat.baseBet); 
-        seat.totalBet += seat.baseBet;
-        seat.fromPlayable += deduction.fromPlayable; 
-        seat.fromMain += deduction.fromMain;
-        
-        let splitCard = hand.pop(); 
-        seat.hands.push([splitCard, drawCard()]); 
-        hand.push(drawCard());
-        
-        startBjTurnTimer();
+function getBJScore(hand) { 
+    let score = 0, aces = 0; 
+    for (let card of hand) { 
+        score += card.bjVal; 
+        if (card.val === 'A') aces += 1; 
+    } 
+    while (score > 21 && aces > 0) { 
+        score -= 10; aces -= 1; 
+    } 
+    return score; 
+}
+
+// Hides the dealer's second card to prevent client-side cheating
+function emitBJSync() {
+    let maskedState = JSON.parse(JSON.stringify(sharedBJ));
+    if (maskedState.status !== 'DEALER_TURN' && maskedState.status !== 'RESOLVING' && maskedState.dealerHand.length > 1) {
+        maskedState.dealerHand[1] = { hidden: true, raw: '?', suitHtml: '?', bjVal: 0 };
     }
-    
-    io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+    io.to('shared_bj').emit('sharedBjSync', maskedState);
 }
 
 function startBjTurnTimer() {
+    clearInterval(bjTurnInterval);
     let seat = sharedBJ.seats[sharedBJ.activeSeatIndex];
-    if(!seat) return nextBjTurn();
+    if (!seat) return nextBjTurn();
     
     let hand = seat.hands[seat.currentHandIndex];
-    
-    // Auto-advance if dealt a natural 21 to keep game flying
-    if (getBJScore(hand) >= 21) {
+    let score = getBJScore(hand);
+
+    // Auto-advance if dealt a 21 or player busted
+    if (score >= 21) {
         if (seat.currentHandIndex < seat.hands.length - 1) { 
             seat.currentHandIndex++; 
-            startBjTurnTimer(); 
+            return startBjTurnTimer(); 
         } else { 
-            seat.status = getBJScore(hand) > 21 ? 'busted' : 'stood'; 
-            nextBjTurn(); 
+            seat.status = score > 21 ? 'busted' : 'stood'; 
+            return nextBjTurn(); 
         }
-        return;
     }
     
-    bjTurnTimer = setTimeout(() => {
-        if (seat.status === 'playing') {
-            if (seat.currentHandIndex < seat.hands.length - 1) { 
-                seat.currentHandIndex++; 
-                startBjTurnTimer(); 
-            } else { 
-                seat.status = 'stood'; 
-                io.to('shared_bj').emit('adminPulse', { msg: `${seat.username} auto-stood due to timeout.`, type: 'alert' }); 
-                nextBjTurn(); 
-            }
+    sharedBJ.turnTime = 10;
+    emitBJSync();
+
+    bjTurnInterval = setInterval(() => {
+        sharedBJ.turnTime--;
+        io.to('shared_bj').emit('sharedBjTimer', sharedBJ.turnTime); // Send just the tick for the progress bar
+        
+        if (sharedBJ.turnTime <= 0) {
+            clearInterval(bjTurnInterval);
+            processBjAction(seat, 'stand', null, true); // Force stand on timeout
         }
-    }, 10000);
+    }, 1000);
 }
 
 function nextBjTurn() {
+    clearInterval(bjTurnInterval);
     sharedBJ.activeSeatIndex++;
     
     while (sharedBJ.activeSeatIndex < 5) {
         let seat = sharedBJ.seats[sharedBJ.activeSeatIndex];
         if (seat && seat.totalBet > 0) { 
             seat.status = 'playing'; 
-            io.to('shared_bj').emit('sharedBjSync', sharedBJ); 
+            sharedBJ.status = 'ACTION';
             startBjTurnTimer(); 
             return; 
         }
@@ -258,22 +214,96 @@ function nextBjTurn() {
     resolveDealerTurn();
 }
 
+async function processBjAction(seat, action, socket = null, isSystem = false) {
+    clearInterval(bjTurnInterval);
+    let hand = seat.hands[seat.currentHandIndex];
+
+    if (action === 'hit') {
+        hand.push(drawCard());
+        startBjTurnTimer(); // Logic inside will auto-advance if they hit 21/bust
+    } 
+    else if (action === 'stand') {
+        if (seat.currentHandIndex < seat.hands.length - 1) { 
+            seat.currentHandIndex++; 
+            startBjTurnTimer(); 
+        } else { 
+            seat.status = 'stood'; 
+            if (isSystem) io.to('shared_bj').emit('adminPulse', { msg: `${seat.username} auto-stood.`, type: 'alert' });
+            nextBjTurn(); 
+        }
+    } 
+    else if (action === 'double' && !isSystem) {
+        if (hand.length !== 2) return startBjTurnTimer(); 
+        let user = await User.findById(seat.userId);
+        let deduction = await deductBet(user, seat.baseBet);
+        
+        if (!deduction.success) { 
+            if (socket) socket.emit('localGameError', { msg: 'INSUFFICIENT TC FOR DOUBLE', game: 'shared_bj' }); 
+            return startBjTurnTimer(); 
+        }
+        
+        await user.save();
+        seat.bets[seat.currentHandIndex] += seat.baseBet; 
+        seat.totalBet += seat.baseBet;
+        seat.fromPlayable += deduction.fromPlayable; 
+        seat.fromMain += deduction.fromMain;
+        
+        hand.push(drawCard()); 
+        
+        // Auto stand after 1 card
+        if (seat.currentHandIndex < seat.hands.length - 1) { 
+            seat.currentHandIndex++; 
+            startBjTurnTimer(); 
+        } else { 
+            seat.status = getBJScore(hand) > 21 ? 'busted' : 'stood'; 
+            nextBjTurn(); 
+        }
+    } 
+    else if (action === 'split' && !isSystem) {
+        // Value check: Any two 10s (K and Q) or matching ranks (8 and 8)
+        if (hand.length === 2 && (hand[0].bjVal === hand[1].bjVal)) { 
+            let user = await User.findById(seat.userId);
+            let deduction = await deductBet(user, seat.baseBet);
+            
+            if (!deduction.success) { 
+                if (socket) socket.emit('localGameError', { msg: 'INSUFFICIENT TC FOR SPLIT', game: 'shared_bj' }); 
+                return startBjTurnTimer(); 
+            }
+            
+            await user.save();
+            seat.bets.push(seat.baseBet); 
+            seat.totalBet += seat.baseBet;
+            seat.fromPlayable += deduction.fromPlayable; 
+            seat.fromMain += deduction.fromMain;
+            
+            let splitCard = hand.pop(); 
+            seat.hands.push([splitCard, drawCard()]); 
+            hand.push(drawCard());
+            
+            startBjTurnTimer();
+        } else {
+            if (socket) socket.emit('localGameError', { msg: 'INVALID SPLIT', game: 'shared_bj' });
+            startBjTurnTimer();
+        }
+    }
+}
+
 async function resolveDealerTurn() {
     sharedBJ.status = 'DEALER_TURN'; 
-    io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+    emitBJSync();
     
-    // 1-second delay for the hole card reveal
+    // Cinematic pause for the hole card reveal
     await new Promise(r => setTimeout(r, 1000));
     
-    // Sequential Dealer Draw for tension and smoothness
+    // Sequential Dealer Draw for tension
     while (getBJScore(sharedBJ.dealerHand) < 17) { 
         sharedBJ.dealerHand.push(drawCard()); 
-        io.to('shared_bj').emit('sharedBjSync', sharedBJ); 
-        await new Promise(r => setTimeout(r, 1000)); // Pause between hits
+        emitBJSync(); 
+        await new Promise(r => setTimeout(r, 1000)); 
     }
     
     sharedBJ.status = 'RESOLVING'; 
-    io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+    emitBJSync();
     
     let dScore = getBJScore(sharedBJ.dealerHand);
     let dResStr = dScore > 21 ? `DEALER BUSTS (${dScore})` : `DEALER (${dScore})`;
@@ -322,7 +352,7 @@ async function resolveDealerTurn() {
                 if (user) await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-seat.totalBet), details: `Live Blackjack` }).save(); 
             }
             
-            // Wipe seat bets for next round but keep the player sitting
+            // Soft reset seat
             seat.totalBet = 0; 
             seat.baseBet = 0; 
             seat.bets = []; 
@@ -332,73 +362,32 @@ async function resolveDealerTurn() {
         }
     }
     
-    // Broadcast specific results and log global history
     io.to('shared_bj').emit('sharedResults', { room: 'shared_bj', dScore, dealerHand: sharedBJ.dealerHand, playerResults, resStr: dResStr });
     logGlobalResult('shared_bj', dResStr);
     
     gameStats.shared_bj.total++;
-    if(houseLoss > houseWin) gameStats.shared_bj.Win++; 
-    else if(houseWin > houseLoss) gameStats.shared_bj.Lose++; 
-    else gameStats.shared_bj.Push++;
+    if(houseLoss > houseWin) gameStats.shared_bj.Win++; else if(houseWin > houseLoss) gameStats.shared_bj.Lose++; else gameStats.shared_bj.Push++;
     checkResetStats('shared_bj');
 
     setTimeout(() => {
         sharedBJ.dealerHand = []; 
         let hasPlayers = sharedBJ.seats.some(s => s !== null);
         sharedBJ.status = (hasPlayers && sharedTables.status === 'BETTING') ? 'BETTING' : 'WAITING';
-        io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+        emitBJSync();
     }, 5000);
 }
 
-// ================= UTILITIES =================
-function logGlobalResult(game, resultStr) {
-    if(globalResults[game]) { 
-        globalResults[game].unshift({ result: resultStr, time: new Date() }); 
-        if (globalResults[game].length > 5) globalResults[game].pop(); 
-    }
-}
 
-function checkResetStats(game) { 
-    if (gameStats[game].total >= 100) { 
-        Object.keys(gameStats[game]).forEach(key => { gameStats[game][key] = 0; }); 
-        io.emit('system_stats_reset', { game: game });
-    } 
-}
-
-function drawCard() {
-    const vs = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-    const ss = ['♠','♣','♥','♦'];
-    let v = vs[crypto.randomInt(vs.length)];
-    let s = ss[crypto.randomInt(ss.length)];
-    let bac = isNaN(parseInt(v)) ? (v === 'A' ? 1 : 0) : (v === '10' ? 0 : parseInt(v));
-    let bj = isNaN(parseInt(v)) ? (v === 'A' ? 11 : 10) : parseInt(v);
-    let dt = v === 'A' ? 1 : (v === 'K' ? 13 : (v === 'Q' ? 12 : (v === 'J' ? 11 : parseInt(v))));
-    let suitHtml = (s === '♥' || s === '♦') ? `<span class="card-red">${s}</span>` : s;
-    return { val: v, suit: s, bacVal: bac, bjVal: bj, dtVal: dt, raw: v, suitHtml: suitHtml };
-}
-
-function getBJScore(hand) { 
-    let score = 0, aces = 0; 
-    for (let card of hand) { 
-        score += card.bjVal; 
-        if (card.val === 'A') aces += 1; 
-    } 
-    while (score > 21 && aces > 0) { 
-        score -= 10; aces -= 1; 
-    } 
-    return score; 
-}
-
-// ================= GLOBAL CASINO TICKER =================
+// ================= GLOBAL CASINO TICKER (15s Loop) =================
 setInterval(() => {
     if (sharedTables.status === 'BETTING') {
         sharedTables.time--;
         io.emit('timerUpdate', sharedTables.time);
 
-        // Sync BJ state to Betting if people are sitting and waiting
+        // Sync BJ state to global betting if people are sitting and waiting
         if (sharedBJ.status === 'WAITING' && sharedTables.time > 0 && sharedBJ.seats.some(s => s !== null)) { 
             sharedBJ.status = 'BETTING'; 
-            io.to('shared_bj').emit('sharedBjSync', sharedBJ); 
+            emitBJSync();
         }
 
         // Global Bet Lock
@@ -406,7 +395,7 @@ setInterval(() => {
             sharedTables.status = 'RESOLVING';
             io.emit('lockBets');
 
-            // --- 1. Resolve Fire-and-Forget Games ---
+            // --- 1. Resolve Baccarat, SicBo, Perya, DT ---
             setTimeout(async () => {
                 let dtD = drawCard(), dtT = drawCard();
                 let dtWin = dtD.dtVal > dtT.dtVal ? 'Dragon' : (dtT.dtVal > dtD.dtVal ? 'Tiger' : 'Tie');
@@ -495,7 +484,7 @@ setInterval(() => {
 
             }, 500);
 
-            // --- 2. Trigger Live Blackjack Deal ---
+            // --- 2. Trigger Live Blackjack Sequence ---
             if (sharedBJ.status === 'BETTING') {
                 let bjHasBets = sharedBJ.seats.some(s => s && s.totalBet > 0);
                 if (bjHasBets) {
@@ -507,16 +496,15 @@ setInterval(() => {
                         }
                     });
                     sharedBJ.dealerHand = [drawCard(), drawCard()];
-                    io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+                    emitBJSync();
                     
                     setTimeout(() => {
-                        sharedBJ.status = 'ACTION';
                         sharedBJ.activeSeatIndex = -1;
-                        nextBjTurn(); // Kicks off the sequential flow
+                        nextBjTurn(); // Starts the spotlight sequence
                     }, 2000);
                 } else {
                     sharedBJ.status = 'WAITING';
-                    io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+                    emitBJSync();
                 }
             }
 
@@ -531,6 +519,19 @@ setInterval(() => {
         }
     }
 }, 1000);
+
+function logGlobalResult(game, resultStr) {
+    if(globalResults[game]) { 
+        globalResults[game].unshift({ result: resultStr, time: new Date() }); 
+        if (globalResults[game].length > 5) globalResults[game].pop(); 
+    }
+}
+function checkResetStats(game) { 
+    if (gameStats[game].total >= 100) { 
+        Object.keys(gameStats[game]).forEach(key => { gameStats[game][key] = 0; }); 
+        io.emit('system_stats_reset', { game: game });
+    } 
+}
 
 async function pushAdminData(targetSocket = null) {
     try {
@@ -573,7 +574,6 @@ io.on('connection', (socket) => {
     socket.isCashier = false; 
     socket.isAuth = false;
 
-    // --- UTILITIES ---
     socket.on('requestBalanceRefresh', async () => {
         if(socket.user) {
             let u = await User.findById(socket.user._id);
@@ -782,6 +782,7 @@ io.on('connection', (socket) => {
         if(socket.currentRoom) { socket.leave(socket.currentRoom); rooms[socket.currentRoom]--; }
         socket.join(room); socket.currentRoom = room; rooms[room]++; 
         io.emit('playerCount', rooms); 
+        if (room === 'shared_bj') emitBJSync();
     });
     
     socket.on('leaveRoom', (room) => { 
@@ -791,11 +792,6 @@ io.on('connection', (socket) => {
     });
 
     // --- SHARED BLACKJACK EVENTS ---
-    socket.on('joinSharedBJ', () => {
-        socket.join('shared_bj');
-        socket.emit('sharedBjSync', sharedBJ);
-    });
-
     socket.on('takeBjSeat', (seatIndex) => {
         if (!socket.user || seatIndex < 0 || seatIndex > 4) return;
         
@@ -817,11 +813,11 @@ io.on('connection', (socket) => {
                 fromPlayable: 0,
                 fromMain: 0
             };
-            io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+            emitBJSync();
             
             if (sharedBJ.status === 'WAITING' && sharedTables.time > 0) {
                 sharedBJ.status = 'BETTING';
-                io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+                emitBJSync();
             }
         }
     });
@@ -830,7 +826,7 @@ io.on('connection', (socket) => {
         let seatIndex = sharedBJ.seats.findIndex(s => s && s.socketId === socket.id);
         if (seatIndex !== -1) {
             sharedBJ.seats[seatIndex] = null;
-            io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+            emitBJSync();
         }
     });
 
@@ -854,7 +850,7 @@ io.on('connection', (socket) => {
         seat.fromMain += deduction.fromMain;
         seat.status = 'betting';
         
-        io.to('shared_bj').emit('sharedBjSync', sharedBJ);
+        emitBJSync();
     });
 
     socket.on('sharedBjAction', (action) => {
@@ -883,6 +879,8 @@ io.on('connection', (socket) => {
     
     socket.on('placeSharedBet', async (data) => {
         if (isMaintenanceMode) return socket.emit('localGameError', { msg: 'SYSTEM UNDER MAINTENANCE', game: data.room });
+        
+        // Strict Lock verification
         if (!socket.user || sharedTables.status !== 'BETTING' || socket.isSharedBetting) return;
         socket.isSharedBetting = true;
         
@@ -1149,7 +1147,7 @@ io.on('connection', (socket) => {
         if (socket.user) { await User.findByIdAndUpdate(socket.user._id, { status: 'Offline' }); delete connectedUsers[socket.user.username]; }
         if(socket.currentRoom && rooms[socket.currentRoom] > 0) { rooms[socket.currentRoom]--; io.emit('playerCount', rooms); }
         let seatIndex = sharedBJ.seats.findIndex(s => s && s.socketId === socket.id);
-        if (seatIndex !== -1) { sharedBJ.seats[seatIndex] = null; io.to('shared_bj').emit('sharedBjSync', sharedBJ); }
+        if (seatIndex !== -1) { sharedBJ.seats[seatIndex] = null; emitBJSync(); }
         pushAdminData();
     });
 });
