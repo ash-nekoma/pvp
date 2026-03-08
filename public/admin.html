@@ -3,74 +3,1229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARENA COMMAND - ADMIN</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <title>Stick N' Trade | Master Admin</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="/socket.io/socket.io.js"></script>
+
     <style>
-        :root { --bg-dark: #121216; --bg-panel: #1e1e24; --accent: #feca57; --success: #2ecc71; --danger: #ff4757; }
-        * { box-sizing: border-box; font-family: 'Press Start 2P', cursive; color: #fff; }
-        body { background: var(--bg-dark); height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; }
-        .neon-box { background: var(--bg-panel); border: 2px solid var(--accent); padding: 30px; text-align: center; width: 100%; max-width: 900px; }
-        .input-retro { background: #000; border: 2px solid #555; padding: 15px; margin: 10px 0; width: 100%; font-size: 12px; }
-        .btn-retro { background: var(--accent); color: #000; border: none; padding: 15px; cursor: pointer; width: 100%; margin-top: 10px; }
-        .dashboard { display: none; width: 100%; height: 100%; padding: 20px; gap: 20px; flex-direction: row; align-items: flex-start; }
-        table { width: 100%; border-collapse: collapse; font-family: 'Rajdhani', sans-serif; font-size: 18px; text-align: left; margin-top: 20px;}
-        th, td { border: 1px solid #444; padding: 12px; } th { background: #222; color: var(--accent); font-size: 10px; font-family: 'Press Start 2P'; }
+        :root { 
+            --ps-bg: #000814; --ps-blue: #00439c; --ps-glow: #00a2ff; 
+            --glass-bg: rgba(0, 15, 35, 0.85); --glass-border: rgba(255, 255, 255, 0.15); 
+            --danger: #ff3366; --success: #00e676; --credits: #ffb400; --playable: #b366ff;
+            --text-main: #f8fafc; --text-muted: #8c9eb5; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
+        
+        body { background: linear-gradient(135deg, #000a1f 0%, #00122e 100%); color: var(--text-main); min-height: 100vh; width: 100vw; display: flex; overflow: hidden; }
+
+        /* Custom Glass Scrollbars */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 162, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 162, 255, 0.5); box-shadow: 0 0 10px var(--ps-glow); }
+
+        .hidden { display: none !important; opacity: 0; pointer-events: none; }
+
+        /* AUTHENTICATION */
+        #auth-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 999999; background: #00050d; }
+        .auth-box { width: 420px; background: var(--glass-bg); padding: 3rem; border-radius: 16px; border: 1px solid var(--glass-border); text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.8); position: relative; z-index: 10; }
+        .auth-title { font-size: 2.2rem; font-weight: 900; color: white; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px;}
+        .auth-sub { color: var(--danger); font-weight: 800; font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; }
+        
+        .input-group { margin-bottom: 15px; text-align: left; width: 100%; }
+        .input-group label { display: block; color: var(--text-muted); font-size: 0.85rem; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; }
+        .input-control { width: 100%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1.1rem; font-weight: 600; transition: 0.2s; pointer-events: auto; cursor: text; }
+        .input-control:focus { border-color: var(--ps-glow); background: rgba(0,0,0,0.7); box-shadow: 0 0 15px rgba(0,162,255,0.2); }
+        
+        select.input-control, .filter-bar select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px !important; cursor: pointer;
+        }
+
+        .btn-primary { background: rgba(0, 162, 255, 0.15); color: var(--ps-glow); border: 1px solid var(--ps-glow); padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; pointer-events: auto; }
+        .btn-primary:hover { background: var(--ps-glow); color: black; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 162, 255, 0.4); }
+        .auth-msg { font-size: 0.95rem; font-weight: 800; min-height: 20px; margin-bottom: 15px; text-align: center; color: var(--danger); }
+
+        #admin-app { display: none; width: 100%; height: 100vh; position: relative; z-index: 1;}
+        
+        /* SIDEBAR */
+        .sidebar { width: 280px; background: rgba(0, 5, 15, 0.95); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; flex-shrink: 0;}
+        .sidebar-header { padding: 30px 25px; border-bottom: 1px solid var(--glass-border); text-align: center; }
+        .sidebar-header h2 { font-weight: 900; font-size: 1.6rem; color: white; letter-spacing: 1px; line-height: 1.1;}
+        .sidebar-header span { color: var(--danger); font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; }
+        
+        .nav-menu { padding: 20px 0; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+        .nav-item { padding: 18px 25px; color: var(--text-muted); font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; border-left: 4px solid transparent; }
+        .nav-item i { width: 25px; text-align: center; font-size: 1.2rem; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: rgba(0, 162, 255, 0.1); color: var(--ps-glow); border-left-color: var(--ps-glow); }
+        
+        .logout-btn { padding: 20px; text-align: center; border-top: 1px solid var(--glass-border); cursor: pointer; color: white; font-weight: 800; transition: 0.2s; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; background: rgba(255,255,255,0.05);}
+        .logout-btn:hover { background: rgba(255,255,255,0.15); color: var(--danger); }
+
+        /* MAIN CONTENT & BENTO */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: transparent; }
+        .topbar { padding: 25px 40px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); flex-shrink: 0;}
+        .topbar h1 { font-weight: 900; font-size: 2rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        
+        .content-area { padding: 40px; flex: 1; width: 100%; display: flex; flex-direction: column; overflow: hidden; }
+        .tab-view { flex: 1; display: flex; flex-direction: row; overflow: hidden; gap: 20px;}
+
+        /* BENTO GRID (Fixed Cut-offs) */
+        .bento-container { flex: 3; display: flex; flex-direction: column; overflow-y: auto; padding: 10px; }
+        .bento-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; }
+        
+        .bento-item { background: rgba(0, 15, 35, 0.6); border: 1px solid var(--glass-border); padding: 30px; border-radius: 12px; display: flex; align-items: center; gap: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); backdrop-filter: blur(5px); transition: all 0.3s ease; cursor: pointer; }
+        .bento-item:hover { transform: translateY(-5px); border-color: transparent; box-shadow: inset 0 0 25px rgba(0,162,255,0.3), 0 10px 30px rgba(0,0,0,0.8); }
+        
+        .bento-span-2 { grid-column: span 2; }
+        .bento-span-row-2 { grid-row: span 2; flex-direction: column; align-items: flex-start; justify-content: center; }
+        
+        .stat-icon { width: 70px; height: 70px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 2.2rem; background: rgba(255,255,255,0.05); box-shadow: inset 0 0 15px rgba(255,255,255,0.02); flex-shrink:0;}
+        .stat-info h3 { color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase; font-weight: 800; margin-bottom: 5px; letter-spacing: 1px;}
+        .stat-info .value { font-size: 2.5rem; font-weight: 900; color: white; line-height: 1; }
+        .glow-neon { text-shadow: 0 0 15px var(--ps-glow); color: var(--ps-glow); }
+        .glow-success { text-shadow: 0 0 15px var(--success); color: var(--success); }
+
+        /* LIVE PULSE SIDEBAR */
+        .live-pulse-panel { flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; display: flex; flex-direction: column; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-width: 300px; max-width: 400px;}
+        .pulse-header { font-weight: 900; font-size: 1.2rem; text-transform: uppercase; color: white; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; }
+        .pulse-dot { width: 10px; height: 10px; background: var(--success); border-radius: 50%; animation: pulseRed 1.5s infinite; }
+        .pulse-feed { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-right: 5px; }
+        .pulse-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; border-left: 3px solid transparent; animation: slideInPulse 0.3s ease-out; }
+        .pulse-item.info { border-left-color: var(--ps-glow); }
+        .pulse-item.success { border-left-color: var(--success); }
+        .pulse-item.alert { border-left-color: var(--danger); }
+        .pulse-item.bet { border-left-color: var(--credits); }
+        @keyframes slideInPulse { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* DATA TABLES & PANELS */
+        .panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; flex: 1; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%;}
+        .panel-header { padding: 20px 30px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); flex-shrink: 0;}
+        .panel-header h3 { font-weight: 900; font-size: 1.3rem; text-transform: uppercase; margin: 0; letter-spacing: 1px;}
+        
+        .table-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        thead { background: #000a1f; position: sticky; top: 0; z-index: 10; }
+        thead th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; border-bottom: 1px solid var(--glass-border); padding: 15px 20px;}
+        td { font-weight: 600; font-size: 1rem; color: white; }
+
+        .pagination { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; border-top: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); flex-shrink: 0; }
+        .pagination button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 15px; border-radius: 6px; font-weight:800; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .pagination button:hover:not(:disabled) { background: var(--ps-glow); color: black; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .center-col { text-align: center; justify-content: center; }
+
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; display: inline-block; }
+        .badge.pending { background: rgba(255, 180, 0, 0.15); color: var(--credits); border: 1px solid rgba(255, 180, 0, 0.3); }
+        .badge.approved, .badge.active { background: rgba(0, 230, 118, 0.15); color: var(--success); border: 1px solid rgba(0, 230, 118, 0.3); }
+        .badge.rejected, .badge.banned { background: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid rgba(255, 51, 102, 0.3); }
+        .badge.offline { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.2); }
+
+        .action-btns { display: flex; gap: 8px; justify-content: center;}
+        .btn-sm { padding: 6px 12px; border: none; border-radius: 6px; font-weight: 800; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; transition: 0.2s; color: white; letter-spacing: 1px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;}
+        .btn-edit { background: rgba(0, 162, 255, 0.15); color: var(--ps-glow); border: 1px solid rgba(0, 162, 255, 0.3); } .btn-edit:hover { background: var(--ps-glow); color: black; }
+        .btn-approve { background: rgba(0, 230, 118, 0.15); color: var(--success); border: 1px solid rgba(0, 230, 118, 0.3); } .btn-approve:hover { background: var(--success); color: black; }
+        .btn-reject { background: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid rgba(255, 51, 102, 0.3); } .btn-reject:hover { background: var(--danger); color: white; }
+
+        .split-screen { display: flex; gap: 20px; width: 100%; flex: 1; align-items: stretch; overflow: hidden;}
+        .split-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 50%; }
+
+        .clickable-row { cursor: pointer; transition: background-color 0.2s ease; border-left: 3px solid transparent; }
+        .clickable-row:hover { background-color: rgba(0, 162, 255, 0.15); border-left: 3px solid var(--ps-glow); }
+
+        /* MODALS */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 100000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-content { background: var(--glass-bg); width: 450px; padding: 40px 30px 30px; border-radius: 12px; border: 1px solid var(--glass-border); position: relative; box-shadow: 0 25px 80px rgba(0,0,0,0.9); pointer-events: auto; display: flex; flex-direction: column;}
+        .modal-content.wide { width: 700px; max-width: 95vw; max-height: 90vh;}
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; background: none; border: none; transition: 0.2s; outline: none; z-index: 10;}
+        .modal-close:hover { color: var(--danger); transform: scale(1.1); }
+        .modal-title { font-size: 1.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; text-align: center; flex-shrink:0;}
+
+        .filter-bar { display: flex; gap: 15px; background: rgba(0,0,0,0.4); padding: 15px 30px; border-bottom: 1px solid var(--glass-border); align-items: center; flex-shrink: 0;}
+        .filter-bar input, .filter-bar select { padding: 10px 15px; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); color: white; border-radius: 6px; font-size: 0.95rem; font-weight: 600; outline: none; }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: var(--ps-glow); }
+        
+        .confirm-btn-container { display: flex; gap: 15px; margin-top: 25px; }
+        .confirm-btn-container button { flex: 1; padding: 15px; font-size: 1.1rem; }
+        .modal-error-text { color: var(--danger); font-size: 0.9rem; font-weight: bold; text-align: center; margin-bottom: 15px; min-height: 20px; }
+
+        /* LIVE TOAST NOTIFICATIONS */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
+        .toast { background: rgba(0,0,0,0.9); border-left: 4px solid var(--ps-glow); color: white; padding: 15px 25px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: toastIn 0.3s forwards, toastOut 0.3s forwards 3s; pointer-events: auto;}
+        .toast.success { border-left-color: var(--success); color: var(--success); }
+        .toast.error { border-left-color: var(--danger); color: var(--danger); }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes toastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        /* QUICK ACTION POPOVER */
+        .glass-popover { position: fixed; background: rgba(0, 15, 35, 0.95); border: 1px solid var(--ps-glow); border-radius: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.9); z-index: 50000; padding: 10px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(20px); }
+        .qa-btn { background: transparent; border: none; color: white; padding: 10px 15px; text-align: left; font-weight: 800; border-radius: 4px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; text-transform: uppercase;}
+        .qa-btn:hover { background: rgba(255,255,255,0.1); }
+
+        .smurf-icon { color: var(--danger); margin-left: 8px; cursor: help; font-size: 1.1rem; animation: pulseRed 2s infinite; }
     </style>
 </head>
-<body>
+<body onclick="hideAllPopovers()">
 
-<div id="loginScreen" class="neon-box" style="max-width: 400px; border-color: var(--danger);">
-    <h1 style="color: var(--danger); margin-bottom: 20px; font-size: 20px;">RESTRICTED</h1>
-    <input type="text" id="adminUser" class="input-retro" placeholder="ADMIN USERNAME">
-    <input type="password" id="adminPass" class="input-retro" placeholder="PASSWORD">
-    <button class="btn-retro" style="background: var(--danger); color: #fff;" onclick="loginAdmin()">AUTHORIZE</button>
-    <div id="loginErr" style="color: var(--danger); font-size: 10px; margin-top: 15px;"></div>
-</div>
+    <div id="toast-container"></div>
 
-<div id="dashboardScreen" class="dashboard">
-    <div class="neon-box" style="flex-grow: 1; text-align: left;">
-        <h2 style="color: var(--success); margin-bottom: 10px;">PENDING BANK TRANSACTIONS</h2>
-        <table>
-            <thead><tr><th>PLAYER</th><th>TYPE</th><th>AMOUNT</th><th>ACTIONS</th></tr></thead>
-            <tbody id="bankQueue"><tr><td colspan="4" style="text-align:center; color:#666;">Waiting...</td></tr></tbody>
-        </table>
+    <div id="auth-container">
+        <div class="auth-box">
+            <div class="auth-title">STICK N' TRADE</div>
+            <div class="auth-sub">Master Control</div>
+            <div class="input-group">
+                <label>Admin Username</label>
+                <input type="text" id="admin-user" class="input-control" placeholder="Enter username">
+            </div>
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Master Password</label>
+                <input type="password" id="admin-pass" class="input-control" placeholder="Enter password">
+            </div>
+            <div id="auth-msg" class="auth-msg auth-error"></div>
+            <button class="btn-primary" onclick="loginAdmin()">ACCESS DASHBOARD</button>
+        </div>
     </div>
-</div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
+    <div id="admin-app">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>STICK N' TRADE</h2>
+                <span>Master Admin</span>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="switchTab('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard Overview</div>
+                <div class="nav-item" onclick="switchTab('users')"><i class="fas fa-users"></i> Player Management</div>
+                <div class="nav-item" onclick="switchTab('cashier')"><i class="fas fa-money-bill-transfer"></i> Economy & Cashier</div>
+                <div class="nav-item" onclick="switchTab('promos')"><i class="fas fa-gift"></i> Promos & Rewards</div>
+                <div class="nav-item" onclick="switchTab('tools')"><i class="fas fa-wrench"></i> System Tools</div>
+                <div class="nav-item" onclick="switchTab('audit')"><i class="fas fa-shield-alt"></i> Security & Audit Logs</div>
+            </div>
+            <div class="logout-btn" onclick="confirmLogout()">
+                <i class="fas fa-arrow-left"></i> Back to Casino
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <h1 id="page-title">Dashboard Overview</h1>
+                <div style="font-weight: 800; color: var(--ps-glow); display: flex; align-items: center; gap: 10px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">
+                    <i class="fas fa-shield-alt"></i> Terminal Connected
+                </div>
+            </div>
+
+            <div class="content-area">
+                
+                <div id="view-dashboard" class="tab-view">
+                    <div class="bento-container">
+                        <div class="bento-grid">
+                            <div class="bento-item bento-span-2 bento-span-row-2" onclick="switchTab('users')">
+                                <div style="display:flex; align-items:center; gap:20px;">
+                                    <div class="stat-icon" style="color: var(--credits); font-size:3rem; width:80px; height:80px;"><i class="fas fa-coins"></i></div>
+                                    <div class="stat-info">
+                                        <h3 style="font-size:1.1rem;">Total Economy (Main TC)</h3>
+                                        <div class="value glow-neon" id="stat-economy" style="font-size:3.5rem;">0.0</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bento-item bento-span-2" onclick="switchTab('cashier')">
+                                <div class="stat-icon" style="color: var(--success);"><i class="fas fa-arrow-down"></i></div>
+                                <div class="stat-info"><h3>Total Deposits (Approved)</h3><div class="value glow-success" id="stat-deposits">0.0</div></div>
+                            </div>
+
+                            <div class="bento-item" onclick="switchTab('users')">
+                                <div class="stat-icon" style="color: var(--ps-glow);"><i class="fas fa-users"></i></div>
+                                <div class="stat-info"><h3>Registered Players</h3><div class="value" id="stat-users">0</div></div>
+                            </div>
+
+                            <div class="bento-item" onclick="switchTab('cashier')">
+                                <div class="stat-icon" style="color: var(--danger);"><i class="fas fa-clock"></i></div>
+                                <div class="stat-info"><h3>Pending Requests</h3><div class="value" id="stat-pending">0</div></div>
+                            </div>
+
+                            <div class="bento-item bento-span-2">
+                                <div class="stat-icon" style="color: var(--text-muted);"><i class="fas fa-university"></i></div>
+                                <div class="stat-info"><h3>Bank Vault Limit</h3><div class="value" id="stat-limit">2,000,000</div></div>
+                            </div>
+                            
+                            <div class="bento-item bento-span-2">
+                                <div class="stat-icon" style="color: var(--success);"><i class="fas fa-chart-line"></i></div>
+                                <div class="stat-info"><h3>House Profit (24H)</h3><div class="value" id="stat-profit" style="color:var(--success);">0.0</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="live-pulse-panel">
+                        <div class="pulse-header"><div class="pulse-dot"></div> Live Pulse</div>
+                        <div class="pulse-feed custom-scroll" id="live-pulse-container">
+                            <div style="color:var(--text-muted); font-style:italic; text-align:center; padding: 20px;">Listening for events...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-users" class="tab-view hidden" style="flex-direction: column;">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Player Database Hierarchy</h3>
+                            <button class="btn-sm" style="background: rgba(255,180,0,0.15); color: var(--credits); border: 1px solid rgba(255,180,0,0.3); padding: 10px 20px; font-size: 0.95rem;" onclick="openModal('direct-gift-modal')">
+                                <i class="fas fa-gift"></i> Direct Gift Credits
+                            </button>
+                        </div>
+                        <div class="filter-bar">
+                            <i class="fas fa-search" style="color:var(--text-muted)"></i>
+                            <input type="text" id="filter-search" placeholder="Search by username..." style="flex:1;" onkeyup="pgUsers=1; renderUsers()">
+                            <select id="filter-role" onchange="pgUsers=1; renderUsers()">
+                                <option value="All">All Roles</option>
+                                <option value="Player">Player</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                            <select id="filter-status" onchange="pgUsers=1; renderUsers()">
+                                <option value="All">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Offline">Offline</option>
+                                <option value="Banned">Banned</option>
+                            </select>
+                            <select id="filter-sort" onchange="pgUsers=1; renderUsers()">
+                                <option value="desc">Credits: High to Low</option>
+                                <option value="asc">Credits: Low to High</option>
+                            </select>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="center-col">JOINED</th>
+                                        <th class="center-col">USERNAME</th>
+                                        <th class="center-col">CREDITS (TC)</th>
+                                        <th class="center-col">ROLE</th>
+                                        <th class="center-col">STATUS</th>
+                                        <th class="center-col">ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="pag-users"></div>
+                    </div>
+                </div>
+
+                <div id="view-cashier" class="tab-view hidden" style="flex-direction: column;">
+                    <div class="split-screen">
+                        <div class="panel split-col">
+                            <div class="panel-header"><h3 style="color: var(--credits);"><i class="fas fa-clock"></i> Pending Requests</h3></div>
+                            <div class="filter-bar">
+                                <i class="fas fa-search" style="color:var(--text-muted)"></i>
+                                <input type="text" id="filter-pend-search" placeholder="Search user or ref..." style="flex:1;" onkeyup="pgPend=1; renderTransactions()">
+                                <select id="filter-pend-sort" onchange="pgPend=1; renderTransactions()">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                </select>
+                            </div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead><tr><th class="center-col">DATE</th><th class="center-col">TYPE</th><th class="center-col">AMOUNT</th><th class="center-col">USER</th></tr></thead>
+                                    <tbody id="tx-pending-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination" id="pag-pend"></div>
+                        </div>
+
+                        <div class="panel split-col">
+                            <div class="panel-header"><h3><i class="fas fa-history"></i> Transaction History</h3></div>
+                            <div class="filter-bar">
+                                <i class="fas fa-search" style="color:var(--text-muted)"></i>
+                                <input type="text" id="filter-hist-search" placeholder="Search..." style="flex:1;" onkeyup="pgHist=1; renderTransactions()">
+                                <select id="filter-hist-type" onchange="pgHist=1; renderTransactions()">
+                                    <option value="All">All Types</option><option value="Deposit">Deposit</option><option value="Withdrawal">Withdrawal</option>
+                                </select>
+                                <select id="filter-hist-status" onchange="pgHist=1; renderTransactions()">
+                                    <option value="All">All Status</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option>
+                                </select>
+                                <select id="filter-hist-sort" onchange="pgHist=1; renderTransactions()">
+                                    <option value="newest">Newest</option>
+                                    <option value="oldest">Oldest</option>
+                                </select>
+                            </div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead><tr><th class="center-col">DATE</th><th class="center-col">TYPE</th><th class="center-col">AMOUNT</th><th class="center-col">STATUS</th></tr></thead>
+                                    <tbody id="tx-history-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination" id="pag-hist"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-promos" class="tab-view hidden" style="flex-direction: column;">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Active Gift Codes</h3>
+                            <button class="btn-sm btn-approve" onclick="openModal('create-promo-modal')" style="padding: 10px 20px; font-size: 0.95rem;"><i class="fas fa-plus"></i> Generate Codes</button>
+                        </div>
+                        <div class="filter-bar">
+                            <i class="fas fa-search" style="color:var(--text-muted)"></i>
+                            <input type="text" id="filter-promo-search" placeholder="Search batch ID..." style="flex:1;" onkeyup="pgPromos=1; renderPromos()">
+                            <select id="filter-promo-type" onchange="pgPromos=1; renderPromos()">
+                                <option value="All">All Types</option>
+                                <option value="playable">Playable Bonus</option>
+                                <option value="regular">Regular TC</option>
+                            </select>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="center-col">BATCH ID</th>
+                                        <th class="center-col">VALUE PER CODE</th>
+                                        <th class="center-col">CREDIT TYPE</th>
+                                        <th class="center-col">QUANTITY</th>
+                                        <th class="center-col">ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="promos-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="pag-promos"></div>
+                    </div>
+                </div>
+
+                <div id="view-tools" class="tab-view hidden" style="flex-direction: column;">
+                    <div class="panel">
+                        <div class="panel-header"><h3>System & Communication Tools</h3></div>
+                        <div class="bento-grid" style="padding: 30px; overflow: visible;">
+                            
+                            <div class="bento-item" onclick="openModal('global-update-modal')">
+                                <div class="stat-icon" style="color: var(--ps-glow);"><i class="fas fa-bullhorn"></i></div>
+                                <div class="stat-info">
+                                    <h3>Communication</h3>
+                                    <div class="value" style="font-size: 1.6rem;">Global Broadcast</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bento-item" onclick="toggleMaintenanceMode()" id="maintenance-card" style="border-color: var(--danger); box-shadow: inset 0 0 15px rgba(255,51,102,0.1);">
+                                <div class="stat-icon" style="color: var(--danger);" id="maintenance-icon"><i class="fas fa-power-off"></i></div>
+                                <div class="stat-info">
+                                    <h3 style="color: var(--danger);">Killswitch</h3>
+                                    <div class="value" style="font-size: 1.4rem; color: var(--danger);" id="maintenance-text">Maintenance: OFF</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-audit" class="tab-view hidden" style="flex-direction: column;">
+                    <div class="panel">
+                        <div class="panel-header"><h3 style="color: var(--danger);"><i class="fas fa-shield-alt"></i> Admin Audit Logs</h3></div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="center-col">DATE / TIME</th>
+                                        <th class="center-col">ADMIN NAME</th>
+                                        <th class="center-col">ACTION</th>
+                                        <th class="center-col">DETAILS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="audit-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="pag-audit"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="smurf-popover" class="glass-popover hidden" style="min-width: 200px;"></div>
     
-    function loginAdmin() {
-        socket.emit('login-attempt', { username: document.getElementById('adminUser').value, password: document.getElementById('adminPass').value });
-    }
+    <div id="quick-action-popover" class="glass-popover hidden" style="width: 220px;" onclick="event.stopPropagation()"></div>
 
-    socket.on('auth-error', msg => document.getElementById('loginErr').innerText = msg);
-    socket.on('auth-success', data => {
-        if(data.role !== 'admin') { document.getElementById('loginErr').innerText = 'ACCESS DENIED: NOT ADMIN.'; return; }
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboardScreen').style.display = 'flex';
-        document.body.style.alignItems = 'flex-start';
-        socket.emit('admin-fetch-bank-queue');
-    });
+    <div id="edit-user-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeModal('edit-user-modal')">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('edit-user-modal')"><i class="fas fa-times"></i></button>
+            <h3 class="modal-title">Edit Player</h3>
+            <div id="edit-user-err" class="modal-error-text"></div>
+            <input type="hidden" id="edit-u-id">
+            
+            <div class="input-group">
+                <label>Username (Read Only)</label>
+                <input type="text" id="edit-u-name" class="input-control" disabled style="opacity: 0.5;">
+            </div>
+            <div class="input-group">
+                <label>Main Balance (Withdrawable TC)</label>
+                <input type="number" id="edit-u-credits" class="input-control" step="0.1">
+            </div>
+            <div class="input-group">
+                <label>Playable Bonus (TC)</label>
+                <input type="number" id="edit-u-playable" class="input-control" step="0.1">
+            </div>
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Account Role</label>
+                <select id="edit-u-role" class="input-control">
+                    <option value="Player">Player</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="saveUserEdit()">SAVE CHANGES</button>
+        </div>
+    </div>
 
-    socket.on('admin-bank-queue-update', (requests) => {
-        const queue = document.getElementById('bankQueue'); queue.innerHTML = '';
-        if(requests.length === 0) return queue.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">No pending requests.</td></tr>`;
-        requests.forEach(req => {
-            queue.innerHTML += `<tr>
-                <td style="font-weight:bold;">${req.username}</td>
-                <td style="color: ${req.type==='deposit'?'var(--success)':'var(--danger)'};">${req.type.toUpperCase()}</td>
-                <td style="color: var(--accent);">${req.amount} TC</td>
-                <td>
-                    <button style="background:var(--success); color:#000; padding:5px; cursor:pointer;" onclick="process('${req._id}', 'approve')">APPROVE</button>
-                    <button style="background:var(--danger); color:#fff; padding:5px; cursor:pointer;" onclick="process('${req._id}', 'deny')">DENY</button>
-                </td>
-            </tr>`;
+    <div id="player-logs-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeModal('player-logs-modal')">
+        <div class="modal-content wide">
+            <button class="modal-close" onclick="closeModal('player-logs-modal')"><i class="fas fa-times"></i></button>
+            <h3 class="modal-title" id="pl-title">PLAYER LOGS</h3>
+            <div style="text-align:right; margin-bottom:15px;">
+                <button class="btn-sm btn-reject" onclick="clearPlayerLogs()" style="display:inline-flex; font-size: 1rem; padding: 10px 20px;"><i class="fas fa-trash"></i> Clear Logs</button>
+            </div>
+            <div class="table-wrapper" style="max-height: 400px;">
+                <table>
+                    <thead>
+                        <tr><th class="center-col">Date</th><th class="center-col">Action</th><th class="center-col">Amount</th><th class="center-col">Details</th></tr>
+                    </thead>
+                    <tbody id="pl-tbody"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pag-pl"></div>
+        </div>
+    </div>
+
+    <div id="snt-confirm-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeConfirmModal()">
+        <div class="modal-content" style="width: 400px; text-align: center;">
+            <h3 class="modal-title" id="confirm-title" style="color: var(--danger);">SYSTEM OVERRIDE</h3>
+            <p id="confirm-msg" style="font-size: 1.1rem; color: white; margin-bottom: 20px;">Are you sure?</p>
+            <div class="confirm-btn-container">
+                <button class="btn-primary" style="background: transparent; color: white; border-color: var(--text-muted);" onclick="closeConfirmModal()">CANCEL</button>
+                <button class="btn-primary" id="confirm-action-btn" style="background: var(--danger); border-color: var(--danger); color: white;">PROCEED</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="global-update-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeModal('global-update-modal')">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('global-update-modal')"><i class="fas fa-times"></i></button>
+            <h3 class="modal-title">Global Broadcast</h3>
+            <div class="input-group">
+                <label>Message (Notifies all active players)</label>
+                <input type="text" id="tool-msg" class="input-control" placeholder="Server maintenance in 5 minutes...">
+            </div>
+            <button class="btn-primary" onclick="sendGlobalUpdate()"><i class="fas fa-paper-plane"></i> Send Notification</button>
+        </div>
+    </div>
+
+    <div id="direct-gift-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeModal('direct-gift-modal')">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('direct-gift-modal')"><i class="fas fa-times"></i></button>
+            <h3 class="modal-title" style="color:var(--credits)">Direct Gift Credits</h3>
+            <div class="input-group">
+                <label>Target Group</label>
+                <select id="tool-target-type" class="input-control" onchange="toggleGiftTarget()">
+                    <option value="specific">Specific Player</option>
+                    <option value="all_active">All Active Players</option>
+                    <option value="all_registered">All Registered Players</option>
+                </select>
+            </div>
+            <div class="input-group" id="gift-user-group">
+                <label>Username</label>
+                <input type="text" id="tool-target-user" class="input-control" placeholder="PlayerName">
+            </div>
+            <div class="input-group">
+                <label>Amount (Max 500,000)</label>
+                <input type="number" id="tool-amt" class="input-control" placeholder="500" min="1" max="500000">
+            </div>
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Credit Type</label>
+                <select id="tool-credit-type" class="input-control">
+                    <option value="playable">Playable Bonus</option>
+                    <option value="regular">Regular TC</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="sendGift()"><i class="fas fa-check"></i> Send Gift</button>
+        </div>
+    </div>
+
+    <div id="create-promo-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeModal('create-promo-modal')">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('create-promo-modal')"><i class="fas fa-times"></i></button>
+            <h3 class="modal-title">Generate Gift Codes</h3>
+            <div id="promo-err" class="modal-error-text"></div>
+            <div class="input-group">
+                <label>TC Value Per Code</label>
+                <input type="number" id="promo-amount" class="input-control" placeholder="e.g. 500" min="10" max="100000">
+            </div>
+            <div class="input-group">
+                <label>Quantity of Codes to Generate</label>
+                <input type="number" id="promo-count" class="input-control" placeholder="e.g. 10" min="1" max="100">
+            </div>
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Credit Type</label>
+                <select id="promo-type" class="input-control">
+                    <option value="playable">Playable Bonus</option>
+                    <option value="regular">Regular TC</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="generatePromo()">CREATE BATCH</button>
+        </div>
+    </div>
+
+    <div id="view-batch-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeModal('view-batch-modal')">
+        <div class="modal-content wide">
+            <button class="modal-close" onclick="closeModal('view-batch-modal')"><i class="fas fa-times"></i></button>
+            <h3 class="modal-title" id="vb-title">BATCH DETAILS</h3>
+            <div style="text-align:right; margin-bottom:15px;">
+                <button class="btn-sm btn-edit" onclick="copyAllCodes()" style="display:inline-flex; font-size: 1rem; padding: 10px 20px;"><i class="fas fa-copy"></i> Copy All Codes</button>
+            </div>
+            <div class="table-wrapper" style="max-height: 400px;">
+                <table>
+                    <thead>
+                        <tr><th class="center-col">Code</th><th class="center-col">Status</th><th class="center-col">Copy</th></tr>
+                    </thead>
+                    <tbody id="vb-tbody"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pag-vb"></div>
+        </div>
+    </div>
+
+    <div id="inspector-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeModal('inspector-modal')">
+        <div class="modal-content" style="width: 500px; border-top: 4px solid var(--ps-glow);">
+            <button class="modal-close" onclick="closeModal('inspector-modal')"><i class="fas fa-times"></i></button>
+            <h3 class="modal-title" style="border: none; margin-bottom: 5px;">REQUEST INSPECTOR</h3>
+            
+            <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; border: 1px solid var(--glass-border); margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="color: var(--text-muted); font-weight: 800;">TYPE:</span>
+                    <span id="inspector-type" style="font-weight: 900; color: white;">DEPOSIT</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="color: var(--text-muted); font-weight: 800;">USER:</span>
+                    <span id="inspector-user" style="font-weight: 900; color: white;"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="color: var(--text-muted); font-weight: 800;">AMOUNT:</span>
+                    <span id="inspector-amt" style="font-weight: 900; color: var(--credits); font-size: 1.2rem;">0 TC</span>
+                </div>
+                <div style="display: flex; flex-direction: column; margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.2);">
+                    <span style="color: var(--text-muted); font-weight: 800; margin-bottom: 5px;">DETAILS PROVIDED:</span>
+                    <span id="inspector-proof-container" style="font-family: monospace; color: var(--ps-glow); word-break: break-all; font-size: 1.1rem; text-align: center; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 6px;"></span>
+                </div>
+            </div>
+
+            <div class="confirm-btn-container">
+                <button class="btn-primary" style="background: rgba(255, 51, 102, 0.15); color: var(--danger); border-color: var(--danger);" id="btn-reject-tx">REJECT</button>
+                <button class="btn-primary" style="background: rgba(0, 230, 118, 0.15); color: var(--success); border-color: var(--success);" id="btn-approve-tx">APPROVE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="lightbox-modal" class="modal-overlay hidden" onclick="closeModal('lightbox-modal')">
+        <img id="lightbox-img" class="lightbox-img" src="" alt="Proof Receipt" onclick="event.stopPropagation();">
+    </div>
+
+    <script>
+        const socket = io();
+        
+        // AUDIO CONTEXT FOR CASHIER SONAR PING
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let lastPendingCount = 0;
+
+        function playSonarPing() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            let o = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o.type = 'sine'; o.frequency.setValueAtTime(800, audioCtx.currentTime);
+            o.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.5);
+            g.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = msg;
+            container.appendChild(t);
+            setTimeout(() => { if(t.parentElement) t.remove(); }, 3500);
+        }
+
+        socket.on('adminSuccess', msg => showToast(msg, 'success'));
+        socket.on('adminError', msg => showToast(msg, 'error'));
+
+        socket.on('adminPulse', data => {
+            let fc = document.getElementById('live-pulse-container');
+            if(!fc) return;
+            if(fc.innerHTML.includes('Listening for events')) fc.innerHTML = '';
+            
+            let dStr = new Date(data.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            let item = document.createElement('div');
+            item.className = `pulse-item ${data.type}`;
+            item.innerHTML = `<span style="color:var(--text-muted); font-size:0.7rem; margin-right:5px;">[${dStr}]</span> ${data.msg}`;
+            
+            fc.appendChild(item);
+            if(fc.children.length > 50) fc.removeChild(fc.firstChild);
+            fc.scrollTop = fc.scrollHeight;
         });
-    });
 
-    function process(id, action) { socket.emit('admin-process-bank', { requestId: id, action }); }
-</script>
+        let gUsers = []; let pgUsers = 1;
+        let gTxs = []; let pgPend = 1; let pgHist = 1;
+        let gPromos = []; let pgPromos = 1;
+        let gBatchesArr = [];
+        let gAdminLogs = []; let pgAudit = 1;
+        
+        let activePlayerLogs = []; let pgPL = 1;
+        let activeBatchCodes = []; let pgVB = 1;
+        let currentLogUsername = '';
+        let sysMaintenance = false;
+        const limit = 10;
+
+        function renderPagination(totalItems, currentPage, elementId, updateVarStr) {
+            const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+            const c = document.getElementById(elementId);
+            if(!c) return;
+            c.innerHTML = `
+                <button onclick="${updateVarStr}=Math.max(1, ${updateVarStr}-1); window[arguments.callee.caller.name]();" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Prev</button>
+                <span style="font-weight: 800; color: var(--text-muted); font-size:0.9rem;">Page ${currentPage} of ${totalPages}</span>
+                <button onclick="${updateVarStr}=Math.min(${totalPages}, ${updateVarStr}+1); window[arguments.callee.caller.name]();" ${currentPage === totalPages ? 'disabled' : ''}>Next <i class="fas fa-chevron-right"></i></button>
+            `;
+        }
+
+        document.getElementById('admin-pass').addEventListener('keypress', function(e) { if (e.key === 'Enter') loginAdmin(); });
+
+        function loginAdmin() {
+            const u = document.getElementById('admin-user').value.trim();
+            const p = document.getElementById('admin-pass').value.trim();
+            const msgBox = document.getElementById('auth-msg');
+
+            if (!u || !p) { msgBox.innerText = "Please fill in all fields."; return; }
+            msgBox.innerText = "Authenticating..."; msgBox.style.color = "white";
+
+            socket.emit('adminLogin', { username: u, password: p });
+        }
+
+        socket.on('authError', msg => {
+            const msgBox = document.getElementById('auth-msg');
+            msgBox.innerText = msg; msgBox.style.color = "var(--danger)";
+        });
+
+        socket.on('adminLoginSuccess', data => {
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('admin-app').style.display = 'flex';
+        });
+
+        function confirmLogout() {
+            showSNTConfirm("DISCONNECT TERMINAL", "Are you sure you want to leave the Master Admin dashboard?", () => { window.location.href = '/'; });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            let triggerEl = Array.from(document.querySelectorAll('.nav-item')).find(el => el.getAttribute('onclick').includes(tabId));
+            if(triggerEl) triggerEl.classList.add('active');
+            
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+
+            const titles = { 
+                'dashboard': 'Dashboard Overview', 
+                'users': 'Player Management', 
+                'cashier': 'Economy & Cashier', 
+                'promos': 'Promos & Rewards', 
+                'tools': 'System Tools',
+                'audit': 'Security & Audit Logs' 
+            };
+            document.getElementById('page-title').innerText = titles[tabId];
+        }
+
+        function openModal(id) { 
+            hideAllPopovers();
+            document.querySelectorAll('.modal-error-text').forEach(el => el.innerText = '');
+            document.getElementById(id).classList.remove('hidden'); 
+        }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        let confirmActionCallback = null;
+        function showSNTConfirm(title, message, callback) {
+            hideAllPopovers();
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-msg').innerText = message;
+            confirmActionCallback = callback;
+            document.getElementById('confirm-action-btn').style.display = 'block';
+            openModal('snt-confirm-modal');
+        }
+        function closeConfirmModal() { closeModal('snt-confirm-modal'); confirmActionCallback = null; }
+        document.getElementById('confirm-action-btn').addEventListener('click', () => { if (confirmActionCallback) confirmActionCallback(); closeConfirmModal(); });
+
+        function showSNTAlert(title, message) {
+            hideAllPopovers();
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-msg').innerText = message;
+            document.getElementById('confirm-action-btn').style.display = 'none'; 
+            openModal('snt-confirm-modal');
+        }
+
+        // LIGHTBOX TRIGGER
+        function openLightbox(url) {
+            document.getElementById('lightbox-img').src = url;
+            openModal('lightbox-modal');
+        }
+
+        socket.on('adminDataSync', data => {
+            gUsers = data.users;
+            gTxs = data.transactions;
+            gPromos = data.giftBatches;
+            gAdminLogs = data.adminLogs || [];
+            
+            document.getElementById('stat-economy').innerText = data.stats.economy.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            document.getElementById('stat-users').innerText = gUsers.length;
+            document.getElementById('stat-deposits').innerText = data.stats.approvedDeposits.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            document.getElementById('stat-limit').innerText = data.stats.limit.toLocaleString();
+            
+            // House Profit Styling
+            let hp = document.getElementById('stat-profit');
+            hp.innerText = data.stats.houseProfit.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            hp.style.color = data.stats.houseProfit >= 0 ? "var(--success)" : "var(--danger)";
+            
+            // Audio Sonar Logic
+            let currentPending = gTxs.filter(t => t.status === 'Pending').length;
+            document.getElementById('stat-pending').innerText = currentPending;
+            if(currentPending > lastPendingCount) { playSonarPing(); }
+            lastPendingCount = currentPending;
+
+            // Maintenance Status Sync
+            sysMaintenance = data.isMaintenance;
+            let mCard = document.getElementById('maintenance-card');
+            let mIcon = document.getElementById('maintenance-icon');
+            let mText = document.getElementById('maintenance-text');
+            if(sysMaintenance) {
+                mCard.style.borderColor = 'var(--danger)'; mCard.style.boxShadow = 'inset 0 0 15px rgba(255,51,102,0.1)';
+                mIcon.style.color = 'var(--danger)'; mText.style.color = 'var(--danger)'; mText.innerText = 'Maintenance: ON';
+            } else {
+                mCard.style.borderColor = 'var(--glass-border)'; mCard.style.boxShadow = 'none';
+                mIcon.style.color = 'var(--text-muted)'; mText.style.color = 'white'; mText.innerText = 'Maintenance: OFF';
+            }
+
+            renderUsers(); renderTransactions(); renderPromos(); renderAuditLogs();
+            
+            // Update dropdown dynamic target
+            let d = document.getElementById('tool-target-user');
+            let v = d.value;
+            d.innerHTML = `<option value="all_registered">All Registered Users</option><option value="all_active">All Currently Online</option>`;
+            gUsers.forEach(u => d.innerHTML += `<option value="${u.username}">Specific: ${u.username}</option>`);
+            if(d.querySelector(`option[value="${v}"]`)) d.value = v;
+        });
+
+        // HIDE POPOVERS ON CLICK OUTSIDE
+        function hideAllPopovers() {
+            document.querySelectorAll('.glass-popover').forEach(p => p.classList.add('hidden'));
+        }
+
+        // SMURF INDICATOR LOGIC
+        function showSmurfPop(event, ip) {
+            let p = document.getElementById('smurf-popover');
+            let smurfs = gUsers.filter(u => u.ipAddress === ip).map(u => u.username);
+            p.innerHTML = `<div style="font-weight:900;margin-bottom:8px;color:var(--danger); border-bottom:1px solid rgba(255,51,102,0.3); padding-bottom:5px;">Linked Accounts (IP)</div>` + smurfs.map(s => `<div style="color:white; font-weight:600; font-size:0.9rem; margin-bottom:3px;"><i class="fas fa-user-circle" style="color:var(--text-muted); margin-right:5px;"></i> ${s}</div>`).join('');
+            p.style.top = (event.clientY + 15) + 'px';
+            p.style.left = (event.clientX + 15) + 'px';
+            p.classList.remove('hidden');
+        }
+        function hideSmurfPop() { document.getElementById('smurf-popover').classList.add('hidden'); }
+
+        // QUICK ACTION LOGIC
+        function toggleQuickActions(event, id, username, status) {
+            event.stopPropagation();
+            hideAllPopovers();
+            
+            let p = document.getElementById('quick-action-popover');
+            if (!p.classList.contains('hidden') && p.dataset.uid === id) { p.classList.add('hidden'); return; }
+            
+            let banText = status === 'Banned' ? 'Unban Player' : 'Ban Player';
+            let banAction = status === 'Banned' ? 'unban' : 'ban';
+            let banIcon = status === 'Banned' ? 'fa-unlock' : 'fa-ban';
+            let banColor = status === 'Banned' ? 'var(--success)' : 'var(--danger)';
+
+            p.innerHTML = `
+                <div style="padding:10px; border-bottom:1px solid var(--glass-border); font-weight:900; color:white; font-size:1.1rem; text-align:center;">${username}</div>
+                <button class="qa-btn" onclick="openEditUser('${id}')"><i class="fas fa-pen" style="color:var(--ps-glow)"></i> Edit Balances</button>
+                <button class="qa-btn" onclick="viewPlayerLogs('${username}')"><i class="fas fa-list" style="color:white"></i> View Logs</button>
+                <button class="qa-btn" onclick="actionUser('${banAction}', '${id}', '${username}')"><i class="fas ${banIcon}" style="color:${banColor}"></i> ${banText}</button>
+            `;
+            p.style.top = (event.clientY) + 'px';
+            p.style.left = (event.clientX - 230) + 'px';
+            p.dataset.uid = id;
+            p.classList.remove('hidden');
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('users-tbody'); tbody.innerHTML = '';
+            let sTerm = document.getElementById('filter-search').value.toLowerCase();
+            let rFilt = document.getElementById('filter-role').value;
+            let sFilt = document.getElementById('filter-status').value;
+            let sortDir = document.getElementById('filter-sort').value;
+
+            // IP Tracking for Smurfs
+            let ipCounts = {};
+            gUsers.forEach(u => { if(u.ipAddress && u.ipAddress !== 'Unknown') { ipCounts[u.ipAddress] = (ipCounts[u.ipAddress] || 0) + 1; } });
+
+            let filtered = gUsers.filter(u => {
+                if (sTerm && !u.username.toLowerCase().includes(sTerm)) return false;
+                if (rFilt !== 'All' && u.role !== rFilt) return false;
+                if (sFilt !== 'All' && u.status !== sFilt) return false;
+                return true;
+            });
+
+            filtered.sort((a, b) => {
+                const statusOrder = { 'Active': 1, 'Offline': 2, 'Banned': 3 };
+                if (statusOrder[a.status] !== statusOrder[b.status]) return statusOrder[a.status] - statusOrder[b.status];
+                let aBal = (a.credits || 0); let bBal = (b.credits || 0);
+                return sortDir === 'desc' ? bBal - aBal : aBal - bBal;
+            });
+
+            let paginated = filtered.slice((pgUsers - 1) * limit, pgUsers * limit);
+            renderPagination(filtered.length, pgUsers, 'pag-users', 'pgUsers');
+
+            if(paginated.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="center-col" style="color:var(--text-muted); font-style:italic; padding:30px;">No players found.</td></tr>`; return; }
+
+            paginated.forEach(u => {
+                let statClass = u.status === 'Active' ? 'active' : (u.status === 'Banned' ? 'banned' : 'offline');
+                let displayCredits = `<div style="font-weight: 900; color: var(--credits); font-size:1.1rem;">${(u.credits || 0).toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1})}</div><div style="font-size: 0.8rem; color: var(--playable); font-weight:800;">+ ${(u.playableCredits || 0).toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1})} P</div>`;
+                
+                let smurfWarning = (u.ipAddress && u.ipAddress !== 'Unknown' && ipCounts[u.ipAddress] > 1) ? `<i class="fas fa-exclamation-circle smurf-icon" onmouseover="showSmurfPop(event, '${u.ipAddress}')" onmouseout="hideSmurfPop()"></i>` : '';
+
+                tbody.innerHTML += `
+                    <tr class="clickable-row">
+                        <td class="center-col" style="color:var(--text-muted);">${new Date(u.joinDate).toLocaleDateString()}</td>
+                        <td class="center-col"><div style="font-weight:900; font-size:1.1rem; color: white; display:flex; align-items:center; justify-content:center;">${u.username} ${smurfWarning}</div></td>
+                        <td class="center-col">${displayCredits}</td>
+                        <td class="center-col">${u.role}</td>
+                        <td class="center-col"><span class="badge ${statClass}">${u.status}</span></td>
+                        <td class="center-col">
+                            <button class="btn-sm btn-edit" onclick="toggleQuickActions(event, '${u._id}', '${u.username}', '${u.status}')" style="background:transparent; border-color:var(--glass-border); color:white; font-size:1.2rem; padding:4px 15px;"><i class="fas fa-ellipsis-h"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function renderAuditLogs() {
+            const tbody = document.getElementById('audit-tbody'); tbody.innerHTML = '';
+            let paginated = gAdminLogs.slice((pgAudit - 1) * limit, pgAudit * limit);
+            renderPagination(gAdminLogs.length, pgAudit, 'pag-audit', 'pgAudit');
+
+            if(paginated.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="center-col" style="color:var(--text-muted); font-style: italic; padding: 30px;">No audit logs available.</td></tr>`; return; }
+
+            paginated.forEach(l => {
+                let dStr = new Date(l.date).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="center-col" style="color:var(--text-muted); font-size:0.85rem;">${dStr}</td>
+                        <td class="center-col" style="font-weight: 800; color:white;">${l.adminName}</td>
+                        <td class="center-col" style="color:var(--ps-glow); font-weight:900; text-transform:uppercase;">${l.action}</td>
+                        <td class="center-col" style="color:var(--text-muted); font-size:0.9rem;">${l.details}</td>
+                    </tr>`;
+            });
+        }
+
+        function viewPlayerLogs(username) {
+            hideAllPopovers();
+            currentLogUsername = username;
+            document.getElementById('pl-title').innerText = `${username} LOGS`;
+            pgPL = 1;
+            socket.emit('fetchUserLogs', username);
+            openModal('player-logs-modal');
+        }
+
+        socket.on('userLogsData', data => {
+            if(data.username !== currentLogUsername) return;
+            activePlayerLogs = data.logs;
+            renderPlayerLogsPage();
+        });
+
+        function renderPlayerLogsPage() {
+            const tbody = document.getElementById('pl-tbody'); tbody.innerHTML = '';
+            let paginated = activePlayerLogs.slice((pgPL - 1) * limit, pgPL * limit);
+            renderPagination(activePlayerLogs.length, pgPL, 'pag-pl', 'pgPL');
+
+            if(paginated.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="center-col" style="color:var(--text-muted); font-style: italic; padding: 30px;">No logs found for this user.</td></tr>`; return; }
+
+            paginated.forEach(l => {
+                let dStr = new Date(l.date).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+                let amtColor = l.amount > 0 ? 'var(--success)' : (l.amount < 0 ? 'var(--danger)' : 'white');
+                let amtSign = l.amount > 0 ? '+' : '';
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="center-col" style="color:var(--text-muted); font-size:0.85rem;">${dStr}</td>
+                        <td class="center-col" style="font-weight: 800; text-transform: uppercase;">${l.action}</td>
+                        <td class="center-col" style="color:${amtColor}; font-weight:900;">${amtSign}${l.amount.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</td>
+                        <td class="center-col" style="color:var(--text-muted); font-size:0.9rem; text-transform:uppercase;">${l.details}</td>
+                    </tr>`;
+            });
+        }
+
+        function clearPlayerLogs() {
+            closeModal('player-logs-modal');
+            showSNTConfirm("CLEAR LOGS", `Delete all logs for ${currentLogUsername}? This cannot be undone.`, () => {
+                socket.emit('adminAction', { type: 'clearUserLogs', username: currentLogUsername });
+            });
+        }
+
+        function renderTransactions() {
+            const pBody = document.getElementById('tx-pending-tbody'); const hBody = document.getElementById('tx-history-tbody');
+            pBody.innerHTML = ''; hBody.innerHTML = '';
+
+            let pTerm = document.getElementById('filter-pend-search').value.toLowerCase();
+            let pSort = document.getElementById('filter-pend-sort').value;
+            let hTerm = document.getElementById('filter-hist-search').value.toLowerCase();
+            let hType = document.getElementById('filter-hist-type').value;
+            let hStat = document.getElementById('filter-hist-status').value;
+            let hSort = document.getElementById('filter-hist-sort').value;
+
+            let pendings = gTxs.filter(t => t.status === 'Pending');
+            let histories = gTxs.filter(t => t.status !== 'Pending');
+
+            if(pTerm) pendings = pendings.filter(t => t.username.toLowerCase().includes(pTerm) || t.ref.toLowerCase().includes(pTerm));
+            if(hTerm) histories = histories.filter(t => t.username.toLowerCase().includes(hTerm) || t.ref.toLowerCase().includes(hTerm));
+            if(hType !== 'All') histories = histories.filter(t => t.type === hType);
+            if(hStat !== 'All') histories = histories.filter(t => t.status === hStat);
+
+            pendings.sort((a,b) => pSort === 'newest' ? new Date(b.date) - new Date(a.date) : new Date(a.date) - new Date(b.date));
+            histories.sort((a,b) => hSort === 'newest' ? new Date(b.date) - new Date(a.date) : new Date(a.date) - new Date(b.date));
+
+            let pagPend = pendings.slice((pgPend - 1) * limit, pgPend * limit);
+            renderPagination(pendings.length, pgPend, 'pag-pend', 'pgPend');
+            
+            let pagHist = histories.slice((pgHist - 1) * limit, pgHist * limit);
+            renderPagination(histories.length, pgHist, 'pag-hist', 'pgHist');
+
+            if(pagPend.length === 0) pBody.innerHTML = `<tr><td colspan="4" class="center-col" style="color:var(--text-muted); font-style:italic; padding:30px;">Queue is empty.</td></tr>`;
+            pagPend.forEach(t => {
+                let color = t.type === 'Deposit' ? 'var(--success)' : 'var(--danger)';
+                let dStr = new Date(t.date).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+                pBody.innerHTML += `
+                    <tr class="clickable-row" onclick="openInspector('${t._id}', '${t.type}', ${t.amount}, '${t.username}', '${t.ref}')">
+                        <td class="center-col" style="color:var(--text-muted); font-size:0.9rem;">${dStr}</td>
+                        <td class="center-col" style="text-transform:uppercase; font-weight:800; font-size: 0.8rem;">${t.type}</td>
+                        <td class="center-col" style="color:${color}; font-weight: 800; font-size: 1.1rem;">${t.amount.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</td>
+                        <td class="center-col" style="font-weight:900; color:white;">${t.username}</td>
+                    </tr>`;
+            });
+
+            if(pagHist.length === 0) hBody.innerHTML = `<tr><td colspan="4" class="center-col" style="color:var(--text-muted); font-style:italic; padding:30px;">No history found.</td></tr>`;
+            pagHist.forEach(t => {
+                let color = t.type === 'Deposit' ? 'var(--success)' : 'var(--danger)';
+                let dStr = new Date(t.date).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+                let statClass = t.status === 'Approved' ? 'approved' : 'rejected';
+                hBody.innerHTML += `
+                    <tr>
+                        <td class="center-col" style="color:var(--text-muted); font-size:0.9rem;">${dStr}</td>
+                        <td class="center-col" style="text-transform:uppercase; font-weight: 800; font-size: 0.8rem;">${t.type}</td>
+                        <td class="center-col" style="color:${color}; font-weight: 800;">${t.amount.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</td>
+                        <td class="center-col"><span class="badge ${statClass}">${t.status}</span></td>
+                    </tr>`;
+            });
+        }
+
+        function openInspector(id, type, amount, username, proofRef) {
+            document.getElementById('inspector-type').innerText = type.toUpperCase();
+            document.getElementById('inspector-amt').innerText = amount.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}) + " TC";
+            document.getElementById('inspector-user').innerText = username;
+            
+            const proofContainer = document.getElementById('inspector-proof-container');
+            if (type === 'Deposit') {
+                proofContainer.innerHTML = `<img src="${proofRef}" style="max-width:100%; max-height:200px; border-radius:8px; cursor:zoom-in;" alt="Proof of Payment" onclick="openLightbox('${proofRef}')" onerror="this.src='https://via.placeholder.com/400x200/111/fff?text=Image+Not+Found'">`;
+            } else {
+                proofContainer.innerHTML = `<div style="font-size: 1.2rem; color: var(--text-main); text-align: center; padding: 20px;">Payout Details Provided:<br><span style="color: var(--credits); font-family: monospace;">${proofRef}</span></div>`;
+            }
+
+            document.getElementById('btn-approve-tx').onclick = () => { socket.emit('adminAction', { type: 'resolveTx', id: id, status: 'Approved' }); closeModal('inspector-modal'); };
+            document.getElementById('btn-reject-tx').onclick = () => { socket.emit('adminAction', { type: 'resolveTx', id: id, status: 'Rejected' }); closeModal('inspector-modal'); };
+
+            openModal('inspector-modal');
+        }
+
+        function renderPromos() {
+            let gBatches = {};
+            let sTerm = document.getElementById('filter-promo-search').value.toLowerCase();
+            let tFilt = document.getElementById('filter-promo-type').value;
+
+            gPromos.forEach(p => {
+                if(tFilt !== 'All' && p.creditType !== tFilt) return;
+                if(sTerm && !p.batchId.toLowerCase().includes(sTerm)) return;
+                if(!gBatches[p.batchId]) gBatches[p.batchId] = { id: p.batchId, amount: p.amount, type: p.creditType || 'playable', codes: [] };
+                gBatches[p.batchId].codes.push(p);
+            });
+
+            gBatchesArr = Object.values(gBatches);
+            let paginated = gBatchesArr.slice((pgPromos - 1) * limit, pgPromos * limit);
+            renderPagination(gBatchesArr.length, pgPromos, 'pag-promos', 'pgPromos');
+
+            const tbody = document.getElementById('promos-tbody'); tbody.innerHTML = '';
+            if(paginated.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="center-col" style="color:var(--text-muted); font-style:italic; padding:30px;">No batches found.</td></tr>`; return; }
+
+            paginated.forEach(b => {
+                let tColor = b.type === 'playable' ? 'var(--playable)' : 'var(--credits)';
+                let tName = b.type === 'playable' ? 'Playable' : 'Regular';
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="center-col" style="font-weight:900; color:white; font-size:1.1rem;">${b.id}</td>
+                        <td class="center-col" style="color:var(--ps-glow); font-weight: 800;">${b.amount.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</td>
+                        <td class="center-col" style="font-weight:800; color:${tColor};">${tName}</td>
+                        <td class="center-col" style="font-weight:800; font-size:1.1rem;">${b.codes.length}</td>
+                        <td class="center-col">
+                            <div class="action-btns" style="justify-content:center;">
+                                <button class="btn-sm btn-edit" onclick="openBatchView('${b.id}')"><i class="fas fa-eye"></i> View</button>
+                                <button class="btn-sm btn-reject" onclick="deleteBatch('${b.id}')"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function openBatchView(batchId) {
+            let b = gBatchesArr.find(x => x.id === batchId);
+            if(!b) return;
+            document.getElementById('vb-title').innerText = `${batchId} CODES`;
+            activeBatchCodes = b.codes;
+            pgVB = 1;
+            renderBatchViewPage();
+            openModal('view-batch-modal');
+        }
+
+        function renderBatchViewPage() {
+            const tbody = document.getElementById('vb-tbody'); tbody.innerHTML = '';
+            let paginated = activeBatchCodes.slice((pgVB - 1) * limit, pgVB * limit);
+            renderPagination(activeBatchCodes.length, pgVB, 'pag-vb', 'pgVB');
+            
+            paginated.forEach(c => {
+                let statHtml = c.redeemedBy ? `<span class="badge offline">Claimed by ${c.redeemedBy}</span>` : `<span class="badge active">Available</span>`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="center-col" style="font-family:monospace; font-size:1.2rem; font-weight:900; letter-spacing:1px;">${c.code}</td>
+                        <td class="center-col">${statHtml}</td>
+                        <td class="center-col"><button class="btn-sm btn-edit" style="margin:0 auto; padding: 10px;" onclick="copySingle('${c.code}', this)"><i class="fas fa-copy"></i></button></td>
+                    </tr>`;
+            });
+        }
+
+        function copySingle(code, btn) {
+            navigator.clipboard.writeText(code);
+            let og = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-check"></i>`;
+            btn.style.background = 'var(--success)'; btn.style.color = 'black';
+            setTimeout(() => { btn.innerHTML = og; btn.style.background = ''; btn.style.color = ''; }, 1000);
+        }
+
+        function copyAllCodes() {
+            if(activeBatchCodes.length === 0) return;
+            let codes = activeBatchCodes.map(c => c.code);
+            navigator.clipboard.writeText(codes.join('\n'));
+            showSNTAlert("SUCCESS", `Copied ${codes.length} codes to your clipboard!`);
+        }
+
+        function actionUser(type, id, username) {
+            hideAllPopovers();
+            let msg = type === 'ban' ? `Are you sure you want to BAN ${username}?` : `Are you sure you want to UNBAN ${username}?`;
+            showSNTConfirm("MODIFY ACCOUNT", msg, () => { socket.emit('adminAction', { type: type, id: id }); });
+        }
+
+        function openEditUser(id) {
+            hideAllPopovers();
+            const u = gUsers.find(x => x._id === id); if(!u) return;
+            document.getElementById('edit-u-id').value = u._id;
+            document.getElementById('edit-u-name').value = u.username;
+            document.getElementById('edit-u-credits').value = u.credits || 0;
+            document.getElementById('edit-u-playable').value = u.playableCredits || 0;
+            document.getElementById('edit-u-role').value = u.role;
+            openModal('edit-user-modal');
+        }
+
+        function saveUserEdit() {
+            let cr = parseFloat(document.getElementById('edit-u-credits').value);
+            let pcr = parseFloat(document.getElementById('edit-u-playable').value);
+            if(isNaN(cr) || isNaN(pcr)) return document.getElementById('edit-user-err').innerText = 'Please enter valid numbers.';
+            
+            socket.emit('adminAction', { type: 'editUser', id: document.getElementById('edit-u-id').value, credits: cr, playableCredits: pcr, role: document.getElementById('edit-u-role').value });
+            closeModal('edit-user-modal');
+        }
+
+        function generatePromo() {
+            let amt = parseFloat(document.getElementById('promo-amount').value);
+            let cnt = parseInt(document.getElementById('promo-count').value);
+            let cType = document.getElementById('promo-type').value;
+
+            if(!amt || !cnt) { document.getElementById('promo-err').innerText = 'Please fill out both the TC amount and quantity.'; return; }
+            socket.emit('adminAction', { type: 'createBatch', amount: amt, count: cnt, creditType: cType });
+            closeModal('create-promo-modal');
+            document.getElementById('promo-amount').value = ''; document.getElementById('promo-count').value = '';
+        }
+
+        function deleteBatch(batchId) {
+            showSNTConfirm("DELETE BATCH", `Permanently delete ALL codes in batch ${batchId}?`, () => { socket.emit('adminAction', { type: 'deleteBatch', batchId: batchId }); });
+        }
+
+        function toggleGiftTarget() {
+            const type = document.getElementById('tool-target-type').value;
+            const userGroup = document.getElementById('gift-user-group');
+            userGroup.style.display = type === 'specific' ? 'block' : 'none';
+        }
+
+        function sendGlobalUpdate() {
+            let msg = document.getElementById('tool-msg').value;
+            if(!msg) return;
+            closeModal('global-update-modal');
+            showSNTConfirm("GLOBAL BROADCAST", `Send this message to everyone online?\n"${msg}"`, () => {
+                socket.emit('adminAction', { type: 'sendUpdate', msg: msg });
+                document.getElementById('tool-msg').value = ''; 
+            });
+        }
+        
+        function toggleMaintenanceMode() {
+            let actionStr = sysMaintenance ? "DISABLE" : "ACTIVATE";
+            let confirmMsg = sysMaintenance ? "Turn OFF Maintenance Mode and allow players to access the casino?" : "Turn ON Maintenance Mode? Players will be blocked from accessing the game.";
+            showSNTConfirm(`${actionStr} MAINTENANCE`, confirmMsg, () => {
+                socket.emit('adminAction', { type: 'toggleMaintenance' });
+            });
+        }
+
+        function sendGift() {
+            let type = document.getElementById('tool-target-type').value;
+            let targetUser = document.getElementById('tool-target-user').value;
+            let amt = parseFloat(document.getElementById('tool-amt').value);
+            let cType = document.getElementById('tool-credit-type').value;
+            
+            if (!amt) return;
+            if (type === 'specific' && !targetUser) return;
+            
+            let target = type === 'specific' ? targetUser : type; 
+            let tName = cType === 'playable' ? 'Playable TC' : 'Regular TC';
+
+            let confirmMsg = type === 'specific' ? `Gift ${amt} ${tName} to ${target}?` : `Gift ${amt} ${tName} to ${target.replace('_', ' ').toUpperCase()}?`;
+
+            closeModal('direct-gift-modal');
+            showSNTConfirm("AUTHORIZE GIFT", confirmMsg, () => {
+                socket.emit('adminAction', { type: 'giftCredits', target: target, amount: amt, creditType: cType });
+                document.getElementById('tool-target-user').value = ''; document.getElementById('tool-amt').value = ''; 
+            });
+        }
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if(e.keyCode === 123) return false; 
+            if(e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false; 
+        };
+    </script>
 </body>
 </html>
