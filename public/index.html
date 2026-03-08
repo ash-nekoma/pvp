@@ -19,20 +19,35 @@
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
+        /* ================= CSS VARIABLES & RESET ================= */
         :root { 
-            --ps-bg: #000814; --ps-blue: #00439c; --ps-light-blue: #0070cc; --ps-glow: #00a2ff; 
-            --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15); --glass-hover: rgba(255, 255, 255, 0.9); 
-            --danger: #ff3366; --success: #00e676; --credits: #ffb400; 
-            --text-main: #f8fafc; --text-muted: #8c9eb5; --playable: #b366ff; 
+            --ps-bg: #000814; 
+            --ps-blue: #00439c; 
+            --ps-light-blue: #0070cc; 
+            --ps-glow: #00a2ff; 
+            --glass-bg: rgba(0, 10, 25, 0.75); 
+            --glass-border: rgba(255, 255, 255, 0.15); 
+            --glass-hover: rgba(255, 255, 255, 0.9); 
+            --danger: #ff3366; 
+            --success: #00e676; 
+            --credits: #ffb400; 
+            --text-main: #f8fafc; 
+            --text-muted: #8c9eb5; 
+            --playable: #b366ff; 
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
-            background-size: 200% 200%; animation: AmbientBG 15s ease infinite; 
-            color: var(--text-main); height: 100vh !important; width: 100vw !important; overflow: hidden !important; 
-            -webkit-user-select: none; user-select: none; touch-action: manipulation; padding-bottom: env(safe-area-inset-bottom);
+            background-size: 200% 200%; 
+            animation: AmbientBG 15s ease infinite; 
+            color: var(--text-main); 
+            height: 100vh !important; 
+            width: 100vw !important; 
+            overflow: hidden !important; 
+            -webkit-user-select: none; user-select: none; touch-action: manipulation;
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         @keyframes AmbientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -50,9 +65,15 @@
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
         select { appearance: none; cursor: pointer; }
+        
         .hidden { display: none !important; }
 
-        #auth-container { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999999; background: linear-gradient(rgba(0, 5, 15, 0.8), rgba(0, 5, 15, 0.95)), url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80') center/cover no-repeat; backdrop-filter: blur(15px); }
+        /* ================= AUTHENTICATION ================= */
+        #auth-container { 
+            position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999999; 
+            background: linear-gradient(rgba(0, 5, 15, 0.8), rgba(0, 5, 15, 0.95)), url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80') center/cover no-repeat;
+            backdrop-filter: blur(15px); 
+        }
         .auth-box { width: 420px; max-width: 95vw; background: rgba(0, 5, 15, 0.9); padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(0, 162, 255, 0.4); border-top: 3px solid var(--ps-glow); box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 162, 255, 0.1); text-align: center; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
         .auth-title { font-size: 2.2rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; white-space: nowrap;}
         .auth-sub { color: var(--ps-glow); font-weight: 800; font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; }
@@ -68,6 +89,7 @@
         .pwd-input-wrapper i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 1.1rem; z-index: 2; transition: 0.2s; }
         .pwd-input-wrapper i:hover { color: white; }
 
+        /* BUTTONS & INPUTS */
         .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-size: 1rem; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3);}
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.2); border-color: white;} 
         .btn-play:disabled { background: rgba(0,0,0,0.5) !important; color: var(--text-muted) !important; cursor: not-allowed !important; border-color: transparent !important; opacity: 0.5 !important; box-shadow:none !important; transform:none !important; }
@@ -81,6 +103,7 @@
         .btn-rules { background: rgba(0,0,0,0.5); color: var(--text-muted); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0;} 
         .btn-rules:hover { background: rgba(255,255,255,0.1); color: white; border-color: white; transform: scale(1.05); }
 
+        /* ================= HUD TOPBAR & DUAL CURRENCY ================= */
         #app-container { display: none; height: 100vh; width: 100vw; overflow: hidden;}
         .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 99999; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 12px 25px; height: 75px; display: flex; align-items: center; padding-top: calc(12px + env(safe-area-inset-top));}
         .topbar-inner { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
@@ -92,6 +115,7 @@
         .brand-sub { color: var(--ps-glow); font-weight: 800; font-size: 0.9rem; letter-spacing: 3px; margin-top: 2px; text-transform: uppercase; }
 
         .topbar-right { display: flex; flex-direction: row; align-items: center; gap: 15px;}
+        
         .player-profile { display: flex; align-items: center; gap: 8px; font-weight: 800; color: white; font-size: 1rem; text-transform: uppercase; margin-right: 10px;}
         .player-profile i { color: var(--ps-glow); font-size: 1.4rem; }
 
@@ -118,6 +142,7 @@
         .mobile-menu-btn { display: none; }
         .desktop-actions { display: flex; gap: 15px; align-items: center; }
 
+        /* DROPDOWN POPOVERS */
         .dropdown-wrapper { position: relative; display: inline-block; }
         .custom-dropdown { position: absolute; top: 45px; right: -10px; width: 350px; background: rgba(0,5,15,0.95); border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); border-radius: 8px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 100000; box-shadow: 0 25px 50px rgba(0,0,0,0.9); cursor: default;}
         
@@ -138,6 +163,7 @@
         .notif-item-del { position: absolute; right: 12px; bottom: 12px; background: transparent; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; transition: 0.2s; }
         .notif-item-del:hover { color: var(--danger); transform: scale(1.1); }
 
+        /* BOTTOM RIGHT RESULTS UI */
         .result-box, .result-overlay-shared { 
             position: absolute; bottom: 20px; right: 20px; 
             opacity: 0; text-align: right; padding: 20px 30px; border-radius: 12px; display: none; 
@@ -154,23 +180,44 @@
         .res-title { font-size: 1.2rem; font-weight: 900; color: white; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; text-align: right; width: 100%; } 
         .res-payout { font-size: 1.8rem; font-weight: 900; text-align: right; width: 100%; }
 
+        /* SUBTLE ARCADE FLASH - BOTTOM RIGHT */
         .local-flash { 
-            position: absolute; bottom: 25px; right: 25px; z-index: 2500; 
-            color: var(--danger); font-size: 1.2rem; font-weight: 900; text-transform: uppercase; 
-            text-align: right; pointer-events: none; opacity: 0; transition: all 0.3s; 
-            display: none; white-space: nowrap; text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 15px var(--danger);
+            position: absolute; 
+            bottom: 25px; 
+            right: 25px; 
+            z-index: 2500; 
+            color: var(--danger); 
+            font-size: 1.2rem; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            text-align: right; 
+            pointer-events: none; 
+            opacity: 0; 
+            transition: all 0.3s; 
+            display: none; 
+            white-space: nowrap;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 15px var(--danger);
             transform: translateY(20px);
         }
         .local-flash.show { display: block; animation: flashAnimSubtle 2s forwards; }
         .local-flash.success { color: var(--success); text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 15px var(--success); }
-        @keyframes flashAnimSubtle { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+        @keyframes flashAnimSubtle { 
+            0% { opacity: 0; transform: translateY(20px); } 
+            15% { opacity: 1; transform: translateY(0); } 
+            80% { opacity: 1; } 
+            100% { opacity: 0; transform: translateY(-10px); } 
+        }
 
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes popBalance { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); } 100% { transform: scale(1); } } .anim-pop { animation: popBalance 0.6s ease-out; }
         @keyframes popBet { 0% { transform: scale(1); } 50% { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.5); } 100% { transform: scale(1); } } .anim-pop-bet { animation: popBet 0.3s ease-out; }
         @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } 100% { transform: rotate(0deg); } } .anim-shake { animation: shake 0.3s infinite; }
 
-        .main-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 75px); margin-top: 75px; width: 100vw; overflow-y: auto; overflow-x: hidden; position: relative; padding-bottom: 50px; }
+        /* STRICT CENTERED MAIN WRAPPER */
+        .main-wrapper { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: calc(100vh - 75px); margin-top: 75px; width: 100vw; overflow-y: auto; overflow-x: hidden; position: relative; padding-bottom: 50px;
+        }
         .content { width: 100%; max-width: 1400px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; flex: 1; min-height: 700px;}
         .view-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; flex-shrink: 0;}
         
@@ -178,11 +225,20 @@
         .casino-title { font-size: 4rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 3rem 0; line-height: 1.1; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.2); text-align: center; flex-shrink: 0;}
         
         .lobby-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; flex-shrink: 0;}
+        
+        /* FIXED DETACHED BACK BUTTON */
         .btn-back-fixed { position: fixed; top: 95px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 10px; backdrop-filter: blur(10px); text-transform: uppercase; letter-spacing: 1px; }
         .btn-back-fixed:hover { background: white; color: black; box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
 
+        /* ================= REDESIGNED PLAYSTATION GRIDS & CARDS ================= */
         .lobby-modes-container { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 40px; width: 100%; flex-wrap: wrap; }
-        .mode-card { width: 340px; min-width: 340px; height: 440px; text-align: center; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); transition: 0.3s; overflow: hidden; flex-shrink: 0; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .mode-card { 
+            width: 340px; min-width: 340px; height: 440px; text-align: center; cursor: pointer; position: relative; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 20px; 
+            background: var(--glass-bg); border: 1px solid var(--glass-border); transition: 0.3s; overflow: hidden; 
+            flex-shrink: 0; padding: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
         .mode-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent); z-index: 1; }
         .mode-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 20px rgba(0,162,255,0.2); background: rgba(0, 30, 60, 0.8); }
         .mode-icon { font-size: 6.5rem; margin-bottom: 2rem; color: var(--ps-light-blue); transition: 0.3s; position: relative; z-index: 2; }
@@ -193,30 +249,43 @@
         .casino-grid.solo-grid { display: grid; grid-template-columns: repeat(3, 260px); justify-content: center; gap: 20px; width: 100%; max-width: 900px; }
         .casino-grid.shared-grid { display: grid; grid-template-columns: repeat(4, 260px); justify-content: center; gap: 20px; width: 100%; max-width: 1200px; }
 
-        .game-card { width: 100%; height: 320px; text-align: center; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; border-radius: 12px; background: #020813; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; overflow: hidden; padding: 0; box-shadow: 0 10px 25px rgba(0,0,0,0.6); flex-shrink: 0; }
+        .game-card { 
+            width: 100%; height: 320px; text-align: center; cursor: pointer; position: relative;
+            display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start;
+            border-radius: 12px; background: #020813; border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s; overflow: hidden; padding: 0; box-shadow: 0 10px 25px rgba(0,0,0,0.6); flex-shrink: 0;
+        }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 20px rgba(0,162,255,0.2); }
+        
         .game-img { flex: 1; display: flex; justify-content: center; align-items: center; font-size: 5.5rem; color: #0070cc; transition: 0.3s; background: transparent;}
         .game-card:hover .game-img { color: var(--ps-glow); text-shadow: 0 0 25px var(--ps-glow); transform: scale(1.1); }
+        
         .game-info { background: #000000; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100px; border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;}
         .game-title { font-size: 1.2rem; font-weight: 900; color: white; text-transform:uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .game-desc { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
 
         .live-badge { position: absolute; top: 15px; right: 15px; background: transparent; color: var(--danger); font-size: 1.3rem; padding: 0; border-radius: 0; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; z-index: 10; border: none; text-shadow: 0 0 10px rgba(255,51,102,0.5);}
         .live-dot { width: 12px; height: 12px; background-color: var(--danger); border-radius: 50%; animation: pulseRed 1.5s infinite; }
+
         .active-players { position: absolute; top: 15px; left: 15px; color: var(--success); font-size: 0.9rem; font-weight: 800; z-index: 10; display: flex; align-items: center; gap: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
         .game-wrapper { width: 100%; max-width: 1300px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: center; flex-shrink: 0;}
         
+        /* ================= IN-GAME UI PANELS ================= */
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; width: 100%; position: relative; flex-shrink: 0;}
         .glass-header { background: rgba(0,0,0,0.7); padding: 15px 20px; border-bottom: 1px solid var(--glass-border); color: white; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
         .glass-header h2 { margin:0; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1; }
 
         .game-box { display: flex; flex-direction: column; width: 100%; max-width: 850px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden; height: 600px; flex-shrink: 0; position: relative;} 
         .main-panel { display: flex; flex-direction: column; height: 100%; position: relative;}
+        
+        /* Ensures the flash anchors to the bottom right of the board */
         .game-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; perspective: 1000px; padding: 20px;}
+        
         .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto;} 
         .controls-full { display: flex; gap: 15px; justify-content: center; width: 100%; }
 
+        /* SHARED LAYOUT WIDTH FIX */
         .shared-layout { display: flex; gap: 20px; width: 100%; max-width: 1200px; height: 600px; align-items: stretch; justify-content: center; flex-shrink: 0;}
         .shared-layout .main-panel { max-width: 850px; width: 100%; flex: 1; }
         
@@ -226,10 +295,12 @@
         .chat-user { font-weight: 900; color: var(--ps-glow); margin-bottom: 5px; text-transform: uppercase; font-size: 0.85rem;}
         .chat-sys { border-left-color: var(--success); color: var(--success); font-style: italic; font-weight: 600;}
 
+        /* TIMER */
         .timer-box { background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); padding: 0 15px; height: 44px; border-radius: 8px; color: white; font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.5); transition: 0.3s; font-family: 'Rajdhani', monospace;} 
         .timer-box.closing { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 20px rgba(255, 51, 102, 0.4); animation: shake 0.5s infinite;}
         .timer-sec { font-size: 0.7em; margin-left: 2px; font-weight: 600; color: var(--text-muted); }
 
+        /* SHARED BET BUTTONS */
         .bet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; }
         .bet-grid.perya-grid { grid-template-columns: repeat(3, 1fr); gap: 10px;}
         .bet-btn { position: relative; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); color: white; padding: 15px 10px; min-height: 50px; border-radius: 8px; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;}
@@ -239,6 +310,7 @@
         
         .tile-bet-badge { position: absolute; top: -10px; right: -10px; background: var(--credits); color: black; font-size: 0.8rem; font-weight: 900; padding: 4px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.9); pointer-events: none; display: none; z-index: 10;}
 
+        /* MODALS & BOTTOM SHEETS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 1000000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
         .modal-content { background: rgba(0, 5, 15, 0.95); width: 500px; max-width: 95vw; padding: 2.5rem; border-radius: 12px; border: 1px solid rgba(0, 162, 255, 0.4); border-top: 3px solid var(--ps-glow); color: white; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 162, 255, 0.1); position: relative; display: flex; flex-direction: column; height: auto; max-height: 90vh; backdrop-filter: blur(20px);}
         .modal-close-icon { position: absolute; top: 25px; right: 25px; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10;}
@@ -259,24 +331,34 @@
         .chip-btn { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 8px 0; border-radius: 6px; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center;}
         .chip-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
 
+        thead th { position: sticky; top: 0; background: #000a1f; z-index: 10; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; border-bottom: 1px solid var(--glass-border); padding: 10px 15px; white-space: nowrap;}
+        tbody td { white-space: nowrap; }
+
+        /* DAILY REWARD */
         .dr-days { display: flex; gap: 10px; justify-content: center; align-items: flex-end; margin-bottom: 25px; height: 180px; flex-wrap: wrap;}
         .dr-day { flex: 1; background: linear-gradient(180deg, #1a2a6c 0%, #001f4d 100%); border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 15px 5px; height: 150px; min-width: 80px; transition: 0.3s; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .dr-day::before { content: ''; position: absolute; inset: -50%; background: repeating-conic-gradient(rgba(255,255,255,0.08) 0 15deg, transparent 15deg 30deg); z-index: 0; opacity: 0.8; animation: rotateBurst 20s linear infinite; }
         @keyframes rotateBurst { 100% { transform: rotate(360deg); } }
+
         .dr-day > * { position: relative; z-index: 1; }
         .dr-day.claimed { background: rgba(255,255,255,0.05); filter: grayscale(1); opacity: 0.6; border-color: var(--glass-border); box-shadow: none;}
         .dr-day.claimed::before { display: none; }
+
         .dr-day.active { background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%); border: 2px solid #fff; transform: scale(1.1); opacity: 1; z-index: 5; box-shadow: 0 10px 25px rgba(255, 204, 0, 0.4); height: 170px; color: black; }
         .dr-day.active::before { background: repeating-conic-gradient(rgba(255,255,255,0.3) 0 15deg, transparent 15deg 30deg); opacity: 0.6; display: block;}
         .dr-day.active .dr-title, .dr-day.active .dr-coin { color: #000; text-shadow: none; }
+        
         .dr-day.active.active-claimed { background: rgba(255,255,255,0.1); border: 2px solid var(--glass-border); filter: grayscale(1); opacity: 0.8; box-shadow: none; color: white;}
         .dr-day.active.active-claimed .dr-title, .dr-day.active.active-claimed .dr-coin { color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         .dr-day.active.active-claimed::before { display: none; }
+
         .dr-title { font-size: 0.95rem; text-transform: uppercase; font-weight: 900; margin-top: 5px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); text-align: center;}
         .dr-coin { font-size: 1.2rem; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); text-align: center; margin-bottom: 5px;}
+
         .dr-claim-btn { width: 100%; max-width: 250px; margin: 0 auto; background: #ffcc00; color: #000; font-size: 1.2rem; border: 2px solid #fff; box-shadow: 0 5px 15px rgba(255,204,0,0.4); }
         .dr-claim-btn:hover:not(:disabled) { background: #ff9900; color: #000; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,204,0,0.6);}
         .dr-claim-btn:disabled { background: rgba(255,255,255,0.1) !important; border-color: transparent !important; color: var(--text-muted) !important; box-shadow: none !important; cursor: not-allowed !important; transform: none !important;}
+
         #dr-status-container { text-align: center; margin-top: 10px; }
         .dr-status-text { font-size: 1.2rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
         .dr-timer { font-size: 1.5rem; font-weight: 900; color: var(--ps-glow); font-family: 'Rajdhani', sans-serif; }
@@ -289,10 +371,12 @@
         .ticket-log-status.approved { background: rgba(0, 230, 118, 0.15); color: var(--success); border: 1px solid rgba(0, 230, 118, 0.3); }
         .ticket-log-status.rejected { background: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid rgba(255, 51, 102, 0.3); }
 
+        /* GAME ASSETS */
         .blackjack-scores { display: flex; justify-content: center; gap: 40px; width: 100%; align-items: flex-start; } .card-area { min-width: 250px; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 240px; } .bj-title { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; } .bj-score { font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 15px; line-height: 1; } .card-hand { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; width: 100%; } .play-card { background: white; color: black; border-radius: 6px; width: 65px; height: 95px; border: 1px solid #ccc; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; } .play-card .val { font-size: 1.6rem; line-height: 1; margin-bottom: 2px; } .play-card .suit { font-size: 1.8rem; line-height: 1; } .card-red { color: #e60000; } .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); color: transparent; }
         .anim-deal { animation: dealCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform-origin: center; } @keyframes dealCard { 0% { opacity: 0; transform: translate(0, -200px) scale(0.5) rotateY(180deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotateY(0deg); } } .anim-flip { animation: flipCard 0.4s ease-in-out forwards; } @keyframes flipCard { 0% { transform: rotateY(180deg); } 50% { transform: rotateY(90deg); color: transparent; } 51% { color: inherit; background: white; } 100% { transform: rotateY(0deg); background: white; color: black; } }
         .dice-icon { font-size: 7rem; color: var(--text-muted); text-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: 0.1s; line-height: 1; } #d20-num { font-size: 6rem !important; line-height: 1; text-shadow: 0 10px 30px rgba(0,0,0,0.8); font-weight: 900 !important; }
         
+        /* STRICT 3D COIN FLIP FIX */
         .coin-wrapper { perspective: 1000px; width: 150px; height: 150px; margin: 0 auto; display: flex; justify-content: center; align-items: center; } 
         .coin-inner { width: 100%; height: 100%; transform-style: preserve-3d; position: relative; transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275); } 
         .coin-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 900; border-radius: 50%; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 15px 40px rgba(0,0,0,0.9); border: 6px solid; } 
@@ -305,19 +389,19 @@
         .dt-arena { display: flex; justify-content: center; gap: 80px; width: 100%; align-items: center; margin-bottom: 20px; } .dt-side { display: flex; flex-direction: column; align-items: center; gap: 20px; } .dt-label { font-size: 2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; } .lbl-dragon { color: var(--danger); text-shadow: 0 0 20px rgba(255,51,102,0.6); } .lbl-tiger { color: var(--credits); text-shadow: 0 0 20px rgba(255,180,0,0.6); } .dt-card { width: 120px !important; height: 170px !important; } .dt-card .val { font-size: 3rem; } .dt-card .suit { font-size: 3.5rem; }
         .sicbo-dice { display: flex; justify-content: center; gap: 30px; font-size: 6rem; margin-bottom: 10px; } .s-die { color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8); }
 
+        /* BUTTON FIXES & POPOVERS */
         #bj-action-controls { display: flex; flex-direction: row !important; gap: 10px; width: 100%; justify-content: center; }
         .btn-rules.undo-btn { height: 48px; width: 48px; align-self: flex-end; flex-shrink: 0; }
         #current-bets-popover { bottom: 100%; top: auto; right: 0; margin-bottom: 15px; width: 300px; z-index: 2500; cursor: default; display: flex; flex-direction: column;}
         .cb-item { display: flex; justify-content: space-between; align-items: center; font-weight: 800; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; white-space: nowrap; }
 
-        /* --- SHARED BLACKJACK UI --- */
+        /* SHARED BLACKJACK SPECIFIC STYLES */
         .sbj-arena { display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; width: 100%; padding: 20px; }
         .sbj-dealer { display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid var(--danger); min-width: 200px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .sbj-seats-container { display: flex; justify-content: center; gap: 15px; width: 100%; margin-top: auto; perspective: 1000px; flex-wrap: wrap;}
         .sbj-seat { width: 150px; height: 170px; background: rgba(0, 15, 35, 0.8); border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; transition: 0.3s; transform-style: preserve-3d; }
         .sbj-seat.empty:hover { background: rgba(255,255,255,0.1); border-color: var(--ps-glow); cursor: pointer; }
-        .sbj-seat.occupied { border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); }
-        .sbj-seat.active-turn { box-shadow: 0 0 25px var(--success); border-color: var(--success); transform: translateY(-10px); }
+        .sbj-seat.occupied { border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); cursor: default;}
         .sbj-username { font-weight: 900; font-size: 0.9rem; color: white; text-transform: uppercase; margin-top: 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); z-index: 5; }
         .sbj-bet { background: var(--credits); color: black; font-weight: 900; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-top: 5px; z-index: 5; }
         .sbj-cards { position: absolute; top: -40px; display: flex; gap: -20px; z-index: 10; transform: scale(0.65); }
@@ -340,23 +424,38 @@
             .brand-title { font-size: 1.2rem; }
             .brand-sub { font-size: 0.7rem; }
             
-            .lobby-modes-container, .casino-grid.shared-grid, .casino-grid.solo-grid { display: flex; flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; justify-content: flex-start; padding: 0 20px 20px; width: 100vw; gap: 15px; }
+            /* SWIPE CAROUSEL LOGIC */
+            .lobby-modes-container, .casino-grid.shared-grid, .casino-grid.solo-grid {
+                display: flex; flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; justify-content: flex-start; padding: 0 20px 20px; width: 100vw; gap: 15px;
+            }
             .mode-card, .game-card { scroll-snap-align: center; }
 
+            /* SHARED TABLE VERTICAL STACK & CHAT OVERLAY */
             .shared-layout { flex-direction: column; height: calc(100vh - 150px); }
             .main-panel { height: 60vh; }
             .chat-panel { position: fixed; bottom: 0; left: 0; width: 100vw; height: 50vh; z-index: 1000; transform: translateY(100%); }
             .chat-panel.show { transform: translateY(0); }
             #chat-floating-btn { display: flex; align-items: center; justify-content: center; position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--ps-glow); color: black; font-size: 1.5rem; z-index: 1001; border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); cursor: pointer; }
             
+            /* Game Board Scaling for Mobile (Blackjack/Dragon Tiger Fix) */
             .blackjack-scores, .dt-arena { flex-direction: column !important; gap: 15px !important; align-items: center;}
             .card-area { min-height: auto; padding: 10px; width: 100%; min-width: unset; }
             .play-card { transform: scale(0.85); margin: -5px; } 
 
+            /* Popovers alignment adjustment */
             .custom-dropdown { right: -50px; width: 300px; }
             #history-popover { width: 340px; right: -50px; }
 
-            .modal-content { position: absolute; bottom: 0; width: 100vw; max-width: 100vw; border-radius: 20px 20px 0 0; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 85vh; }
+            /* NATIVE APP BOTTOM SHEET MODALS */
+            .modal-content {
+                position: absolute;
+                bottom: 0;
+                width: 100vw;
+                max-width: 100vw;
+                border-radius: 20px 20px 0 0;
+                animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                max-height: 85vh;
+            }
             @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
             .sbj-seat { width: 100px; height: 120px; }
@@ -429,10 +528,10 @@
                 <span id="player-name-display">Player</span>
             </div>
 
-            <div class="wallet-pill" id="pill-playable" onclick="openModal('playable-info-modal')" style="display: none;">
+            <div class="wallet-pill" id="pill-playable" onclick="openModal('playable-info-modal')" style="display: none; border-color: rgba(179, 102, 255, 0.4); box-shadow: inset 0 0 10px rgba(179, 102, 255, 0.1); margin-right: 4px;">
                 <div class="wallet-main">
                     <i class="fas fa-star" style="color: var(--playable);"></i>
-                    <span id="nav-playable">0.0</span>
+                    <span id="nav-playable" style="color: var(--playable); font-weight: 900; font-size: 1.1rem;">0.0</span>
                     <span class="wallet-unit" style="color: var(--playable); opacity: 0.8;">P</span>
                 </div>
             </div>
@@ -1686,7 +1785,7 @@
       const successHandler = async (res) => {
           mySoloRounds.d20++;
           
-     await delay(600); 
+          await delay(600); 
           clearInterval(window.d20AnimCycle);
           
           icn.style.display = 'none'; 
@@ -1898,7 +1997,7 @@
 
     socket.on('playerCount', (counts) => {
         document.querySelectorAll('.active-players .ap-count').forEach((el, index) => {
-            const keys = ['baccarat', 'perya', 'dt', 'sicbo'];
+            const keys = ['baccarat', 'perya', 'dt', 'sicbo', 'shared_bj'];
             if(counts[keys[index]]!==undefined) el.innerText = counts[keys[index]];
         });
         const sgCount = document.getElementById('sg-active-players');
@@ -1951,6 +2050,106 @@
         
         updateCurrentBetsPopover();
         sfx.tick();
+    });
+
+    // --- SHARED BLACKJACK CLIENT LOGIC ---
+    window.placeSharedBjBet = function() {
+        let input = document.getElementById('sg-bet-input');
+        if(!input) return;
+        let amt = parseFloat(input.value);
+        
+        if(isNaN(amt) || amt < 10) { showLocalFlash('shared', "Min Bet is 10 TC", "error"); return; }
+        if (amt > (myCredits + myPlayable)) { showLocalFlash('shared', "Insufficient TC", "error"); return; }
+        
+        socket.emit('placeSharedBjBet', amt);
+        
+        if(myPlayable >= amt) { myPlayable -= amt; } 
+        else { let rem = amt - myPlayable; myPlayable = 0; myCredits -= rem; }
+        updateMyBalance({credits: myCredits, playable: myPlayable});
+        triggerBetAnim();
+    };
+
+    socket.on('sharedBjTimer', (t) => {
+        let timerDisplay = document.getElementById('sg-timer');
+        let timerBox = document.getElementById('sg-timer-box');
+        if (timerDisplay) timerDisplay.innerText = t;
+        if (t <= 5 && timerBox) timerBox.classList.add('closing');
+        else if (timerBox) timerBox.classList.remove('closing');
+    });
+
+    socket.on('sharedBjSync', (state) => {
+        if (window.activeSharedGame !== 'shared_bj') return;
+        
+        // 1. Render the Dealer
+        const dHandContainer = document.getElementById('sbj-d-hand');
+        if (dHandContainer) {
+            dHandContainer.innerHTML = '';
+            state.dealerHand.forEach((card, index) => {
+                if (index === 1 && state.status !== 'DEALER_TURN' && state.status !== 'RESOLVING') {
+                    dHandContainer.innerHTML += `<div class="play-card card-back">?</div>`;
+                } else {
+                    dHandContainer.innerHTML += `<div class="play-card"><div class="val">${card.raw}</div><div class="suit">${card.suitHtml}</div></div>`;
+                }
+            });
+            document.getElementById('sbj-d-score').innerText = (state.status === 'DEALER_TURN' || state.status === 'RESOLVING') ? getBJScore(state.dealerHand) : (state.dealerHand.length > 0 ? state.dealerHand[0].bjVal : '0');
+        }
+
+        // 2. Render the 5 Seats
+        const seatsWrapper = document.getElementById('sbj-seats-wrapper');
+        if (seatsWrapper) {
+            seatsWrapper.innerHTML = '';
+            let iAmSeated = false, myTurn = false;
+
+            for (let i = 0; i < 5; i++) {
+                let seat = state.seats[i];
+                if (!seat) {
+                    seatsWrapper.innerHTML += `
+                        <div class="sbj-seat empty" onclick="socket.emit('takeBjSeat', ${i})">
+                            <i class="fas fa-plus" style="font-size:2rem; color:var(--text-muted); margin-bottom:10px;"></i>
+                            <div style="color:var(--text-muted); font-weight:800;">SIT HERE</div>
+                        </div>`;
+                } else {
+                    if (seat.socketId === socket.id) iAmSeated = true;
+                    let isActive = (state.activeSeatIndex === i);
+                    if (isActive && seat.socketId === socket.id) myTurn = true;
+                    
+                    let cardsHtml = seat.hands.map((hand, hIdx) => {
+                        let activeHandClass = (isActive && seat.currentHandIndex === hIdx) ? 'box-shadow: 0 0 10px var(--ps-glow); border-color: var(--ps-glow);' : '';
+                        let cHtml = hand.map(c => `<div class="play-card" style="${activeHandClass}"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`).join('');
+                        return `<div class="sbj-hand-wrap ${seat.hands.length > 1 ? 'split-hand' : ''}">${cHtml}</div>`;
+                    }).join('');
+
+                    let statusText = seat.status === 'busted' ? '<span style="color:var(--danger); text-shadow: 0 2px 10px rgba(0,0,0,0.9);">BUST</span>' : (seat.status === 'stood' ? '<span style="color:white; text-shadow: 0 2px 10px rgba(0,0,0,0.9);">STOOD</span>' : '');
+                    let activeSeatStyle = isActive ? 'border-color: var(--success); box-shadow: 0 0 25px rgba(0, 230, 118, 0.4); transform: translateY(-10px);' : 'border-color: var(--glass-border);';
+
+                    seatsWrapper.innerHTML += `
+                        <div class="sbj-seat occupied" style="${activeSeatStyle}">
+                            <div class="sbj-cards" style="flex-direction: column;">${cardsHtml}</div>
+                            <div class="sbj-status" style="z-index: 20;">${statusText}</div>
+                            <div class="sbj-username" style="${seat.socketId === socket.id ? 'color:var(--ps-glow);' : ''}">${seat.username}</div>
+                            ${seat.totalBet > 0 ? `<div class="sbj-bet">${seat.totalBet} TC</div>` : ''}
+                        </div>`;
+                }
+            }
+
+            // 3. Toggle Betting vs Action Controls
+            let betControls = document.getElementById('sbj-betting-controls');
+            let actionControls = document.getElementById('sbj-action-controls');
+            
+            if (state.status === 'BETTING') {
+                if(betControls) {
+                    betControls.classList.remove('hidden');
+                    let betBtn = betControls.querySelector('button');
+                    if (betBtn) betBtn.disabled = !iAmSeated;
+                }
+                if(actionControls) actionControls.classList.add('hidden');
+            } else {
+                if(betControls) betControls.classList.add('hidden');
+                if(actionControls) {
+                    actionControls.classList.toggle('hidden', !myTurn || state.status !== 'ACTION');
+                }
+            }
+        }
     });
 
     const sConf = {
