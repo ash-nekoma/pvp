@@ -255,7 +255,7 @@
         .mode-desc { color: var(--text-muted); font-size: 1.1rem; position: relative; z-index: 2; font-weight: 600; line-height: 1.4; padding: 0 20px; }
 
         .casino-grid.solo-grid { display: grid; grid-template-columns: repeat(3, 260px); justify-content: center; gap: 20px; width: 100%; max-width: 900px; }
-        .casino-grid.shared-grid { display: grid; grid-template-columns: repeat(4, 260px); justify-content: center; gap: 20px; width: 100%; max-width: 1200px; }
+        .casino-grid.shared-grid { display: grid; grid-template-columns: repeat(5, 220px); justify-content: center; gap: 20px; width: 100%; max-width: 1300px; }
 
         .game-card { 
             width: 100%; height: 320px; text-align: center; cursor: pointer; position: relative;
@@ -317,6 +317,13 @@
         .bet-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; border-color: var(--glass-border) !important; color: var(--text-muted) !important; text-shadow: none !important;}
         
         .tile-bet-badge { position: absolute; top: -10px; right: -10px; background: var(--credits); color: black; font-size: 0.8rem; font-weight: 900; padding: 4px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.9); pointer-events: none; display: none; z-index: 10;}
+
+        /* HORSE RACE TRACK CSS */
+        .hr-track { border: 2px solid rgba(255,255,255,0.1); border-radius: 8px; background: #000; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%; min-height: 250px; width: 100%; max-width: 700px; box-shadow: inset 0 0 50px rgba(0,0,0,0.9);}
+        .hr-lane { flex: 1; border-bottom: 1px dashed rgba(255,255,255,0.15); position: relative; display: flex; align-items: center; padding-left: 10px;}
+        .hr-lane:last-child { border-bottom: none; }
+        .hr-finish-line { position: absolute; right: 10%; top: 0; bottom: 0; width: 6px; background: repeating-linear-gradient(to bottom, #fff, #fff 10px, #ff3366 10px, #ff3366 20px); z-index: 1; box-shadow: 0 0 15px rgba(255,51,102,0.5);}
+        .hr-horse { position: absolute; left: 0; width: 40px; height: 28px; border-radius: 4px; z-index: 2; display: flex; justify-content: center; align-items: center; font-size: 16px; transition: left 0.1s linear; box-shadow: 0 0 15px rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5);}
 
         /* MODALS & BOTTOM SHEETS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
@@ -724,6 +731,15 @@
                         <div class="game-info">
                             <div class="game-title">SIC BO</div>
                             <div class="game-desc">Asian 3-dice betting.</div>
+                        </div>
+                    </div>
+
+                    <div class="game-card" onclick="openSharedGame('horserace')">
+                        <div class="active-players"><i class="fas fa-users"></i> <span class="ap-count">0</span></div>
+                        <div class="game-img"><i class="fas fa-horse-head" style="color:var(--danger);"></i></div>
+                        <div class="game-info">
+                            <div class="game-title">RETRO DERBY</div>
+                            <div class="game-desc">Virtual 6-horse racing.</div>
                         </div>
                     </div>
 
@@ -1244,8 +1260,8 @@
     let myCredits = 0;
     let myPlayable = 0;
     
-    let myGameHistory = { d20: [], coinflip: [], baccarat: [], blackjack: [], perya: [], dt: [], sicbo: [] };
-    let globalFallback = { baccarat: [], perya: [], dt: [], sicbo: [] };
+    let myGameHistory = { d20: [], coinflip: [], baccarat: [], blackjack: [], perya: [], dt: [], sicbo: [], horserace: [] };
+    let globalFallback = { baccarat: [], perya: [], dt: [], sicbo: [], horserace: [] };
     
     let mySoloRounds = { d20: 0, coinflip: 0, blackjack: 0 };
     let myNotifications = [];
@@ -1280,6 +1296,7 @@
             'DRAGON': 'var(--danger)', 'TIGER': 'var(--credits)',
             'SMALL': 'var(--ps-glow)', 'BIG': 'var(--danger)', 'TRIPLE': 'white',
             'YELLOW': '#ffcc00', 'WHITE': '#fff', 'PINK': '#ff66b2', 'BLUE': '#00a2ff', 'RED': '#ff3366', 'GREEN': '#00e676',
+            'PURPLE': '#b366ff', 'ORANGE': '#ff8800',
             'BUST!': 'var(--danger)', 'PUSH': 'white', 'DEALER': 'var(--danger)', 'YOU': 'var(--success)',
             'HEADS': '#ffb400', 'TAILS': '#e2e8f0'
         };
@@ -1748,7 +1765,8 @@
       'blackjack': { title: "Blackjack", body: "<ul><li>Beat the dealer without going over 21.</li><li>Dealer must stand on <strong>17 or higher</strong>.</li><li>Natural Blackjack pays <strong>2.5x</strong>. Standard wins pay <strong>2x</strong>. Ties push.</li></ul>" },
       'perya': { title: "Color Game", body: "<ul><li>Bet on Red, Blue, Yellow, White, Green, or Pink.</li><li>3 dice are rolled.</li><li>1 Match pays <strong>2x</strong>. 2 Matches pay <strong>3x</strong>. 3 Matches pay <strong>4x</strong>!</li></ul>" },
       'dt': { title: "Dragon Tiger", body: "<ul><li>Bet on Dragon, Tiger, or Tie. Highest card wins.</li><li>Aces are low (1). Kings are high (13).</li><li>Dragon/Tiger pays <strong>2x</strong>. Tie pays <strong>9x</strong>.</li></ul>" },
-      'sicbo': { title: "Sic Bo", body: "<ul><li>Bet on Small (Sum 4-10) or Big (Sum 11-17).</li><li>Wins pay <strong>2x</strong>.</li><li>Any Triple roll loses all Big/Small bets.</li></ul>" }
+      'sicbo': { title: "Sic Bo", body: "<ul><li>Bet on Small (Sum 4-10) or Big (Sum 11-17).</li><li>Wins pay <strong>2x</strong>.</li><li>Any Triple roll loses all Big/Small bets.</li></ul>" },
+      'horserace': { title: "Retro Derby", body: "<ul><li>Bet on the winning horse. 6 horses race to the finish line.</li><li>A winning bet pays <strong>5.5x</strong> your wager.</li><li>Race duration is 8 seconds!</li></ul>" }
     };
 
     function logHistory(gid, betStr, resultStr, wonProfit, lostBet, didBet = true) {
@@ -1767,7 +1785,7 @@
     });
 
     socket.on('globalResultsData', data => {
-        if (data.game === 'baccarat' || data.game === 'perya' || data.game === 'dt' || data.game === 'sicbo') {
+        if (data.game === 'baccarat' || data.game === 'perya' || data.game === 'dt' || data.game === 'sicbo' || data.game === 'horserace') {
             globalFallback[data.game] = data.results;
             if(data.game === currentHistoryGame) document.getElementById('stat-total-rounds').innerText = data.stats.total;
         }
@@ -1912,6 +1930,8 @@
             bjSt.active = false; 
             document.getElementById('btn-bj-deal').disabled = false; 
             document.getElementById('bj-start-controls').classList.remove('hidden');
+        } else if (data.game === 'horserace') {
+            isBettingTimeout = false;
         }
     });
 
@@ -2016,7 +2036,6 @@
           
           let d20Choices = activeBets.map(b => b.guessValue.toUpperCase()).join(', ');
           
-          // Use exact data from the fixed server
           logHistory('d20', d20Choices, res.resStr, res.wonProfit, res.lostBet, true);
           
           await delay(800); 
@@ -2214,7 +2233,7 @@
 
     socket.on('playerCount', (counts) => {
         document.querySelectorAll('.active-players .ap-count').forEach((el, index) => {
-            const keys = ['baccarat', 'perya', 'dt', 'sicbo'];
+            const keys = ['baccarat', 'perya', 'dt', 'sicbo', 'horserace'];
             if(counts[keys[index]]!==undefined) el.innerText = counts[keys[index]];
         });
         const sgCount = document.getElementById('sg-active-players');
@@ -2579,13 +2598,64 @@
             processSharedPayout('sicbo', tp, tba, msg, wonProfit, lostBet, Object.keys(mySBets).join(', '), data.resStr); 
           }, 2000); 
         }
+      },
+      'horserace': {
+        title: 'Retro Derby',
+        setupUI: function() {
+            let d = document.getElementById('sg-display'); if (!d) return;
+            let trackHTML = `<div class="hr-track"><div class="hr-finish-line"></div>`;
+            const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
+            const hexColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
+            
+            colors.forEach(c => {
+                trackHTML += `<div class="hr-lane"><div id="horse-${c}" class="hr-horse" style="background:${hexColors[c]};"><i class="fas fa-horse" style="color:black;"></i></div></div>`;
+            });
+            trackHTML += `</div>`;
+            d.innerHTML = trackHTML;
+
+            let cg = document.getElementById('sg-controls-container');
+            if (cg) cg.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; max-width: 600px; margin: 0 auto 15px auto; grid-column:span 2;">
+                    <div style="display: flex; gap: 10px; align-items: stretch;">
+                        <div class="input-group" style="margin: 0; width: 150px;">
+                            <label>BET AMOUNT</label>
+                            <input type="number" id="sg-bet-input" class="input-control bet-input" placeholder="10" style="height: 48px; padding: 0 15px;">
+                        </div>
+                        <button class="btn-rules" style="height: 48px; width: 48px; align-self: flex-end; flex-shrink: 0;" onclick="undoSharedBet()" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
+                    </div>
+                    <div style="text-align: right; position: relative;" class="dropdown-wrapper">
+                        <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 800; text-transform: uppercase; margin-bottom:5px;">TOTAL BET</div>
+                        <div id="sg-my-bet" style="color: white; font-size: 1.5rem; font-weight: 900; line-height: 1; cursor:pointer;" onclick="toggleCurrentBets(event)">0 TC</div>
+                        <div id="current-bets-popover" class="custom-dropdown hidden" style="bottom: 100%; top: auto; right: 0; margin-bottom: 15px; width: 300px; z-index: 2500; cursor: default; display: flex; flex-direction: column;" onclick="event.stopPropagation()">
+                            <div class="popover-header" style="display:flex; justify-content:space-between; align-items:center; padding: 15px; border-bottom: 1px solid var(--glass-border);">
+                                <span style="font-weight: 900; color: white;">CURRENT BETS</span>
+                                <button onclick="document.getElementById('current-bets-popover').classList.add('hidden')" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem;"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="popover-body" id="cb-list" style="padding: 15px; max-height: 250px; overflow-y: auto;">
+                                <div style="text-align:center; color:var(--text-muted);">No active bets.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bet-grid perya-grid controls-full" id="sg-bet-grid" style="width:100%; max-width: 600px; margin: 0 auto;"></div>`;
+            
+            let bg = document.getElementById('sg-bet-grid');
+            if (bg) {
+                colors.forEach(c => {
+                    bg.innerHTML += `<button class="bet-btn shared-tile" data-choice="${c}" style="border-bottom-color:${hexColors[c]};" onclick="placeSharedBet('${c}')">${c.toUpperCase()} (5.5x)<div class="tile-bet-badge" id="badge-${c}">0</div></button>`;
+                });
+            }
+        },
+        animateResult: function(data) { } // Intentionally empty; handled by dedicated socket listeners below
       }
     };
     
     let isBettingTimeout = false;
 
     function placeSharedBet(c) { 
-      if (sState.status !== 'BETTING') { showLocalFlash('shared', "Bets are closed!", "error"); return; } 
+      let targetState = window.activeSharedGame === 'horserace' ? hrState : sState;
+
+      if (targetState.status !== 'BETTING') { showLocalFlash('shared', "Bets are closed!", "error"); return; } 
       if (isBettingTimeout) return;
 
       let i = document.getElementById('sg-bet-input'); 
@@ -2718,7 +2788,9 @@
         document.querySelectorAll('#sg-bet-grid .bet-btn').forEach(btn => { btn.classList.remove('has-bet'); btn.disabled = false; }); 
     }
 
+    // STANDARD TABLES LISTENERS
     socket.on('timerUpdate', (t) => { 
+      if(window.activeSharedGame === 'horserace') return;
       sState.time = t; 
       let r = document.getElementById('sg-timer-box'), s = document.getElementById('sg-timer');
       if (sState.status === 'BETTING') {
@@ -2731,6 +2803,7 @@
     const disableInputs = (disabled) => { document.querySelectorAll(".bet-btn").forEach(el => { el.disabled = disabled; }); }
 
     socket.on('lockBets', () => { 
+        if(window.activeSharedGame === 'horserace') return;
         sState.status = 'RESOLVING'; 
         let r = document.getElementById('sg-timer-box'); 
         if (r) { r.classList.remove('closing'); r.style.color = 'var(--danger)'; r.style.borderColor = 'var(--danger)'; } 
@@ -2748,6 +2821,7 @@
     });
 
     socket.on('newRound', () => { 
+        if(window.activeSharedGame === 'horserace') return;
         sState.status = 'BETTING'; sState.time = 15;
         let r = document.getElementById('sg-timer-box'); 
         if (r) { r.style.color = 'white'; r.style.borderColor = 'var(--glass-border)'; } 
@@ -2758,6 +2832,105 @@
             wipeTableVisually();
         }
         disableInputs(false);
+    });
+
+    // HORSE RACE SPECIFIC LISTENERS
+    let hrState = { time: 30, status: 'BETTING' };
+    
+    socket.on('hrTimerUpdate', (t) => {
+        if(window.activeSharedGame === 'horserace') {
+            hrState.time = t; 
+            let r = document.getElementById('sg-timer-box'), s = document.getElementById('sg-timer');
+            if (hrState.status === 'BETTING') {
+                if (s) s.innerText = t; 
+                if (t <= 5 && r) r.classList.add('closing'); 
+                else if(r) r.classList.remove('closing');
+            }
+        }
+    });
+
+    socket.on('hrLockBets', () => {
+        if(window.activeSharedGame === 'horserace') {
+            hrState.status = 'RESOLVING'; 
+            let r = document.getElementById('sg-timer-box'); 
+            if (r) { r.classList.remove('closing'); r.style.color = 'var(--danger)'; r.style.borderColor = 'var(--danger)'; } 
+            let s = document.getElementById('sg-timer'); if (s) s.innerText = '0';
+            
+            let cb = document.getElementById('sg-chat');
+            if (cb) { cb.insertAdjacentHTML('beforeend', `<div class="chat-msg chat-sys">They're off!</div>`); cb.scrollTop = cb.scrollHeight; }
+            disableInputs(true); sfx.lock(); 
+        }
+    });
+
+    let hrRaceInterval;
+    socket.on('hrRaceStart', (data) => {
+        if(window.activeSharedGame !== 'horserace') return;
+        
+        const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
+        let progress = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
+        let duration = data.duration;
+        let startTime = Date.now();
+        
+        if(hrRaceInterval) clearInterval(hrRaceInterval);
+
+        hrRaceInterval = setInterval(() => {
+            let elapsed = Date.now() - startTime;
+            if(elapsed >= duration) {
+                clearInterval(hrRaceInterval);
+                horses.forEach(h => {
+                    let el = document.getElementById('horse-' + h);
+                    if(el) el.style.left = (h === data.winner ? 90 : progress[h]) + '%';
+                });
+                return;
+            }
+            
+            horses.forEach(h => {
+                if (h === data.winner) {
+                    let expectedProgress = (elapsed / duration) * 90;
+                    progress[h] = expectedProgress + (Math.random() * 5 - 2.5); 
+                } else {
+                    let maxLoserProgress = (elapsed / duration) * 80;
+                    progress[h] += Math.random() * 2;
+                    if(progress[h] > maxLoserProgress) progress[h] = maxLoserProgress - Math.random() * 5;
+                }
+                
+                let el = document.getElementById('horse-' + h);
+                if(el) el.style.left = Math.max(0, progress[h]) + '%';
+            });
+        }, 100);
+    });
+
+    socket.on('hrRaceResults', (data) => {
+        if(window.activeSharedGame !== 'horserace') return;
+        
+        let w = data.winner;
+        let tp = 0, tba = 0;
+        let wonProfit = 0, lostBet = 0;
+        
+        for (let b in mySBets) {
+            let a = mySBets[b]; tba += a;
+            if (b === w) {
+                let p = a * 5.5; // 5.5x Multiplier
+                tp += p; wonProfit += (p - a);
+            } else {
+                lostBet += a;
+            }
+        }
+        let msg = `${w.toUpperCase()} WINS!`;
+        processSharedPayout('horserace', tp, tba, msg, wonProfit, lostBet, Object.keys(mySBets).join(', '), msg);
+    });
+
+    socket.on('hrNewRound', () => {
+        if(window.activeSharedGame === 'horserace') {
+            hrState.status = 'BETTING'; hrState.time = 30;
+            let r = document.getElementById('sg-timer-box'); 
+            if (r) { r.style.color = 'white'; r.style.borderColor = 'var(--glass-border)'; } 
+            
+            let cb = document.getElementById('sg-chat');
+            if (cb) { cb.insertAdjacentHTML('beforeend', `<div class="chat-msg chat-sys">Place your bets for the next race!</div>`); cb.scrollTop = cb.scrollHeight; }
+            wipeTableVisually();
+            disableInputs(false);
+        }
     });
 
     // --- CASHIER ACTIONS ---
@@ -2878,7 +3051,7 @@
         setTimeout(() => { msgBox.innerHTML = ''; }, 3500);
     }
 
-    socket.on('transactionsData', (txs) => {
+socket.on('transactionsData', (txs) => {
         const container = document.getElementById('bank-logs-container'); container.innerHTML = '';
         if(txs.length === 0) return container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">No requests found.</div>';
         txs.forEach(t => {
