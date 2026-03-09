@@ -319,7 +319,7 @@
         .tile-bet-badge { position: absolute; top: -10px; right: -10px; background: var(--credits); color: black; font-size: 0.8rem; font-weight: 900; padding: 4px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.9); pointer-events: none; display: none; z-index: 10;}
 
         /* MODALS & BOTTOM SHEETS */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 1000000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
         .modal-content { background: rgba(0, 5, 15, 0.95); width: 500px; max-width: 95vw; padding: 2.5rem; border-radius: 12px; border: 1px solid rgba(0, 162, 255, 0.4); border-top: 3px solid var(--ps-glow); color: white; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 162, 255, 0.1); position: relative; display: flex; flex-direction: column; height: auto; max-height: 90vh; backdrop-filter: blur(20px);}
         .modal-close-icon { position: absolute; top: 25px; right: 25px; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10;}
         .modal-close-icon:hover { color: var(--danger); transform: scale(1.1); }
@@ -492,10 +492,11 @@
                       <i class="fas fa-eye" onclick="toggleInputPwd('reg-pass', this)"></i>
                   </div>
               </div>
+              
               <div class="input-group" style="margin-bottom:15px;">
                   <input type="text" id="reg-ref" class="input-control" placeholder="Referral Code (Optional)">
               </div>
-              
+
               <div class="input-group" style="margin-bottom:15px; text-align: left;">
                   <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: white; font-size: 0.85rem; text-transform: none;">
                       <input type="checkbox" id="reg-tos" style="width: 18px; height: 18px; cursor: pointer;">
@@ -643,6 +644,13 @@
                   <div class="mode-desc">Multiplayer game rooms.<br>Play with others live.</div>
                 </div>
               </div>
+
+              <div style="margin-top: 40px; text-align: center; width: 100%;">
+                  <button onclick="openModal('tos-modal')" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: var(--text-muted); padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                      <i class="fas fa-file-contract" style="margin-right: 5px; color: var(--ps-glow);"></i> Casino Rules & Terms
+                  </button>
+              </div>
+
             </div>
 
             <div class="lobby-wrapper hidden" id="lobby-indiv">
@@ -1061,7 +1069,7 @@
     </div>
   </div>
 
-  <div id="tos-modal" class="modal-overlay hidden" style="display: none;" onclick="if(event.target===this) closeModal('tos-modal')">
+  <div id="tos-modal" class="modal-overlay hidden" style="display: none; z-index: 10000000;" onclick="if(event.target===this) closeModal('tos-modal')">
     <div class="modal-content custom-scroll" style="width: 600px; height: auto; max-height: 85vh; text-align: left; padding: 2.5rem;">
         <i class="fas fa-times modal-close-icon" onclick="closeModal('tos-modal')"></i>
         <h3 style="color: white; border-bottom: 1px solid var(--glass-border); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">TERMS OF SERVICE</h3>
@@ -1122,7 +1130,7 @@
             </ul>
         </div>
         
-        <button class="btn-play" style="width: 100%; margin-top: 25px; background: var(--ps-glow); color: black; border: none;" onclick="closeModal('tos-modal'); document.getElementById('reg-tos').checked = true;">I AGREE TO THESE TERMS</button>
+        <button class="btn-play" style="width: 100%; margin-top: 25px; background: var(--ps-glow); color: black; border: none;" onclick="closeModal('tos-modal'); let cb = document.getElementById('reg-tos'); if(cb) cb.checked = true;">I UNDERSTAND & AGREE</button>
     </div>
   </div>
 
