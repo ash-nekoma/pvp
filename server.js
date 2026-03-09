@@ -70,7 +70,6 @@ async function processReferralBetCommission(user, betAmount) {
             referrer.playableCredits = formatTC((referrer.playableCredits || 0) + comm);
             await referrer.save();
             
-            // Silently update their balance if they are online
             let refSock = connectedUsers[referrer.username];
             if (refSock) {
                 io.to(refSock).emit('balanceUpdateData', { credits: referrer.credits, playable: referrer.playableCredits });
@@ -220,37 +219,56 @@ setInterval(() => {
                 let playerStats = {}; 
                 sharedTables.bets.forEach(b => {
                     let payout = 0;
+                    let isPush = false;
+
                     if (b.room === 'dt') { 
-                        if (dtWin === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else payout = b.amount; } 
+                        if (dtWin === 'Tie') { 
+                            if (b.choice === 'Tie') payout = b.amount * 9; 
+                            else isPush = true; // Fix: Dragon/Tiger correctly pushes on tie 
+                        } 
                         else { if (b.choice === dtWin) payout = b.amount * 2; }
                     } 
-                    else if (b.room === 'sicbo') { if (b.choice === sbWin) payout = b.amount * 2; } 
+                    else if (b.room === 'sicbo') { 
+                        if (b.choice === sbWin) payout = b.amount * 2; 
+                    } 
                     else if (b.room === 'perya') {
                         let matches = pyR.filter(c => c === b.choice).length;
                         if (matches > 0) payout = b.amount + (b.amount * matches);
                     } 
                     else if (b.room === 'baccarat') {
-                        if (bacWin === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else if (b.choice === 'Player' || b.choice === 'Banker') payout = b.amount; } 
+                        if (bacWin === 'Tie') { 
+                            if (b.choice === 'Tie') payout = b.amount * 9; 
+                            else if (b.choice === 'Player' || b.choice === 'Banker') isPush = true; // Fix: Player/Banker push on Tie
+                        } 
                         else if (bacWin === 'Player') { if (b.choice === 'Player') payout = b.amount * 2; } 
                         else if (bacWin === 'Banker') { if (b.choice === 'Banker') payout = b.amount * 1.95; }
                     }
 
-                    if (!playerStats[b.userId]) playerStats[b.userId] = { socketId: b.socketId, username: b.username, amountWon: 0, amountBet: 0, room: b.room };
+                    if (!playerStats[b.userId]) playerStats[b.userId] = { socketId: b.socketId, username: b.username, amountWon: 0, amountBet: 0, room: b.room, pushPlayable: 0, pushMain: 0 };
+                    
                     playerStats[b.userId].amountBet += b.amount;
-                    playerStats[b.userId].amountWon += formatTC(payout);
+                    if (isPush) {
+                        playerStats[b.userId].pushPlayable += b.fromPlayable;
+                        playerStats[b.userId].pushMain += b.fromMain;
+                    } else {
+                        playerStats[b.userId].amountWon += formatTC(payout);
+                    }
                 });
 
                 let roomNames = { 'perya': 'Color Game', 'dt': 'Dragon Tiger', 'sicbo': 'Sic Bo', 'baccarat': 'Baccarat' };
 
+                // Fix: Push logic correctly refunds Playable P and Main TC respectively to prevent currency exploits
                 Object.keys(playerStats).forEach(async (userId) => {
                     let st = playerStats[userId];
                     let user = await User.findById(userId);
                     if (user) {
-                        if (st.amountWon > 0) {
-                            user.credits = formatTC((user.credits || 0) + st.amountWon);
-                            await user.save();
-                        }
-                        let net = formatTC(st.amountWon - st.amountBet);
+                        if (st.pushPlayable > 0) user.playableCredits = formatTC((user.playableCredits || 0) + st.pushPlayable);
+                        if (st.pushMain > 0) user.credits = formatTC((user.credits || 0) + st.pushMain);
+                        if (st.amountWon > 0) user.credits = formatTC((user.credits || 0) + st.amountWon);
+                        await user.save();
+                        
+                        let nonPushBet = st.amountBet - (st.pushPlayable + st.pushMain);
+                        let net = formatTC(st.amountWon - nonPushBet);
                         if (net !== 0) {
                             await new CreditLog({ username: user.username, action: 'GAME', amount: net, details: roomNames[st.room] }).save();
                         }
@@ -416,7 +434,6 @@ io.on('connection', (socket) => {
                 await user.save();
                 sendPulse(`${user.username} bet ${amt} TC on ${data.game.toUpperCase()}`, 'bet');
 
-                // Process 1% Referral Commission (fire and forget)
                 processReferralBetCommission(user, amt);
 
                 if (data.game === 'blackjack') {
@@ -435,6 +452,8 @@ io.on('connection', (socket) => {
             if (data.game === 'd20') {
                 let roll = crypto.randomInt(1, 21);
                 let wonAny = false;
+                let wonProfit = 0;
+                let lostBet = 0;
                 
                 for(let b of data.bets) {
                     let win = false;
@@ -444,7 +463,14 @@ io.on('connection', (socket) => {
                     if (val === 'even' && roll % 2 === 0) win = true;
                     if (val === 'odd' && roll % 2 !== 0) win = true;
                     
-                    if(win) { payout += formatTC(b.amount * 1.95); wonAny = true; }
+                    // Fix: Provide accurate individual wonProfit/lostBet math down to the client for the History UI
+                    if(win) { 
+                        payout += formatTC(b.amount * 1.95); 
+                        wonAny = true; 
+                        wonProfit += formatTC(b.amount * 0.95); 
+                    } else { 
+                        lostBet += formatTC(b.amount); 
+                    }
                 }
                 payout = formatTC(payout);
                 
@@ -455,7 +481,7 @@ io.on('connection', (socket) => {
                 await new CreditLog({ username: user.username, action: 'GAME', amount: net, details: `D20` }).save();
                 
                 pushAdminData();
-                socket.emit('d20Result', { roll, payout, bet: data.bet, resStr: `ROLLED ${roll}`, newBalance: { credits: user.credits, playable: user.playableCredits }});
+                socket.emit('d20Result', { roll, payout, bet: data.bet, resStr: `ROLLED ${roll}`, newBalance: { credits: user.credits, playable: user.playableCredits }, wonProfit, lostBet });
                 
                 setTimeout(() => {
                     gameStats.d20.total++;
@@ -657,7 +683,6 @@ io.on('connection', (socket) => {
             await user.save();
             sendPulse(`${user.username} placed ${amt} TC on ${data.room.toUpperCase()}`, 'bet');
 
-            // Process 1% Referral Commission
             processReferralBetCommission(user, amt);
             
             sharedTables.bets.push({ 
