@@ -323,7 +323,15 @@
         .hr-lane { flex: 1; border-bottom: 1px dashed rgba(255,255,255,0.15); position: relative; display: flex; align-items: center; padding-left: 10px;}
         .hr-lane:last-child { border-bottom: none; }
         .hr-finish-line { position: absolute; right: 10%; top: 0; bottom: 0; width: 6px; background: repeating-linear-gradient(to bottom, #fff, #fff 10px, #ff3366 10px, #ff3366 20px); z-index: 1; box-shadow: 0 0 15px rgba(255,51,102,0.5);}
-        .hr-horse { position: absolute; left: 0; width: 40px; height: 28px; border-radius: 4px; z-index: 2; display: flex; justify-content: center; align-items: center; font-size: 16px; transition: left 0.1s linear; box-shadow: 0 0 15px rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5);}
+        .hr-horse-container { position: absolute; left: 0; display: flex; align-items: center; gap: 8px; z-index: 2; transition: left 0.15s linear; transform: translateX(-10px); }
+        .horse-badge { width: 22px; height: 22px; border-radius: 4px; color: white; font-weight: 900; font-size: 13px; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.5); text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        .hr-horse-sprite { font-size: 32px; line-height: 1; filter: drop-shadow(2px 4px 2px rgba(0,0,0,0.4)); transform-origin: bottom center; }
+        
+        .gallop { animation: gallopAnim 0.25s infinite alternate; }
+        @keyframes gallopAnim {
+            0% { transform: translateY(0) rotate(-5deg); }
+            100% { transform: translateY(-4px) rotate(8deg); }
+        }
 
         /* MODALS & BOTTOM SHEETS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
@@ -891,7 +899,7 @@
                       </div>
                     </div>
                     
-                    <div class="game-display">
+                    <div class="game-display" style="padding: 0;">
                         <div id="sg-display" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;"></div>
                         <div id="flash-shared" class="local-flash"></div> 
                         <div class="result-overlay-shared" id="sg-overlay"><div class="res-title" id="sg-res-title"></div><div class="res-payout" id="sg-res-payout" style="display:none"></div></div>
@@ -2036,6 +2044,7 @@
           
           let d20Choices = activeBets.map(b => b.guessValue.toUpperCase()).join(', ');
           
+          // Use exact data from the fixed server
           logHistory('d20', d20Choices, res.resStr, res.wonProfit, res.lostBet, true);
           
           await delay(800); 
@@ -2607,8 +2616,14 @@
             const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
             const hexColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
             
-            colors.forEach(c => {
-                trackHTML += `<div class="hr-lane"><div id="horse-${c}" class="hr-horse" style="background:${hexColors[c]};"><i class="fas fa-horse" style="color:black;"></i></div></div>`;
+            colors.forEach((c, idx) => {
+                trackHTML += `
+                <div class="hr-lane">
+                    <div id="horse-${c}" class="hr-horse-container">
+                        <div class="horse-badge" style="background:${hexColors[c]};">${idx+1}</div>
+                        <div class="hr-horse-sprite" id="sprite-${c}">🏇</div>
+                    </div>
+                </div>`;
             });
             trackHTML += `</div>`;
             d.innerHTML = trackHTML;
@@ -2868,36 +2883,60 @@
         
         const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
         let progress = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
+        let targetSpeeds = { Red: 1, Blue: 1, Green: 1, Yellow: 1, Purple: 1, Orange: 1 };
         let duration = data.duration;
         let startTime = Date.now();
+        let finishLine = 90; // The CSS sets the finish line visual at right:10%
         
         if(hrRaceInterval) clearInterval(hrRaceInterval);
 
+        // Turn on galloping animation
+        horses.forEach(h => {
+            let sprite = document.getElementById('sprite-' + h);
+            if(sprite) sprite.classList.add('gallop');
+        });
+
         hrRaceInterval = setInterval(() => {
             let elapsed = Date.now() - startTime;
+            let timeRemaining = duration - elapsed;
+            
             if(elapsed >= duration) {
                 clearInterval(hrRaceInterval);
                 horses.forEach(h => {
+                    let sprite = document.getElementById('sprite-' + h);
+                    if(sprite) sprite.classList.remove('gallop'); // stop running
+                    
                     let el = document.getElementById('horse-' + h);
-                    if(el) el.style.left = (h === data.winner ? 90 : progress[h]) + '%';
+                    if(el) el.style.left = (h === data.winner ? finishLine : Math.min(progress[h], finishLine - 2)) + '%';
                 });
                 return;
             }
             
             horses.forEach(h => {
+                // Change speed randomly to simulate jockeying for position
+                if(Math.random() < 0.15) targetSpeeds[h] = Math.random() * 2.5 + 0.2;
+                
                 if (h === data.winner) {
-                    let expectedProgress = (elapsed / duration) * 90;
-                    progress[h] = expectedProgress + (Math.random() * 5 - 2.5); 
+                    // Winner pacing
+                    let expectedProgress = (elapsed / duration) * finishLine;
+                    if (timeRemaining < 2500) {
+                        // The sprint to the finish
+                        progress[h] += (finishLine - progress[h]) / (timeRemaining / 100);
+                    } else {
+                        // Hang around the front pack but don't finish early
+                        progress[h] += (expectedProgress - progress[h]) * 0.1 + (Math.random() * 2 - 0.5);
+                    }
                 } else {
-                    let maxLoserProgress = (elapsed / duration) * 80;
-                    progress[h] += Math.random() * 2;
-                    if(progress[h] > maxLoserProgress) progress[h] = maxLoserProgress - Math.random() * 5;
+                    // Losers pacing
+                    progress[h] += targetSpeeds[h];
+                    let maxLoser = (elapsed / duration) * finishLine * 0.9;
+                    if(progress[h] > maxLoser) progress[h] -= targetSpeeds[h] * 1.5; // fall back if too far ahead
                 }
                 
                 let el = document.getElementById('horse-' + h);
-                if(el) el.style.left = Math.max(0, progress[h]) + '%';
+                if(el) el.style.left = Math.max(0, Math.min(progress[h], finishLine + 5)) + '%';
             });
-        }, 100);
+        }, 100); // 10 updates per second
     });
 
     socket.on('hrRaceResults', (data) => {
@@ -2981,7 +3020,7 @@
         });
     }
 
-    function submitDeposit() {
+function submitDeposit() {
         const amt = document.getElementById('dep-amount').value;
         const snt = document.getElementById('dep-snt').value.trim();
         const discord = document.getElementById('dep-discord').value.trim();
@@ -3051,7 +3090,7 @@
         setTimeout(() => { msgBox.innerHTML = ''; }, 3500);
     }
 
-socket.on('transactionsData', (txs) => {
+    socket.on('transactionsData', (txs) => {
         const container = document.getElementById('bank-logs-container'); container.innerHTML = '';
         if(txs.length === 0) return container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">No requests found.</div>';
         txs.forEach(t => {
