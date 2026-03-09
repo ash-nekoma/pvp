@@ -500,7 +500,7 @@
               <div class="input-group" style="margin-bottom:15px; text-align: left;">
                   <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: white; font-size: 0.85rem; text-transform: none;">
                       <input type="checkbox" id="reg-tos" style="width: 18px; height: 18px; cursor: pointer;">
-                      <span>I agree to the <a href="#" onclick="openModal('tos-modal'); return false;" style="color: var(--ps-glow); text-decoration: none; font-weight: 800;">Terms of Service</a></span>
+                      <span>I agree to the <a href="#" onclick="openModal('tos-reg-modal'); return false;" style="color: var(--ps-glow); text-decoration: none; font-weight: 800;">Terms of Registration</a></span>
                   </label>
               </div>
 
@@ -646,7 +646,7 @@
               </div>
 
               <div style="margin-top: 40px; text-align: center; width: 100%;">
-                  <button onclick="openModal('tos-modal')" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: var(--text-muted); padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                  <button onclick="openModal('tos-casino-modal')" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: var(--text-muted); padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
                       <i class="fas fa-file-contract" style="margin-right: 5px; color: var(--ps-glow);"></i> Casino Rules & Terms
                   </button>
               </div>
@@ -938,7 +938,7 @@
         <div id="rules-body" class="rules-text"></div>
   </div>
 
-  <div id="playable-info-modal" class="modal-overlay hidden" style="display: none;" onclick="if(event.target===this) closeModal('playable-info-modal')">
+  <div id="playable-info-modal" class="modal-overlay hidden" style="display: none; z-index: 10000000;" onclick="if(event.target===this) closeModal('playable-info-modal')">
     <div class="modal-content" style="width: 400px; text-align: center; border-top-color: var(--playable);">
         <i class="fas fa-times modal-close-icon" onclick="closeModal('playable-info-modal')"></i>
         <h3 style="color: var(--playable); border-bottom: none; margin-bottom: 5px;">Playable Credits</h3>
@@ -954,7 +954,7 @@
     </div>
   </div>
 
-  <div id="admin-confirm-modal" class="modal-overlay hidden" style="display: none;" onclick="if(event.target===this) closeModal('admin-confirm-modal')">
+  <div id="admin-confirm-modal" class="modal-overlay hidden" style="display: none; z-index: 10000000;" onclick="if(event.target===this) closeModal('admin-confirm-modal')">
     <div class="modal-content" style="width: 400px; text-align: center;">
         <h3 style="color: var(--danger); border-bottom: none; margin-bottom: 10px;">SYSTEM OVERRIDE</h3>
         <p style="color: var(--text-muted); margin-bottom: 25px; font-weight: 600;">Leave the casino and enter the Admin Control Panel?</p>
@@ -965,7 +965,7 @@
     </div>
   </div>
 
-  <div id="daily-reward-modal" class="modal-overlay hidden" style="display: none;" onclick="if(event.target===this) closeModal('daily-reward-modal')">
+  <div id="daily-reward-modal" class="modal-overlay hidden" style="display: none; z-index: 10000000;" onclick="if(event.target===this) closeModal('daily-reward-modal')">
     <div class="modal-content" style="width: 800px; height: auto; min-height: fit-content; max-width: 95vw;">
       <i class="fas fa-times modal-close-icon" onclick="closeModal('daily-reward-modal')"></i>
       <h3 style="font-size: 2.2rem; color: var(--credits); margin-bottom: 5px; border: none; padding-bottom: 0;">Daily Reward</h3>
@@ -975,7 +975,7 @@
     </div>
   </div>
 
-  <div id="support-center-modal" class="modal-overlay hidden" style="display: none;" onclick="if(event.target===this) closeModal('support-center-modal')">
+  <div id="support-center-modal" class="modal-overlay hidden" style="display: none; z-index: 10000000;" onclick="if(event.target===this) closeModal('support-center-modal')">
     <div class="modal-content" style="width: 500px; height: auto;">
       <i class="fas fa-times modal-close-icon" onclick="closeModal('support-center-modal')"></i>
       <h3 style="margin-bottom: 20px;">CASHIER</h3>
@@ -1069,10 +1069,10 @@
     </div>
   </div>
 
-  <div id="tos-modal" class="modal-overlay hidden" style="display: none; z-index: 10000000;" onclick="if(event.target===this) closeModal('tos-modal')">
+  <div id="tos-reg-modal" class="modal-overlay hidden" style="display: none; z-index: 10000000;" onclick="if(event.target===this) closeModal('tos-reg-modal')">
     <div class="modal-content custom-scroll" style="width: 600px; height: auto; max-height: 85vh; text-align: left; padding: 2.5rem;">
-        <i class="fas fa-times modal-close-icon" onclick="closeModal('tos-modal')"></i>
-        <h3 style="color: white; border-bottom: 1px solid var(--glass-border); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">TERMS OF SERVICE</h3>
+        <i class="fas fa-times modal-close-icon" onclick="closeModal('tos-reg-modal')"></i>
+        <h3 style="color: white; border-bottom: 1px solid var(--glass-border); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">TERMS OF REGISTRATION</h3>
         
         <div style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; overflow-y: auto; padding-right: 10px;">
             <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">1. Accounts & Anti-Smurfing</h4>
@@ -1098,8 +1098,20 @@
                 <li>You earn bonuses (sign-up, deposit, and lifetime bet commissions) by inviting genuine new players.</li>
                 <li>Attempting to self-refer by generating alt accounts is considered fraud and immediately triggers the Wipe Protocol (Section 1).</li>
             </ul>
+        </div>
+        
+        <button class="btn-play" style="width: 100%; margin-top: 25px; background: var(--ps-glow); color: black; border: none;" onclick="closeModal('tos-reg-modal'); let cb = document.getElementById('reg-tos'); if(cb) cb.checked = true;">I UNDERSTAND & AGREE</button>
+    </div>
+  </div>
 
-            <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">4. VIP Status & Perks</h4>
+  <div id="tos-casino-modal" class="modal-overlay hidden" style="display: none; z-index: 10000000;" onclick="if(event.target===this) closeModal('tos-casino-modal')">
+    <div class="modal-content custom-scroll" style="width: 600px; height: auto; max-height: 85vh; text-align: left; padding: 2.5rem;">
+        <i class="fas fa-times modal-close-icon" onclick="closeModal('tos-casino-modal')"></i>
+        <h3 style="color: white; border-bottom: 1px solid var(--glass-border); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">CASINO RULES & PERKS</h3>
+        
+        <div style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; overflow-y: auto; padding-right: 10px;">
+            
+            <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">1. VIP Status & Perks</h4>
             <ul style="margin-left: 20px; margin-bottom: 15px;">
                 <li>Granted at the Administration's discretion, VIPs receive exclusive platform privileges:
                     <ul style="margin-left: 20px; margin-top: 5px; list-style-type: circle;">
@@ -1111,26 +1123,26 @@
                 <li>VIP status can be revoked if fair play rules are violated.</li>
             </ul>
 
-            <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">5. Fair Play & Security</h4>
+            <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">2. Fair Play & Security</h4>
             <ul style="margin-left: 20px; margin-bottom: 15px;">
                 <li><strong>Prohibited Software:</strong> The use of automated bots, betting scripts, or macros is strictly banned.</li>
                 <li><strong>Exploits:</strong> Abusing system lag, bypassing Martingale betting caps, or exploiting game logic results in a permanent ban. You must report bugs immediately.</li>
                 <li><strong>Conduct:</strong> Spamming, harassment, or staff impersonation in global chat is forbidden.</li>
             </ul>
 
-            <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">6. Cashier (Deposits & Withdrawals)</h4>
+            <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">3. Cashier (Deposits & Withdrawals)</h4>
             <ul style="margin-left: 20px; margin-bottom: 15px;">
                 <li>Transactions must meet specified minimum limits.</li>
                 <li>You must provide accurate tags. The Administration reserves the right to reject or refund any transaction if account activity appears suspicious.</li>
             </ul>
 
-            <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">7. Administrative Rights</h4>
+            <h4 style="color: white; margin-bottom: 5px; font-size: 1.1rem;">4. Administrative Rights</h4>
             <ul style="margin-left: 20px; margin-bottom: 15px;">
                 <li>The Casino Administration reserves the right to modify balances, adjust betting limits, initiate server maintenance, or terminate accounts at any time to protect the integrity of the platform's economy.</li>
             </ul>
         </div>
         
-        <button class="btn-play" style="width: 100%; margin-top: 25px; background: var(--ps-glow); color: black; border: none;" onclick="closeModal('tos-modal'); let cb = document.getElementById('reg-tos'); if(cb) cb.checked = true;">I UNDERSTAND & AGREE</button>
+        <button class="btn-play" style="width: 100%; margin-top: 25px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);" onclick="closeModal('tos-casino-modal')">CLOSE</button>
     </div>
   </div>
 
@@ -1435,16 +1447,19 @@
         } 
         
         merged.slice(0,5).forEach(h => {
-            let net = formatTC(h.wonProfit - h.lostBet);
             let winVal = '-';
             let lossVal = '-';
             
             if (h.didBet) {
-                if (net > 0) {
-                    winVal = `<span style="color:var(--success)">+${fmtTC(net)}</span>`;
-                } else if (net < 0) {
-                    lossVal = `<span style="color:var(--danger)">-${fmtTC(Math.abs(net))}</span>`;
-                } else {
+                if (h.wonProfit > 0) {
+                    winVal = `<span style="color:var(--success)">+${fmtTC(h.wonProfit)}</span>`;
+                }
+                if (h.lostBet > 0) {
+                    lossVal = `<span style="color:var(--danger)">-${fmtTC(h.lostBet)}</span>`;
+                }
+                
+                // Standard single bet push
+                if (h.wonProfit === 0 && h.lostBet === 0) {
                     winVal = '<span style="color:white; font-weight: 900;">PUSH</span>';
                 }
             }
@@ -1587,7 +1602,7 @@
         if (mode === 'register') {
             const tosChecked = document.getElementById('reg-tos').checked;
             if (!tosChecked) {
-                return document.getElementById('auth-error-register').innerText = "You must agree to the Terms of Service.";
+                return document.getElementById('auth-error-register').innerText = "You must agree to the Terms of Registration.";
             }
         }
 
@@ -1999,13 +2014,10 @@
           
           showEndBox(mb, res.bet, res.payout, res.resStr, res.newBalance);
           
-          let net = formatTC(res.payout - res.bet);
-          let wP = net > 0 ? net : 0;
-          let lB = net < 0 ? Math.abs(net) : 0;
-          
-          // Log clean names instead of amounts for multiple bets
           let d20Choices = activeBets.map(b => b.guessValue.toUpperCase()).join(', ');
-          logHistory('d20', d20Choices, res.resStr, wP, lB, true);
+          
+          // Use exact data from the fixed server
+          logHistory('d20', d20Choices, res.resStr, res.wonProfit, res.lostBet, true);
           
           await delay(800); 
           icn.className = 'fas fa-dice-d20 dice-icon';
@@ -2418,7 +2430,6 @@
             }
             if(acText) acText.innerText = ""; 
 
-            // Boosted Suspense Delay
             await delay(2000); 
 
             let w = data.winner;
