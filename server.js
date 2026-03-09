@@ -13,7 +13,6 @@ const io = new Server(server, { cors: { origin: "*" } });
 let isMaintenanceMode = false;
 let globalBankVault = 2000000;
 
-// GLOBAL RADIO STATE
 let currentRadio = { url: null, startTime: 0, requestedBy: null };
 
 app.use((req, res, next) => {
@@ -53,12 +52,10 @@ async function deductBet(user, betAmount) {
     return { success: true, fromPlayable, fromMain };
 }
 
-// Admin Live Pulse Emitter
 function sendPulse(msg, type='info') {
     io.to('admin_room').emit('adminPulse', { msg, type, time: Date.now() });
 }
 
-// 1% Referral Commission Engine
 async function processReferralBetCommission(user, betAmount) {
     if (!user.referredBy) return;
     let comm = formatTC(betAmount * 0.01);
@@ -126,16 +123,19 @@ const adminLogSchema = new mongoose.Schema({
 });
 const AdminLog = mongoose.model('AdminLog', adminLogSchema);
 
-let rooms = { baccarat: 0, perya: 0, dt: 0, sicbo: 0 };
+let rooms = { baccarat: 0, perya: 0, dt: 0, sicbo: 0, horserace: 0 };
 let sharedTables = { time: 15, status: 'BETTING', bets: [] };
+let hrState = { time: 30, status: 'BETTING', bets: [] }; // Custom loop for Horse Race
+
 let connectedUsers = {}; 
-let globalResults = { baccarat: [], perya: [], dt: [], sicbo: [] }; 
+let globalResults = { baccarat: [], perya: [], dt: [], sicbo: [], horserace: [] }; 
 
 let gameStats = {
     baccarat: { total: 0, Player: 0, Banker: 0, Tie: 0 },
     dt: { total: 0, Dragon: 0, Tiger: 0, Tie: 0 },
     sicbo: { total: 0, Big: 0, Small: 0, Triple: 0 },
     perya: { total: 0, Yellow: 0, White: 0, Pink: 0, Blue: 0, Red: 0, Green: 0 },
+    horserace: { total: 0, Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 },
     coinflip: { total: 0, Heads: 0, Tails: 0 },
     d20: { total: 0, Win: 0, Lose: 0 },
     blackjack: { total: 0, Win: 0, Lose: 0, Push: 0 }
@@ -171,6 +171,7 @@ function getBJScore(hand) {
     return score;
 }
 
+// ---------------- STANDARD SHARED TABLES ENGINE ----------------
 setInterval(() => {
     if (sharedTables.status === 'BETTING') {
         sharedTables.time--;
@@ -224,7 +225,7 @@ setInterval(() => {
                     if (b.room === 'dt') { 
                         if (dtWin === 'Tie') { 
                             if (b.choice === 'Tie') payout = b.amount * 9; 
-                            else isPush = true; // Fix: Dragon/Tiger correctly pushes on tie 
+                            else isPush = true; 
                         } 
                         else { if (b.choice === dtWin) payout = b.amount * 2; }
                     } 
@@ -238,7 +239,7 @@ setInterval(() => {
                     else if (b.room === 'baccarat') {
                         if (bacWin === 'Tie') { 
                             if (b.choice === 'Tie') payout = b.amount * 9; 
-                            else if (b.choice === 'Player' || b.choice === 'Banker') isPush = true; // Fix: Player/Banker push on Tie
+                            else if (b.choice === 'Player' || b.choice === 'Banker') isPush = true; 
                         } 
                         else if (bacWin === 'Player') { if (b.choice === 'Player') payout = b.amount * 2; } 
                         else if (bacWin === 'Banker') { if (b.choice === 'Banker') payout = b.amount * 1.95; }
@@ -257,7 +258,6 @@ setInterval(() => {
 
                 let roomNames = { 'perya': 'Color Game', 'dt': 'Dragon Tiger', 'sicbo': 'Sic Bo', 'baccarat': 'Baccarat' };
 
-                // Fix: Push logic correctly refunds Playable P and Main TC respectively to prevent currency exploits
                 Object.keys(playerStats).forEach(async (userId) => {
                     let st = playerStats[userId];
                     let user = await User.findById(userId);
@@ -298,6 +298,71 @@ setInterval(() => {
     }
 }, 1000);
 
+// ---------------- HORSE RACE ENGINE (CUSTOM LOOP) ----------------
+setInterval(() => {
+    if (hrState.status === 'BETTING') {
+        hrState.time--;
+        io.emit('hrTimerUpdate', hrState.time);
+
+        if (hrState.time <= 0) {
+            hrState.status = 'RACING';
+            io.emit('hrLockBets');
+
+            setTimeout(async () => {
+                const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
+                let winner = horses[crypto.randomInt(6)];
+
+                // Emit start command to frontend to trigger 8 second animation
+                io.emit('hrRaceStart', { winner: winner, duration: 8000 });
+
+                // Wait for the exact race duration to finish before paying out
+                setTimeout(async () => {
+                    let playerStats = {}; 
+                    hrState.bets.forEach(b => {
+                        let payout = 0;
+                        if (b.choice === winner) payout = b.amount * 5.5; // 5.5x Multiplier
+
+                        if (!playerStats[b.userId]) playerStats[b.userId] = { socketId: b.socketId, username: b.username, amountWon: 0, amountBet: 0 };
+                        playerStats[b.userId].amountBet += b.amount;
+                        playerStats[b.userId].amountWon += formatTC(payout);
+                    });
+
+                    Object.keys(playerStats).forEach(async (userId) => {
+                        let st = playerStats[userId];
+                        let user = await User.findById(userId);
+                        if (user) {
+                            if (st.amountWon > 0) user.credits = formatTC((user.credits || 0) + st.amountWon);
+                            await user.save();
+                            let net = formatTC(st.amountWon - st.amountBet);
+                            if (net !== 0) await new CreditLog({ username: user.username, action: 'GAME', amount: net, details: 'Derby Racing' }).save();
+                        }
+                    });
+
+                    io.emit('hrRaceResults', { winner: winner });
+                    
+                    setTimeout(() => {
+                        logGlobalResult('horserace', winner);
+                        gameStats.horserace.total++;
+                        gameStats.horserace[winner]++;
+                        checkResetStats('horserace');
+                    }, 2000);
+
+                }, 8500); // Wait 8.5 seconds (covers race duration + small buffer)
+
+                // Complete reset phase
+                setTimeout(() => {
+                    hrState.time = 30; // 30s betting timer for race
+                    hrState.status = 'BETTING';
+                    hrState.bets = [];
+                    io.emit('hrNewRound'); 
+                    pushAdminData();
+                }, 14000); // 8.5s race + 5.5s win screen
+            }, 500);
+        }
+    }
+}, 1000);
+
+
 async function pushAdminData(targetSocket = null) {
     try {
         const users = await User.find(); 
@@ -334,6 +399,7 @@ async function pushAdminData(targetSocket = null) {
 
 io.on('connection', (socket) => {
     socket.emit('timerUpdate', sharedTables.time);
+    socket.emit('hrTimerUpdate', hrState.time);
     socket.emit('maintenanceToggle', isMaintenanceMode); 
     socket.emit('radioSync', currentRadio); 
 
@@ -463,7 +529,6 @@ io.on('connection', (socket) => {
                     if (val === 'even' && roll % 2 === 0) win = true;
                     if (val === 'odd' && roll % 2 !== 0) win = true;
                     
-                    // Fix: Provide accurate individual wonProfit/lostBet math down to the client for the History UI
                     if(win) { 
                         payout += formatTC(b.amount * 1.95); 
                         wonAny = true; 
@@ -652,7 +717,11 @@ io.on('connection', (socket) => {
     
     socket.on('placeSharedBet', async (data) => {
         if (isMaintenanceMode) return socket.emit('localGameError', { msg: 'SYSTEM UNDER MAINTENANCE', game: data.room });
-        if (!socket.user || sharedTables.status !== 'BETTING') return;
+        if (!socket.user) return;
+        
+        let targetState = data.room === 'horserace' ? hrState : sharedTables;
+        if (targetState.status !== 'BETTING') return socket.emit('localGameError', { msg: 'Bets are closed!', game: data.room });
+        
         if (socket.isSharedBetting) return;
         socket.isSharedBetting = true;
         
@@ -663,7 +732,7 @@ io.on('connection', (socket) => {
             let amt = formatTC(data.amount);
             if (isNaN(amt) || amt < 10) { socket.emit('localGameError', { msg: 'MIN BET IS 10 TC', game: data.room }); return; }
 
-            let currentTileBet = sharedTables.bets
+            let currentTileBet = targetState.bets
                 .filter(b => b.userId.toString() === user._id.toString() && b.room === data.room && b.choice === data.choice)
                 .reduce((sum, b) => sum + b.amount, 0);
 
@@ -671,7 +740,7 @@ io.on('connection', (socket) => {
                 socket.emit('localGameError', { msg: 'MAX 50K TC PER TILE', game: data.room }); return;
             }
 
-            let maxMultiplier = { 'baccarat': 9, 'dt': 9, 'sicbo': 2, 'perya': 4 }[data.room] || 2;
+            let maxMultiplier = { 'baccarat': 9, 'dt': 9, 'sicbo': 2, 'perya': 4, 'horserace': 5.5 }[data.room] || 2;
             if ((amt * maxMultiplier) > globalBankVault) {
                 socket.emit('localGameError', { msg: 'VAULT LIMIT REACHED. CANNOT COVER BET.', game: data.room }); return;
             }
@@ -685,7 +754,7 @@ io.on('connection', (socket) => {
 
             processReferralBetCommission(user, amt);
             
-            sharedTables.bets.push({ 
+            targetState.bets.push({ 
                 userId: user._id, socketId: socket.id, username: user.username, room: data.room, choice: data.choice, amount: amt, fromPlayable: deduction.fromPlayable, fromMain: deduction.fromMain 
             });
 
@@ -702,13 +771,17 @@ io.on('connection', (socket) => {
     });
 
     socket.on('undoSharedBet', async (data) => {
-        if (!socket.user || sharedTables.status !== 'BETTING') return;
+        if (!socket.user) return;
+        
+        let targetState = data.room === 'horserace' ? hrState : sharedTables;
+        if (targetState.status !== 'BETTING') return;
+        
         if (socket.isSharedBetting) return;
         socket.isSharedBetting = true;
 
         try {
-            for (let i = sharedTables.bets.length - 1; i >= 0; i--) {
-                let b = sharedTables.bets[i];
+            for (let i = targetState.bets.length - 1; i >= 0; i--) {
+                let b = targetState.bets[i];
                 if (b.userId.toString() === socket.user._id.toString() && b.room === data.room) {
                     let user = await User.findById(socket.user._id);
                     if (user) {
@@ -718,7 +791,7 @@ io.on('connection', (socket) => {
                         socket.emit('balanceUpdateData', { credits: user.credits, playable: user.playableCredits });
                         socket.emit('undoSuccess', { choice: b.choice, amount: b.amount });
                     }
-                    sharedTables.bets.splice(i, 1);
+                    targetState.bets.splice(i, 1);
                     break;
                 }
             }
@@ -833,7 +906,6 @@ io.on('connection', (socket) => {
                 referredBy: refUser ? refUser.username : null 
             });
 
-            // Grant 500 Playable Credits to both
             if (refUser) {
                 newUser.playableCredits = 500;
                 refUser.playableCredits = formatTC((refUser.playableCredits || 0) + 500);
@@ -869,10 +941,7 @@ io.on('connection', (socket) => {
         const rewards = [100, 250, 500, 750, 1000, 1500, 2000];
         let amt = rewards[day - 1]; 
 
-        // VIP PERK: Double Daily Reward
-        if (user.role === 'VIP') {
-            amt *= 2; 
-        }
+        if (user.role === 'VIP') { amt *= 2; }
         amt = formatTC(amt);
 
         user.playableCredits = formatTC((user.playableCredits || 0) + amt); 
