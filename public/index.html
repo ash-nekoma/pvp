@@ -45,10 +45,13 @@
         .auth-tab { flex: 1; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-muted); font-weight: 900; padding: 10px; cursor: pointer; text-transform: uppercase; transition: 0.2s; font-size: 1rem; }
         .auth-tab.active { border-bottom-color: var(--ps-glow); color: var(--ps-glow); }
         .auth-msg { font-size: 0.9rem; font-weight: 800; min-height: 20px; margin-bottom: 15px; text-align: center; }
+        .auth-error { color: var(--danger); }
+        .auth-success { color: var(--success); }
         .pwd-input-wrapper { position: relative; width: 100%; display: block; }
         .pwd-input-wrapper input { width: 100%; text-align: center; padding: 12px; }
         .pwd-input-wrapper i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 1.1rem; z-index: 2; transition: 0.2s; }
         .pwd-input-wrapper i:hover { color: white; }
+
         .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-size: 1rem; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.3);}
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.2); border-color: white;} 
         .btn-play:disabled { background: rgba(0,0,0,0.5) !important; color: var(--text-muted) !important; cursor: not-allowed !important; border-color: transparent !important; opacity: 0.5 !important; box-shadow:none !important; transform:none !important; }
@@ -59,9 +62,9 @@
         .btn-rules { background: rgba(0,0,0,0.5); color: var(--text-muted); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0;} 
         .btn-rules:hover { background: rgba(255,255,255,0.1); color: white; border-color: white; transform: scale(1.05); }
 
-        /* HUD & NAVIGATION */
+        /* HUD TOPBAR */
         #app-container { display: none; height: 100vh; width: 100vw; overflow: hidden;}
-        .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 99999; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); padding: 12px 25px; height: 75px; display: flex; align-items: center; padding-top: calc(12px + env(safe-area-inset-top));}
+        .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 99999; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 12px 25px; height: 75px; display: flex; align-items: center; padding-top: calc(12px + env(safe-area-inset-top));}
         .topbar-inner { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
         .brand { display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; padding: 5px; border-radius: 8px;}
         .brand:hover { background: rgba(255,255,255,0.05); transform: scale(1.02); }
@@ -70,6 +73,7 @@
         .brand-sub { color: var(--ps-glow); font-weight: 800; font-size: 0.9rem; letter-spacing: 3px; margin-top: 2px; text-transform: uppercase; }
         .topbar-right { display: flex; flex-direction: row; align-items: center; gap: 15px;}
         .player-profile { display: flex; align-items: center; gap: 8px; font-weight: 800; color: white; font-size: 1rem; text-transform: uppercase; margin-right: 10px;}
+        .player-profile i { color: var(--ps-glow); font-size: 1.4rem; }
         .wallet-pill { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,180,0,0.4); padding: 5px 15px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; box-shadow: inset 0 0 10px rgba(255,180,0,0.1); }
         .wallet-pill:hover { border-color: var(--credits); transform: translateY(-2px); box-shadow: 0 0 15px rgba(255,180,0,0.3); }
         .wallet-main { display: flex; align-items: center; gap: 6px; } .wallet-main i { color: var(--credits); font-size: 1.1rem; }
@@ -92,7 +96,7 @@
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
         .dropdown-wrapper { position: relative; display: inline-block; }
-        .custom-dropdown { position: absolute; top: 45px; right: -10px; width: 350px; background: rgba(0,5,15,0.95); border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); border-radius: 8px; backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 100000; box-shadow: 0 25px 50px rgba(0,0,0,0.9); cursor: default;}
+        .custom-dropdown { position: absolute; top: 45px; right: -10px; width: 350px; background: rgba(0,5,15,0.95); border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); border-radius: 8px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 100000; box-shadow: 0 25px 50px rgba(0,0,0,0.9); cursor: default;}
         .notif-header, .popover-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--glass-border); font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0;}
         .notif-actions { display: flex; gap: 10px; }
         .notif-action-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.8rem; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
@@ -190,34 +194,28 @@
         .bet-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; border-color: var(--glass-border) !important; color: var(--text-muted) !important; text-shadow: none !important;}
         .tile-bet-badge { position: absolute; top: -10px; right: -10px; background: var(--credits); color: black; font-size: 0.8rem; font-weight: 900; padding: 4px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.9); pointer-events: none; display: none; z-index: 10;}
 
-        /* HORSE RACE CRT TRACK CSS */
-        .crt-effect { position: relative; }
-        .crt-effect::before { content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none; }
+        /* HORSE RACE CSS (CRT + ANIMATED TRACK) */
+        .crt-effect { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .crt-effect::before { content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); z-index: 5; background-size: 100% 2px, 3px 100%; pointer-events: none; }
         
-        .hr-track { 
-            border: 4px solid #333; border-radius: 12px; background: #2b4a22; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%; min-height: 250px; width: 100%; max-width: 750px; box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 0 20px rgba(0,255,0,0.1);
-        }
+        .hr-track { border: 4px solid #333; border-radius: 12px; background: #2b4a22; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%; min-height: 250px; width: 100%; max-width: 750px; box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 0 20px rgba(0,255,0,0.1); }
         
-        .hr-lane { 
-            flex: 1; border-bottom: none; position: relative; display: flex; align-items: center; padding-left: 10px;
-            background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.25) 50%);
-            background-size: 80px 2px; background-position: bottom; background-repeat: repeat-x;
-        }
-        .hr-lane:last-child { background-image: none; }
+        /* The Moving Dirt/Grass lanes */
+        .hr-lane { flex: 1; border-bottom: none; position: relative; display: flex; align-items: center; padding-left: 10px; background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.15) 50%); background-size: 100px 2px; background-position: bottom; background-repeat: repeat-x; }
         
-        .hr-track.racing .hr-lane { animation: panTrack 0.25s linear infinite; }
-        @keyframes panTrack { from { background-position: 0 bottom; } to { background-position: -80px bottom; } }
+        .hr-track.racing .hr-lane { animation: panTrack 0.2s linear infinite; }
+        .hr-track.slowing .hr-lane { animation: panTrack 0.6s linear infinite; }
+        @keyframes panTrack { from { background-position: 0 bottom; } to { background-position: -100px bottom; } }
 
-        .hr-finish-line { 
-            position: absolute; right: -50px; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(to bottom, #fff, #fff 15px, #000 15px, #000 30px); z-index: 1; border-left: 3px solid white; transition: right 1.5s linear;
-        }
-        .hr-finish-line.show { right: 10%; }
+        .hr-finish-line { position: absolute; right: -50px; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(to bottom, #fff, #fff 15px, #000 15px, #000 30px); z-index: 1; border-left: 3px solid white; transition: right 2.5s cubic-bezier(0.1, 0.7, 0.1, 1); }
+        .hr-finish-line.show { right: 15%; }
 
-        .hr-horse-container { position: absolute; left: 0; display: flex; align-items: center; gap: 8px; z-index: 2; transition: left 0.05s linear; transform: translateX(-15px); }
+        .hr-horse-container { position: absolute; left: 0; display: flex; align-items: center; gap: 8px; z-index: 2; transform: translateX(-15px); }
         .horse-badge { width: 24px; height: 24px; border-radius: 4px; color: white; font-weight: 900; font-size: 14px; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.5); text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
         
         .hr-horse-sprite { font-size: 34px; line-height: 1; filter: drop-shadow(-4px 10px 4px rgba(0,0,0,0.5)); transform-origin: bottom center; transform: scaleX(-1); }
         
+        /* The Gallop Math */
         .gallop { animation-name: gallopAnim; animation-iteration-count: infinite; animation-direction: alternate; }
         @keyframes gallopAnim { 
             0% { transform: scaleX(-1) translateY(0) rotate(-10deg); } 
@@ -233,7 +231,6 @@
         .modal-close-icon { position: absolute; top: 25px; right: 25px; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10;}
         .modal-close-icon:hover { color: var(--danger); transform: scale(1.1); }
         .modal-content h3 { font-size: 1.8rem; font-weight: 900; margin-bottom: 1.5rem; margin-top: 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; text-align: center; flex-shrink: 0; color: white;}
-
         .bank-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; flex-shrink: 0;}
         .bank-tab { flex: 1; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-muted); font-weight: 900; padding: 12px; cursor: pointer; text-transform: uppercase; transition: 0.2s; font-size: 1.1rem; letter-spacing: 1px;}
         .bank-tab:hover { color: white; }
@@ -242,11 +239,9 @@
         .bank-section.active { display: block; }
         .btn-ledger { background: rgba(0,0,0,0.5); color: white; border: 1px solid var(--glass-border); border-left: 3px solid var(--ps-glow); width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 8px; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: center; align-items: center; gap: 10px; flex-shrink: 0;}
         .btn-ledger:hover { background: rgba(255,255,255,0.1); border-color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,162,255,0.2);}
-
         .quick-chips { display: flex; gap: 10px; justify-content: space-between; margin-bottom: 20px; flex-shrink: 0;}
         .chip-btn { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 8px 0; border-radius: 6px; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center;}
         .chip-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
-
         thead th { position: sticky; top: 0; background: #000a1f; z-index: 10; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; border-bottom: 1px solid var(--glass-border); padding: 10px 15px; white-space: nowrap;}
         tbody td { white-space: nowrap; }
 
@@ -295,7 +290,7 @@
         #current-bets-popover { bottom: 100%; top: auto; right: 0; margin-bottom: 15px; width: 300px; z-index: 2500; cursor: default; display: flex; flex-direction: column;}
         .cb-item { display: flex; justify-content: space-between; align-items: center; font-weight: 800; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; white-space: nowrap; }
 
-        /* ================= MOBILE UI / MEDIA QUERIES ================= */
+        /* ================= MOBILE UI ================= */
         #chat-floating-btn { display: none; }
         @media (max-width: 1200px) { .casino-grid.solo-grid { grid-template-columns: repeat(2, 260px); } .casino-grid.shared-grid { grid-template-columns: repeat(2, 260px); } }
         @media (max-width: 768px) {
@@ -1803,7 +1798,7 @@
         title: 'Retro Derby',
         setupUI: function() {
             let d = document.getElementById('sg-display'); if (!d) return;
-            let trackHTML = `<div class="crt-effect" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"><div class="hr-track" id="hr-track"><div class="hr-finish-line" id="hr-finish-line"></div>`;
+            let trackHTML = `<div class="crt-effect"><div class="hr-track" id="hr-track"><div class="hr-finish-line" id="hr-finish-line"></div>`;
             const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
             const hexColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
             
@@ -2079,19 +2074,21 @@
         if(window.activeSharedGame !== 'horserace') return;
         
         const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
-        let progress = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
-        let targetSpeeds = { Red: 1, Blue: 1, Green: 1, Yellow: 1, Purple: 1, Orange: 1 };
-        let duration = data.duration;
+        let pos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
+        let targetPos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
+
+        let duration = data.duration; 
         let startTime = Date.now();
-        let finishLine = 85; 
-        
+        let finishLineX = 85; 
+
         let track = document.getElementById('hr-track');
         let fLineEl = document.getElementById('hr-finish-line');
-        if(track) track.classList.add('racing');
+        if(track) { track.classList.add('racing'); track.classList.remove('slowing'); }
         if(fLineEl) fLineEl.classList.remove('show');
 
         if(hrRaceInterval) clearInterval(hrRaceInterval);
 
+        // Initial Breakaway Targets
         horses.forEach(h => {
             let el = document.getElementById('horse-' + h);
             if (el) el.style.left = '0%';
@@ -2100,52 +2097,66 @@
                 sprite.classList.add('gallop');
                 sprite.style.animationDuration = (0.2 + Math.random() * 0.1) + 's';
             }
-            progress[h] = 0;
-            targetSpeeds[h] = 30; 
+            pos[h] = 0;
+            targetPos[h] = 30 + (Math.random() * 30); 
         });
 
+        let nextTargetUpdate = startTime + 1000;
+
         hrRaceInterval = setInterval(() => {
-            let elapsed = Date.now() - startTime;
+            let now = Date.now();
+            let elapsed = now - startTime;
+            let progressRatio = elapsed / duration;
             let timeRemaining = duration - elapsed;
-            
+
+            // Phase 2: Jostling randomly
+            if (now > nextTargetUpdate && timeRemaining > 2500) {
+                horses.forEach(h => { targetPos[h] = 20 + Math.random() * 55; });
+                nextTargetUpdate = now + 800 + Math.random() * 1000;
+            }
+
+            // Phase 3: The Finish Line Sprints
+            if (timeRemaining <= 2500 && timeRemaining > 2400) {
+                if (track) { track.classList.remove('racing'); track.classList.add('slowing'); }
+                if (fLineEl) fLineEl.classList.add('show');
+                
+                horses.forEach(h => {
+                    if (h === data.winner) {
+                        targetPos[h] = 100; // Winner runs all the way off screen
+                    } else {
+                        targetPos[h] = 30 + Math.random() * 45; // Losers get stuck behind line
+                    }
+                });
+            }
+
+            // Stop Animation
             if(elapsed >= duration) {
                 clearInterval(hrRaceInterval);
                 horses.forEach(h => {
                     let sprite = document.getElementById('sprite-' + h);
-                    if(sprite) sprite.classList.remove('gallop'); 
+                    if(sprite) sprite.classList.remove('gallop');
                     let el = document.getElementById('horse-' + h);
-                    if(el) el.style.left = (h === data.winner ? 90 : Math.min(progress[h], 85)) + '%';
+                    if(el) el.style.left = (h === data.winner ? 100 : Math.min(pos[h], finishLineX - 2)) + '%';
                 });
+                if(track) track.classList.remove('slowing');
                 return;
             }
 
-            if (timeRemaining <= 1500) {
-                if (track) track.classList.remove('racing');
-                if (fLineEl) fLineEl.classList.add('show');
-            }
-            
-            let phase = elapsed < 1500 ? 1 : (timeRemaining > 1500 ? 2 : 3);
-
+            // Apply movement physics
             horses.forEach(h => {
-                if (phase === 1) {
-                    let target = 30 + (Math.random() * 20);
-                    progress[h] += (target - progress[h]) * 0.1;
-                } else if (phase === 2) {
-                    if(Math.random() < 0.1) targetSpeeds[h] = 40 + (Math.random() * 30 - 15); 
-                    progress[h] += (targetSpeeds[h] - progress[h]) * 0.05;
-                } else {
-                    if (h === data.winner) {
-                        progress[h] += (90 - progress[h]) / (timeRemaining / 50);
-                    } else {
-                        let loserTarget = 65 + (Math.random() * 15 - 7.5);
-                        progress[h] += (loserTarget - progress[h]) * 0.05;
-                    }
-                }
+                let currentSpeed = (h === data.winner && timeRemaining <= 2500) ? 0.08 : 0.04;
+                pos[h] += (targetPos[h] - pos[h]) * currentSpeed;
                 
                 let el = document.getElementById('horse-' + h);
-                if(el) el.style.left = Math.max(0, Math.min(progress[h], 95)) + '%';
+                if(el) el.style.left = Math.max(0, Math.min(pos[h], 100)) + '%';
+
+                // Make faster horses bob faster visually
+                let sprite = document.getElementById('sprite-' + h);
+                if(sprite && timeRemaining > 2500) {
+                    sprite.style.animationDuration = (0.3 - ((targetPos[h] / 100) * 0.15)) + 's';
+                }
             });
-        }, 50); 
+        }, 30); 
     });
 
     socket.on('hrRaceResults', (data) => {
@@ -2228,7 +2239,7 @@
         });
     }
 
-    function submitDeposit() {
+  function submitDeposit() {
         const amt = document.getElementById('dep-amount').value;
         const snt = document.getElementById('dep-snt').value.trim();
         const discord = document.getElementById('dep-discord').value.trim();
@@ -2265,7 +2276,7 @@
         setTimeout(() => { msgBox.innerHTML = ''; }, 3500);
     }
 
-socket.on('transactionsData', (txs) => {
+    socket.on('transactionsData', (txs) => {
         const container = document.getElementById('bank-logs-container'); container.innerHTML = '';
         if(txs.length === 0) return container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">No requests found.</div>';
         txs.forEach(t => {
