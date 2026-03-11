@@ -33,6 +33,8 @@
             --text-main: #f8fafc;
             --text-muted: #8c9eb5;
             --playable: #b366ff;
+            --table-green: #006400;
+            --table-dark: #002200;
         }
 
         * {
@@ -85,10 +87,23 @@
             padding-right: 5px;
         }
 
-        .custom-scroll::-webkit-scrollbar { width: 6px; display: block; }
-        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            display: block;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
 
         input[type="number"]::-webkit-inner-spin-button, 
         input[type="number"]::-webkit-outer-spin-button {
@@ -188,11 +203,26 @@
             text-align: center;
         }
 
-        .auth-error { color: var(--danger); }
-        .auth-success { color: var(--success); }
+        .auth-error {
+            color: var(--danger);
+        }
 
-        .pwd-input-wrapper { position: relative; width: 100%; display: block; }
-        .pwd-input-wrapper input { width: 100%; text-align: center; padding: 12px; }
+        .auth-success {
+            color: var(--success);
+        }
+
+        .pwd-input-wrapper {
+            position: relative;
+            width: 100%;
+            display: block;
+        }
+
+        .pwd-input-wrapper input {
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+        }
+
         .pwd-input-wrapper i {
             position: absolute;
             right: 15px;
@@ -204,7 +234,10 @@
             z-index: 2;
             transition: 0.2s;
         }
-        .pwd-input-wrapper i:hover { color: white; }
+
+        .pwd-input-wrapper i:hover {
+            color: white;
+        }
 
         .btn-play {
             background: rgba(255,255,255,0.1);
@@ -276,8 +309,14 @@
             box-shadow: 0 0 15px rgba(0,162,255,0.2);
         }
 
-        .bet-input { text-align: center !important; }
-        .bet-input::placeholder { text-align: center; color: rgba(255,255,255,0.4); }
+        .bet-input {
+            text-align: center !important;
+        }
+
+        .bet-input::placeholder {
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+        }
 
         .btn-rules {
             background: rgba(0,0,0,0.5);
@@ -309,6 +348,7 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
+            position: relative;
         }
 
         .topbar {
@@ -529,8 +569,15 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); }
         }
 
-        .mobile-menu-btn { display: none; }
-        .desktop-actions { display: flex; gap: 15px; align-items: center; }
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        .desktop-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
 
         .radio-hud {
             flex: 1;
@@ -542,7 +589,9 @@
             align-items: center;
         }
 
-        .radio-hud.show { display: flex; }
+        .radio-hud.show {
+            display: flex;
+        }
 
         .radio-marquee {
             display: inline-block;
@@ -561,7 +610,10 @@
         }
 
         /* ================= DROPDOWNS & POPOVERS ================= */
-        .dropdown-wrapper { position: relative; display: inline-block; }
+        .dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
 
         .custom-dropdown {
             position: absolute;
@@ -594,7 +646,10 @@
             flex-shrink: 0;
         }
 
-        .notif-actions { display: flex; gap: 10px; }
+        .notif-actions {
+            display: flex;
+            gap: 10px;
+        }
 
         .notif-action-btn {
             background: transparent;
@@ -606,9 +661,19 @@
             text-transform: uppercase;
             transition: 0.2s;
         }
-        .notif-action-btn:hover { color: white; }
-        .notif-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .notif-action-btn.del:hover:not(:disabled) { color: var(--danger); }
+
+        .notif-action-btn:hover {
+            color: white;
+        }
+
+        .notif-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .notif-action-btn.del:hover:not(:disabled) {
+            color: var(--danger);
+        }
 
         .notif-popover-list {
             display: flex;
@@ -632,7 +697,11 @@
             transition: 0.2s;
             cursor: pointer;
         }
-        .notif-item.unread { border-left: 3px solid var(--ps-glow); background: rgba(0,162,255,0.05); }
+
+        .notif-item.unread {
+            border-left: 3px solid var(--ps-glow);
+            background: rgba(0,162,255,0.05);
+        }
 
         .notif-item-header {
             display: flex;
@@ -644,10 +713,20 @@
             pointer-events: none;
         }
 
-        .notif-item-title { color: white; }
-        .notif-item.unread .notif-item-title { color: var(--ps-glow); }
-        .notif-item-time { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; }
-        
+        .notif-item-title {
+            color: white;
+        }
+
+        .notif-item.unread .notif-item-title {
+            color: var(--ps-glow);
+        }
+
+        .notif-item-time {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
         .notif-item-body {
             font-size: 0.9rem;
             color: var(--text-muted);
@@ -667,9 +746,155 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .notif-item-del:hover { color: var(--danger); transform: scale(1.1); }
 
-        /* ================= GENERAL LAYOUT ================= */
+        .notif-item-del:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+
+        .result-box, .result-overlay-shared {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0;
+            padding: 20px 30px;
+            border-radius: 12px;
+            display: none;
+            z-index: 2000;
+            min-width: 250px;
+            text-transform: uppercase;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            pointer-events: none;
+            transform: translateX(50px);
+            text-align: right;
+        }
+
+        .result-box.win, .result-overlay-shared.win {
+            background: rgba(0, 230, 118, 0.15);
+            border-right: 4px solid var(--success);
+            color: var(--success);
+        }
+
+        .result-box.lose, .result-overlay-shared.lose {
+            background: rgba(255, 51, 102, 0.15);
+            border-right: 4px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .result-box.push, .result-overlay-shared.push {
+            background: rgba(255, 255, 255, 0.1);
+            border-right: 4px solid var(--text-muted);
+            color: white;
+        }
+
+        .result-box.show, .result-overlay-shared.show {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+            display: flex !important;
+        }
+
+        .res-title {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: right;
+            width: 100%;
+            white-space: normal;
+            line-height: 1.2;
+        }
+
+        .res-payout {
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-align: right;
+            width: 100%;
+        }
+
+        .local-flash {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            z-index: 2500;
+            color: var(--danger);
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: right;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s;
+            display: none;
+            white-space: normal;
+            max-width: 300px;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 15px var(--danger);
+            transform: translateY(20px);
+        }
+
+        .local-flash.show {
+            display: block;
+            animation: flashAnimSubtle 2s forwards;
+        }
+
+        .local-flash.success {
+            color: var(--success);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 15px var(--success);
+        }
+
+        @keyframes flashAnimSubtle {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes popBalance {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); }
+            100% { transform: scale(1); }
+        }
+
+        .anim-pop {
+            animation: popBalance 0.6s ease-out;
+        }
+
+        @keyframes popBet {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.5); }
+            100% { transform: scale(1); }
+        }
+
+        .anim-pop-bet {
+            animation: popBet 0.3s ease-out;
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-15deg); }
+            50% { transform: rotate(15deg); }
+            75% { transform: rotate(-15deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .anim-shake {
+            animation: shake 0.3s infinite;
+        }
+
+        /* ================= GENERAL LAYOUT & LOBBY ================= */
         .main-wrapper {
             display: flex;
             flex-direction: column;
@@ -696,6 +921,9 @@
             min-height: 700px;
         }
 
+        /* These classes are for the normal, boxed games.
+           They will not be used by Fullscreen games.
+        */
         .view-container {
             width: 100%;
             height: 100%;
@@ -743,13 +971,13 @@
             padding: 40px 0;
             flex-shrink: 0;
         }
-        
+
         .btn-back-fixed {
             position: fixed;
             top: 95px;
             left: 25px;
-            z-index: 1000;
-            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            background: rgba(0,0,0,0.8);
             border: 1px solid var(--glass-border);
             color: white;
             padding: 10px 20px;
@@ -765,6 +993,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
         .btn-back-fixed:hover {
             background: white;
             color: black;
@@ -934,7 +1163,7 @@
             font-size: 1.2rem;
             font-weight: 900;
             color: white;
-            text-transform:uppercase;
+            text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 5px;
         }
@@ -999,7 +1228,7 @@
             justify-content: center;
             flex-shrink: 0;
         }
-        
+
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -1048,7 +1277,7 @@
             height: 600px;
             flex-shrink: 0;
             position: relative;
-        } 
+        }
 
         .main-panel {
             display: flex;
@@ -1081,7 +1310,7 @@
             position: relative;
             z-index: 100;
             pointer-events: auto;
-        } 
+        }
 
         .controls-full {
             display: flex;
@@ -1090,11 +1319,14 @@
             width: 100%;
         }
 
+        /* The shared layout for the standard 4 games (Baccarat, SicBo, Perya, DT) 
+           This is completely separate from Fullscreen MBJ and HR.
+        */
         .shared-layout {
             display: flex;
             gap: 20px;
             width: 100%;
-            max-width: 900px; /* Reduced since chat is moving out */
+            max-width: 850px;
             height: 600px;
             align-items: stretch;
             justify-content: center;
@@ -1110,7 +1342,7 @@
         #global-chat-panel {
             position: fixed;
             bottom: 20px;
-            right: -400px; /* Hidden by default */
+            right: -400px; /* Hidden by default off screen */
             width: 350px;
             height: 500px;
             background: rgba(0, 5, 15, 0.95);
@@ -1124,9 +1356,39 @@
             transition: right 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 9000;
         }
-        
+
         #global-chat-panel.show {
             right: 0;
+        }
+
+        #chat-floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--ps-glow);
+            color: #000;
+            font-size: 1.5rem;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px rgba(0,162,255,0.4);
+            cursor: pointer;
+            z-index: 9001;
+            display: none; /* Only show when in a shared room */
+            transition: 0.2s;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #chat-floating-btn:hover {
+            transform: scale(1.1);
+        }
+
+        #chat-floating-btn.active {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px rgba(255,51,102,0.4);
         }
 
         .chat-body {
@@ -1161,36 +1423,6 @@
             font-style: italic;
             font-weight: 600;
         }
-        
-        #chat-floating-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--ps-glow);
-            color: #000;
-            font-size: 1.5rem;
-            border: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px rgba(0,162,255,0.4);
-            cursor: pointer;
-            z-index: 9001;
-            display: none; /* Only show in shared rooms */
-            transition: 0.2s;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        #chat-floating-btn:hover {
-            transform: scale(1.1);
-        }
-        
-        #chat-floating-btn.active {
-            background: var(--danger);
-            color: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px rgba(255,51,102,0.4);
-        }
 
         /* ================= TIMERS AND BET UI ================= */
         .timer-box {
@@ -1208,7 +1440,7 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
             transition: 0.3s;
             font-family: 'Rajdhani', monospace;
-        } 
+        }
 
         .timer-box.closing {
             border-color: var(--danger);
@@ -1299,21 +1531,29 @@
             z-index: 10;
         }
 
-        /* ================= FULLSCREEN GAME WRAPPERS ================= */
-        .fullscreen-view {
+        /* ================= FULLSCREEN VIEW ARCHITECTURE ================= */
+        /* This is the container that breaks MBJ and Horse Race out of the box. 
+           It takes up 100% of the screen below the topbar.
+           display: none !important ensures it doesn't block clicks when hidden.
+        */
+        .fs-view-container {
             position: absolute;
-            top: 75px; /* below topbar */
+            top: 75px; 
             left: 0;
             width: 100vw;
             height: calc(100vh - 75px);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            z-index: 100;
+            z-index: 50;
             background: var(--ps-bg);
         }
 
-        /* ================= FULLSCREEN MBJ STYLES ================= */
+        .fs-view-container.hidden {
+            display: none !important;
+        }
+
+        /* ================= FULLSCREEN VIP BLACKJACK ================= */
         .mbj-table-container {
             width: 100%;
             height: 100%;
@@ -1322,34 +1562,36 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            background: radial-gradient(circle at center, #001a33, #000);
         }
 
         .mbj-table {
             width: 100%;
-            max-width: 1100px;
-            height: 550px;
-            background: radial-gradient(circle at 50% 30%, #007a33, #003314);
-            border: 15px solid #3d2314;
-            border-radius: 500px 500px 50px 50px;
+            max-width: 1200px;
+            height: 600px;
+            background: radial-gradient(circle at 50% 20%, var(--table-green), var(--table-dark));
+            border: 20px solid #3d2314; /* Wooden edge */
+            border-radius: 600px 600px 100px 100px;
             position: relative;
-            box-shadow: 0 30px 50px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,0,0,0.8);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.9), inset 0 0 50px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding-top: 30px;
+            overflow: hidden;
         }
-        
+
         .mbj-table-edge {
             position: absolute;
             inset: 0;
             border: 4px solid rgba(255,255,255,0.1);
-            border-radius: 485px 485px 35px 35px;
+            border-radius: 580px 580px 80px 80px;
             pointer-events: none;
         }
-        
+
         .mbj-table-text {
             text-align: center;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.2);
             position: absolute;
             top: 40%;
             left: 50%;
@@ -1357,9 +1599,21 @@
             pointer-events: none;
             width: 100%;
         }
-        .mbj-table-text h1 { font-size: 3rem; letter-spacing: 5px; margin-bottom: 5px; color: rgba(255,255,255,0.5); }
-        .mbj-table-text p { font-weight: 800; font-size: 0.9rem; letter-spacing: 2px; }
-        
+
+        .mbj-table-text h1 {
+            font-size: 3.5rem;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .mbj-table-text p {
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
         .mbj-dealer-area {
             display: flex;
             flex-direction: column;
@@ -1367,7 +1621,7 @@
             z-index: 10;
             position: relative;
         }
-        
+
         .mbj-shoe {
             position: absolute;
             top: 0;
@@ -1379,17 +1633,17 @@
             border-radius: 8px;
             box-shadow: -10px 10px 20px rgba(0,0,0,0.8);
         }
-        
+
         .mbj-seats-arc {
             display: flex;
             justify-content: space-evenly;
             align-items: flex-end;
             width: 90%;
             margin: 0 auto;
-            padding-bottom: 20px;
+            padding-bottom: 30px;
             z-index: 10;
         }
-        
+
         .mbj-seat-wrapper { 
             display: flex; 
             flex-direction: column; 
@@ -1397,11 +1651,12 @@
             position: relative; 
             width: 18%; 
         }
-        
-        .mbj-seat-wrapper:nth-child(1), .mbj-seat-wrapper:nth-child(5) { padding-bottom: 60px; }
-        .mbj-seat-wrapper:nth-child(2), .mbj-seat-wrapper:nth-child(4) { padding-bottom: 20px; }
+
+        /* Arc positioning */
+        .mbj-seat-wrapper:nth-child(1), .mbj-seat-wrapper:nth-child(5) { padding-bottom: 80px; }
+        .mbj-seat-wrapper:nth-child(2), .mbj-seat-wrapper:nth-child(4) { padding-bottom: 30px; }
         .mbj-seat-wrapper:nth-child(3) { padding-bottom: 0px; }
-        
+
         .mbj-seat-circle {
             width: 90px;
             height: 90px;
@@ -1415,11 +1670,24 @@
             background: rgba(0,0,0,0.2);
             position: relative;
         }
-        
-        .mbj-seat-circle:hover { border-color: white; background: rgba(255,255,255,0.1); }
-        .mbj-seat-circle.occupied { border: 3px solid rgba(255,255,255,0.8); background: transparent; }
-        .mbj-seat-wrapper.active-turn .mbj-seat-circle { border-color: var(--ps-glow); box-shadow: 0 0 20px var(--ps-glow); background: rgba(0, 162, 255, 0.2); }
-        
+
+        .mbj-seat-circle:hover { 
+            border-color: white; 
+            background: rgba(255,255,255,0.1); 
+        }
+
+        .mbj-seat-circle.occupied { 
+            border: 3px solid rgba(255,255,255,0.8); 
+            background: transparent; 
+        }
+
+        .mbj-seat-wrapper.active-turn .mbj-seat-circle { 
+            border-color: var(--ps-glow); 
+            box-shadow: 0 0 20px var(--ps-glow); 
+            background: rgba(0, 162, 255, 0.2); 
+        }
+
+        /* Spotlight Effect */
         .mbj-seat-wrapper.active-turn::before {
             content: '';
             position: absolute;
@@ -1435,7 +1703,7 @@
 
         .mbj-dashboard {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1200px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1445,9 +1713,13 @@
             border-radius: 12px;
             border: 1px solid var(--glass-border);
         }
-        
-        .mbj-dash-left, .mbj-dash-right { display: flex; gap: 15px; align-items: center; }
-        
+
+        .mbj-dash-left, .mbj-dash-right { 
+            display: flex; 
+            gap: 15px; 
+            align-items: center; 
+        }
+
         .mbj-action-btn {
             width: 60px;
             height: 60px;
@@ -1463,7 +1735,7 @@
             transition: 0.2s;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        
+
         .mbj-action-btn:hover { transform: scale(1.1); }
         .mbj-action-btn.hit { background: #00e676; }
         .mbj-action-btn.stand { background: #ff3366; }
@@ -1478,14 +1750,78 @@
             animation: floatEmote 2s ease-out forwards;
             z-index: 50;
         }
-        
+
         @keyframes floatEmote {
             0% { transform: translateY(0) scale(0.5); opacity: 1; }
             20% { transform: translateY(-20px) scale(1.2); opacity: 1; }
             100% { transform: translateY(-80px) scale(1); opacity: 0; }
         }
 
-        /* ================= FULLSCREEN HORSE RACE (TREADMILL) STYLES ================= */
+        /* Large Cards for Fullscreen */
+        .mbj-fs-card {
+            width: 70px;
+            height: 100px;
+            background: white;
+            color: black;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-shadow: 2px 5px 15px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            position: absolute; 
+        }
+        
+        .mbj-fs-card .val { font-size: 1.8rem; line-height: 1; }
+        .mbj-fs-card .suit { font-size: 2rem; line-height: 1; }
+        
+        .mbj-fs-hand-cards {
+            position: relative;
+            width: 70px; 
+            height: 100px;
+            margin-top: -30px; /* pull up out of the circle slightly */
+            z-index: 5;
+        }
+
+        .mbj-fs-hand-score {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid var(--glass-border);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            color: white;
+            margin-top: 5px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .mbj-fs-status {
+            position: absolute;
+            bottom: -20px;
+            background: var(--ps-bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 1px solid var(--glass-border);
+            white-space: nowrap;
+            z-index: 15;
+        }
+
+        .anim-slide-deal {
+            animation: slideDeal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes slideDeal {
+            0% { opacity: 0; transform: translate(500px, -500px) scale(0.5) rotateY(180deg); }
+            100% { opacity: 1; transform: translate(0, 0) scale(1) rotateY(0deg); }
+        }
+
+        /* ================= FULLSCREEN HORSE RACE (TREADMILL) ================= */
         .hr-fs-container {
             width: 100%;
             height: 100%;
@@ -1562,7 +1898,6 @@
             padding: 20px 0;
         }
 
-        /* The lane lines */
         .hr-fs-track::before {
             content: '';
             position: absolute;
@@ -1581,16 +1916,16 @@
 
         .hr-fs-horse-wrapper {
             position: absolute;
-            left: 5%; /* Start slightly on screen */
+            left: 5%; 
             display: flex;
             align-items: center;
             gap: 15px;
-            transition: left 0.1s linear; /* Smooth positional updates */
+            transition: left 0.1s linear; 
             z-index: 10;
         }
 
         .hr-fs-horse-sprite {
-            font-size: 4rem; /* Huge for fullscreen */
+            font-size: 4rem; 
             line-height: 1;
             filter: drop-shadow(-10px 15px 5px rgba(0,0,0,0.5));
             transform-origin: bottom center;
@@ -1622,7 +1957,7 @@
 
         @keyframes moveBg {
             from { transform: translateX(0); }
-            to { transform: translateX(-50%); } /* Since width is 300%, moving 50% loops it cleanly */
+            to { transform: translateX(-50%); } 
         }
         
         .track-slowmo .hr-fs-fence { animation: moveBg 6s linear infinite; }
@@ -1668,7 +2003,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            display: none; /* Only show during race */
+            display: none; 
             gap: 15px;
             z-index: 90;
         }
@@ -1686,6 +2021,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             transition: 0.1s;
         }
+
         .cheer-btn:active { transform: scale(0.9); }
 
         .hr-winners-circle {
@@ -1717,77 +2053,71 @@
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* RESULT OVERLAYS & NOTIFICATIONS */
-        .result-box, .result-overlay-shared { 
-            position: absolute; 
-            bottom: 20px; 
-            right: 20px; 
-            opacity: 0; 
-            padding: 20px 30px; 
-            border-radius: 12px; 
-            display: none; 
-            z-index: 2000; 
-            min-width: 250px; 
-            text-transform: uppercase; 
-            backdrop-filter: blur(20px); 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8); 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            flex-direction: column; 
-            align-items: flex-end; 
-            justify-content: center; 
-            pointer-events: none; 
-            transform: translateX(50px); 
-            text-align: right; 
+        .cheer-particle {
+            position: absolute;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
         }
-
-        .result-box.win, .result-overlay-shared.win { background: rgba(0, 230, 118, 0.15); border-right: 4px solid var(--success); color: var(--success); } 
-        .result-box.lose, .result-overlay-shared.lose { background: rgba(255, 51, 102, 0.15); border-right: 4px solid var(--danger); color: var(--danger); } 
-        .result-box.push, .result-overlay-shared.push { background: rgba(255, 255, 255, 0.1); border-right: 4px solid var(--text-muted); color: white; }
-        .result-box.show, .result-overlay-shared.show { opacity: 1; transform: translateX(0); pointer-events: all; display: flex !important; }
         
-        .res-title { font-size: 1.2rem; font-weight: 900; color: white; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; text-align: right; width: 100%; white-space: normal; line-height: 1.2; } 
-        .res-payout { font-size: 1.8rem; font-weight: 900; text-align: right; width: 100%; }
-
-        .local-flash { 
-            position: absolute; 
-            bottom: 25px; 
-            right: 25px; 
-            z-index: 2500; 
-            color: var(--danger); 
-            font-size: 1.1rem; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            text-align: right; 
-            pointer-events: none; 
-            opacity: 0; 
-            transition: all 0.3s; 
-            display: none; 
-            white-space: normal; 
-            max-width: 300px; 
-            line-height: 1.2; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 15px var(--danger); 
-            transform: translateY(20px); 
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
         }
 
-        .local-flash.show { display: block; animation: flashAnimSubtle 2s forwards; }
-        .local-flash.success { color: var(--success); text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 15px var(--success); }
+        /* ================= GAME ASSETS (Base Code) ================= */
+        .blackjack-scores { display: flex; justify-content: center; gap: 40px; width: 100%; align-items: flex-start; } 
+        .card-area { min-width: 250px; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 240px; } 
+        .bj-title { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; } 
+        .bj-score { font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 15px; line-height: 1; } 
+        .card-hand { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; width: 100%; } 
+        
+        .play-card { background: white; color: black; border-radius: 6px; width: 65px; height: 95px; border: 1px solid #ccc; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; } 
+        .play-card .val { font-size: 1.6rem; line-height: 1; margin-bottom: 2px; } 
+        .play-card .suit { font-size: 1.8rem; line-height: 1; } 
+        .card-red { color: #e60000; } 
+        .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); color: transparent; }
+        
+        .dice-icon { font-size: 7rem; color: var(--text-muted); text-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: 0.1s; line-height: 1; } 
+        #d20-num { font-size: 6rem !important; line-height: 1; text-shadow: 0 10px 30px rgba(0,0,0,0.8); font-weight: 900 !important; }
+        
+        .coin-wrapper { perspective: 1000px; width: 150px; height: 150px; margin: 0 auto; display: flex; justify-content: center; align-items: center; } 
+        .coin-inner { width: 100%; height: 100%; transform-style: preserve-3d; position: relative; transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275); } 
+        .coin-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 900; border-radius: 50%; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 15px 40px rgba(0,0,0,0.9); border: 6px solid; } 
+        .coin-heads { background: radial-gradient(circle at 30% 30%, #fde047, #b45309); color: #78350f; border-color: #f59e0b; transform: rotateY(0deg); } 
+        .coin-tails { background: radial-gradient(circle at 30% 30%, #e2e8f0, #475569); color: #0f172a; border-color: #94a3b8; transform: rotateY(180deg); } 
+        
+        .color-dice-container { display: flex; gap: 30px; justify-content: center; font-size: 6rem; margin-bottom: 20px; } 
+        .color-die { width: 130px; height: 130px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.3); box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 15px 30px rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; color: white; transition: 0.3s; background: #111; font-weight: 800;} 
+        .c-grey { background: radial-gradient(circle, #333, #0a0a0a); color: rgba(255,255,255,0.4); border-color: #444; } 
+        .c-red { background: radial-gradient(circle, #ff3366, #99002b); border-color: #ff3366;} 
+        .c-blue { background: radial-gradient(circle, #00a2ff, #003d66); border-color: #00a2ff;} 
+        .c-yellow { background: radial-gradient(circle, #ffcc00, #997a00); border-color: #ffcc00;} 
+        .c-white { background: radial-gradient(circle, #ffffff, #999999); color: #000; border-color: #fff;} 
+        .c-green { background: radial-gradient(circle, #00e676, #006634); border-color: #00e676;} 
+        .c-pink { background: radial-gradient(circle, #ff66b2, #99004d); border-color: #ff66b2;}
+        
+        .dt-arena { display: flex; justify-content: center; gap: 80px; width: 100%; align-items: center; margin-bottom: 20px; } 
+        .dt-side { display: flex; flex-direction: column; align-items: center; gap: 20px; } 
+        .dt-label { font-size: 2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; } 
+        .lbl-dragon { color: var(--danger); text-shadow: 0 0 20px rgba(255,51,102,0.6); } 
+        .lbl-tiger { color: var(--credits); text-shadow: 0 0 20px rgba(255,180,0,0.6); } 
+        .dt-card { width: 120px !important; height: 170px !important; } 
+        .dt-card .val { font-size: 3rem; } .dt-card .suit { font-size: 3.5rem; }
+        
+        .sicbo-dice { display: flex; justify-content: center; gap: 30px; font-size: 6rem; margin-bottom: 10px; } 
+        .s-die { color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8); }
 
-        @keyframes flashAnimSubtle { 
-            0% { opacity: 0; transform: translateY(20px); } 
-            15% { opacity: 1; transform: translateY(0); } 
-            80% { opacity: 1; } 
-            100% { opacity: 0; transform: translateY(-10px); } 
-        }
-
-        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes popBalance { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); } 100% { transform: scale(1); } } .anim-pop { animation: popBalance 0.6s ease-out; }
-        @keyframes popBet { 0% { transform: scale(1); } 50% { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.5); } 100% { transform: scale(1); } } .anim-pop-bet { animation: popBet 0.3s ease-out; }
-        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } 100% { transform: rotate(0deg); } } .anim-shake { animation: shake 0.3s infinite; }
+        #bj-action-controls { display: flex; flex-direction: row !important; gap: 10px; width: 100%; justify-content: center; }
+        .cb-item { display: flex; justify-content: space-between; align-items: center; font-weight: 800; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; white-space: nowrap; }
 
         /* ================= MEDIA QUERIES ================= */
         @media (max-width: 1200px) { 
             .casino-grid.solo-grid { grid-template-columns: repeat(2, 260px); } 
-            .casino-grid.shared-grid { grid-template-columns: repeat(3, 220px); } 
+            .casino-grid.shared-grid { grid-template-columns: repeat(2, 260px); } 
         }
 
         @media (max-width: 768px) {
@@ -1812,8 +2142,6 @@
                 border-radius: 20px 20px 0 0;
             }
             
-            #chat-floating-btn { display: flex; }
-            
             .blackjack-scores, .dt-arena { flex-direction: column !important; gap: 15px !important; align-items: center;}
             .card-area { min-height: auto; padding: 10px; width: 100%; min-width: unset; }
             .play-card { transform: scale(0.85); margin: -5px; } 
@@ -1822,7 +2150,6 @@
             #history-popover { width: 340px; right: -50px; }
             
             .modal-content { position: absolute; bottom: 0; width: 100vw; max-width: 100vw; border-radius: 20px 20px 0 0; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 85vh; }
-            @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
             
             /* Mobile MBJ Scaling */
             .mbj-table { height: auto; min-height: 500px; border-width: 8px; padding-top: 10px; }
@@ -2312,11 +2639,11 @@
             </div>
           </div>
           
-        </div> <div id="view-fullscreen-mbj" class="view-container hidden fullscreen-view">
-            <div style="width: 100%; max-width: 1200px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; margin: 0 auto;">
+        </div> <div id="view-fullscreen-mbj" class="fs-view-container hidden">
+            <div class="mbj-table-container">
                 
-                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h2 style="color: white; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;">VIP BLACKJACK</h2>
+                <div style="width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2 style="color: white; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0;">VIP BLACKJACK</h2>
                     <div style="display:flex; gap:10px;">
                         <button class="btn-rules" onclick="toggleRules('mbj', event)"><i class="fas fa-info-circle"></i></button>
                         <div class="dropdown-wrapper"><button class="btn-rules" onclick="toggleHistory('mbj', event)"><i class="fas fa-list-alt"></i></button></div>
@@ -2351,7 +2678,7 @@
                         </div>
                     </div>
 
-                    <div class="mbj-dash-center" id="mbj-emote-panel" style="display:none; gap:10px;">
+                    <div class="mbj-dash-center" id="emote-panel" style="display:none; gap:10px;">
                         <button class="mbj-action-btn emote" onclick="sendMBJEmote('🔥')">🔥</button>
                         <button class="mbj-action-btn emote" onclick="sendMBJEmote('💸')">💸</button>
                         <button class="mbj-action-btn emote" onclick="sendMBJEmote('😭')">😭</button>
@@ -2373,7 +2700,7 @@
             </div>
         </div>
 
-        <div id="view-fullscreen-hr" class="view-container hidden fullscreen-view">
+        <div id="view-fullscreen-hr" class="fs-view-container hidden">
             <div class="hr-fs-container">
                 <div class="glass-header" style="background: rgba(0,0,0,0.8); border-radius: 0; width: 100%; border-bottom: 2px solid var(--glass-border); z-index: 100;">
                     <h2 style="margin:0; line-height:1;">RETRO DERBY</h2>
@@ -2402,7 +2729,7 @@
                     <div class="res-payout" id="hr-wc-payout" style="color:var(--success); font-size:3rem; text-align:center;"></div>
                 </div>
 
-                <div id="flash-hr" class="local-flash" style="bottom: 150px; z-index: 2500;"></div> 
+                <div id="flash-horserace" class="local-flash" style="bottom: 150px; z-index: 2500;"></div> 
 
                 <div class="hr-cheer-panel" id="hr-cheer-panel">
                     <button class="cheer-btn" style="border-color:#ff3366;" onclick="sendHRCheer('Red')">Red</button>
@@ -2676,7 +3003,7 @@
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let audioMuted = false, sfxGainVal = 0.5;
 
-    // GLOBAL VARS (Fixed issue with undefined hrState causing crash)
+    // GLOBAL VARS 
     let hrState = { time: 40, status: 'BETTING', currentOdds: {} };
     let mbjGameState = 'BETTING';
     let sState = { time: 15, status: 'BETTING' };
@@ -2686,11 +3013,13 @@
     let globalFallback = { baccarat: [], perya: [], dt: [], sicbo: [], horserace: [], mbj: [] };
     let mySoloRounds = { d20: 0, coinflip: 0, blackjack: 0 };
     let myNotifications = [];
-    let window_activeSharedGame = null; // Re-alias to avoid window property clashes
+    let window_activeSharedGame = null;
+    
     Object.defineProperty(window, "activeSharedGame", {
         get: function() { return window_activeSharedGame; },
         set: function(val) { window_activeSharedGame = val; }
     });
+    
     let dailyTimerInterval = null, currentHistoryGame = null;
 
     document.body.addEventListener('click', () => { 
@@ -3176,7 +3505,7 @@
         'dt': { title: "Dragon Tiger", body: "<ul><li>Bet on Dragon, Tiger, or Tie. Highest card wins.</li><li>Aces are low (1). Kings are high (13).</li><li>Dragon/Tiger pays <strong>2x</strong>. Tie pays <strong>9x</strong>.</li></ul>" }, 
         'sicbo': { title: "Sic Bo", body: "<ul><li>Bet on Small (Sum 4-10) or Big (Sum 11-17).</li><li>Wins pay <strong>2x</strong>.</li><li>Any Triple roll loses all Big/Small bets.</li></ul>" }, 
         'horserace': { title: "Retro Derby", body: "<ul><li>Odds shuffle dynamically every round!</li><li>Watch the lane multipliers to pick your favorite or underdog.</li><li>Payouts multiply based on the exact odds locked in when the race starts.</li></ul>" }, 
-        'mbj': { title: "Multiplayer Blackjack", body: "<ul><li>Take a seat to play against the dealer.</li><li>You have 10 seconds to Hit, Stand, Double, or Split.</li><li>Dealer draws to 17. Blackjack pays 2.5x.</li></ul>" } 
+        'mbj': { title: "VIP Blackjack", body: "<ul><li>Take a seat to play against the dealer.</li><li>You have 15 seconds to Hit, Stand, Double, or Split.</li><li>Dealer draws to 16. Blackjack pays 2.5x.</li></ul>" } 
     };
 
     function logHistory(gid, betStr, resultStr, wonProfit, lostBet, didBet = true) { 
@@ -3227,14 +3556,23 @@
 
     function switchView(viewId) { 
         if (audioCtx.state === 'suspended') audioCtx.resume(); 
+        
+        // Hide all standard views
         document.querySelectorAll('.main-wrapper > .content > .view-container').forEach(d => d.classList.add('hidden')); 
+        // Hide all fullscreen views
+        document.querySelectorAll('.fs-view-container').forEach(d => d.classList.add('hidden')); 
+        
         let v = document.getElementById('view-' + viewId); 
         if (v) v.classList.remove('hidden'); 
+        
         let backBtn = document.getElementById('global-back-btn'); 
+        
         if (viewId === 'casino') { 
             openLobbyMode('modes'); 
             let cBtn = document.getElementById('chat-floating-btn');
+            let cPanel = document.getElementById('global-chat-panel');
             if(cBtn) cBtn.style.display = 'none'; 
+            if(cPanel) cPanel.classList.remove('show');
         } else { 
             backBtn.classList.remove('hidden'); 
             document.getElementById('back-btn-text').innerText = 'LEAVE TABLE'; 
@@ -3292,7 +3630,7 @@
         socket.emit('joinRoom', id); 
         
         if (id === 'mbj') {
-            renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
+            sConf['mbj'].setupUI();
             switchView('fullscreen-mbj');
         } else if (id === 'horserace') {
             sConf['horserace'].setupUI();
@@ -3319,9 +3657,10 @@
         } else if (window.activeSharedGame && mySBets && Object.values(mySBets).reduce((a,b)=>a+b,0) > 0 && (window.activeSharedGame === 'horserace' ? hrState.status : sState.status) === 'BETTING') { 
             showLocalFlash('shared', "Wait for round to finish.", "error"); return; 
         } 
-        document.getElementById('view-shared-game').classList.add('hidden'); 
-        document.getElementById('view-fullscreen-mbj').classList.add('hidden');
-        document.getElementById('view-fullscreen-hr').classList.add('hidden');
+        
+        // Hide popovers
+        document.getElementById('current-bets-popover').classList.add('hidden');
+        
         socket.emit('leaveRoom', window.activeSharedGame); 
         window.activeSharedGame = null; 
         switchView('casino'); 
@@ -3547,74 +3886,121 @@
         }
     });
 
-    function sendChat() { 
-        const input = document.getElementById('chat-input'); 
-        if(input && input.value.trim() !== '') { 
-            socket.emit('sendChat', { room: window.activeSharedGame, msg: input.value }); 
-            input.value = ''; 
-        } 
-    }
-    
-    socket.on('chatMessage', (data) => { 
-        let cb = document.getElementById('sg-chat'); 
-        if (cb) { 
-            cb.insertAdjacentHTML('beforeend', `<div class="chat-msg chat-sys">${data.text}</div>`); 
-            cb.scrollTop = cb.scrollHeight; 
-        } 
-    });
-
-    socket.on('playerCount', (counts) => { 
-        document.querySelectorAll('.active-players .ap-count').forEach((el, index) => { 
-            const keys = ['baccarat', 'perya', 'dt', 'sicbo', 'horserace', 'mbj']; 
-            if(counts[keys[index]]!==undefined) el.innerText = counts[keys[index]]; 
-        }); 
-        const sgCount = document.getElementById('sg-active-players'); 
-        if(sgCount && window.activeSharedGame) sgCount.innerText = counts[window.activeSharedGame] || 0; 
-    });
-    
-    function fetchActivePlayers(e) { 
-        if(!window.activeSharedGame) return; 
-        toggleCustomDropdown('ap-popover', e); 
-        socket.emit('getRoomPlayers', window.activeSharedGame); 
-    }
-    
-    socket.on('roomPlayersList', (players) => { 
-        const container = document.getElementById('ap-list-container'); 
-        if (players.length === 0) { 
-            container.innerHTML = '<div style="color:var(--text-muted); font-style:italic; padding:10px; text-align:center;">Room is empty.</div>'; 
-        } else { 
-            container.innerHTML = players.map(p => `<div style="padding:8px 12px; background:rgba(255,255,255,0.05); margin-bottom:5px; border-radius:6px; font-weight:800; color:white;">${p}</div>`).join(''); 
-        } 
-    });
-
-    function undoSharedBet() { 
+    let isBettingTimeout = false;
+    function placeSharedBet(c) { 
         let targetState = window.activeSharedGame === 'horserace' ? hrState : sState; 
-        if (targetState.status !== 'BETTING' || mySBetsStack.length === 0) return; 
-        socket.emit('undoSharedBet', { room: window.activeSharedGame }); 
+        if (targetState.status !== 'BETTING') { showLocalFlash('shared', "Bets are closed!", "error"); return; } 
+        if (isBettingTimeout) return; 
+        
+        let iId = window.activeSharedGame === 'horserace' ? 'hr-fs-bet-input' : 'sg-bet-input';
+        let i = document.getElementById(iId); 
+        if (!i) return; 
+        
+        let a = parseFloat(i.value); 
+        if (isNaN(a) || a < 10) { showLocalFlash('shared', "Min Bet is 10 TC", "error"); return; } 
+        
+        let currentTileBet = mySBets[c] || 0; 
+        if (currentTileBet + a > 50000) { showLocalFlash('shared', "Max 50K TC Per Tile", "error"); return; } 
+        
+        isBettingTimeout = true; 
+        setTimeout(() => { isBettingTimeout = false; }, 250); 
+        
+        socket.emit('placeSharedBet', { room: window.activeSharedGame, choice: c, amount: a }); 
     }
     
-    socket.on('undoSuccess', (data) => { 
-        mySBetsStack.pop(); 
-        if(mySBets[data.choice]) { 
-            mySBets[data.choice] -= data.amount; 
-            let badge = document.getElementById('badge-' + data.choice); 
-            if (mySBets[data.choice] > 0) { if(badge) badge.innerText = fmtTC(mySBets[data.choice]); } 
-            if(mySBets[data.choice] <= 0) { 
-                delete mySBets[data.choice]; 
-                if(badge) badge.style.display = 'none'; 
-                let btn = document.querySelector(`.bet-btn[data-choice="${data.choice}"]`); 
-                if(btn) { btn.classList.remove('has-bet'); btn.style.setProperty('--tile-color', btn.style.borderBottomColor); } 
-            } 
-        } 
+    socket.on('sharedBetConfirmed', (data) => { 
+        if (data.room !== window.activeSharedGame) return; 
+        let a = data.amount; let c = data.choice; 
+        updateMyBalance(data.newBalance, false); 
+        triggerBetAnim(); 
+        if (!mySBets[c]) mySBets[c] = 0; 
+        mySBets[c] += a; mySBetsStack.push({ choice: c, amount: a }); 
+        
         let tot = Object.values(mySBets).reduce((sum, val) => sum + val, 0); 
+        
         let mb = document.getElementById('sg-my-bet'); 
-        if(mb) mb.innerHTML = `${fmtTC(tot)} TC`; 
+        if (mb) { mb.innerHTML = `${fmtTC(tot)} TC`; } 
         
         let hrMb = document.getElementById('hr-fs-my-bet');
-        if(hrMb) hrMb.innerHTML = `${fmtTC(tot)} TC`;
+        if (hrMb) { hrMb.innerHTML = `${fmtTC(tot)} TC`; }
 
-        updateCurrentBetsPopover(); sfx.tick(); 
+        updateCurrentBetsPopover(); 
+        
+        let badge = document.getElementById('badge-' + c); 
+        if (badge) { badge.innerText = fmtTC(mySBets[c]); badge.style.display = 'block'; } 
+        
+        document.querySelectorAll('.bet-btn').forEach(b => { 
+            if (b.getAttribute('data-choice') === c) { 
+                b.classList.add('has-bet'); 
+                let t = b.style.getPropertyValue('--tile-color') || b.style.borderBottomColor; 
+                if (t) { b.style.setProperty('--tile-color', t); } 
+            } 
+        }); 
+        sfx.tick(); 
     });
+
+    let sharedResultTimeout;
+    function processSharedPayout(gid, pa, tba, msg, wonProfit = 0, lostBet = 0, betsPlacedStr = "", resStr = "") { 
+        const box = document.getElementById('sg-overlay'); 
+        const t = document.getElementById('sg-res-title'); 
+        const b = document.getElementById('sg-res-payout'); 
+        if (!box) return; 
+        
+        if(resStr === "") resStr = msg; 
+        let net = formatTC(wonProfit - lostBet); 
+        let h = `<div class="res-title" style="color:white;">${msg}</div>`; 
+        
+        if (tba > 0) { 
+            if (net > 0) { box.className = "result-overlay-shared win"; } 
+            else if (net < 0) { box.className = "result-overlay-shared lose"; } 
+            else { box.className = "result-overlay-shared push"; } 
+        } else { 
+            box.className = "result-overlay-shared push"; 
+        } 
+        
+        logHistory(gid, betsPlacedStr || '-', resStr, wonProfit, lostBet, tba > 0); 
+        
+        requestAnimationFrame(() => { 
+            if (t) t.innerHTML = msg; 
+            if (tba > 0 && b) { 
+                b.style.display = 'block'; 
+                if (net > 0) { b.innerHTML = `WON <span style="color:var(--success)">+${fmtTC(net)} TC</span>`; b.style.color = "white"; } 
+                else if (net < 0) { b.innerHTML = `LOST <span style="color:var(--danger)">-${fmtTC(Math.abs(net))} TC</span>`; b.style.color = "white"; } 
+                else { b.innerHTML = `PUSH <span style="color:var(--text-muted)">RETURNED</span>`; b.style.color = "white"; } 
+            } else if (b) { b.style.display = 'none'; } 
+            
+            box.style.display = 'flex'; box.style.opacity = '0'; 
+            requestAnimationFrame(() => { 
+                box.style.opacity = '1'; box.classList.add('show'); 
+                if (tba > 0 && net > 0) sfx.win(); else if (tba > 0 && net < 0) sfx.lose(); 
+                clearTimeout(sharedResultTimeout); 
+                sharedResultTimeout = setTimeout(() => { 
+                    box.classList.remove('show'); setTimeout(() => { box.style.display = 'none'; }, 400); 
+                }, 3500); 
+            }); 
+            setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1500); 
+        }); 
+    }
+    
+    function wipeTableVisually() { 
+        let o = document.getElementById('sg-overlay'); 
+        if (o) { o.classList.remove('show'); setTimeout(() => { o.style.display = 'none'; }, 300); } 
+        
+        let oldBetInput = document.getElementById('sg-bet-input') ? document.getElementById('sg-bet-input').value : ''; 
+        if (window.activeSharedGame && sConf[window.activeSharedGame] && sConf[window.activeSharedGame].setupUI) { 
+            sConf[window.activeSharedGame].setupUI(); 
+        } 
+        let newBetInput = document.getElementById('sg-bet-input'); 
+        if(newBetInput && oldBetInput) newBetInput.value = oldBetInput; 
+        
+        mySBets = {}; mySBetsStack = []; 
+        let m = document.getElementById('sg-my-bet'); 
+        if (m) m.innerHTML = '0 TC'; 
+        
+        updateCurrentBetsPopover(); 
+        document.querySelectorAll('.tile-bet-badge').forEach(b => { b.style.display = 'none'; b.innerText = '0'; }); 
+        document.querySelectorAll('.bet-btn').forEach(btn => { btn.classList.remove('has-bet'); btn.disabled = false; }); 
+    }
 
     const sConf = {
       'perya': {
@@ -3685,7 +4071,7 @@
             processSharedPayout('baccarat', tp, tba, msg, wonProfit, lostBet, Object.keys(mySBets).join(', '), data.resStr); 
         }
       },
-'dt': {
+      'dt': {
         title: 'Dragon Tiger', 
         setupUI: function() { 
           let d = document.getElementById('sg-display'); if (!d) return; 
@@ -3715,7 +4101,7 @@
             }, 500); 
         }
       },
-      'sicbo': {
+'sicbo': {
         title: 'Sic Bo', 
         setupUI: function() { 
           let d = document.getElementById('sg-display'); if (!d) return; 
@@ -3745,8 +4131,210 @@
                 processSharedPayout('sicbo', tp, tba, msg, wonProfit, lostBet, Object.keys(mySBets).join(', '), data.resStr); 
             }, 2000); 
         }
+      },
+      'horserace': {
+        title: 'Retro Derby',
+        setupUI: function() {
+            let trackLanes = document.getElementById('hr-fs-lanes'); 
+            if (!trackLanes) return;
+            
+            let trackHTML = '';
+            const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
+            const hexColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
+            
+            colors.forEach((c, idx) => {
+                trackHTML += `
+                <div class="hr-fs-lane">
+                    <div id="horse-${c}" class="hr-fs-horse-wrapper">
+                        <div class="horse-badge" style="background:${hexColors[c]};">${idx+1}</div>
+                        <div class="hr-fs-horse-sprite" id="sprite-${c}">🏇</div>
+                    </div>
+                </div>`;
+            });
+            trackLanes.innerHTML = trackHTML;
+
+            let bg = document.getElementById('hr-fs-bet-grid');
+            if (bg) {
+                bg.innerHTML = '';
+                colors.forEach(c => {
+                    let oText = hrState.currentOdds && hrState.currentOdds[c] ? hrState.currentOdds[c] + 'x' : '?x';
+                    bg.innerHTML += `<button class="bet-btn shared-tile" data-choice="${c}" style="border-bottom-color:${hexColors[c]};" onclick="placeSharedBet('${c}')">${c.toUpperCase()} (${oText})<div class="tile-bet-badge" id="badge-${c}">0</div></button>`;
+                });
+            }
+            
+            // Ensure the finish line starts hidden off-screen
+            let fLineEl = document.getElementById('hr-fs-finish-line');
+            if(fLineEl) fLineEl.classList.remove('show');
+        },
+        animateResult: function(data) { } 
+      },
+      'mbj': {
+        title: 'VIP Blackjack',
+        setupUI: function() { },
+        animateResult: function(data) { }
       }
     };
-</script>
+
+    // --- CASHIER ACTIONS ---
+    function openCashier() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      sfx.click();
+      document.querySelectorAll('.cashier-balance-display').forEach(el => el.innerText = fmtTC(myCredits) + ' TC');
+      switchSupportCenterTab('deposit', document.querySelectorAll('#cashier-tabs-nav .bank-tab')[0]);
+      openModal('support-center-modal');
+    }
+
+    function switchSupportCenterTab(tab, el) {
+      if(el) {
+          document.querySelectorAll('#cashier-tabs-nav .bank-tab').forEach(b => b.classList.remove('active'));
+          el.classList.add('active');
+      }
+      
+      if (tab === 'ledger') {
+          document.getElementById('cashier-tabs-nav').style.display = 'none';
+          document.getElementById('btn-view-ledger').style.display = 'none';
+          document.getElementById('cashier-balance-header').style.display = 'none';
+      } else {
+          document.getElementById('cashier-tabs-nav').style.display = 'flex';
+          document.getElementById('btn-view-ledger').style.display = 'block';
+          document.getElementById('cashier-balance-header').style.display = 'block';
+      }
+
+      ['deposit','withdraw','requests','ledger'].forEach(t => {
+        let scTab = document.getElementById('sc-tab-' + t);
+        if(scTab) {
+            scTab.classList.toggle('active', t === tab);
+            scTab.classList.toggle('hidden', t !== tab);
+        }
+      });
+      if(tab === 'requests') socket.emit('getTransactions');
+      if(tab === 'ledger') socket.emit('getWalletLogs');
+    }
+
+    function copyDiscord(el) {
+        navigator.clipboard.writeText('@sr.ashley').then(() => {
+            let ogHtml = el.innerHTML;
+            el.innerHTML = '✓ COPIED TO CLIPBOARD';
+            el.style.color = 'var(--success)';
+            setTimeout(() => { el.innerHTML = ogHtml; el.style.color = 'var(--text-muted)'; }, 2000);
+        });
+    }
+
+    function submitDeposit() {
+        const amt = document.getElementById('dep-amount').value;
+        const snt = document.getElementById('dep-snt').value.trim();
+        const discord = document.getElementById('dep-discord').value.trim();
+        const msgBox = document.getElementById('deposit-msg');
+        
+        if(!amt || !snt || !discord) { msgBox.innerHTML = '<span style="color:var(--danger)">Please fill all fields.</span>'; return; }
+        if(parseFloat(amt) < 1000) { msgBox.innerHTML = '<span style="color:var(--danger)">Minimum deposit is 1,000 TC.</span>'; return; }
+        if(parseFloat(amt) > 100000) { msgBox.innerHTML = '<span style="color:var(--danger)">Maximum deposit is 100,000 TC.</span>'; return; }
+
+        let combinedRef = `SNT: ${snt} | Discord: ${discord}`; 
+        socket.emit('submitTransaction', { type: 'Deposit', amount: parseFloat(amt), ref: combinedRef });
+        
+        msgBox.innerHTML = '<span style="color:var(--success)"><i class="fas fa-check-circle"></i> Deposit Request Submitted!</span>';
+        document.getElementById('dep-amount').value = ''; document.getElementById('dep-snt').value = ''; document.getElementById('dep-discord').value = '';
+        setTimeout(() => { msgBox.innerHTML = ''; }, 3500);
+    }
+
+    function submitWithdrawal() {
+        const amt = parseFloat(document.getElementById('wit-amount').value);
+        const snt = document.getElementById('wit-snt').value.trim();
+        const discord = document.getElementById('wit-discord').value.trim();
+        const msgBox = document.getElementById('withdraw-msg');
+
+        if(!amt || !snt || !discord) { msgBox.innerHTML = '<span style="color:var(--danger)">Please fill all fields.</span>'; return; }
+        if(amt < 10000) { msgBox.innerHTML = '<span style="color:var(--danger)">Minimum withdrawal is 10,000 TC.</span>'; return; }
+        if(amt > 100000) { msgBox.innerHTML = '<span style="color:var(--danger)">Maximum withdrawal is 100,000 TC.</span>'; return; }
+        if(amt > myCredits) { msgBox.innerHTML = '<span style="color:var(--danger)">Insufficient Withdrawable TC.</span>'; return; }
+        
+        let combinedRef = `SNT: ${snt} | Discord: ${discord}`;
+        socket.emit('submitTransaction', { type: 'Withdrawal', amount: amt, ref: combinedRef });
+        
+        msgBox.innerHTML = '<span style="color:var(--success)"><i class="fas fa-check-circle"></i> Withdrawal Request Submitted!</span>';
+        document.getElementById('wit-amount').value = ''; document.getElementById('wit-snt').value = ''; document.getElementById('wit-discord').value = '';
+        setTimeout(() => { msgBox.innerHTML = ''; }, 3500);
+    }
+
+    socket.on('transactionsData', (txs) => {
+        const container = document.getElementById('bank-logs-container'); container.innerHTML = '';
+        if(txs.length === 0) return container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">No requests found.</div>';
+        txs.forEach(t => {
+            let statClass = t.status === 'Approved' ? 'approved' : (t.status === 'Rejected' ? 'rejected' : 'pending');
+            let color = t.type === 'Deposit' ? 'var(--success)' : 'var(--danger)'; let sign = t.type === 'Deposit' ? '+' : '-';
+            container.innerHTML += `<div class="ticket-log-item"><div class="ticket-log-header"><span class="ticket-log-id">${t._id.substring(0,8)}... - ${new Date(t.date).toLocaleDateString()}</span><span class="ticket-log-status ${statClass}">${t.status}</span></div><div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:900; font-size:1.1rem; text-transform:uppercase;">${t.type}</div><div style="color:${color}; font-weight:900; font-size:1.2rem;">${sign}${fmtTC(t.amount)} TC</div></div></div>`;
+        });
+    });
+
+    function clearLedger() {
+        if(confirm("Are you sure you want to clear your ledger history?")) socket.emit('clearWalletLogs');
+    }
+
+    socket.on('walletLogsData', (data) => {
+        const container = document.getElementById('ledger-logs-container'); container.innerHTML = '';
+        const pHud = document.getElementById('ledger-daily-profit');
+        
+        if(pHud) {
+            let pColor = data.dailyProfit > 0 ? 'var(--success)' : (data.dailyProfit < 0 ? 'var(--danger)' : 'white');
+            let pSign = data.dailyProfit > 0 ? '+' : '';
+            pHud.innerHTML = `<span style="color:${pColor}">${pSign}${fmtTC(data.dailyProfit)} TC</span>`;
+        }
+        
+        if(data.logs.length === 0) return container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px; grid-column: span 4;">No ledger history found.</div>';
+        
+        data.logs.forEach(l => {
+            let color = l.amount > 0 ? 'var(--success)' : (l.amount < 0 ? 'var(--danger)' : 'white'); 
+            let sign = l.amount > 0 ? '+' : '';
+            container.innerHTML += `
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); align-items:center; text-align:center; font-size:0.9rem; white-space:nowrap;">
+                <div style="color:white; font-weight:900; text-transform:uppercase;">${l.action}</div>
+                <div style="color:${color}; font-weight:900;">${sign}${fmtTC(l.amount)}</div>
+                <div style="color:var(--text-muted); font-weight:600; text-transform:uppercase;">${l.details}</div>
+                <div style="color:var(--text-muted); font-weight:600; font-size:0.8rem;">${new Date(l.date).toLocaleDateString([], {month:'short', day:'numeric'})}</div>
+            </div>`;
+        });
+    });
+
+    function submitPromo() {
+        const code = document.getElementById('promo-code').value.trim(); 
+        if(!code) { document.getElementById('promo-response').innerHTML = '<span style="color:var(--danger)">Enter a code</span>'; return; }
+        socket.emit('redeemPromo', code);
+    }
+
+    socket.on('promoResult', (res) => {
+        let respDiv = document.getElementById('promo-response');
+        if(res.success) { 
+            respDiv.innerHTML = `<span style="color:var(--success)">Valid: +${fmtTC(res.amt)} ${res.type === 'playable' ? 'P TC' : 'TC'}</span>`;
+            document.getElementById('promo-code').value = ''; 
+            socket.emit('requestBalanceRefresh');
+        } else { 
+            respDiv.innerHTML = `<span style="color:var(--danger)">${res.msg}</span>`; 
+        }
+    });
+
+    socket.on('maintenanceToggle', (isMain) => {
+        if(isMain && myUsername !== 'admin') {
+            document.body.innerHTML = `
+            <div id="maintenance-overlay" style="height:100vh;width:100vw;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#00050d;color:white;text-align:center;padding:20px;">
+                <i class="fas fa-tools" style="font-size:5rem;color:var(--danger);margin-bottom:20px;animation:pulseRed 2s infinite;"></i>
+                <h1 style="font-weight:900;font-size:2.5rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">System Maintenance</h1>
+                <p style="color:var(--text-muted);font-size:1.1rem;max-width:400px;line-height:1.5;">The casino vault is currently closed for upgrades and routine security checks. Please check our Discord for updates.</p>
+            </div>`;
+        } else if (!isMain && document.getElementById('maintenance-overlay')) {
+            location.reload();
+        }
+    });
+
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.onkeydown = function(e) {
+        if(e.keyCode === 123) return false; 
+        if(e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false; 
+        if(e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false; 
+        if(e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false; 
+        if(e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false; 
+    };
+
+  </script>
 </body>
 </html>
