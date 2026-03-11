@@ -19,7 +19,7 @@
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
-        /* ================= BASE STYLES ================= */
+        /* ================= BASE STYLES & LAYOUT ================= */
         :root {
             --ps-bg: #000814;
             --ps-blue: #00439c;
@@ -33,17 +33,14 @@
             --text-main: #f8fafc;
             --text-muted: #8c9eb5;
             --playable: #b366ff;
+            --table-green: #006400;
+            --table-dark: #002200;
+            --table-wood: #3d2314;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
 
+        /* Strict no-scroll body */
         body {
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%);
             background-size: 200% 200%;
@@ -51,25 +48,15 @@
             color: var(--text-main);
             height: 100vh !important;
             width: 100vw !important;
-            overflow: hidden !important;
+            overflow: hidden !important; 
             -webkit-user-select: none;
             user-select: none;
             touch-action: manipulation;
-            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        @keyframes AmbientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes AmbientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .chip, .anim-deal, .play-card, .wheelPanel, canvas, .flying-obj, .coin, .dice-icon, .mode-card, .game-card {
-            will-change: transform, opacity;
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-
+        .chip, .anim-deal, .play-card, .flying-obj, .coin, .dice-icon, .mode-card, .game-card { will-change: transform, opacity; transform: translateZ(0); backface-visibility: hidden; }
         button i { pointer-events: none; }
         ::-webkit-scrollbar { display: none; }
         .hidden { display: none !important; }
@@ -115,8 +102,10 @@
 
         /* ================= TOP NAVIGATION HUD ================= */
         #app-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
-        .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 99999; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 12px 25px; height: 75px; display: flex; align-items: center; padding-top: calc(12px + env(safe-area-inset-top)); }
+        
+        .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 99999; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); padding: 12px 25px; height: 75px; display: flex; align-items: center; }
         .topbar-inner { width: 100%; max-width: 1600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+        
         .brand { display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; padding: 5px; border-radius: 8px; }
         .brand:hover { background: rgba(255,255,255,0.05); transform: scale(1.02); }
         .brand-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--ps-glow); box-shadow: 0 0 20px var(--ps-glow); }
@@ -145,6 +134,7 @@
         .notif-badge { display: none; position: absolute; top: -6px; right: -8px; background: var(--danger); color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 5px; border-radius: 50px; border: 2px solid var(--ps-bg); pointer-events: none; box-shadow: 0 0 10px var(--danger); }
         .notif-badge.pulse { animation: pulseBadge 1.5s infinite; }
         @keyframes pulseBadge { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 51, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); } }
+        
         .mobile-menu-btn { display: none; }
         .desktop-actions { display: flex; gap: 15px; align-items: center; }
         
@@ -155,7 +145,7 @@
 
         /* ================= DROPDOWNS & POPOVERS ================= */
         .dropdown-wrapper { position: relative; display: inline-block; }
-        .custom-dropdown { position: absolute; top: 45px; right: -10px; width: 350px; background: rgba(0,5,15,0.95); border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); border-radius: 8px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 100000; box-shadow: 0 25px 50px rgba(0,0,0,0.9); cursor: default; }
+        .custom-dropdown { position: absolute; top: 45px; right: -10px; width: 350px; background: rgba(0,5,15,0.95); border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); border-radius: 8px; backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 100000; box-shadow: 0 25px 50px rgba(0,0,0,0.9); cursor: default; }
         .notif-header, .popover-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--glass-border); font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
         .notif-actions { display: flex; gap: 10px; }
         .notif-action-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.8rem; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
@@ -175,16 +165,14 @@
         .notif-item-del:hover { color: var(--danger); transform: scale(1.1); }
 
         /* ================= GENERAL LAYOUT & LOBBY ================= */
-        .main-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 75px); margin-top: 75px; width: 100vw; position: relative; }
-        
-        /* Inner content container ensures layout fits perfectly inside the screen height */
-        .content { width: 100%; max-width: 1400px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; height: 100%; }
+        .main-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 75px); margin-top: 75px; width: 100vw; position: relative; overflow: hidden; }
+        .content { width: 100%; max-width: 1400px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; height: 100%; }
 
-        .view-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; flex-shrink: 0; }
+        .view-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s; flex-shrink: 0; position: relative; }
         
         .header-title { font-size: 3rem; font-weight: 900; margin: 0 0 2rem 0; text-transform: uppercase; letter-spacing: 2px; color: white; text-shadow: 0 2px 15px rgba(0,0,0,0.8); text-align: center; width: 100%; flex-shrink: 0; }
         .casino-title { font-size: 4rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 3rem 0; line-height: 1.1; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.2); text-align: center; flex-shrink: 0; }
-        .lobby-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+        .lobby-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; height: 100%; }
         
         .btn-back-fixed { position: fixed; top: 95px; left: 25px; z-index: 10000; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 10px; backdrop-filter: blur(10px); text-transform: uppercase; letter-spacing: 1px; }
         .btn-back-fixed:hover { background: white; color: black; box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
@@ -213,7 +201,7 @@
         .live-dot { width: 12px; height: 12px; background-color: var(--danger); border-radius: 50%; animation: pulseRed 1.5s infinite; }
         .active-players { position: absolute; top: 15px; left: 15px; color: var(--success); font-size: 0.9rem; font-weight: 800; z-index: 10; display: flex; align-items: center; gap: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
-        /* ================= GAME CONTAINERS (Standard Boxed Games) ================= */
+        /* ================= GAME CONTAINERS (Boxed Games) ================= */
         .game-wrapper { width: 100%; max-width: 1300px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: center; flex-shrink: 0; }
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; width: 100%; position: relative; flex-shrink: 0; }
         .glass-header { background: rgba(0,0,0,0.7); padding: 15px 20px; border-bottom: 1px solid var(--glass-border); color: white; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
@@ -223,7 +211,7 @@
         .game-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; perspective: 1000px; padding: 20px; }
         .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto; }
         .controls-full { display: flex; gap: 15px; justify-content: center; width: 100%; }
-
+        
         .shared-layout { display: flex; gap: 20px; width: 100%; max-width: 850px; height: 600px; align-items: stretch; justify-content: center; flex-shrink: 0; }
         .shared-layout .main-panel { width: 100%; flex: 1; }
 
@@ -250,58 +238,91 @@
         .bet-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; border-color: var(--glass-border) !important; color: var(--text-muted) !important; text-shadow: none !important; }
         .tile-bet-badge { position: absolute; top: -10px; right: -10px; background: var(--credits); color: black; font-size: 0.8rem; font-weight: 900; padding: 4px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.9); pointer-events: none; display: none; z-index: 10; }
 
-        /* ================= VIP BLACKJACK (Centered, No Scroll) ================= */
-        .mbj-container { width: 100%; max-width: 1000px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; margin: 0 auto; }
-        
+        /* ================= VIP BLACKJACK (Centered Rectangle, Curved Felt) ================= */
+        .mbj-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .mbj-board {
+            width: 100%;
+            max-width: 1100px;
+            background: #050505;
+            border: 2px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .mbj-table {
             width: 100%;
-            aspect-ratio: 2.2 / 1;
-            max-height: 400px;
-            background: radial-gradient(circle at 50% 100%, #007a33, #003314);
-            border: 12px solid #3d2314; /* Wooden rim */
-            border-bottom: none;
-            border-radius: 500px 500px 0 0;
+            height: 450px;
+            background: radial-gradient(circle at 50% 100%, var(--table-green), var(--table-dark));
+            border: 15px solid var(--table-wood);
+            border-bottom: 5px solid #22110a; /* flat bottom edge */
+            border-radius: 600px 600px 20px 20px;
             position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
-            flex-shrink: 0;
         }
 
-        .mbj-table-edge { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.1); border-bottom: none; border-radius: 480px 480px 0 0; pointer-events: none; }
+        .mbj-table-edge { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.05); border-bottom: none; border-radius: 580px 580px 0 0; pointer-events: none; }
 
         .mbj-table-text { text-align: center; color: rgba(255,255,255,0.2); position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; width: 100%; z-index: 1; }
-        .mbj-table-text h1 { font-size: 2.8rem; letter-spacing: 5px; margin-bottom: 5px; color: rgba(255,255,255,0.4); }
-        .mbj-table-text p { font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; }
+        .mbj-table-text h1 { font-size: 3rem; letter-spacing: 5px; margin-bottom: 5px; color: rgba(255,255,255,0.3); }
+        .mbj-table-text p { font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; color: rgba(255,255,255,0.2); }
 
         .mbj-dealer-area { display: flex; flex-direction: column; align-items: center; padding-top: 15px; z-index: 10; position: relative; }
-        .mbj-shoe { position: absolute; top: 15px; right: 10%; width: 60px; height: 90px; background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 3px solid #555; border-radius: 8px; box-shadow: -10px 10px 20px rgba(0,0,0,0.8); }
+        .mbj-shoe { position: absolute; top: 15px; right: 15%; width: 50px; height: 75px; background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 3px solid #555; border-radius: 6px; box-shadow: -5px 10px 20px rgba(0,0,0,0.8); }
 
-        .mbj-seats-arc { display: flex; justify-content: space-evenly; align-items: flex-end; width: 90%; margin: 0 auto; padding-bottom: 15px; z-index: 10; }
+        .mbj-seats-arc { display: flex; justify-content: space-evenly; align-items: flex-end; width: 85%; margin: 0 auto; padding-bottom: 10px; z-index: 10; }
         .mbj-seat-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; width: 18%; }
         
         .mbj-seat-wrapper:nth-child(1), .mbj-seat-wrapper:nth-child(5) { padding-bottom: 60px; }
         .mbj-seat-wrapper:nth-child(2), .mbj-seat-wrapper:nth-child(4) { padding-bottom: 20px; }
         .mbj-seat-wrapper:nth-child(3) { padding-bottom: 0px; }
 
-        .mbj-seat-circle { width: 70px; height: 70px; border: 2px dashed rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2); position: relative; z-index: 5;}
+        .mbj-seat-circle { width: 60px; height: 60px; border: 2px dashed rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2); position: relative; z-index: 5;}
         .mbj-seat-circle:hover { border-color: white; background: rgba(255,255,255,0.1); }
         .mbj-seat-circle.occupied { border: 2px solid rgba(255,255,255,0.8); background: transparent; }
         .mbj-seat-wrapper.active-turn .mbj-seat-circle { border-color: var(--ps-glow); box-shadow: 0 0 20px var(--ps-glow); background: rgba(0, 162, 255, 0.2); }
 
-        .mbj-controls-bar { width: 100%; max-width: 1000px; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); border-top: none; padding: 15px 25px; border-radius: 0 0 12px 12px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
-        
-        .mbj-action-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 8px; font-size: 1rem; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .mbj-action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .mbj-action-btn.hit { background: #00a2ff; color: black; border: none; }
-        .mbj-action-btn.stand { background: #ff3366; color: black; border: none; }
-        .mbj-action-btn.double { background: #ffb400; color: black; border: none; }
-        .mbj-action-btn.split { background: #b366ff; color: black; border: none; }
+        /* Floating Action Buttons (Bottom Right) */
+        .mbj-floating-controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 20; }
+        .mbj-action-circle { width: 55px; height: 55px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); color: white; font-size: 0.8rem; font-weight: 900; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 10px 20px rgba(0,0,0,0.8); text-transform: uppercase; line-height: 1; }
+        .mbj-action-circle:hover { transform: scale(1.1); border-color: white; }
+        .mbj-action-circle.hit { background: radial-gradient(circle, #00e676, #008040); }
+        .mbj-action-circle.stand { background: radial-gradient(circle, #ff3366, #99002b); }
+        .mbj-action-circle.double { background: radial-gradient(circle, #ffcc00, #997a00); color: black; }
+        .mbj-action-circle.split { background: radial-gradient(circle, #b366ff, #5900b3); }
+
+        /* Betting Controls (Bottom Left) */
+        .mbj-floating-bet { position: absolute; bottom: 20px; left: 20px; display: flex; gap: 10px; z-index: 20; align-items: center; }
 
         .mbj-emote-bubble { position: absolute; font-size: 2rem; pointer-events: none; animation: floatEmote 2s ease-out forwards; z-index: 50; }
         @keyframes floatEmote { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
+
+        /* Smaller Cards for MBJ */
+        .mbj-card { width: 50px; height: 72px; background: white; color: black; border-radius: 5px; border: 1px solid #ccc; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; position: absolute; }
+        .mbj-card .val { font-size: 1.2rem; line-height: 1; margin-bottom: 2px;}
+        .mbj-card .suit { font-size: 1.4rem; line-height: 1; }
+        .mbj-hand-cards { position: relative; width: 50px; height: 72px; margin-top: -20px; z-index: 5; }
+        .mbj-hand-score { background: rgba(0,0,0,0.9); border: 1px solid var(--glass-border); padding: 2px 6px; border-radius: 4px; font-weight: 900; font-size: 0.8rem; color: white; margin-top: 5px; z-index: 10; position: relative; }
+        .mbj-status { position: absolute; bottom: -15px; background: var(--ps-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; border: 1px solid var(--glass-border); white-space: nowrap; z-index: 15; }
+        
+        .anim-slide-deal { animation: slideDeal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes slideDeal { 0% { opacity: 0; transform: translate(300px, -300px) scale(0.5) rotateY(180deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotateY(0deg); } }
 
         /* ================= RESULT OVERLAYS & NOTIFICATIONS ================= */
         .result-box, .result-overlay-shared { position: absolute; bottom: 20px; right: 20px; opacity: 0; padding: 20px 30px; border-radius: 12px; display: none; z-index: 2000; min-width: 250px; text-transform: uppercase; backdrop-filter: blur(20px); box-shadow: 0 15px 40px rgba(0,0,0,0.8); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); flex-direction: column; align-items: flex-end; justify-content: center; pointer-events: none; transform: translateX(50px); text-align: right; }
@@ -399,15 +420,15 @@
             .modal-content { position: absolute; bottom: 0; width: 100vw; max-width: 100vw; border-radius: 20px 20px 0 0; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 85vh; }
             
             /* Mobile MBJ Scaling */
-            .mbj-table { aspect-ratio: 1/1; max-height: unset; border-radius: 200px 200px 20px 20px; border-width: 8px; border-bottom: 8px solid #3d2314; }
-            .mbj-seats-arc { flex-wrap: wrap; gap: 5px; padding-bottom: 10px; }
+            .mbj-table { height: 350px; border-radius: 200px 200px 10px 10px; border-width: 8px; border-bottom: none; }
+            .mbj-seats-arc { flex-wrap: wrap; gap: 5px; padding-bottom: 5px; }
             .mbj-seat-wrapper { width: 30%; }
             .mbj-seat-wrapper:nth-child(1), .mbj-seat-wrapper:nth-child(5),
             .mbj-seat-wrapper:nth-child(2), .mbj-seat-wrapper:nth-child(4),
-            .mbj-seat-wrapper:nth-child(3) { padding-bottom: 0px; margin-bottom: 10px; }
-            .mbj-seat-circle { width: 50px; height: 50px; }
-            .mbj-dashboard { flex-direction: column; gap: 15px; }
-            .mbj-table-text h1 { font-size: 1.8rem; }
+            .mbj-seat-wrapper:nth-child(3) { padding-bottom: 0px; margin-bottom: 5px; }
+            .mbj-seat-circle { width: 40px; height: 40px; }
+            .mbj-controls-bar { flex-direction: column; gap: 15px; padding: 10px; }
+            .mbj-table-text h1 { font-size: 1.5rem; }
         }
         
         .rules-text { text-align: left; padding-left: 20px; }
@@ -547,7 +568,7 @@
                             </div>
                         </div>
                         
-                        <button class="top-icon-btn" onclick="openModal('daily-reward-modal')" title="Daily Reward" style="color:var(--credits);">
+                        <button class="top-icon-btn" onclick="openModal('daily-reward-modal')" title="Daily Reward" style="color:var(--credits); z-index: 100000;">
                             <i class="fas fa-calendar-check"></i>
                         </button>
                         
@@ -884,9 +905,9 @@
           </div>
           
         </div> <div id="view-mbj" class="view-container hidden">
-            <div class="mbj-container">
+            <div class="mbj-wrapper">
                 
-                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="width: 100%; max-width: 1100px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <h2 style="color: white; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0; font-size: 1.8rem;">VIP BLACKJACK</h2>
                     <div style="display:flex; gap:10px;">
                         <div class="timer-box" id="mbj-timer-box" style="font-size:1.2rem; height:44px; margin-right: 10px;">
@@ -897,42 +918,46 @@
                     </div>
                 </div>
 
-                <div class="mbj-table">
-                    <div class="mbj-table-edge"></div>
-                    
-                    <div class="mbj-dealer-area">
-                        <div class="mbj-shoe"></div>
-                        <div style="color:white; font-weight:900; background:rgba(0,0,0,0.7); padding:4px 15px; border-radius:50px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.2); z-index:10; font-size: 0.8rem;">DEALER <span id="mbj-d-score-val" style="color:var(--danger); margin-left: 5px;">0</span></div>
-                        <div id="mbj-fs-dealer-hand" style="display:flex; gap:10px; height:90px; z-index:10;"></div>
-                    </div>
-
-                    <div class="mbj-table-text">
-                        <h1>BLACKJACK</h1>
-                        <p>BLACKJACK PAYS 3 TO 2<br>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
-                    </div>
-
-                    <div class="mbj-seats-arc" id="mbj-seats-container"></div>
-                </div>
-
-                <div class="mbj-controls-bar">
-                    <div class="mbj-dash-left">
-                        <div class="input-group" style="margin:0; width:150px;">
-                            <input type="number" id="mbj-bet-input" class="input-control bet-input" placeholder="Bet Amount">
+                <div class="mbj-board">
+                    <div class="mbj-table">
+                        <div class="mbj-table-edge"></div>
+                        
+                        <div class="mbj-dealer-area">
+                            <div class="mbj-shoe"></div>
+                            <div style="color:white; font-weight:900; background:rgba(0,0,0,0.7); padding:4px 15px; border-radius:50px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.2); z-index:10; font-size: 0.8rem;">DEALER <span id="mbj-d-score-val" style="color:var(--danger); margin-left: 5px;">0</span></div>
+                            <div id="mbj-fs-dealer-hand" style="display:flex; gap:10px; height:80px; z-index:10;"></div>
                         </div>
-                        <button class="btn-rules" onclick="socket.emit('mbjLeaveSeat');" style="font-size:0.8rem; padding:0 15px; width:auto; font-weight:800; letter-spacing:1px;">CLEAR</button>
+
+                        <div class="mbj-table-text">
+                            <h1>BLACKJACK</h1>
+                            <p>BLACKJACK PAYS 3 TO 2<br>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
+                        </div>
+
+                        <div class="mbj-seats-arc" id="mbj-seats-container"></div>
                     </div>
 
-                    <div class="mbj-dash-center" id="emote-panel" style="display:none; gap:10px;">
-                        <button class="mbj-action-btn emote" onclick="sendMBJEmote('🔥')">🔥</button>
-                        <button class="mbj-action-btn emote" onclick="sendMBJEmote('💸')">💸</button>
-                        <button class="mbj-action-btn emote" onclick="sendMBJEmote('😭')">😭</button>
-                    </div>
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 20px;">
+                        
+                        <div class="mbj-floating-bet">
+                            <button class="btn-rules" onclick="socket.emit('mbjLeaveSeat');" style="font-size:0.8rem; padding:0 15px; width:auto; font-weight:800; letter-spacing:1px;" title="Clear Bet">CLEAR</button>
+                            <div class="input-group" style="margin:0; width:150px;">
+                                <input type="number" id="mbj-bet-input" class="input-control bet-input" placeholder="Bet Amount">
+                            </div>
+                        </div>
 
-                    <div class="mbj-dash-right" id="mbj-action-panel" style="display:none;">
-                        <button class="mbj-action-btn hit" onclick="handleMBJClick('hit')">HIT</button>
-                        <button class="mbj-action-btn stand" onclick="handleMBJClick('stand')">STAND</button>
-                        <button class="mbj-action-btn double" id="btn-mbj-double" onclick="handleMBJClick('double')" style="display:none;">DOUBLE</button>
-                        <button class="mbj-action-btn split" id="btn-mbj-split" onclick="handleMBJClick('split')" style="display:none;">SPLIT</button>
+                        <div id="emote-panel" style="display:none; gap:10px; padding-bottom: 5px;">
+                            <button class="mbj-action-circle" style="width:40px; height:40px; font-size:1.2rem;" onclick="sendMBJEmote('🔥')">🔥</button>
+                            <button class="mbj-action-circle" style="width:40px; height:40px; font-size:1.2rem;" onclick="sendMBJEmote('💸')">💸</button>
+                            <button class="mbj-action-circle" style="width:40px; height:40px; font-size:1.2rem;" onclick="sendMBJEmote('😭')">😭</button>
+                        </div>
+
+                        <div class="mbj-floating-controls" id="mbj-action-panel" style="display:none;">
+                            <button class="mbj-action-circle double" id="btn-mbj-double" onclick="handleMBJClick('double')" style="display:none;">x2</button>
+                            <button class="mbj-action-circle split" id="btn-mbj-split" onclick="handleMBJClick('split')" style="display:none;"><i class="fas fa-arrows-alt-h" style="font-size:1.5rem;"></i></button>
+                            <button class="mbj-action-circle stand" onclick="handleMBJClick('stand')"><i class="fas fa-hand-paper" style="font-size:1.5rem; margin-bottom: 2px;"></i></button>
+                            <button class="mbj-action-circle hit" onclick="handleMBJClick('hit')"><i class="fas fa-hand-pointer" style="font-size:1.5rem; margin-bottom: 2px;"></i></button>
+                        </div>
+
                     </div>
                 </div>
                 
@@ -1523,7 +1548,7 @@
     };
     
     document.addEventListener('mousedown', (e) => { 
-        if(e.target.closest('button, .nav-link, .mode-card, .game-card, .bank-tab, .action-btn, .top-icon-btn, .brand, .wallet-pill, .mbj-seat-circle')) sfx.click(); 
+        if(e.target.closest('button, .nav-link, .mode-card, .game-card, .bank-tab, .action-btn, .top-icon-btn, .brand, .wallet-pill, .mbj-seat-circle, .mbj-action-circle')) sfx.click(); 
     });
 
     function switchAuthTab(tab) { 
@@ -1738,7 +1763,6 @@
         
         // Hide all views completely so they don't block clicks
         document.querySelectorAll('.main-wrapper > .content > .view-container').forEach(d => d.classList.add('hidden')); 
-        document.querySelectorAll('.fs-view-container').forEach(d => d.classList.add('hidden')); 
         
         let v = document.getElementById('view-' + viewId); 
         if (v) v.classList.remove('hidden'); 
@@ -2407,26 +2431,26 @@
                         let hClass = isThisSpecificHandTurn ? 'border-bottom: 3px solid var(--ps-glow); padding-bottom: 10px;' : '';
                         
                         html += `<div style="display: flex; flex-direction: column; align-items: center; position: relative; ${hClass}">`;
-                        html += `<div class="mbj-fs-hand-cards">`;
+                        html += `<div class="mbj-hand-cards">`;
                         hand.cards.forEach((c, cIdx) => { 
-                            let offset = cIdx * 25;
-                            html += `<div class="mbj-fs-card" style="left: ${offset}px;"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`; 
+                            let offset = cIdx * 15; // tighter spacing for smaller cards
+                            html += `<div class="mbj-card" style="left: ${offset}px;"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`; 
                         });
                         html += `</div>`;
                         
-                        if(hand.cards.length > 0) html += `<div class="mbj-fs-hand-score">${hand.score}</div>`;
+                        if(hand.cards.length > 0) html += `<div class="mbj-hand-score">${hand.score}</div>`;
                         
                         if(hand.status && hand.status !== 'WAITING' && hand.status !== 'PLAYING') {
                             let stColor = hand.status === 'BUST' ? 'var(--danger)' : (hand.status === 'BLACKJACK' ? 'var(--credits)' : 'white');
-                            html += `<div class="mbj-fs-status" style="color:${stColor}; border-color:${stColor};">${hand.status}</div>`;
+                            html += `<div class="mbj-status" style="color:${stColor}; border-color:${stColor};">${hand.status}</div>`;
                         }
                         html += `</div>`;
                     });
                 }
                 html += `</div>`;
             } else { 
-                html += `<i class="fas fa-plus-circle" style="font-size:2.5rem; opacity:0.5; color: white;"></i></div>`; 
-                html += `<div style="color:var(--text-muted); font-weight:800; font-size:1rem; margin-top: 15px; text-transform: uppercase;">Empty</div>`;
+                html += `<i class="fas fa-plus-circle" style="font-size:1.5rem; opacity:0.5; color: white;"></i></div>`; 
+                html += `<div style="color:var(--text-muted); font-weight:800; font-size:0.8rem; margin-top: 10px; text-transform: uppercase;">Empty</div>`;
             }
             html += `</div>`; 
             cont.innerHTML += html;
@@ -2481,7 +2505,7 @@
             let bubble = document.createElement('div');
             bubble.className = 'mbj-emote-bubble';
             bubble.innerText = data.emote;
-            bubble.style.left = (40 + Math.random() * 40) + 'px';
+            bubble.style.left = (30 + Math.random() * 20) + 'px';
             seatBox.appendChild(bubble);
             setTimeout(() => { if (bubble.parentNode) bubble.remove(); }, 2000);
         }
@@ -2522,7 +2546,7 @@
                         let isHidden = c.raw === '?'; 
                         let hClass = isHidden ? 'card-back' : ''; 
                         let cHtml = isHidden ? '?' : `<div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div>`; 
-                        dHand.innerHTML += `<div class="mbj-fs-card anim-slide-deal ${hClass}" style="position:relative; margin-left: 5px;">${cHtml}</div>`; 
+                        dHand.innerHTML += `<div class="mbj-card anim-slide-deal ${hClass}" style="position:relative; margin-left: 5px;">${cHtml}</div>`; 
                         sfx.deal();
                         await delay(800);
                     }
@@ -2545,8 +2569,8 @@
                     sfx.tick();
                     let activeHand = s.hands[data.activeTurn.handIdx];
                     if (activeHand && activeHand.cards.length === 2) { 
-                        dBtn.style.display = 'block'; 
-                        if (activeHand.cards[0].raw === activeHand.cards[1].raw) spBtn.style.display = 'block'; 
+                        dBtn.style.display = 'flex'; 
+                        if (activeHand.cards[0].raw === activeHand.cards[1].raw) spBtn.style.display = 'flex'; 
                         else spBtn.style.display = 'none'; 
                     } else { 
                         dBtn.style.display = 'none'; 
@@ -2573,16 +2597,16 @@
             let dScore = document.getElementById('mbj-d-score-val');
             
             if(dHand) {
-                dHand.innerHTML = `<div class="mbj-fs-card" style="position:relative; margin-left: 5px;"><div class="val">${data.dealerHand[0].raw}</div><div class="suit">${data.dealerHand[0].suitHtml}</div></div>`;
+                dHand.innerHTML = `<div class="mbj-card" style="position:relative; margin-left: 5px;"><div class="val">${data.dealerHand[0].raw}</div><div class="suit">${data.dealerHand[0].suitHtml}</div></div>`;
                 let revealCard = data.dealerHand[1]; 
-                dHand.innerHTML += `<div class="mbj-fs-card anim-flip" style="position:relative; margin-left: 5px;"><div class="val">${revealCard.raw}</div><div class="suit">${revealCard.suitHtml}</div></div>`; 
+                dHand.innerHTML += `<div class="mbj-card anim-flip" style="position:relative; margin-left: 5px;"><div class="val">${revealCard.raw}</div><div class="suit">${revealCard.suitHtml}</div></div>`; 
                 sfx.deal();
                 
                 const drawRemaining = async () => {
                     for(let i=2; i<data.dealerHand.length; i++) { 
                         await delay(800); 
                         let c = data.dealerHand[i]; 
-                        dHand.innerHTML += `<div class="mbj-fs-card anim-slide-deal" style="position:relative; margin-left: 5px;"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`; 
+                        dHand.innerHTML += `<div class="mbj-card anim-slide-deal" style="position:relative; margin-left: 5px;"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`; 
                         sfx.deal(); 
                     }
                     await delay(500); 
@@ -2672,7 +2696,7 @@
         }
     });
 
-// --- HORSE RACE ANIMATION ---
+    // --- HORSE RACE ANIMATION ---
     let hrRaceInterval;
     socket.on('hrRaceStart', (data) => {
         if(window.activeSharedGame !== 'horserace') return;
@@ -2686,14 +2710,18 @@
         let finishLineX = 85; 
 
         let fLineEl = document.getElementById('hr-fs-finish-line');
-        if(fLineEl) fLineEl.style.right = '-50px'; // Reset line
+        if(fLineEl) fLineEl.style.right = '-50px'; 
 
         if(hrRaceInterval) clearInterval(hrRaceInterval);
 
-        // Reset positions
         horses.forEach(h => {
             let el = document.getElementById('horse-' + h);
             if (el) el.style.left = '0%';
+            let sprite = document.getElementById('sprite-' + h);
+            if(sprite) {
+                sprite.classList.add('gallop-fs');
+                sprite.style.animationDuration = (0.2 + Math.random() * 0.1) + 's';
+            }
             pos[h] = 0;
             targetPos[h] = 0; 
         });
@@ -2705,43 +2733,41 @@
             let elapsed = now - startTime;
             let timeRemaining = duration - elapsed;
 
-            // Phase 1: General racing across the screen
             if (now > nextTargetUpdate && timeRemaining > 4000) {
                 horses.forEach(h => { 
-                    // Move forward progressively
                     targetPos[h] = pos[h] + (Math.random() * 10 + 2); 
                 });
                 nextTargetUpdate = now + 1000 + Math.random() * 1000;
             }
 
-            // Phase 2: The Finish Line Sprints
             if (timeRemaining <= 4000) {
-                if (fLineEl) fLineEl.style.right = '10%'; // Slide finish line in
+                if (fLineEl) fLineEl.style.right = '10%'; 
                 
                 horses.forEach(h => {
                     if (h === data.winner) {
-                        targetPos[h] = 100; // Winner pushes past finish line
+                        targetPos[h] = 100; 
                     } else {
-                        targetPos[h] = finishLineX - (Math.random() * 15 + 2); // Losers fall behind
+                        targetPos[h] = finishLineX - (Math.random() * 15 + 2); 
                     }
+                    let sprite = document.getElementById('sprite-' + h);
+                    if(sprite) sprite.style.animationDuration = (0.2 + Math.random() * 0.1) + 's';
                 });
             }
 
-            // Stop Animation at exactly 0
             if(elapsed >= duration) {
                 clearInterval(hrRaceInterval);
                 horses.forEach(h => {
+                    let sprite = document.getElementById('sprite-' + h);
+                    if(sprite) sprite.classList.remove('gallop-fs');
                     let el = document.getElementById('horse-' + h);
                     if(el) el.style.left = (h === data.winner ? 100 : Math.min(pos[h], finishLineX - 2)) + '%';
                 });
                 return;
             }
 
-            // Apply movement physics to DOM
             horses.forEach(h => {
                 let currentSpeed = (h === data.winner && timeRemaining <= 4000) ? 0.08 : 0.02;
                 pos[h] += (targetPos[h] - pos[h]) * currentSpeed;
-                
                 let el = document.getElementById('horse-' + h);
                 if(el) el.style.left = Math.max(0, Math.min(pos[h], 100)) + '%';
             });
@@ -2767,8 +2793,6 @@
         }
         
         let msg = `${w.toUpperCase()} WINS!`;
-        
-        // Since Derby is back in the box, we use the standard payout overlay
         processSharedPayout('horserace', tp, tba, msg, wonProfit, lostBet, Object.keys(mySBets).join(', '), msg);
     });
 
@@ -2783,7 +2807,6 @@
             let cb = document.getElementById('sg-chat');
             if (cb) { cb.insertAdjacentHTML('beforeend', `<div class="chat-msg chat-sys">Place your bets for the next race!</div>`); cb.scrollTop = cb.scrollHeight; }
             
-            // Wipe the board clean visually
             wipeTableVisually();
         }
     });
@@ -2833,7 +2856,7 @@
         });
     }
 
-    function submitDeposit() {
+function submitDeposit() {
         const amt = document.getElementById('dep-amount').value;
         const snt = document.getElementById('dep-snt').value.trim();
         const discord = document.getElementById('dep-discord').value.trim();
