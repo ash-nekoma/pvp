@@ -168,7 +168,6 @@ function getBJScore(hand) {
     return score;
 }
 
-
 // =========================================================================
 // 1. STANDARD SHARED TABLES ENGINE (Baccarat, Dragon Tiger, Sic Bo, Perya)
 // =========================================================================
@@ -321,7 +320,7 @@ setInterval(() => {
             setTimeout(async () => {
                 const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
                 
-                // Weighted Randomness Calculation
+                // Weighted Randomness Calculation based on odds
                 let weights = horses.map(h => ({ horse: h, weight: 1 / hrState.currentOdds[h] }));
                 let totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
                 let randomVal = Math.random() * totalWeight;
@@ -332,12 +331,11 @@ setInterval(() => {
                     if(randomVal <= cumulative) { winner = w.horse; break; }
                 }
 
-                // Generates a 20% chance for a suspenseful slow-motion photo finish
-                let isPhotoFinish = Math.random() < 0.2;
+                let isPhotoFinish = Math.random() < 0.2; // 20% chance for dramatic slow-mo
 
+                // Duration is locked at exactly 25 seconds
                 io.emit('hrRaceStart', { winner: winner, duration: 25000, photoFinish: isPhotoFinish });
 
-                // Wait 25.5s for the track animation to finish before distributing payouts
                 setTimeout(async () => {
                     let playerStats = {}; 
                     hrState.bets.forEach(b => {
@@ -402,16 +400,14 @@ function mbjNextTurn() {
 
     if (seatNum !== null) {
         let seat = mbjState.seats[seatNum];
-        // Are there more active split hands in this current seat?
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') {
             mbjState.activeTurn.handIdx++;
-            mbjState.turnTimer = 15; // Reset 15s for the next hand
+            mbjState.turnTimer = 15; 
             io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
             return;
         }
     }
 
-    // Move to next active seat
     let nextSeatNum = null;
     let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
     for (let i = startIdx; i <= 5; i++) {
@@ -474,7 +470,6 @@ async function mbjResolveDealer() {
 
             seatResults[i] = { win: totalWin, push: totalPush };
             
-            // Payout main player
             if (totalWin > 0 || totalPush > 0) {
                 let user = await User.findById(seat.userId);
                 if (user) {
@@ -482,16 +477,15 @@ async function mbjResolveDealer() {
                     await user.save();
                     let totalBet = seat.hands.reduce((sum, h)=>sum+h.bet, 0);
                     let profit = formatTC(totalWin - (totalBet - totalPush)); 
-                    if (profit !== 0) await new CreditLog({ username: user.username, action: 'GAME', amount: profit, details: '5-Seat Blackjack' }).save();
+                    if (profit !== 0) await new CreditLog({ username: user.username, action: 'GAME', amount: profit, details: '5-Seat VIP Blackjack' }).save();
                     if (connectedUsers[user.username]) io.to(connectedUsers[user.username]).emit('balanceUpdateData', { credits: user.credits, playable: user.playableCredits });
                 }
             } else {
                 let totalBet = seat.hands.reduce((sum, h)=>sum+h.bet, 0);
                 let user = await User.findById(seat.userId);
-                if(user) await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-totalBet), details: '5-Seat Blackjack' }).save();
+                if(user) await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-totalBet), details: '5-Seat VIP Blackjack' }).save();
             }
 
-            // Payout Spectators (Bet Behinders)
             let seatWinRatio = totalWin / initialSeatBet;
             let seatPushRatio = totalPush / initialSeatBet;
             
@@ -518,15 +512,11 @@ async function mbjResolveDealer() {
 
     io.to('mbj').emit('mbjUpdate', { event: 'dealer_resolved', dealerHand: mbjState.dealer.hand, dealerScore: dScore, seats: mbjState.seats, results: seatResults });
     
-    // Wait for the client to animate the dealer drawing all cards sequentially before resetting
     setTimeout(() => {
         for (let i=1; i<=5; i++) {
             if (mbjState.seats[i]) {
                 if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) mbjState.seats[i] = null;
-                else {
-                    mbjState.seats[i].hands = [];
-                    mbjState.seats[i].betBehinders = [];
-                }
+                else { mbjState.seats[i].hands = []; mbjState.seats[i].betBehinders = []; }
             }
         }
         mbjState.dealer.hand = []; 
@@ -542,7 +532,6 @@ setInterval(() => {
         io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time });
         
         if (mbjState.time <= 0) {
-            // AFK KICK LOGIC
             for (let i=1; i<=5; i++) {
                 if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) {
                     mbjState.seats[i] = null;
@@ -561,7 +550,7 @@ setInterval(() => {
                 activeSeats.forEach(k => {
                     let c1 = drawCard(), c2 = drawCard();
                     mbjState.seats[k].hands[0].cards = [c1, c2];
-                    mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet; // Used for bet-behind ratio
+                    mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet;
                     let score = getBJScore([c1, c2]);
                     mbjState.seats[k].hands[0].score = score;
                     mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
@@ -570,7 +559,6 @@ setInterval(() => {
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: '<span class="card-back">?</span>', bjVal: 0 }];
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
-                // Wait for the sequential card dealing animation to finish on the frontend
                 setTimeout(() => {
                     mbjState.activeOrder = activeSeats.filter(k => mbjState.seats[k].hands[0].status === 'PLAYING');
                     if (mbjState.activeOrder.length > 0) {
@@ -579,7 +567,7 @@ setInterval(() => {
                         mbjState.turnTimer = 15;
                         io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
                     } else {
-                        mbjResolveDealer(); // Everyone hit a natural 21
+                        mbjResolveDealer(); 
                     }
                 }, 4000); 
             }
@@ -588,7 +576,6 @@ setInterval(() => {
         mbjState.turnTimer--;
         io.to('mbj').emit('mbjUpdate', { event: 'turn_timer', time: mbjState.turnTimer });
         
-        // Timeout -> Force Stand
         if (mbjState.turnTimer <= 0) {
             let seat = mbjState.seats[mbjState.activeTurn.seat];
             if(seat && seat.hands[mbjState.activeTurn.handIdx]) seat.hands[mbjState.activeTurn.handIdx].status = 'STAND';
@@ -881,13 +868,8 @@ io.on('connection', (socket) => {
 
     // ---------------- MULTIPLAYER BLACKJACK (MBJ) SOCKET ROUTES ----------------
     
-    // Seat Reactions (Emotes)
-    socket.on('mbjEmote', (data) => {
-        // data: { seatNum: 1, emote: '🔥' }
-        io.to('mbj').emit('mbjEmoteBroadcast', data);
-    });
+    socket.on('mbjEmote', (data) => { io.to('mbj').emit('mbjEmoteBroadcast', data); });
 
-    // Bet Behind
     socket.on('mbjBetBehind', async (data) => {
         if (!socket.user || mbjState.status !== 'BETTING') return;
         let seatNum = data.seatNum;
@@ -913,12 +895,8 @@ io.on('connection', (socket) => {
             existingBet.pushMain += deduction.fromMain;
         } else {
             seat.betBehinders.push({
-                userId: user._id,
-                username: user.username,
-                socketId: socket.id,
-                amount: amt,
-                pushPlayable: deduction.fromPlayable,
-                pushMain: deduction.fromMain
+                userId: user._id, username: user.username, socketId: socket.id,
+                amount: amt, pushPlayable: deduction.fromPlayable, pushMain: deduction.fromMain
             });
         }
 
@@ -929,7 +907,6 @@ io.on('connection', (socket) => {
     socket.on('mbjTakeSeat', (seatNum) => {
         if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
         for(let i=1; i<=5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) return; }
-        
         mbjState.seats[seatNum] = { userId: socket.user._id, socketId: socket.id, username: socket.user.username, pushPlayable: 0, pushMain: 0, hands: [], betBehinders: [] };
         io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
     });
@@ -940,7 +917,6 @@ io.on('connection', (socket) => {
             let s = mbjState.seats[i];
             if (s && s.userId.toString() === socket.user._id.toString()) {
                 if (mbjState.status === 'BETTING') {
-                    // Refund main bet
                     if (s.hands.length > 0 && s.hands[0].bet > 0) {
                         let user = await User.findById(s.userId);
                         if (user) {
@@ -950,7 +926,6 @@ io.on('connection', (socket) => {
                             socket.emit('balanceUpdateData', { credits: user.credits, playable: user.playableCredits });
                         }
                     }
-                    // Refund all Bet Behinders
                     for (let bh of s.betBehinders) {
                         let bUser = await User.findById(bh.userId);
                         if (bUser) {
@@ -1053,7 +1028,6 @@ io.on('connection', (socket) => {
     
     // HORSE RACE INTERACTIVE CHEER
     socket.on('hrCheer', (data) => {
-        // data: { horse: 'Red' }
         if (hrState.status === 'RACING') {
             io.to('horserace').emit('hrCheerBroadcast', data);
         }
@@ -1070,7 +1044,6 @@ io.on('connection', (socket) => {
 
             if (data.type === 'Deposit' && amount < 1000) { socket.emit('localGameError', { msg: 'MIN DEPOSIT IS 1,000 TC', game: 'cashier' }); return; }
             if (data.type === 'Withdrawal' && amount < 10000) { socket.emit('localGameError', { msg: 'MIN WITHDRAWAL IS 10,000 TC', game: 'cashier' }); return; }
-
             if (data.type === 'Deposit' && amount > 100000) { socket.emit('localGameError', { msg: 'MAX DEPOSIT IS 100,000 TC', game: 'cashier' }); return; }
             if (data.type === 'Withdrawal' && amount > 100000) { socket.emit('localGameError', { msg: 'MAX WITHDRAWAL IS 100,000 TC', game: 'cashier' }); return; }
 
@@ -1158,12 +1131,7 @@ io.on('connection', (socket) => {
             }
             
             let ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-            let newUser = new User({ 
-                username: data.username, 
-                password: data.password, 
-                ipAddress: ip,
-                referredBy: refUser ? refUser.username : null 
-            });
+            let newUser = new User({ username: data.username, password: data.password, ipAddress: ip, referredBy: refUser ? refUser.username : null });
 
             if (refUser) {
                 newUser.playableCredits = 500;
@@ -1180,9 +1148,7 @@ io.on('connection', (socket) => {
             }
             
             await newUser.save();
-            if (refUser) {
-                await new CreditLog({ username: newUser.username, action: 'REFERRAL', amount: 500, details: `Used code ${refUser.username}` }).save();
-            }
+            if (refUser) { await new CreditLog({ username: newUser.username, action: 'REFERRAL', amount: 500, details: `Used code ${refUser.username}` }).save(); }
             
             sendPulse(`New account created: ${data.username}`, 'success');
             pushAdminData();
