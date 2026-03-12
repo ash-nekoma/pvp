@@ -11,27 +11,50 @@
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
-        /* ================= BASE STYLES & RIGID FLEXBOX ================= */
+        /* ================= BASE STYLES ================= */
         :root { --ps-bg: #000814; --ps-glow: #00a2ff; --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15); --danger: #ff3366; --success: #00e676; --credits: #ffb400; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
         
-        /* THIS FIXES THE LAYOUT BUG - Forces 100vh column structure */
-        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh; width: 100vw; overflow: hidden; user-select: none; -webkit-user-select: none; display: flex; flex-direction: column; }
+        body { 
+            background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
+            color: white; height: 100vh; width: 100vw; overflow: hidden; 
+            user-select: none; -webkit-user-select: none; margin: 0; padding: 0;
+        }
+        
         input, textarea { user-select: auto; -webkit-user-select: auto; }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
         
-        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         .btn-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; }
 
-        /* ================= TOP NAVIGATION ================= */
-        .topbar { background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; }
+        /* ================= BULLETPROOF LAYOUT SHELL ================= */
+        #app-container { 
+            display: flex; flex-direction: column; height: 100vh; width: 100vw; 
+        }
+        
+        .topbar { 
+            background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); 
+            height: 75px; flex-shrink: 0; /* Prevents topbar from squishing */
+            display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; 
+        }
+        
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer;}
         
-        /* Main Wrapper takes exactly the remaining height and centers content */
-        .main-wrapper { flex-grow: 1; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .view-container { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .main-wrapper { 
+            flex-grow: 1; /* Takes up all remaining vertical space */
+            position: relative; width: 100%; 
+        }
+        
+        .content { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+        
+        .view-container { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+        }
         
         .btn-back-fixed { position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .btn-back-fixed:hover { background: white; color: black; }
