@@ -3,7 +3,6 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const crypto = require('crypto');
 
 const app = express();
 const server = http.createServer(app);
@@ -237,10 +236,10 @@ setInterval(() => {
         
         if (hasBets) {
             mbjState.time--;
-            io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true });
+            io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true, seats: mbjState.seats });
         } else {
             mbjState.time = 15; 
-            io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false });
+            io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false, seats: mbjState.seats });
         }
         
         if (mbjState.time <= 0 && hasBets) {
@@ -252,7 +251,7 @@ setInterval(() => {
             
             if (activeSeats.length > 0) {
                 mbjState.status = 'DEALING';
-                io.to('mbj').emit('mbjUpdate', { event: 'lock_bets' });
+                io.to('mbj').emit('mbjUpdate', { event: 'lock_bets', seats: mbjState.seats });
                 
                 mbjState.dealer.hand = [drawCard(), drawCard()];
                 activeSeats.forEach(k => {
@@ -312,10 +311,8 @@ io.on('connection', (socket) => {
 
     socket.on('joinRoom', (room) => { 
         socket.join(room); 
-        // BUG FIX: Force sync the state immediately so the player can see empty seats and sit down
         if (room === 'mbj') {
-            socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
-            socket.emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
+            socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
             if (mbjState.status === 'PLAYER_TURN') socket.emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
         }
     });
@@ -338,7 +335,7 @@ io.on('connection', (socket) => {
         if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
         for(let i=1; i<=5; i++) { if (mbjState.seats[i] && mbjState.seats[i].username === socket.user.username) return; }
         mbjState.seats[seatNum] = { username: socket.user.username, hands: [] };
-        io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
+        io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
     });
 
     socket.on('mbjLeaveSeat', () => {
@@ -354,7 +351,7 @@ io.on('connection', (socket) => {
                     }
                 }
                 mbjState.seats[i] = null;
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
+                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(st => st && st.hands.length > 0 && st.hands[0].bet > 0) });
                 break;
             }
         }
@@ -377,7 +374,7 @@ io.on('connection', (socket) => {
             s.hands[0].originalBet += amt;
             
             socket.emit('balanceUpdateData', { credits: user.credits });
-            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
+            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
         }
     });
 
