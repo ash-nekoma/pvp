@@ -39,7 +39,6 @@ function buildShoe() {
             }
         }
     }
-    // Shuffle
     for (let i = shoe.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
@@ -48,7 +47,7 @@ function buildShoe() {
 buildShoe();
 
 function drawCard() {
-    if(shoe.length < 52) buildShoe(); // Reshuffle when 1 deck remains
+    if(shoe.length < 52) buildShoe(); 
     return shoe.pop();
 }
 
@@ -203,19 +202,18 @@ async function mbjResolveDealer() {
                     if (playerNatural) {
                         isPush = true;
                     } else {
-                        // The OBO Rule (Original Bets Only)
                         if (dealerUpcardVal === 10 && h.doubledAmount > 0) {
-                            refundAmount += h.doubledAmount; // Return the doubled portion
+                            refundAmount += h.doubledAmount; 
                         }
-                        // If dealer upcard is 'A', they lose everything including double.
                         payout = 0; 
                     }
                 } else if (playerNatural) {
-                    payout = h.bet * 2.5; // Pays 3 to 2
+                    payout = h.bet * 2.5; 
                 } else if (dScore > 21 || pScore > dScore) {
                     payout = h.bet * 2;
                 } else if (pScore === dScore) {
-                    isPush = true;
+                    if (dealerNatural && !isNaturalBlackjack(h.cards)) payout = 0; 
+                    else isPush = true;
                 }
 
                 if (isPush) totalPush += h.bet; 
@@ -268,6 +266,7 @@ setInterval(() => {
                     let c1 = drawCard(), c2 = drawCard();
                     mbjState.seats[k].hands[0].cards = [c1, c2];
                     mbjState.seats[k].hands[0].isSplitHand = false;
+                    mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet;
                     let score = getBJScore([c1, c2]);
                     mbjState.seats[k].hands[0].score = score;
                     mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
@@ -275,7 +274,6 @@ setInterval(() => {
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
                 
-                // 0.4s sequential animation calculation
                 let totalCardsToDeal = (activeSeats.length * 2) + 2;
                 let animTime = (totalCardsToDeal * 400) + 1000; 
 
@@ -394,6 +392,7 @@ io.on('connection', (socket) => {
         let hand = seat.hands[handIdx];
 
         if (actionData.type === 'hit') {
+            if (hand.isSplitAce) return; 
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
             if (hand.score > 21) { hand.status = 'BUST'; io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats }); mbjNextTurn(); } 
@@ -411,7 +410,7 @@ io.on('connection', (socket) => {
                 user.credits -= hand.bet;
                 socket.emit('balanceUpdateData', { credits: user.credits });
                 
-                hand.doubledAmount = hand.bet; // Track the doubled portion
+                hand.doubledAmount = hand.bet; 
                 hand.bet *= 2;
                 
                 hand.cards.push(drawCard());
@@ -438,9 +437,7 @@ io.on('connection', (socket) => {
                 seat.hands.push(newHand);
                 
                 if (splitCard.raw === 'A') {
-                    // Split Aces only receive 1 card each, force stand immediately
-                    hand.status = 'STAND'; 
-                    seat.hands[1].status = 'STAND';
+                    hand.status = 'STAND'; seat.hands[1].status = 'STAND';
                     io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
                     mbjNextTurn();
                 } else {
