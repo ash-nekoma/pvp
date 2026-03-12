@@ -7,27 +7,24 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
-        /* ================= BASE STYLES & BULLETPROOF LAYOUT ================= */
+        /* ================= BASE STYLES ================= */
         :root { --ps-bg: #000814; --ps-glow: #00a2ff; --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15); --danger: #ff3366; --success: #00e676; --credits: #ffb400; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
         
-        /* Forces 100vh column layout to PREVENT blank screen collapse */
-        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh; width: 100vw; overflow: hidden; user-select: none; display: flex; flex-direction: column; }
+        /* THIS IS THE FIX: Direct Flex Body prevents 0px collapse */
+        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh; width: 100vw; overflow: hidden; user-select: none; display: flex; flex-direction: column; margin: 0; padding: 0; }
         input, textarea { user-select: auto; }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
-
+        
         .topbar { background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; }
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer;}
         
-        /* The wrapper automatically calculates exact remaining screen height */
-        .main-wrapper { flex-grow: 1; position: relative; width: 100%; overflow: hidden; }
-        
-        /* The container forces elements into the dead center of the wrapper */
+        /* Main Wrapper safely consumes remaining 100vh space */
+        .main-wrapper { flex-grow: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
         .view-container { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
         .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
@@ -62,14 +59,11 @@
         .mbj-timer-display .hud-title { color: var(--ps-glow); font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
         .mbj-timer-display .hud-val { color: white; font-family: 'Rajdhani', monospace; font-size: 1.8rem; font-weight: 900; line-height: 1; }
 
-        /* The Horizontal Flexbox for the 5 Seats. Mathematically prevents lateral overlaps. */
+        /* HORIZONTAL FLEXBOX ROW FOR SEATS */
         #mbj-seats-row { position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: space-evenly; align-items: flex-end; padding: 0 20px; z-index: 10; pointer-events: none;}
-        
-        /* The Vertical Flexbox for individual seat. Mathematically prevents vertical overlaps. */
-        .mbj-seat-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 120px; pointer-events: auto; position: relative; }
+        .mbj-seat-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 140px; pointer-events: auto; position: relative; }
 
-        /* Seat Elements */
-        .mbj-hand-container { display: flex; justify-content: center; position: relative; margin-bottom: 15px; min-height: 80px; width: 100%; }
+        .mbj-hand-container { display: flex; justify-content: center; position: relative; margin-bottom: 10px; min-height: 80px; width: 100%; }
         
         .mbj-action-row { display: flex; gap: 6px; margin-bottom: 10px; height: 35px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .mbj-action-row.show { opacity: 1; pointer-events: auto; }
@@ -82,7 +76,7 @@
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 3px solid var(--credits); background: transparent; cursor: default; }
         
-        .mbj-chip { position: absolute; bottom: -5px; right: -5px; background: #222; border: 3px dashed #ffcc00; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.65rem; font-weight: 900; color: white; box-shadow: 0 5px 10px rgba(0,0,0,0.9); z-index: 10;}
+        .mbj-chip { position: absolute; bottom: -5px; right: -10px; background: #222; border: 3px dashed #ffcc00; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.65rem; font-weight: 900; color: white; box-shadow: 0 5px 10px rgba(0,0,0,0.9); z-index: 10;}
         .mbj-seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative;}
 
         /* Cards & Animation */
@@ -94,7 +88,6 @@
         .card-red { color: #e60000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
 
-        /* Score Badge positioned perfectly outside the card */
         .mbj-hand-score { position: absolute; top: -10px; left: -10px; width: 24px; height: 24px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 0.85rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8);}
         .dealer-score-badge { position: absolute; top: -5px; left: -25px; width: 28px; height: 28px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 1rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8);}
 
@@ -102,6 +95,7 @@
         @keyframes flyIn { 0% { opacity: 0; transform: translate(500px, -200px) scale(0.3) rotate(90deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } }
         .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
         @keyframes flipCard { 0% { transform: rotateY(180deg); } 100% { transform: rotateY(0deg); } }
+        
         .payout-flare { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.2rem; font-weight: 900; text-shadow: 0 2px 5px black; animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap;}
         @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -20px); } 80% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -60px); } }
 
@@ -125,7 +119,7 @@
         .mbj-internal-balance .hud-val { font-size: 1.3rem; font-weight: 900; color: var(--credits); }
 
         /* ================= RETRO HORSE DERBY - GRID ARCHITECTURE & PARALLAX ================= */
-        .hr-board { width: 900px; height: 600px; background: #0a0a0a; border: 4px solid #333; border-radius: 12px; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+        .hr-board { width: 900px; height: 600px; background: #0a0a0a; border: 4px solid #333; border-radius: 12px; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); z-index: 10;}
         .hr-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .hr-ticker { flex: 1; text-align: center; color: var(--credits); font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 900; text-shadow: 0 0 10px var(--credits); padding: 10px; background: #111; border: 2px solid #333; border-radius: 8px; margin: 0 20px; text-transform: uppercase;}
         
@@ -148,24 +142,21 @@
 
         .hr-finish-line { position: absolute; right: -100px; top: 30%; bottom: 0; width: 40px; background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-color: #fff; z-index: 5; border-left: 6px solid #ffcc00; box-shadow: -15px 0 30px rgba(0,0,0,0.6); }
         
-        /* CSS Grid forces 6 exact rows, preventing horses from dropping off-screen */
         .hr-lanes-grid { position: absolute; top: 30%; bottom: 0; width: 100%; display: grid; grid-template-rows: repeat(6, 1fr); z-index: 10; }
         .hr-lane { width: 100%; height: 100%; border-bottom: 2px dashed rgba(255,255,255,0.15); display: flex; align-items: center; position: relative; }
         
         .hr-horse-group { position: absolute; left: 5%; display: flex; align-items: center; justify-content: center; z-index: 15; transition: left 0.1s linear, opacity 1s; transform: scaleX(-1); }
         
-        /* Animated Dust Particles Behind Hooves */
         .hr-horse-group.running::after { content: ''; position: absolute; bottom: -5px; left: -15px; width: 15px; height: 10px; background: rgba(92, 58, 33, 0.6); border-radius: 50%; animation: kick 0.3s infinite; pointer-events: none; }
         @keyframes kick { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(-30px, -10px) scale(3); opacity: 0; } }
 
-        /* The Hue-Rotated GIF */
         .hr-gif { height: 45px; filter: drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); pointer-events: none;}
-        .horse-Red .hr-gif { filter: saturate(3) hue-rotate(0deg); }
-        .horse-Blue .hr-gif { filter: saturate(3) hue-rotate(220deg) brightness(1.2); }
-        .horse-Green .hr-gif { filter: saturate(3) hue-rotate(120deg) brightness(1.1); }
-        .horse-Yellow .hr-gif { filter: saturate(3) hue-rotate(50deg) brightness(1.5); }
-        .horse-Purple .hr-gif { filter: saturate(3) hue-rotate(280deg) brightness(1.1); }
-        .horse-Orange .hr-gif { filter: saturate(3) hue-rotate(30deg) brightness(1.2); }
+        .horse-Red .hr-gif { filter: saturate(3) hue-rotate(0deg) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Blue .hr-gif { filter: saturate(3) hue-rotate(220deg) brightness(1.2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Green .hr-gif { filter: saturate(3) hue-rotate(120deg) brightness(1.1) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Yellow .hr-gif { filter: saturate(3) hue-rotate(50deg) brightness(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Purple .hr-gif { filter: saturate(3) hue-rotate(280deg) brightness(1.1) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Orange .hr-gif { filter: saturate(3) hue-rotate(30deg) brightness(1.2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
 
         .winner-glow { filter: drop-shadow(0 0 15px white); transform: scaleX(-1) scale(1.1) !important; z-index: 50 !important; }
         .loser-fade { opacity: 0.3; }
@@ -182,111 +173,109 @@
 </head>
 <body>
 
-  <div id="app-container">
-      <header class="topbar">
-          <div class="brand-title" onclick="backToHub()">STICK N' TRADE</div>
-          <div class="topbar-right" style="display:flex; gap:15px; align-items:center;">
-              <div style="font-weight: 800; font-size: 1.1rem;"><i class="fas fa-user-circle" style="color:var(--ps-glow)"></i> <span id="player-name-display">Loading...</span></div>
-          </div>
-      </header>
+  <header class="topbar">
+      <div class="brand-title" onclick="backToHub()">STICK N' TRADE</div>
+      <div style="font-weight: 800; font-size: 1.1rem;"><i class="fas fa-user-circle" style="color:var(--ps-glow)"></i> <span id="player-name-display">Loading...</span></div>
+  </header>
 
-      <div class="main-wrapper">
-          <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()"><i class="fas fa-arrow-left"></i> LEAVE TABLE</button>
-          
-          <div id="view-casino" class="view-container">
-            <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 15px rgba(0,0,0,0.8);">SELECT TABLE</h1>
-            <div class="lobby-modes-container">
-                <div class="game-card" onclick="openGame('mbj')">
-                    <i class="fas fa-cards" style="font-size:4rem;"></i>
-                    <div>
-                        <div class="game-title" style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Rigid Flexbox Alignment</div>
-                    </div>
-                </div>
-                <div class="game-card" onclick="openGame('horserace')">
-                    <i class="fas fa-horse-head" style="font-size:4rem; color: var(--danger);"></i>
-                    <div>
-                        <div class="game-title" style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Grid Architecture & Gates</div>
-                    </div>
+  <div class="main-wrapper">
+      
+      <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()"><i class="fas fa-arrow-left"></i> LEAVE TABLE</button>
+      
+      <div id="view-casino" class="view-container">
+        <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 15px rgba(0,0,0,0.8);">SELECT TABLE</h1>
+        <div class="lobby-modes-container">
+            <div class="game-card" onclick="openGame('mbj')">
+                <i class="fas fa-cards" style="font-size:4rem;"></i>
+                <div>
+                    <div class="game-title" style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Rigid Flexbox Alignment</div>
                 </div>
             </div>
-          </div>
-
-          <div id="view-mbj" class="view-container hidden">
-              <div class="mbj-board">
-                  <div class="mbj-table-line"></div>
-                  
-                  <div class="mbj-table-text">
-                      <h1>BLACKJACK</h1>
-                      <p>BLACKJACK PAYS 3 TO 2<br>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
-                  </div>
-
-                  <div class="mbj-timer-display" id="mbj-timer-box">
-                      <div class="hud-title" id="mbj-timer-title">PLACE BETS</div>
-                      <div class="hud-val" id="mbj-timer">15</div>
-                  </div>
-
-                  <div class="mbj-dealer-area">
-                      <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
-                      <div id="mbj-fs-dealer-hand" style="display:flex; justify-content:center; position:relative; min-width:100px;"></div>
-                  </div>
-                  
-                  <div class="mbj-shoe"></div>
-                  
-                  <div class="mbj-internal-balance">
-                      <div class="hud-title">BALANCE</div>
-                      <div class="hud-val" id="mbj-hud-balance">0 TC</div>
-                  </div>
-
-                  <div id="mbj-seats-row"></div>
-              </div>
-
-              <div class="chip-rack-container" id="mbj-chip-rack">
-                  <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
-                  <div class="rack-chip chip-10" onclick="addLocalBet(10)">10</div>
-                  <div class="rack-chip chip-100" onclick="addLocalBet(100)">100</div>
-                  <div class="rack-chip chip-1k" onclick="addLocalBet(1000)">1K</div>
-                  <div class="rack-chip chip-10k" onclick="addLocalBet(10000)">10K</div>
-                  <div class="rack-chip chip-50k" onclick="addLocalBet(50000)">50K</div>
-                  <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
-              </div>
-          </div>
-
-          <div id="view-horserace" class="view-container hidden">
-              <div class="hr-board">
-                  <div class="hr-top-bar">
-                      <div style="background:rgba(0,0,0,0.8); border:1px solid var(--glass-border); padding: 10px 20px; border-radius: 8px; color:white; font-weight:900; font-size:1.2rem; font-family: 'Rajdhani', sans-serif;" id="hr-timer-box"><i class="fas fa-clock" style="margin-right:10px;"></i> <span id="hr-timer">15</span></div>
-                      <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
-                      <div style="background: rgba(0,0,0,0.7); border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 8px;">
-                          <div style="font-family:'Outfit'; font-size:0.7rem; color:var(--text-muted); font-weight:800;">BALANCE</div>
-                          <div id="hr-my-bal" style="font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:900; color:var(--credits);">0 TC</div>
-                      </div>
-                  </div>
-                  
-                  <div class="hr-track-window" id="hr-environment">
-                      <div class="hr-hills"></div>
-                      <div class="hr-fence"></div>
-                      <div class="hr-bg-dirt"></div>
-                      
-                      <div class="hr-starting-gate" id="hr-gate"></div>
-                      <div class="hr-finish-line" id="hr-finish-line"></div>
-
-                      <div class="hr-lanes-grid" id="hr-lanes-container"></div>
-                  </div>
-
-                  <div class="hr-controls-area">
-                      <div style="display:flex; gap:15px; justify-content:center;">
-                          <input type="number" id="hr-bet-input" class="input-control bet-input" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
-                      </div>
-                      <div class="hr-bet-grid" id="hr-bet-grid"></div>
-                  </div>
-              </div>
-          </div>
-
+            <div class="game-card" onclick="openGame('horserace')">
+                <i class="fas fa-horse-head" style="font-size:4rem; color: var(--danger);"></i>
+                <div>
+                    <div class="game-title" style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Grid Architecture & Gates</div>
+                </div>
+            </div>
+        </div>
       </div>
-      <div id="flash-msg" class="local-flash"></div> 
+
+      <div id="view-mbj" class="view-container hidden">
+          <div class="mbj-board">
+              <div class="mbj-table-line"></div>
+              
+              <div class="mbj-table-text">
+                  <h1>BLACKJACK</h1>
+                  <p>BLACKJACK PAYS 3 TO 2<br>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
+              </div>
+
+              <div class="mbj-timer-display" id="mbj-timer-box">
+                  <div class="hud-title" id="mbj-timer-title">PLACE BETS</div>
+                  <div class="hud-val" id="mbj-timer">15</div>
+              </div>
+
+              <div class="mbj-dealer-area">
+                  <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
+                  <div id="mbj-fs-dealer-hand" style="display:flex; justify-content:center; position:relative; min-width:100px;"></div>
+              </div>
+              
+              <div class="mbj-shoe"></div>
+              
+              <div class="mbj-internal-balance">
+                  <div class="hud-title">BALANCE</div>
+                  <div class="hud-val" id="mbj-hud-balance">0 TC</div>
+              </div>
+
+              <div id="mbj-seats-row"></div>
+          </div>
+
+          <div class="chip-rack-container" id="mbj-chip-rack">
+              <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
+              <div class="rack-chip chip-10" onclick="addLocalBet(10)">10</div>
+              <div class="rack-chip chip-100" onclick="addLocalBet(100)">100</div>
+              <div class="rack-chip chip-1k" onclick="addLocalBet(1000)">1K</div>
+              <div class="rack-chip chip-10k" onclick="addLocalBet(10000)">10K</div>
+              <div class="rack-chip chip-50k" onclick="addLocalBet(50000)">50K</div>
+              <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
+          </div>
+      </div>
+
+      <div id="view-horserace" class="view-container hidden">
+          <div class="hr-board">
+              <div class="hr-top-bar">
+                  <div style="background:rgba(0,0,0,0.8); border:1px solid var(--glass-border); padding: 10px 20px; border-radius: 8px; color:white; font-weight:900; font-size:1.2rem; font-family: 'Rajdhani', sans-serif;" id="hr-timer-box"><i class="fas fa-clock" style="margin-right:10px;"></i> <span id="hr-timer">15</span></div>
+                  <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
+                  <div style="background: rgba(0,0,0,0.7); border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 8px;">
+                      <div style="font-family:'Outfit'; font-size:0.7rem; color:var(--text-muted); font-weight:800;">BALANCE</div>
+                      <div id="hr-my-bal" style="font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:900; color:var(--credits);">0 TC</div>
+                  </div>
+              </div>
+              
+              <div class="hr-track-window" id="hr-environment">
+                  <div class="hr-hills"></div>
+                  <div class="hr-fence"></div>
+                  <div class="hr-bg-dirt"></div>
+                  
+                  <div class="hr-starting-gate" id="hr-gate"></div>
+                  <div class="hr-finish-line" id="hr-finish-line"></div>
+
+                  <div class="hr-lanes-grid" id="hr-lanes-container"></div>
+              </div>
+
+              <div class="hr-controls-area">
+                  <div style="display:flex; gap:15px; justify-content:center;">
+                      <input type="number" id="hr-bet-input" class="input-control bet-input" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
+                  </div>
+                  <div class="hr-bet-grid" id="hr-bet-grid"></div>
+              </div>
+          </div>
+      </div>
+
   </div>
+  
+  <div id="flash-msg" class="local-flash"></div> 
 
   <script>
     const socket = io(); 
@@ -537,7 +526,7 @@
                         }
                     }
                     if (myNet > 0) showLocalFlash(`WON +${myNet} TC`, 'success');
-                    else if (myNet < 0) showLocalFlash(`LOST ${myNet} TC`, 'error');
+                    else if (myNet < 0) showLocalFlash(`LOST ${Math.abs(myNet)} TC`, 'error');
                 }; 
                 drawRemaining();
             }
