@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const mongoose = require('mongoose');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -233,7 +232,7 @@ async function mbjResolveDealer() {
         }
         mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 12000); // Extended slightly to allow frontend to play the long dealer animation
+    }, 12000); 
 }
 
 setInterval(() => {
@@ -268,7 +267,7 @@ setInterval(() => {
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
                 
                 let totalCardsToDeal = (activeSeats.length * 2) + 2;
-                let animTime = (totalCardsToDeal * 400) + 1500; 
+                let animTime = (totalCardsToDeal * 400) + 1000; 
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
@@ -297,15 +296,16 @@ setInterval(() => {
     }
 }, 1000);
 
-
 // ================= SOCKET.IO HANDLERS =================
 io.on('connection', (socket) => {
     socket.emit('hrTimerUpdate', { time: hrState.time, odds: hrState.currentOdds });
     if(mbjState.status === 'BETTING') socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
 
+    // AUTO-LOGIN LISTENER (Bypasses UI logic)
     socket.on('login', (data) => {
         let user = mockUsers[data.username];
         if(!user) {
+            // Give 10,000 Default Credits
             user = { username: data.username, password: data.password, credits: 10000, playableCredits: 0 };
             mockUsers[data.username] = user;
         }
