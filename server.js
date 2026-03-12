@@ -299,6 +299,7 @@ io.on('connection', (socket) => {
     socket.emit('hrTimerUpdate', { time: hrState.time, odds: hrState.currentOdds });
     if(mbjState.status === 'BETTING') socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
 
+    // AUTO-LOGIN LISTENER
     socket.on('login', (data) => {
         let user = mockUsers[data.username];
         if(!user) {
@@ -371,7 +372,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // BUG FIX: Including activeTurn in EVERY sync_seats emission during gameplay so buttons don't vanish!
+    // BUG FIX: Sends activeTurn correctly after EVERY hit so buttons don't vanish!
     socket.on('mbjAction', (actionData) => {
         if (!socket.user || mbjState.status !== 'PLAYER_TURN' || mbjState.activeTurn.seat === null) return;
         let seatNum = mbjState.activeTurn.seat;
@@ -448,4 +449,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Test Backend running on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Premium Backend running on port ${PORT}`));
