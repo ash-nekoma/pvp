@@ -267,8 +267,7 @@ setInterval(() => {
                 });
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
-                let totalCardsToDeal = (activeSeats.length * 2) + 2;
-                let animTime = (totalCardsToDeal * 400) + 1000; 
+                let animTime = ((activeSeats.length * 2) + 2) * 400 + 1000; 
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
