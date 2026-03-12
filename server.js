@@ -91,14 +91,17 @@ setInterval(() => {
                 io.emit('hrRaceStart', { winner: winner, duration: 15000 }); 
 
                 setTimeout(async () => {
+                    let payouts = {};
                     hrState.bets.forEach(b => {
                         let user = mockUsers[b.username];
                         if (user && b.choice === winner) {
                             let payout = b.amount * hrState.currentOdds[winner];
                             user.credits += formatTC(payout);
+                            if(connectedUsers[b.username]) io.to(connectedUsers[b.username]).emit('balanceUpdateData', { credits: user.credits });
+                            payouts[b.username] = (payouts[b.username] || 0) + payout;
                         }
                     });
-                    io.emit('hrRaceResults', { winner: winner, payoutMult: hrState.currentOdds[winner] });
+                    io.emit('hrRaceResults', { winner: winner, payoutMult: hrState.currentOdds[winner], payouts: payouts });
                 }, 15500); 
 
                 setTimeout(() => {
@@ -226,10 +229,9 @@ async function mbjResolveDealer() {
         }
         mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 10000); 
+    }, 8000); 
 }
 
-// Timer Loop
 setInterval(() => {
     if (mbjState.status === 'BETTING') {
         let hasBets = Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0);
