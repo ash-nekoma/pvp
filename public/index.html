@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Stick N' Trade | Test Build</title>
+    <title>Stick N' Trade | VIP Test Build</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
+        /* ================= BASE STYLES & STRICT NO-SCROLL ================= */
         :root {
             --ps-bg: #000814; --ps-glow: #00a2ff;
             --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15);
@@ -21,12 +24,16 @@
         
         body {
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%);
-            color: white; height: 100vh !important; width: 100vw !important; overflow: hidden !important; 
+            color: white;
+            height: 100vh !important;
+            width: 100vw !important;
+            overflow: hidden !important; 
         }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
+        .custom-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
 
-        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         .btn-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; }
@@ -56,11 +63,16 @@
         .local-flash.success { color: var(--success); border-color: var(--success); }
         @keyframes flashAnim { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
-        /* ================= VIP BLACKJACK UI ================= */
+        /* ================================================================= */
+        /* VIP BLACKJACK - REALISTIC & UNCLIPPED UI                          */
+        /* ================================================================= */
+        
         .mbj-wrapper { width: 1000px; height: 560px; position: relative; margin-top: 20px; }
         
         .mbj-table-surface { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #050505; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
         .mbj-felt { position: absolute; top: -300px; left: 50%; transform: translateX(-50%); width: 1300px; height: 800px; border-radius: 50%; background: radial-gradient(circle at 50% 100%, var(--table-green), var(--table-dark)); border: 25px solid var(--table-wood); box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 10px 30px rgba(0,0,0,0.8); pointer-events: none; }
+
+        .mbj-table-line { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 2px solid rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
 
         .mbj-table-text { position: absolute; top: 250px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; width: 100%; z-index: 1;}
         .mbj-table-text h1 { font-size: 3rem; letter-spacing: 5px; margin-bottom: 5px; color: rgba(255,255,255,0.3); }
@@ -81,7 +93,7 @@
         #mbj-anchor-4 { bottom: 30px; right: 260px; }
         #mbj-anchor-5 { bottom: 100px; right: 80px; }
 
-        .dimmed { opacity: 0.4; pointer-events: none; filter: grayscale(50%); }
+        .dimmed { opacity: 0.4; filter: grayscale(50%); }
         .active-turn { opacity: 1 !important; z-index: 100; }
 
         .mbj-seat-circle { width: 65px; height: 65px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);}
@@ -92,9 +104,9 @@
         /* CONTEXTUAL ACTION BUTTONS */
         .seat-bet-ui { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 10px; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.8); }
         
-        .seat-actions-wrapper { position: absolute; top: -15px; left: -80px; width: 260px; display: flex; justify-content: space-between; z-index: 100; pointer-events: none; }
+        .seat-actions-wrapper { position: absolute; top: -15px; left: -80px; width: 260px; display: flex; justify-content: space-between; z-index: 100; }
         
-        .mbj-action-btn { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); color: white; font-size: 0.75rem; font-weight: 900; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.9); pointer-events: auto; }
+        .mbj-action-btn { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); color: white; font-size: 0.75rem; font-weight: 900; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.9); }
         .mbj-action-btn:hover:not(:disabled) { transform: scale(1.15); border-color: white; }
         .mbj-action-btn:disabled { opacity: 0.3; filter: grayscale(100%); cursor: not-allowed; }
         
@@ -131,7 +143,7 @@
         .mbj-timer-display { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 8px; border: 1px solid var(--glass-border); color: white; font-weight: 900; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; font-family: 'Rajdhani', monospace; z-index: 20; pointer-events: auto;}
         .mbj-timer-display.closing { color: var(--danger); border-color: var(--danger); animation: pulseRed 1s infinite; }
 
-        /* ================= RETRO HORSE DERBY (Tinted Horses & 3-Phase Physics) ================= */
+        /* ================= RETRO HORSE DERBY (Dynamic Track & Tinted Horses) ================= */
         .hr-board { width: 900px; height: 600px; background: #0a0a0a; border: 4px solid #333; border-radius: 12px; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
         
         .hr-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -139,12 +151,13 @@
         
         .hr-track { flex: 1; background: #222; border: 4px solid #444; position: relative; display: flex; flex-direction: column; justify-content: space-evenly; overflow: hidden; border-radius: 8px; }
         
+        /* Depth/Perspective lanes */
         .hr-lane { width: 100%; height: 16%; border-bottom: 2px dashed #555; position: relative; display: flex; align-items: center; background: linear-gradient(to right, rgba(0,0,0,0.5), transparent); }
         
         .hr-horse-group { position: absolute; left: 0; display: flex; align-items: center; z-index: 10; padding-left: 10px; }
         
-        /* Tinted Emoji Technique */
-        .hr-sprite { font-size: 3.5rem; transform: scaleX(-1); color: transparent; text-shadow: 0 0 0 var(--h-color); filter: drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
+        /* The Tinted Emojis Trick */
+        .hr-sprite { font-size: 3rem; transform: scaleX(-1); color: transparent; text-shadow: 0 0 0 var(--h-color); filter: drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
         
         .retro-gallop { animation: retroBounce 0.3s infinite linear; }
         @keyframes retroBounce { 
@@ -154,7 +167,7 @@
             75% { transform: scaleX(-1) translateY(-8px) rotate(-5deg); } 
         }
 
-        .hr-finish-line { position: absolute; right: -50px; top: 0; bottom: 0; width: 25px; background: repeating-linear-gradient(to bottom, #fff, #fff 25px, #000 25px, #000 50px); z-index: 5; border-left: 5px solid white; transition: right 1s cubic-bezier(0.1, 0.7, 0.1, 1); box-shadow: -10px 0 20px rgba(0,0,0,0.5); }
+        .hr-finish-line { position: absolute; right: -50px; top: 0; bottom: 0; width: 25px; background: repeating-linear-gradient(to bottom, #fff, #fff 25px, #000 25px, #000 50px); z-index: 5; border-left: 5px solid white; transition: right 2s cubic-bezier(0.1, 0.7, 0.1, 1); box-shadow: -10px 0 20px rgba(0,0,0,0.5); }
         
         .hr-controls-area { margin-top: 15px; display: flex; flex-direction: column; gap: 15px; }
         .hr-bet-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; width: 100%; }
@@ -268,7 +281,7 @@
 
                   <div class="hr-controls-area">
                       <div style="display:flex; gap:15px; justify-content:center;">
-                          <input type="number" id="hr-bet-input" class="input-control" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
+                          <input type="number" id="hr-bet-input" class="input-control bet-input" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
                       </div>
                       <div class="hr-bet-grid" id="hr-bet-grid"></div>
                   </div>
@@ -401,7 +414,7 @@
             let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
             
             let clickAction = `socket.emit('mbjTakeSeat', ${i})`;
-            if (s && !isMe && mbjGameState === 'BETTING') clickAction = `placeMBJBetBehind(${i})`;
+            if (s && !isMe && mbjGameState === 'BETTING') clickAction = ``;
 
             // Absolute Wrapper
             let html = `<div class="mbj-seat-anchor ${activeClass} ${dimClass}" id="mbj-anchor-${i}">`;
@@ -430,7 +443,7 @@
                 s.hands.forEach((hand, hIdx) => {
                     hand.cards.forEach((c, cIdx) => { 
                         let offset = (hIdx * 60) + (cIdx * 20); 
-                        let animDelay = isInitialDeal ? (cardSequenceIdx * 0.15) : 0; 
+                        let animDelay = isInitialDeal ? (cardSequenceIdx * 0.4) : 0; 
                         let cardHtml = generateCardHTML(c, false, animDelay);
                         
                         cardHtml = cardHtml.replace('style="', `style="left: ${offset}px; `);
@@ -464,10 +477,11 @@
                 
                 // BETTING CONTROLS (Spawn directly below seat)
                 if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
+                    // FIXED ID BUG: Using unique ID per seat
                     html += `<div class="seat-bet-ui">
-                                <input type="number" id="mbj-bet-input" class="input-control" placeholder="Amount" style="padding:6px; font-size:0.9rem;">
+                                <input type="number" id="mbj-bet-input-${i}" class="input-control" placeholder="Amount" style="padding:6px; font-size:0.9rem;">
                                 <div style="display:flex; gap:5px; width:100%;">
-                                    <button class="btn-play" onclick="event.stopPropagation(); placeMBJBet()" style="flex:1; padding:6px; background:var(--success); color:black; font-size:0.8rem; border:none;">BET</button>
+                                    <button class="btn-play" onclick="event.stopPropagation(); placeMBJBet(${i})" style="flex:1; padding:6px; background:var(--success); color:black; font-size:0.8rem; border:none;">BET</button>
                                     <button class="btn-play" onclick="event.stopPropagation(); socket.emit('mbjLeaveSeat');" style="flex:1; padding:6px; background:var(--danger); color:white; font-size:0.8rem; border:none;">LEAVE</button>
                                 </div>
                              </div>`;
@@ -481,20 +495,12 @@
         }
     }
 
-    function placeMBJBet() { 
-        let i = document.getElementById('mbj-bet-input'); 
+    function placeMBJBet(seatNum) { 
+        let i = document.getElementById('mbj-bet-input-' + seatNum); 
         if(!i) return;
         let a = parseFloat(i.value); 
-        if (isNaN(a) || a < 10) return; 
+        if (isNaN(a) || a < 10) return showLocalFlash('mbj', 'Min Bet 10 TC', 'error'); 
         socket.emit('mbjPlaceBet', a); 
-    }
-
-    function placeMBJBetBehind(seatNum) {
-        let amt = prompt("Enter Bet Behind Amount (Min 10 TC):", "10");
-        if(amt) {
-            let a = parseFloat(amt);
-            if (!isNaN(a) && a >= 10) socket.emit('mbjBetBehind', { seatNum: seatNum, amount: a }); 
-        }
     }
 
     function handleMBJClick(actionType) { 
@@ -527,18 +533,18 @@
             if(dHand) { 
                 dHand.innerHTML = ''; 
                 
-                // Dealer cards animate last. Calculate total active players to sync delay.
+                // Dealer cards animate last. 
                 let totalPlayerCards = Object.values(data.seats).reduce((count, s) => {
                     if (s && s.hands && s.hands.length > 0) return count + s.hands[0].cards.length;
                     return count;
                 }, 0);
                 
-                let baseDelay = totalPlayerCards * 0.15; 
+                let baseDelay = totalPlayerCards * 0.4; 
 
                 for(let i=0; i<data.dealerHand.length; i++) {
                     let c = data.dealerHand[i];
                     let isHidden = c.raw === '?'; 
-                    let animDelay = baseDelay + (i * 0.15);
+                    let animDelay = baseDelay + (i * 0.4);
                     let cardHtml = generateCardHTML(c, isHidden, animDelay);
                     cardHtml = cardHtml.replace('style="', 'style="position:relative; ');
                     dHand.innerHTML += cardHtml; 
@@ -560,8 +566,8 @@
                 // First card static
                 dHand.innerHTML = generateCardHTML(data.dealerHand[0]).replace('anim-fly-in', '');
                 
-                // Reveal second card instantly
-                let revealHtml = generateCardHTML(data.dealerHand[1]).replace('anim-fly-in', 'anim-flip');
+                // Reveal second card 
+                let revealHtml = generateCardHTML(data.dealerHand[1]).replace('anim-fly-in', '');
                 dHand.innerHTML += revealHtml;
                 
                 const drawRemaining = async () => {
@@ -682,8 +688,10 @@
         if(activeGame !== 'horserace') return;
         
         const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
-        let pos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
-        
+        let targetPos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
+        let currentPos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
+        let speeds = { Red: 0.05, Blue: 0.05, Green: 0.05, Yellow: 0.05, Purple: 0.05, Orange: 0.05 };
+
         let duration = data.duration; // 15s
         let startTime = Date.now();
         let finishLineX = 85; 
@@ -706,7 +714,7 @@
         hrRaceInterval = setInterval(() => {
             let now = Date.now();
             let elapsed = now - startTime;
-            let percentComplete = (elapsed / duration) * 100; // 0 to 100
+            let percentComplete = (elapsed / duration) * 100; 
             
             if (percentComplete < 20) phase = 1; // Start Burst
             else if (percentComplete < 80) phase = 2; // Mid Race
@@ -722,12 +730,12 @@
                     let sprite = document.getElementById('sprite-' + h);
                     if(sprite) sprite.classList.remove('retro-gallop');
                     let el = document.getElementById('horse-' + h);
-                    if(el) el.style.left = (h === data.winner ? 100 : Math.min(pos[h], finishLineX - 2)) + '%';
+                    if(el) el.style.left = (h === data.winner ? 100 : Math.min(currentPos[h], finishLineX - 2)) + '%';
                 });
                 return;
             }
 
-            // Calculate movement per frame
+            // Calculate movement per frame based on phase
             horses.forEach(h => {
                 let speed = 0;
                 let isWinner = (h === data.winner);
@@ -737,20 +745,20 @@
                 } else if (phase === 2) {
                     speed = 0.05 + (Math.random() * 0.08); // Normalize
                     // Artificially keep them somewhat grouped
-                    if (pos[h] > 70 && !isWinner) speed *= 0.5; 
+                    if (currentPos[h] > 70 && !isWinner) speed *= 0.5; 
                 } else if (phase === 3) {
-                    if (isWinner) speed = 0.25; // Massive sprint
+                    if (isWinner) speed = 0.3; // Massive sprint
                     else speed = 0.02 + (Math.random() * 0.05); // Exhaustion
                 }
 
-                pos[h] += speed;
+                currentPos[h] += speed;
                 
                 // Hard limits
-                if(pos[h] > 100) pos[h] = 100;
-                if(!isWinner && pos[h] > finishLineX - 2) pos[h] = finishLineX - 2;
+                if(currentPos[h] > 100) currentPos[h] = 100;
+                if(!isWinner && currentPos[h] > finishLineX - 2) currentPos[h] = finishLineX - 2;
 
                 let el = document.getElementById('horse-' + h);
-                if(el) el.style.left = pos[h] + '%';
+                if(el) el.style.left = currentPos[h] + '%';
             });
         }, 30); 
     });
