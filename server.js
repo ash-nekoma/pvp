@@ -58,19 +58,15 @@ function getBJScore(hand) {
 function isNaturalBlackjack(handCards) { return (handCards.length === 2 && getBJScore(handCards) === 21); }
 
 // =========================================================================
-// RETRO DERBY HORSE RACE ENGINE 
+// PREMIUM DERBY LOGIC (Strict 15s Betting)
 // =========================================================================
-let hrState = { time: 40, status: 'BETTING', bets: [], currentOdds: {} };
+let hrState = { time: 15, status: 'BETTING', bets: [], currentOdds: {} }; // 15s timer
 
 function generateHorseOdds() {
-    const baseMultipliers = [2, 4, 6, 11, 16, 31];
     const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
-    for (let i = baseMultipliers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [baseMultipliers[i], baseMultipliers[j]] = [baseMultipliers[j], baseMultipliers[i]];
-    }
+    const multipliers = [2, 4, 6, 11, 16, 31].sort(() => Math.random() - 0.5);
     let oddsMap = {}; 
-    horses.forEach((h, index) => { oddsMap[h] = baseMultipliers[index]; });
+    horses.forEach((h, i) => { oddsMap[h] = multipliers[i]; });
     hrState.currentOdds = oddsMap;
 }
 generateHorseOdds(); 
@@ -108,7 +104,7 @@ setInterval(() => {
 
                 setTimeout(() => {
                     generateHorseOdds(); 
-                    hrState.time = 40; 
+                    hrState.time = 15; // Reset to 15s
                     hrState.status = 'BETTING';
                     hrState.bets = [];
                     io.emit('hrNewRound', { odds: hrState.currentOdds }); 
@@ -119,7 +115,7 @@ setInterval(() => {
 }, 1000);
 
 // =========================================================================
-// VIP BLACKJACK (MBJ) ENGINE
+// VIP BLACKJACK ENGINE (Intelligent Timer & Multi-Hit Fix)
 // =========================================================================
 let mbjState = {
     status: 'BETTING', time: 15, turnTimer: 0, 
@@ -234,21 +230,28 @@ async function mbjResolveDealer() {
     }, 12000); 
 }
 
+// Timer Loop
 setInterval(() => {
     if (mbjState.status === 'BETTING') {
-        mbjState.time--;
-        io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time });
+        // Only count down if someone has placed a bet
+        let hasBets = Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0);
         
-        if (mbjState.time <= 0) {
+        if (hasBets) {
+            mbjState.time--;
+            io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true });
+        } else {
+            mbjState.time = 15; // Hold at 15
+            io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false });
+        }
+        
+        if (mbjState.time <= 0 && hasBets) {
             for (let i=1; i<=5; i++) {
                 if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) mbjState.seats[i] = null;
             }
 
             let activeSeats = Object.keys(mbjState.seats).filter(k => mbjState.seats[k] !== null);
             
-            if (activeSeats.length === 0) {
-                mbjState.time = 15; 
-            } else {
+            if (activeSeats.length > 0) {
                 mbjState.status = 'DEALING';
                 io.to('mbj').emit('mbjUpdate', { event: 'lock_bets' });
                 
@@ -372,7 +375,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // BUG FIX: Sends activeTurn correctly after EVERY hit so buttons don't vanish!
+    // BUG FIX: Sends activeTurn correctly after EVERY hit so buttons stay visible
     socket.on('mbjAction', (actionData) => {
         if (!socket.user || mbjState.status !== 'PLAYER_TURN' || mbjState.activeTurn.seat === null) return;
         let seatNum = mbjState.activeTurn.seat;
@@ -392,7 +395,6 @@ io.on('connection', (socket) => {
                 mbjNextTurn(); 
             } 
             else { 
-                // Keep the turn active! Resend state to keep buttons visible.
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
         } 
@@ -416,31 +418,6 @@ io.on('connection', (socket) => {
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
-            }
-        }
-        else if (actionData.type === 'split') {
-            if (hand.cards.length !== 2 || hand.cards[0].raw !== hand.cards[1].raw) return;
-            let user = mockUsers[socket.user.username];
-            if (user && user.credits >= hand.bet) {
-                user.credits -= hand.bet;
-                socket.emit('balanceUpdateData', { credits: user.credits });
-
-                let splitCard = hand.cards.pop();
-                hand.cards.push(drawCard());
-                hand.score = getBJScore(hand.cards);
-                hand.isSplitHand = true; 
-                
-                let newHand = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard, drawCard()], score: 0, status: 'PLAYING', isSplitHand: true };
-                newHand.score = getBJScore(newHand.cards);
-                seat.hands.push(newHand);
-                
-                if (splitCard.raw === 'A') {
-                    hand.status = 'STAND'; seat.hands[1].status = 'STAND';
-                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                    mbjNextTurn();
-                } else {
-                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                }
             }
         }
     });
