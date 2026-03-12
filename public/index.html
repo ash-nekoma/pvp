@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Stick N' Trade | VIP Test Build</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -18,61 +16,41 @@
             --ps-bg: #000814; --ps-glow: #00a2ff;
             --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15);
             --danger: #ff3366; --success: #00e676; --credits: #ffb400;
-            --table-green: #0a4f28; --table-dark: #042410; --table-wood: #1a0f0a;
         }
-        
-        /* Removed user-select:none from the universal selector to fix inputs */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
         
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
-            color: white; 
-            height: 100vh !important; 
-            width: 100vw !important; 
-            overflow: hidden !important; 
-            user-select: none; 
-            -webkit-user-select: none; 
+            color: white; height: 100vh !important; width: 100vw !important; overflow: hidden !important; 
         }
-        
-        /* Explicitly re-enable clicking and typing in inputs */
-        input, textarea { user-select: auto; -webkit-user-select: auto; }
-
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
-        .custom-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
 
-        /* ================= UI COMPONENTS ================= */
-        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         .btn-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
         .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; }
         .input-control:focus { border-color: var(--ps-glow); }
 
-        /* ================= AUTHENTICATION ================= */
-        #auth-container { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 99999; background: rgba(0, 5, 15, 0.95); backdrop-filter: blur(15px); }
-        .auth-box { width: 400px; background: rgba(0,0,0,0.8); padding: 2.5rem; border-radius: 16px; border-top: 3px solid var(--ps-glow); border: 1px solid var(--glass-border); text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.9); }
-
         /* ================= TOP NAVIGATION ================= */
-        #app-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
-        
         .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer;}
         .wallet-pill { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,180,0,0.4); padding: 5px 15px; height: 45px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-weight: 900; color: var(--credits); font-size: 1.1rem; }
 
         /* ================= MAIN LAYOUT ================= */
+        /* Changed from none to block so it bypasses login */
+        #app-container { display: block; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
+        
         .main-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 75px); margin-top: 75px; width: 100%; position: relative; }
         .view-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; }
         
         .btn-back-fixed { position: fixed; top: 95px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .btn-back-fixed:hover { background: white; color: black; }
 
-        /* LOBBY CARDS */
         .lobby-modes-container { display: flex; gap: 40px; }
         .game-card { width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
 
-        /* ================= ALERTS ================= */
         .local-flash { position: fixed; bottom: 25px; right: 25px; z-index: 9999; color: var(--danger); font-size: 1.2rem; font-weight: 900; text-transform: uppercase; opacity: 0; display: none; text-shadow: 0 2px 10px rgba(0,0,0,0.9); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 8px; border: 1px solid var(--danger); }
         .local-flash.show { display: block; animation: flashAnim 2.5s forwards; }
         .local-flash.success { color: var(--success); border-color: var(--success); }
@@ -173,6 +151,7 @@
         
         .hr-track-window { flex: 1; border: 4px solid #444; position: relative; overflow: hidden; border-radius: 8px; background: #222; }
         
+        /* The scrolling dirt background */
         .hr-track-bg { position: absolute; top: 0; left: 0; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, #382415, #382415 40px, #2a1a0f 40px, #2a1a0f 80px); }
         .track-moving { animation: scrollTrack 0.6s linear infinite; }
         @keyframes scrollTrack { from { transform: translateX(0); } to { transform: translateX(-80px); } }
@@ -205,23 +184,6 @@
     </style>
 </head>
 <body>
-
-  <div id="auth-container">
-      <div class="auth-box">
-          <div class="auth-title">STICK N' TRADE</div>
-          <div class="auth-sub">PREMIUM TEST BUILD</div>
-          <div id="auth-form-login">
-              <div class="input-group" style="margin-bottom:20px;">
-                  <input type="text" id="login-user" class="input-control" placeholder="Username">
-              </div>
-              <div class="input-group" style="margin-bottom:15px;">
-                  <input type="password" id="login-pass" class="input-control" placeholder="Password">
-              </div>
-              <div id="auth-error-login" class="auth-msg auth-error"></div>
-              <button class="btn-play" style="width:100%;" onclick="submitAuth('login')">LOGIN</button>
-          </div>
-      </div>
-  </div>
 
   <div id="app-container">
       <header class="topbar">
@@ -322,7 +284,7 @@
 
                   <div class="hr-controls-area">
                       <div style="display:flex; gap:15px; justify-content:center;">
-                          <input type="number" id="hr-bet-input" class="input-control" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
+                          <input type="number" id="hr-bet-input" class="input-control bet-input" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
                       </div>
                       <div class="hr-bet-grid" id="hr-bet-grid"></div>
                   </div>
@@ -344,27 +306,21 @@
     let hrState = { time: 40, status: 'BETTING', currentOdds: {} };
     let mySBets = {};
 
-    function submitAuth(mode) { 
-        const user = document.getElementById('login-user').value.trim(); 
-        const pass = document.getElementById('login-pass').value; 
-        if(!user || !pass) return document.getElementById('auth-error-login').innerText = "Please fill all fields."; 
-        socket.emit('login', { username: user, password: pass }); 
-    }
+    // INSTANT AUTO-LOGIN UPON LOAD
+    window.onload = () => {
+        socket.emit('login', { username: 'VIP_Tester', password: '123' }); 
+    };
     
     socket.on('loginSuccess', (data) => { 
         myUsername = data.username; 
         myCredits = data.credits; 
-        document.getElementById('nav-credits').innerText = myCredits.toLocaleString(); 
         document.getElementById('mbj-hud-balance').innerText = myCredits.toLocaleString() + ' TC';
         document.getElementById('player-name-display').innerText = myUsername;
-        document.getElementById('auth-container').style.display = 'none'; 
-        document.getElementById('app-container').style.display = 'block'; 
         switchView('casino'); 
     });
     
     socket.on('balanceUpdateData', (data) => {
         myCredits = data.credits;
-        document.getElementById('nav-credits').innerText = myCredits.toLocaleString();
         document.getElementById('mbj-hud-balance').innerText = myCredits.toLocaleString() + ' TC';
     });
 
@@ -417,7 +373,7 @@
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // VIP BLACKJACK LOGIC (Simulator Style UI)
+    // VIP BLACKJACK LOGIC
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
