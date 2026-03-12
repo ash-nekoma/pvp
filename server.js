@@ -196,7 +196,6 @@ async function mbjResolveDealer() {
                 if (dealerNatural) {
                     if (playerNatural) isPush = true;
                     else {
-                        // The OBO Rule (Original Bets Only)
                         if (dealerUpcardVal === 10 && h.doubledAmount > 0) refundAmount += h.doubledAmount; 
                         payout = 0; 
                     }
@@ -296,16 +295,13 @@ setInterval(() => {
     }
 }, 1000);
 
-// ================= SOCKET.IO HANDLERS =================
 io.on('connection', (socket) => {
     socket.emit('hrTimerUpdate', { time: hrState.time, odds: hrState.currentOdds });
     if(mbjState.status === 'BETTING') socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
 
-    // AUTO-LOGIN LISTENER (Bypasses UI logic)
     socket.on('login', (data) => {
         let user = mockUsers[data.username];
         if(!user) {
-            // Give 10,000 Default Credits
             user = { username: data.username, password: data.password, credits: 10000, playableCredits: 0 };
             mockUsers[data.username] = user;
         }
@@ -375,6 +371,7 @@ io.on('connection', (socket) => {
         }
     });
 
+    // BUG FIX: Including activeTurn in EVERY sync_seats emission during gameplay so buttons don't vanish!
     socket.on('mbjAction', (actionData) => {
         if (!socket.user || mbjState.status !== 'PLAYER_TURN' || mbjState.activeTurn.seat === null) return;
         let seatNum = mbjState.activeTurn.seat;
@@ -388,12 +385,19 @@ io.on('connection', (socket) => {
             if (hand.isSplitAce) return; 
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
-            if (hand.score > 21) { hand.status = 'BUST'; io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats }); mbjNextTurn(); } 
-            else { io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats }); }
+            if (hand.score > 21) { 
+                hand.status = 'BUST'; 
+                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
+                mbjNextTurn(); 
+            } 
+            else { 
+                // Keep the turn active! Resend state to keep buttons visible.
+                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
+            }
         } 
         else if (actionData.type === 'stand') {
             hand.status = 'STAND';
-            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
+            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
             mbjNextTurn();
         }
         else if (actionData.type === 'double') {
@@ -409,7 +413,7 @@ io.on('connection', (socket) => {
                 hand.cards.push(drawCard());
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
+                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
             }
         }
@@ -431,10 +435,10 @@ io.on('connection', (socket) => {
                 
                 if (splitCard.raw === 'A') {
                     hand.status = 'STAND'; seat.hands[1].status = 'STAND';
-                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
+                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                     mbjNextTurn();
                 } else {
-                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
+                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 }
             }
         }
