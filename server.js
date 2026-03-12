@@ -13,9 +13,7 @@ const io = new Server(server, { cors: { origin: "*" } });
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
 const formatTC = (amount) => Math.round(amount * 10) / 10;
 
@@ -58,9 +56,7 @@ function getBJScore(hand) {
     return score;
 }
 
-function isNaturalBlackjack(handCards) {
-    return (handCards.length === 2 && getBJScore(handCards) === 21);
-}
+function isNaturalBlackjack(handCards) { return (handCards.length === 2 && getBJScore(handCards) === 21); }
 
 // =========================================================================
 // RETRO DERBY HORSE RACE ENGINE 
@@ -199,12 +195,10 @@ async function mbjResolveDealer() {
                 let playerNatural = isNaturalBlackjack(h.cards) && !h.isSplitHand;
                 
                 if (dealerNatural) {
-                    if (playerNatural) {
-                        isPush = true;
-                    } else {
-                        if (dealerUpcardVal === 10 && h.doubledAmount > 0) {
-                            refundAmount += h.doubledAmount; 
-                        }
+                    if (playerNatural) isPush = true;
+                    else {
+                        // The OBO Rule (Original Bets Only)
+                        if (dealerUpcardVal === 10 && h.doubledAmount > 0) refundAmount += h.doubledAmount; 
                         payout = 0; 
                     }
                 } else if (playerNatural) {
@@ -212,8 +206,7 @@ async function mbjResolveDealer() {
                 } else if (dScore > 21 || pScore > dScore) {
                     payout = h.bet * 2;
                 } else if (pScore === dScore) {
-                    if (dealerNatural && !isNaturalBlackjack(h.cards)) payout = 0; 
-                    else isPush = true;
+                    isPush = true;
                 }
 
                 if (isPush) totalPush += h.bet; 
@@ -240,7 +233,7 @@ async function mbjResolveDealer() {
         }
         mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 10000); 
+    }, 12000); // Extended slightly to allow frontend to play the long dealer animation
 }
 
 setInterval(() => {
@@ -275,7 +268,7 @@ setInterval(() => {
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
                 
                 let totalCardsToDeal = (activeSeats.length * 2) + 2;
-                let animTime = (totalCardsToDeal * 400) + 1000; 
+                let animTime = (totalCardsToDeal * 400) + 1500; 
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
