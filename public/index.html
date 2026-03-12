@@ -11,30 +11,27 @@
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
-        /* ================= BASE STYLES ================= */
+        /* ================= BASE STYLES & RIGID FLEXBOX ================= */
         :root { --ps-bg: #000814; --ps-glow: #00a2ff; --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15); --danger: #ff3366; --success: #00e676; --credits: #ffb400; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
-        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh; width: 100vw; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        
+        /* THIS FIXES THE LAYOUT BUG - Forces 100vh column structure */
+        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh; width: 100vw; overflow: hidden; user-select: none; -webkit-user-select: none; display: flex; flex-direction: column; }
         input, textarea { user-select: auto; -webkit-user-select: auto; }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
         
-        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         .btn-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
-        .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; }
 
-        /* ================= BULLETPROOF LAYOUT GEOMETRY ================= */
-        #app-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
-        
-        .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
+        /* ================= TOP NAVIGATION ================= */
+        .topbar { background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; }
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer;}
         
-        /* Main Wrapper calculates exactly the screen minus the 75px topbar */
-        .main-wrapper { position: absolute; top: 75px; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; }
-        .content { width: 100%; height: 100%; position: relative; }
-        .view-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        /* Main Wrapper takes exactly the remaining height and centers content */
+        .main-wrapper { flex-grow: 1; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .view-container { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
         .btn-back-fixed { position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .btn-back-fixed:hover { background: white; color: black; }
@@ -48,14 +45,14 @@
         .local-flash.success { color: var(--success); border-color: var(--success); }
         @keyframes flashAnim { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
-        /* ================= VIP BLACKJACK - RECTANGULAR BOARD ================= */
+        /* ================= VIP BLACKJACK - TRUE RECTANGULAR BOARD ================= */
         .mbj-board { 
-            width: 1150px; height: 600px; background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); 
+            width: 1200px; height: 600px; background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); 
             border-radius: 20px; position: relative; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8); 
             overflow: hidden; border: 15px solid #2e1a10; 
         }
         
-        .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(255,255,255,0.15); border-radius: 10px; pointer-events: none; z-index: 1;}
+        .mbj-table-line { position: absolute; inset: 20px; border: 2px solid rgba(255,255,255,0.15); border-radius: 10px; pointer-events: none; z-index: 1;}
         .mbj-table-text { position: absolute; top: 220px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; width: 100%; z-index: 2; }
         .mbj-table-text h1 { font-size: 3.5rem; letter-spacing: 8px; margin-bottom: 5px; color: rgba(255,255,255,0.15); font-family: 'Outfit'; }
         .mbj-table-text p { font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,215,0,0.3); }
@@ -63,21 +60,23 @@
         #mbj-seats-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none; }
         
         .mbj-dealer-area { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 20; }
-        .mbj-shoe { position: absolute; top: 30px; right: 30px; width: 65px; height: 100px; background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 4px solid #555; border-radius: 8px; box-shadow: -10px 15px 25px rgba(0,0,0,0.8); z-index: 5; }
+        .mbj-shoe { position: absolute; top: 40px; right: 40px; width: 65px; height: 100px; background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 4px solid #555; border-radius: 8px; box-shadow: -10px 15px 25px rgba(0,0,0,0.8); z-index: 5; }
 
         .mbj-timer-display { position: absolute; top: 130px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); padding: 5px 30px; border-radius: 50px; border: 1px solid var(--ps-glow); display: none; flex-direction: column; align-items: center; box-shadow: 0 5px 15px rgba(0,162,255,0.3); z-index: 20; }
         .mbj-timer-display .hud-title { color: var(--ps-glow); font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
         .mbj-timer-display .hud-val { color: white; font-family: 'Rajdhani', monospace; font-size: 1.8rem; font-weight: 900; line-height: 1; }
 
-        .mbj-seat-anchor { position: absolute; display: flex; flex-direction: column; align-items: center; width: 100px; pointer-events: auto; }
-        #mbj-anchor-1 { bottom: 60px; left: 80px; }
-        #mbj-anchor-2 { bottom: 20px; left: 300px; }
-        #mbj-anchor-3 { bottom: 10px; left: 50%; transform: translateX(-50%); }
-        #mbj-anchor-4 { bottom: 20px; right: 300px; }
-        #mbj-anchor-5 { bottom: 60px; right: 80px; }
+        /* Symmetrical 5-Seat Line Alignment */
+        .mbj-seat-anchor { position: absolute; bottom: 50px; display: flex; flex-direction: column; align-items: center; width: 100px; pointer-events: auto; }
+        #mbj-anchor-1 { left: 15%; transform: translateX(-50%); }
+        #mbj-anchor-2 { left: 32.5%; transform: translateX(-50%); }
+        #mbj-anchor-3 { left: 50%; transform: translateX(-50%); }
+        #mbj-anchor-4 { left: 67.5%; transform: translateX(-50%); }
+        #mbj-anchor-5 { left: 85%; transform: translateX(-50%); }
 
-        .dimmed { opacity: 0.4; filter: grayscale(80%); }
-        .seat-glow { position: absolute; top: -50px; left: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
+        /* The Spotlight Effect */
+        .dimmed { opacity: 0.3; filter: grayscale(80%); }
+        .seat-glow { position: absolute; top: -40px; left: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
         .active-turn { opacity: 1 !important; z-index: 100; filter: grayscale(0) !important; }
         .active-turn .seat-glow { display: block; animation: pulseGlow 2s infinite; }
         
@@ -85,15 +84,17 @@
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 3px solid var(--credits); background: transparent; cursor: default; box-shadow: inset 0 0 15px rgba(255,180,0,0.2); }
         
-        .chip-stack { background: #222; border: 3px dashed #ffcc00; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; font-weight: 900; color: white; position: absolute; box-shadow: 0 5px 10px rgba(0,0,0,0.9); }
-        .seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; margin-top: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; position: relative;}
+        /* Chip positioned at bottom right of circle */
+        .chip-stack { position: absolute; bottom: -10px; right: -10px; background: #222; border: 3px dashed #ffcc00; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; font-weight: 900; color: white; box-shadow: 0 5px 10px rgba(0,0,0,0.9); }
+        .seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; margin-top: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; position: relative;}
 
-        .payout-flare { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.2rem; font-weight: 900; text-shadow: 0 2px 5px black; animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap;}
+        /* Payout Animation */
+        .payout-flare { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.5rem; font-weight: 900; text-shadow: 0 2px 5px black; animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap;}
         @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -20px); } 80% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -60px); } }
 
-        /* CENTERED FLEXBOX CARDS */
-        .mbj-hand-container { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; z-index: 10; pointer-events: none; width: 200px; }
-        .mbj-card { width: 55px; height: 80px; background: white; border-radius: 6px; box-shadow: -3px 3px 10px rgba(0,0,0,0.6); position: relative; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; margin-left: -35px; }
+        /* UPWARD CENTERED FLEXBOX CARDS */
+        .mbj-hand-container { position: absolute; bottom: 100%; margin-bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; z-index: 10; pointer-events: none; }
+        .mbj-card { width: 55px; height: 80px; background: white; border-radius: 6px; box-shadow: -3px 3px 10px rgba(0,0,0,0.6); position: relative; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; margin-left: -35px; transform: translateZ(0); }
         .mbj-card:first-child { margin-left: 0; } 
         
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; font-weight: 900;}
@@ -109,11 +110,12 @@
         
         .anim-fly-in { animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; opacity: 0; }
         @keyframes flyIn { 0% { opacity: 0; transform: translate(500px, -200px) scale(0.3) rotate(90deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } }
+        /* The 3D Reveal Flip */
         .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
         @keyframes flipCard { 0% { transform: rotateY(180deg); } 100% { transform: rotateY(0deg); } }
         
-        /* Action Buttons Above Circle */
-        .seat-actions-wrapper { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; display: flex; gap: 8px; background: rgba(0,0,0,0.9); padding: 6px; border-radius: 50px; border: 1px solid var(--glass-border); z-index: 100; pointer-events: auto; animation: popUp 0.3s ease-out; }
+        /* Action Buttons safely BELOW the name */
+        .seat-actions-wrapper { position: absolute; top: 100%; margin-top: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; background: rgba(0,0,0,0.9); padding: 6px; border-radius: 50px; border: 1px solid var(--glass-border); z-index: 100; pointer-events: auto; animation: popUp 0.3s ease-out; }
         @keyframes popUp { from { transform: translateX(-50%) scale(0.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
         .mbj-action-btn { width: 40px; height: 40px; border-radius: 50%; background: #111; border: 2px solid rgba(255,255,255,0.3); color: white; font-size: 1rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 5px 10px rgba(0,0,0,0.9); }
         .mbj-action-btn:hover:not(:disabled) { transform: scale(1.15); border-color: white; }
@@ -122,7 +124,7 @@
         .mbj-action-btn.stand { background: #9b0022; border-color: #ff3366; }
         .mbj-action-btn.double { background: #997a00; border-color: #ffcc00; color: black; font-size: 0.8rem; }
 
-        /* THE CHIP RACK UI (Absolute top layer so it's always clickable) */
+        /* THE CHIP RACK UI (Absolute top layer) */
         .chip-rack-container { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: none; background: rgba(0,0,0,0.85); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--glass-border); gap: 15px; align-items: center; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.9); pointer-events: auto !important; }
         .rack-chip { width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9); border: 4px dashed rgba(255,255,255,0.5); }
         .rack-chip:hover { transform: translateY(-5px) scale(1.1); border-color: white; }
@@ -140,11 +142,12 @@
         .mbj-internal-balance .hud-title { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; }
         .mbj-internal-balance .hud-val { font-size: 1.3rem; font-weight: 900; color: var(--credits); }
 
-        /* ================= RETRO HORSE DERBY - SPRITE SHEET ENGINE ================= */
+        /* ================= RETRO HORSE DERBY - PHOTO FINISH ================= */
         .hr-board { width: 900px; height: 600px; background: #0a0a0a; border: 4px solid #333; border-radius: 12px; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); margin: 0 auto;}
         .hr-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .hr-ticker { flex: 1; text-align: center; color: var(--credits); font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 900; text-shadow: 0 0 10px var(--credits); padding: 10px; background: #111; border: 2px solid #333; border-radius: 8px; margin: 0 20px; text-transform: uppercase;}
         
+        /* Fixed Width Tabular Timer */
         #hr-timer-box { width: 100px; text-align: center; }
         #hr-timer { font-variant-numeric: tabular-nums; display: inline-block; width: 40px;}
 
@@ -159,7 +162,8 @@
         .track-moving .hr-track-bg { animation: scrollTrack 0.4s linear infinite; }
         @keyframes scrollTrack { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-        .hr-starting-gate { position: absolute; left: 0; top: 30%; bottom: 0; width: 15%; background: #555; border-right: 5px solid #222; z-index: 20; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* The Steel Starting Gate */
+        .hr-starting-gate { position: absolute; left: 0; top: 30%; bottom: 0; width: 15%; background: repeating-linear-gradient(to bottom, #555 0px, #555 15px, #444 15px, #444 20px); border-right: 8px solid #222; z-index: 20; transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 20px rgba(0,0,0,0.8);}
         .gate-open { transform: translateX(-100%); }
 
         .hr-finish-line { position: absolute; right: -100px; top: 0; bottom: 0; width: 40px; background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-color: #fff; z-index: 5; border-left: 6px solid #ffcc00; box-shadow: -15px 0 30px rgba(0,0,0,0.6); }
@@ -167,18 +171,24 @@
         .hr-lanes-overlay { position: absolute; bottom: 0; width: 100%; height: 70%; display: flex; flex-direction: column; justify-content: space-evenly; z-index: 10; }
         .hr-lane { width: 100%; height: 16.6%; border-bottom: 2px dashed rgba(255,255,255,0.15); position: relative; display: flex; align-items: center; }
         
-        .hr-horse-group { position: absolute; left: 5%; display: flex; align-items: center; justify-content: center; z-index: 15; transition: left 0.1s linear; transform: scaleX(-1); }
+        .hr-horse-group { position: absolute; left: 5%; display: flex; align-items: center; justify-content: center; z-index: 15; transition: left 0.1s linear, opacity 1s; transform: scaleX(-1); }
         
-        /* The GIF Engine tied to your uploaded image */
         .hr-gif { height: 50px; filter: drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); pointer-events: none;}
         
-        /* Mathematical Hue Rotation to dye the single giphy.gif */
         .horse-Red .hr-gif { filter: hue-rotate(0deg) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Blue .hr-gif { filter: hue-rotate(220deg) brightness(1.2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Green .hr-gif { filter: hue-rotate(120deg) brightness(1.1) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Yellow .hr-gif { filter: hue-rotate(50deg) brightness(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Purple .hr-gif { filter: hue-rotate(280deg) brightness(1.1) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Orange .hr-gif { filter: hue-rotate(30deg) brightness(1.2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+
+        /* Photo Finish Spotlight Elements */
+        .winner-glow { filter: drop-shadow(0 0 15px white); transform: scaleX(-1) scale(1.1) !important; z-index: 50 !important; }
+        .loser-fade { opacity: 0.3; }
+
+        /* Immersive Dust Particles */
+        .running::after { content: ''; position: absolute; bottom: -5px; left: -20px; width: 15px; height: 10px; background: rgba(92, 58, 33, 0.6); border-radius: 50%; animation: kickDust 0.3s infinite; pointer-events: none;}
+        @keyframes kickDust { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(-30px, -10px) scale(3); opacity: 0; } }
 
         .hr-controls-area { margin-top: 15px; display: flex; flex-direction: column; gap: 15px; }
         .hr-bet-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; width: 100%; }
@@ -218,7 +228,7 @@
                     <i class="fas fa-horse-head" style="font-size:4rem; color: var(--danger);"></i>
                     <div>
                         <div class="game-title" style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">GIF Engine & Camera Stop</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Photo Finish & Dust Particles</div>
                     </div>
                 </div>
             </div>
@@ -380,8 +390,11 @@
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-    function generateCardHTML(c, isHidden = false, animate = true) {
-        let animClass = animate ? 'anim-fly-in' : '';
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false) {
+        let animClass = '';
+        if(animateIn) animClass = 'anim-fly-in';
+        if(animateFlip) animClass = 'anim-flip';
+        
         if(isHidden) return `<div class="mbj-card card-back ${animClass}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
@@ -417,18 +430,7 @@
             let html = `<div class="mbj-seat-anchor ${activeClass} ${dimClass}" id="mbj-anchor-${i}">`;
             html += `<div class="seat-glow"></div>`;
             
-            // Action Buttons (Moved ABOVE the cards!)
-            if (isMySeatTurn && mbjGameState === 'PLAYER_TURN' && isMe) {
-                let activeHand = s.hands[activeTurnObj.handIdx];
-                let canDouble = activeHand && activeHand.cards.length === 2;
-                html += `<div class="seat-actions-wrapper">
-                            <button class="mbj-action-btn hit" onclick="socket.emit('mbjAction', {type:'hit'})"><i class="fas fa-plus"></i></button>
-                            <button class="mbj-action-btn stand" onclick="socket.emit('mbjAction', {type:'stand'})"><i class="fas fa-hand-paper"></i></button>
-                            <button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})" ${canDouble ? '' : 'disabled'}>x2</button>
-                         </div>`;
-            }
-
-            // Render Flexbox Cards (Centered dynamically!)
+            // Render Flexbox Cards UPWARD
             html += `<div class="mbj-hand-container">`;
             if (s && s.hands && s.hands.length > 0) {
                 let currentHandCount = s.hands[0].cards.length;
@@ -438,7 +440,7 @@
                     if(hand.cards.length > 0 && hand.status !== 'BUST') { html += `<div class="mbj-hand-score">${hand.score}</div>`; }
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
-                        html += generateCardHTML(c, false, animateThisCard);
+                        html += generateCardHTML(c, false, animateThisCard, false);
                     });
                     if(hand.status && hand.status !== 'WAITING' && hand.status !== 'PLAYING') {
                         let stClass = hand.status === 'BUST' ? 'status-bust' : (hand.status === 'BLACKJACK' ? 'status-bj' : '');
@@ -451,6 +453,7 @@
             }
             html += `</div>`;
 
+            // Seat Circle & Chip Bottom Right
             html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
             if (s) {
                 let totalSeatBet = s.hands && s.hands.length > 0 ? s.hands.reduce((sum, h)=>sum+h.bet, 0) : s.bet || 0;
@@ -462,13 +465,25 @@
             }
             html += `</div>`; 
 
+            // Name
             let nameHTML = s ? s.username : 'EMPTY';
             html += `<div class="seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${mbjGameState==='BETTING' || s ? 1 : 0.2};" id="seat-name-${i}">`;
             html += nameHTML;
             html += `</div>`;
+            
+            // Action Buttons spawned SAFELY BELOW the Name
+            if (isMySeatTurn && mbjGameState === 'PLAYER_TURN' && isMe) {
+                let activeHand = s.hands[activeTurnObj.handIdx];
+                let canDouble = activeHand && activeHand.cards.length === 2;
+                html += `<div class="seat-actions-wrapper">
+                            <button class="mbj-action-btn hit" onclick="socket.emit('mbjAction', {type:'hit'})"><i class="fas fa-plus"></i></button>
+                            <button class="mbj-action-btn stand" onclick="socket.emit('mbjAction', {type:'stand'})"><i class="fas fa-hand-paper"></i></button>
+                            <button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})" ${canDouble ? '' : 'disabled'}>x2</button>
+                         </div>`;
+            }
 
             if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
-                html += `<div style="margin-top:5px;"><button class="btn-play" onclick="socket.emit('mbjLeaveSeat');" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`;
+                html += `<div style="margin-top:5px; position: absolute; top: 120%;"><button class="btn-play" onclick="socket.emit('mbjLeaveSeat');" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`;
             }
             html += `</div>`; 
             cont.innerHTML += html;
@@ -518,8 +533,8 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, 0); 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, 0.4); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false); 
                 setTimeout(() => { dBadge.style.display = 'flex'; dBadge.innerText = data.dealerHand[0].bjVal; }, 1000);
             } 
         } 
@@ -534,13 +549,15 @@
             renderMBJSeats(data.seats); 
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
             if(dHand) {
-                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false);
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, true);
+                // Card 1 stays face up, Card 2 triggers the 3D Flip
+                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false);
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true); 
                 dBadge.innerText = getBJScore(data.dealerHand.slice(0,2));
+                
                 const drawRemaining = async () => {
-                    await delay(800);
+                    await delay(800); // Dramatic pause
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true); 
+                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false); 
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
                         await delay(800); 
                     }
@@ -574,7 +591,7 @@
     });
 
     // =========================================================================
-    // RETRO HORSE DERBY LOGIC (GIF Engine & Start Gate)
+    // RETRO HORSE DERBY LOGIC (Photo Finish AI & Particles)
     // =========================================================================
     const hexColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
     
@@ -654,9 +671,15 @@
         document.getElementById('hr-environment').classList.add('track-moving');
         
         let fLineEl = document.getElementById('hr-finish-line');
-        if(fLineEl) { fLineEl.style.transition = 'right 1.5s ease-out'; fLineEl.style.right = '-100px'; }
+        if(fLineEl) { fLineEl.style.transition = 'right 2s ease-out'; fLineEl.style.right = '-100px'; }
         
         if(hrRaceInterval) clearInterval(hrRaceInterval);
+
+        horses.forEach(h => {
+            let el = document.getElementById('horse-' + h);
+            // Inject Dust Particles
+            if (el) { el.style.left = '5%'; el.classList.add('running'); el.classList.remove('loser-fade', 'winner-glow'); }
+        });
 
         let nextTargetUpdate = startTime + 500;
         let sprintTriggered = false;
@@ -665,16 +688,23 @@
             let now = Date.now(); let elapsed = now - startTime; let timeRemaining = duration - elapsed;
 
             if (timeRemaining > 3000) {
+                // PHOTO FINISH AI: Keep the pack incredibly tight in the center (40% to 55%)
                 if (now > nextTargetUpdate) {
-                    horses.forEach(h => { targetPos[h] = 10 + (Math.random() * 40); });
-                    nextTargetUpdate = now + 800 + Math.random() * 800; 
+                    horses.forEach(h => { targetPos[h] = 40 + (Math.random() * 15); });
+                    nextTargetUpdate = now + 600 + Math.random() * 600; 
                 }
             } else {
                 if (!sprintTriggered) {
                     sprintTriggered = true;
+                    // Stop scrolling background
                     document.getElementById('hr-environment').classList.remove('track-moving'); 
-                    if (fLineEl) { fLineEl.style.transition = 'none'; fLineEl.style.right = '10%'; }
-                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 88 : 30 + (Math.random() * 40); });
+                    // Bring in Finish Line
+                    if (fLineEl) { fLineEl.style.transition = 'none'; fLineEl.style.right = '5%'; }
+                    
+                    // Winner cleanly breaks away from the pack
+                    horses.forEach(h => { 
+                        targetPos[h] = (h === data.winner) ? 90 : 45 + (Math.random() * 15); 
+                    });
                 }
             }
 
@@ -682,13 +712,16 @@
                 clearInterval(hrRaceInterval);
                 horses.forEach(h => {
                     let el = document.getElementById('horse-' + h);
-                    if(el) { el.style.left = (h === data.winner ? 88 : Math.min(currentPos[h], 80)) + '%'; }
+                    if(el) { 
+                        el.style.left = (h === data.winner ? 90 : Math.min(currentPos[h], 80)) + '%'; 
+                        el.classList.remove('running'); // Stop dust
+                    }
                 });
                 return;
             }
 
             horses.forEach(h => {
-                let speed = (timeRemaining <= 3000 && h === data.winner) ? 0.08 : 0.03;
+                let speed = (timeRemaining <= 3000 && h === data.winner) ? 0.08 : 0.05;
                 currentPos[h] += (targetPos[h] - currentPos[h]) * speed;
                 let el = document.getElementById('horse-' + h);
                 if(el) el.style.left = currentPos[h] + '%';
@@ -702,6 +735,15 @@
         document.getElementById('hr-ticker').innerText = `${w.toUpperCase()} WINS!`;
         document.getElementById('hr-ticker').style.color = hexColors[w];
         
+        // WINNER SPOTLIGHT
+        ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach(c => {
+            let el = document.getElementById('horse-' + c);
+            if (el) {
+                if (c === w) el.classList.add('winner-glow');
+                else el.classList.add('loser-fade');
+            }
+        });
+
         let myPayout = data.payouts ? (data.payouts[myUsername] || 0) : 0;
         if (myPayout > 0) showLocalFlash('horserace', `WON +${myPayout} TC`, 'success');
         else showLocalFlash('horserace', `RACE FINISHED`, 'error');
