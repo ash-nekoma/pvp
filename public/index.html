@@ -7,213 +7,897 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
-        /* ================= BASE STYLES ================= */
-        :root { --ps-bg: #000814; --ps-glow: #00a2ff; --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15); --danger: #ff3366; --success: #00e676; --credits: #ffb400; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
+        /* ================= BASE STYLES & LAYOUT ================= */
+        :root { 
+            --ps-bg: #000814; 
+            --ps-glow: #00a2ff; 
+            --glass-bg: rgba(0, 10, 25, 0.75); 
+            --glass-border: rgba(255, 255, 255, 0.15); 
+            --danger: #ff3366; 
+            --success: #00e676; 
+            --credits: #ffb400; 
+        }
         
-        /* THIS IS THE FIX: Direct Flex Body prevents 0px collapse */
-        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh; width: 100vw; overflow: hidden; user-select: none; display: flex; flex-direction: column; margin: 0; padding: 0; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Outfit', sans-serif; 
+            outline: none; 
+            user-select: none;
+        }
+        
+        /* Strict column layout guarantees no blank screens */
+        body { 
+            background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
+            color: white; 
+            height: 100vh; 
+            width: 100vw; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
         input, textarea { user-select: auto; }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
-        
-        .topbar { background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; }
-        .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer;}
-        
-        /* Main Wrapper safely consumes remaining 100vh space */
-        .main-wrapper { flex-grow: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
-        .view-container { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
-        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
-        .btn-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; }
-
-        .btn-back-fixed { position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
-        .btn-back-fixed:hover { background: white; color: black; }
+        .topbar { 
+            flex: 0 0 75px; 
+            background: rgba(0, 5, 15, 0.95); 
+            border-bottom: 1px solid var(--glass-border); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 25px; 
+            z-index: 1000; 
+        }
         
-        .lobby-modes-container { display: flex; gap: 40px; }
-        .game-card { width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-        .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
+        .brand-title { 
+            font-weight: 900; 
+            letter-spacing: 2px; 
+            font-size: 1.5rem; 
+            text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); 
+            cursor: pointer;
+        }
         
-        .local-flash { position: fixed; bottom: 25px; right: 25px; z-index: 9999; color: var(--danger); font-size: 1.2rem; font-weight: 900; text-transform: uppercase; opacity: 0; display: none; text-shadow: 0 2px 10px rgba(0,0,0,0.9); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 8px; border: 1px solid var(--danger); }
-        .local-flash.show { display: block; animation: flashAnim 2.5s forwards; }
-        .local-flash.success { color: var(--success); border-color: var(--success); }
-        @keyframes flashAnim { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
-
-        /* ================= VIP BLACKJACK - FLEX ROW ARCHITECTURE ================= */
-        .mbj-board { width: 1200px; height: 600px; background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); border-radius: 20px; position: relative; box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8); border: 15px solid #2e1a10; overflow: hidden; }
-        .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(255,255,255,0.15); border-radius: 10px; pointer-events: none; z-index: 1;}
+        /* Main wrapper automatically calculates height */
+        .main-wrapper { 
+            flex: 1; 
+            position: relative; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden;
+        }
         
-        .mbj-table-text { position: absolute; top: 200px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; width: 100%; z-index: 2; }
-        .mbj-table-text h1 { font-size: 3.5rem; letter-spacing: 8px; margin-bottom: 5px; color: rgba(255,255,255,0.15); font-family: 'Outfit'; }
-        .mbj-table-text p { font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,215,0,0.3); }
+        /* View container forces games to center */
+        .view-container { 
+            position: absolute; 
+            inset: 0; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            width: 100%; 
+            height: 100%; 
+        }
 
-        .mbj-dealer-area { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 20; }
-        .mbj-shoe { position: absolute; top: 30px; right: 30px; width: 65px; height: 100px; background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 4px solid #555; border-radius: 8px; box-shadow: -10px 15px 25px rgba(0,0,0,0.8); z-index: 5; }
+        .btn-play { 
+            background: rgba(255,255,255,0.1); 
+            color: white; 
+            border: 1px solid var(--glass-border); 
+            padding: 12px 15px; 
+            border-radius: 8px; 
+            font-weight: 900; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            text-transform: uppercase; 
+        }
+        
+        .btn-play:hover:not(:disabled) { 
+            background: white; 
+            color: black; 
+            transform: translateY(-2px); 
+        }
+        
+        .btn-play:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
+        
+        .input-control { 
+            width: 100%; 
+            padding: 12px 15px; 
+            background: rgba(0,0,0,0.5); 
+            border: 1px solid var(--glass-border); 
+            color: white; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            text-align: center; 
+        }
 
-        .mbj-timer-display { position: absolute; top: 120px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); padding: 5px 30px; border-radius: 50px; border: 1px solid var(--ps-glow); display: none; flex-direction: column; align-items: center; box-shadow: 0 5px 15px rgba(0,162,255,0.3); z-index: 20; }
-        .mbj-timer-display .hud-title { color: var(--ps-glow); font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
-        .mbj-timer-display .hud-val { color: white; font-family: 'Rajdhani', monospace; font-size: 1.8rem; font-weight: 900; line-height: 1; }
+        .btn-back-fixed { 
+            position: absolute; 
+            top: 20px; 
+            left: 25px; 
+            z-index: 1000; 
+            background: rgba(0,0,0,0.8); 
+            border: 1px solid var(--glass-border); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        
+        .btn-back-fixed:hover { 
+            background: white; 
+            color: black; 
+        }
+        
+        .lobby-modes-container { 
+            display: flex; 
+            gap: 40px; 
+        }
+        
+        .game-card { 
+            width: 320px; 
+            height: 380px; 
+            background: #020813; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            padding: 30px 20px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+        }
+        
+        .game-card:hover { 
+            transform: translateY(-8px); 
+            border-color: var(--ps-glow); 
+            box-shadow: 0 15px 40px rgba(0,162,255,0.2); 
+        }
+        
+        .local-flash { 
+            position: fixed; 
+            bottom: 25px; 
+            right: 25px; 
+            z-index: 9999; 
+            color: var(--danger); 
+            font-size: 1.2rem; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            opacity: 0; 
+            display: none; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9); 
+            background: rgba(0,0,0,0.8); 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            border: 1px solid var(--danger); 
+        }
+        
+        .local-flash.show { 
+            display: block; 
+            animation: flashAnim 2.5s forwards; 
+        }
+        
+        .local-flash.success { 
+            color: var(--success); 
+            border-color: var(--success); 
+        }
+        
+        @keyframes flashAnim { 
+            0% { opacity: 0; transform: translateY(20px); } 
+            15% { opacity: 1; transform: translateY(0); } 
+            85% { opacity: 1; transform: translateY(0); } 
+            100% { opacity: 0; transform: translateY(-10px); } 
+        }
+
+        /* ================= VIP BLACKJACK UI ================= */
+        .mbj-top-ui { 
+            width: 1200px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+            z-index: 100; 
+        }
+        
+        .mbj-top-capsule { 
+            background: rgba(0,0,0,0.8); 
+            border: 1px solid var(--glass-border); 
+            padding: 8px 30px; 
+            border-radius: 50px; 
+            text-align: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
+        }
+        
+        .mbj-board { 
+            width: 1200px; 
+            height: 550px; 
+            background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); 
+            border-radius: 20px; 
+            position: relative; 
+            box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8); 
+            border: 15px solid #2e1a10; 
+            overflow: hidden; 
+        }
+        
+        .mbj-table-line { 
+            position: absolute; 
+            inset: 15px; 
+            border: 2px solid rgba(255,255,255,0.15); 
+            border-radius: 10px; 
+            pointer-events: none; 
+            z-index: 1;
+        }
+        
+        .mbj-logo { 
+            position: absolute; 
+            top: 45%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            opacity: 0.15; 
+            pointer-events: none; 
+            width: 100%;
+            z-index: 2;
+        }
+        
+        .mbj-logo h1 {
+            font-size: 3.5rem; 
+            letter-spacing: 8px; 
+            margin-bottom: 5px;
+        }
+        
+        .mbj-logo p {
+            font-weight: 800; 
+            font-size: 0.85rem; 
+            letter-spacing: 2px;
+        }
+
+        .mbj-dealer-area { 
+            position: absolute; 
+            top: 40px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            z-index: 20; 
+        }
+        
+        .mbj-shoe { 
+            position: absolute; 
+            top: 30px; 
+            right: 30px; 
+            width: 65px; 
+            height: 100px; 
+            background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); 
+            border: 4px solid #555; 
+            border-radius: 8px; 
+            box-shadow: -10px 15px 25px rgba(0,0,0,0.8); 
+            z-index: 5; 
+        }
 
         /* HORIZONTAL FLEXBOX ROW FOR SEATS */
-        #mbj-seats-row { position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: space-evenly; align-items: flex-end; padding: 0 20px; z-index: 10; pointer-events: none;}
-        .mbj-seat-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 140px; pointer-events: auto; position: relative; }
-
-        .mbj-hand-container { display: flex; justify-content: center; position: relative; margin-bottom: 10px; min-height: 80px; width: 100%; }
+        #mbj-seats-row { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 0; 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-evenly; 
+            align-items: flex-end; 
+            padding: 0 20px; 
+            z-index: 10; 
+            pointer-events: none;
+        }
         
-        .mbj-action-row { display: flex; gap: 6px; margin-bottom: 10px; height: 35px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .mbj-action-row.show { opacity: 1; pointer-events: auto; }
-        .mbj-action-btn { width: 35px; height: 35px; border-radius: 50%; background: #111; border: 2px solid rgba(255,255,255,0.3); color: white; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 5px 10px rgba(0,0,0,0.9); }
-        .mbj-action-btn:hover:not(:disabled) { transform: scale(1.15); border-color: white; }
-        .mbj-action-btn.hit { background: #008040; } .mbj-action-btn.stand { background: #9b0022; } .mbj-action-btn.double { background: #997a00; font-size: 0.7rem; }
+        /* VERTICAL FLEXBOX FOR SEAT TO PREVENT OVERLAPS */
+        .mbj-seat-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-end; 
+            width: 140px; 
+            pointer-events: auto; 
+            position: relative; 
+        }
 
-        .mbj-circle-container { position: relative; width: 65px; height: 65px; margin-bottom: 8px; }
-        .mbj-seat-circle { width: 100%; height: 100%; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.5); z-index: 5; }
+        /* Cards Flexbox */
+        .mbj-hand-container { 
+            display: flex; 
+            justify-content: center; 
+            position: relative; 
+            margin-bottom: 10px; 
+            min-height: 85px; 
+            width: 100%; 
+        }
+        
+        /* Action buttons below cards, above circle */
+        .mbj-action-row { 
+            display: flex; 
+            gap: 6px; 
+            margin-bottom: 10px; 
+            height: 35px; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.3s; 
+        }
+        
+        .mbj-action-row.show { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+        
+        .mbj-action-btn { 
+            width: 35px; 
+            height: 35px; 
+            border-radius: 50%; 
+            background: #111; 
+            border: 2px solid rgba(255,255,255,0.3); 
+            color: white; 
+            font-size: 0.9rem; 
+            font-weight: 900; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.2s; 
+            box-shadow: 0 5px 10px rgba(0,0,0,0.9); 
+        }
+        
+        .mbj-action-btn:hover:not(:disabled) { transform: scale(1.15); border-color: white; }
+        .mbj-action-btn.hit { background: #008040; } 
+        .mbj-action-btn.stand { background: #9b0022; } 
+        .mbj-action-btn.double { background: #997a00; font-size: 0.7rem; }
+        .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* The Circle */
+        .mbj-circle-container { 
+            position: relative; 
+            width: 65px; 
+            height: 65px; 
+            margin-bottom: 8px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mbj-seat-circle { 
+            width: 100%; 
+            height: 100%; 
+            border: 3px solid rgba(255,255,255,0.3); 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            background: rgba(0,0,0,0.4); 
+            z-index: 5; 
+        }
+        
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 3px solid var(--credits); background: transparent; cursor: default; }
         
-        .mbj-chip { position: absolute; bottom: -5px; right: -10px; background: #222; border: 3px dashed #ffcc00; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.65rem; font-weight: 900; color: white; box-shadow: 0 5px 10px rgba(0,0,0,0.9); z-index: 10;}
-        .mbj-seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative;}
+        /* The Center Chip - Positioned perfectly in the middle of the circle */
+        .mbj-chip { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 0.65rem; 
+            font-weight: 900; 
+            color: white; 
+            box-shadow: 0 5px 10px rgba(0,0,0,0.9); 
+            z-index: 10;
+            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.2) 0deg 20deg, transparent 20deg 40deg), var(--c-bg);
+            border: 2px solid white;
+            text-shadow: 1px 1px 2px black;
+        }
+        
+        .mbj-chip.ghost { opacity: 0.6; border-color: #00a2ff; }
 
-        /* Cards & Animation */
-        .mbj-card { width: 55px; height: 80px; background: white; border-radius: 6px; box-shadow: -3px 3px 10px rgba(0,0,0,0.6); position: relative; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; margin-left: -35px; transform: translateZ(0); }
+        .mbj-seat-name { 
+            font-weight: 900; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9); 
+            color: white; 
+            text-align: center; 
+            position: relative;
+        }
+
+        /* Card Styles */
+        .mbj-card { 
+            width: 55px; 
+            height: 80px; 
+            background: white; 
+            border-radius: 6px; 
+            box-shadow: -3px 3px 10px rgba(0,0,0,0.6); 
+            position: relative; 
+            font-family: 'Outfit', sans-serif; 
+            color: black; 
+            border: 1px solid #ccc; 
+            margin-left: -35px; 
+            transform: translateZ(0); 
+            font-weight: 900;
+        }
+        
         .mbj-card:first-child { margin-left: 0; } 
-        .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; font-weight: 900;}
-        .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; font-weight: 900; transform: rotate(180deg); }
+        
+        .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; }
+        .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; transform: rotate(180deg); }
         .card-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; }
-        .card-red { color: #e60000; } .card-black { color: #000; }
+        .card-red { color: #e60000; } 
+        .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
 
-        .mbj-hand-score { position: absolute; top: -10px; left: -10px; width: 24px; height: 24px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 0.85rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8);}
-        .dealer-score-badge { position: absolute; top: -5px; left: -25px; width: 28px; height: 28px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 1rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8);}
+        .mbj-hand-score { 
+            position: absolute; 
+            top: -10px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #222; 
+            border: 2px solid white; 
+            border-radius: 50%; 
+            font-weight: 900; 
+            font-size: 0.85rem; 
+            color: white; 
+            z-index: 20; 
+            padding: 4px 8px;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+        
+        .dealer-score-badge { 
+            position: absolute; 
+            top: -5px; 
+            left: -25px; 
+            width: 28px; 
+            height: 28px; 
+            background: #222; 
+            border: 2px solid white; 
+            border-radius: 50%; 
+            font-weight: 900; 
+            font-size: 1rem; 
+            color: white; 
+            z-index: 20; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
 
         .anim-fly-in { animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; opacity: 0; }
-        @keyframes flyIn { 0% { opacity: 0; transform: translate(500px, -200px) scale(0.3) rotate(90deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } }
-        .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
-        @keyframes flipCard { 0% { transform: rotateY(180deg); } 100% { transform: rotateY(0deg); } }
+        @keyframes flyIn { 
+            0% { opacity: 0; transform: translate(500px, -200px) scale(0.3) rotate(90deg); } 
+            100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } 
+        }
         
-        .payout-flare { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.2rem; font-weight: 900; text-shadow: 0 2px 5px black; animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap;}
-        @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -20px); } 80% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -60px); } }
+        .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
+        @keyframes flipCard { 
+            0% { transform: rotateY(180deg); } 
+            100% { transform: rotateY(0deg); } 
+        }
+        
+        .payout-flare { 
+            position: absolute; 
+            bottom: 100%; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            color: #00e676; 
+            font-size: 1.2rem; 
+            font-weight: 900; 
+            text-shadow: 0 2px 5px black; 
+            animation: floatUp 2s forwards; 
+            z-index: 500; 
+            pointer-events: none; 
+            white-space: nowrap;
+        }
+        
+        @keyframes floatUp { 
+            0% { opacity: 0; transform: translate(-50%, 0); } 
+            20% { opacity: 1; transform: translate(-50%, -20px); } 
+            80% { opacity: 1; transform: translate(-50%, -40px); } 
+            100% { opacity: 0; transform: translate(-50%, -60px); } 
+        }
 
         .dimmed { opacity: 0.3; filter: grayscale(80%); }
-        .seat-glow { position: absolute; top: -40px; left: -40px; width: 145px; height: 145px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
+        .seat-glow { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 145px; height: 145px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
         .active-turn { opacity: 1 !important; z-index: 100; filter: grayscale(0) !important; }
         .active-turn .seat-glow { display: block; animation: pulseGlow 2s infinite; }
-        @keyframes pulseGlow { 0% { transform: scale(0.9); opacity: 0.5;} 50% { transform: scale(1.1); opacity: 1;} 100% { transform: scale(0.9); opacity: 0.5;} }
+        @keyframes pulseGlow { 
+            0% { transform: translateX(-50%) scale(0.9); opacity: 0.5;} 
+            50% { transform: translateX(-50%) scale(1.1); opacity: 1;} 
+            100% { transform: translateX(-50%) scale(0.9); opacity: 0.5;} 
+        }
+        
+        .turn-badge {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ps-glow);
+            color: black;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 10px;
+            z-index: 30;
+            animation: floatBadge 1s infinite;
+        }
+        @keyframes floatBadge {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
+        }
 
-        /* THE CHIP RACK UI */
-        .chip-rack-container { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: none; background: rgba(0,0,0,0.85); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--glass-border); gap: 15px; align-items: center; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.9); pointer-events: auto; }
-        .rack-chip { width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9); border: 4px dashed rgba(255,255,255,0.5); }
-        .rack-chip:hover { transform: translateY(-5px) scale(1.1); border-color: white; }
-        .chip-10 { background: #444; color: white; } .chip-100 { background: #00a2ff; color: white; } .chip-1k { background: #ff3366; color: white; } .chip-10k { background: #00e676; color: black; } .chip-50k { background: #ffcc00; color: black; }
-        .rack-btn { padding: 10px 15px; border-radius: 50px; font-weight: 900; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.8rem;}
+        /* THE CHIP RACK UI (Below the table) */
+        .chip-rack-container { 
+            width: 1200px;
+            margin-top: 15px;
+            display: none; 
+            background: rgba(0,0,0,0.85); 
+            padding: 15px 20px; 
+            border-radius: 20px; 
+            border: 1px solid var(--glass-border); 
+            justify-content: center;
+            gap: 15px; 
+            align-items: center; 
+            z-index: 9999; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9); 
+            pointer-events: auto; 
+        }
+        
+        .rack-chip { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 0.8rem; 
+            font-weight: 900; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9); 
+            border: 3px solid white; 
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.2) 0deg 20deg, transparent 20deg 40deg), var(--c-bg);
+        }
+        
+        .rack-chip:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 0 15px white; }
+        
+        .rack-btn { 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            font-weight: 900; 
+            border: none; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            font-size: 0.9rem;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        
         .rack-btn-clear { background: rgba(255,255,255,0.1); color: white; }
+        .rack-btn-clear:hover { background: rgba(255,51,102, 0.8); }
         .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
-
-        .mbj-internal-balance { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 12px; display: flex; flex-direction: column; align-items: flex-start; color: white; z-index: 10; pointer-events: none;}
-        .mbj-internal-balance .hud-title { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; }
-        .mbj-internal-balance .hud-val { font-size: 1.3rem; font-weight: 900; color: var(--credits); }
-
-        /* ================= RETRO HORSE DERBY - GRID ARCHITECTURE & PARALLAX ================= */
-        .hr-board { width: 900px; height: 600px; background: #0a0a0a; border: 4px solid #333; border-radius: 12px; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); z-index: 10;}
-        .hr-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .hr-ticker { flex: 1; text-align: center; color: var(--credits); font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 900; text-shadow: 0 0 10px var(--credits); padding: 10px; background: #111; border: 2px solid #333; border-radius: 8px; margin: 0 20px; text-transform: uppercase;}
+        .rack-btn-confirm:hover { background: white; }
         
-        #hr-timer-box { width: 100px; text-align: center; }
-        #hr-timer { font-variant-numeric: tabular-nums; display: inline-block; width: 40px;}
+        .custom-input {
+            width: 100px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: #111;
+            color: white;
+            font-weight: 900;
+            text-align: center;
+        }
 
-        .hr-track-window { flex: 1; border: 4px solid #222; position: relative; overflow: hidden; border-radius: 8px; background: #87CEEB; display: flex; flex-direction: column;}
+        /* ================= RETRO HORSE DERBY ================= */
+        .hr-board { 
+            width: 900px; 
+            height: 600px; 
+            background: #0a0a0a; 
+            border: 4px solid #333; 
+            border-radius: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 20px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+        }
         
-        .hr-hills { position: absolute; bottom: 70%; width: 200%; height: 30%; background: radial-gradient(circle at 50% 100%, #228B22 0%, #006400 100%); border-radius: 50% 50% 0 0; opacity: 0.8; z-index: 1;}
-        .hr-fence { position: absolute; bottom: 70%; width: 200%; height: 15px; border-top: 3px solid white; border-bottom: 3px solid white; background: rgba(255,255,255,0.2); z-index: 2;}
-        .hr-bg-dirt { position: absolute; bottom: 0; width: 200%; height: 70%; background: repeating-linear-gradient(90deg, #4a3026 0px, #4a3026 40px, #3d251d 40px, #3d251d 80px); z-index: 3;}
+        .hr-top-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 15px; 
+        }
         
-        .track-moving .hr-hills { animation: scrollTrack 15s linear infinite; }
-        .track-moving .hr-fence { animation: scrollTrack 3s linear infinite; }
+        .hr-ticker { 
+            flex: 1; 
+            text-align: center; 
+            color: var(--credits); 
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 1.5rem; 
+            font-weight: 900; 
+            text-shadow: 0 0 10px var(--credits); 
+            padding: 10px; 
+            background: #111; 
+            border: 2px solid #333; 
+            border-radius: 8px; 
+            margin: 0 20px; 
+            text-transform: uppercase;
+        }
+        
+        .hr-timer-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: white;
+        }
+        
+        #hr-timer { 
+            font-variant-numeric: tabular-nums; 
+            display: inline-block; 
+            width: 30px; 
+            text-align: center;
+        }
+
+        .hr-track-window { 
+            flex: 1; 
+            border: 4px solid #222; 
+            position: relative; 
+            overflow: hidden; 
+            border-radius: 8px; 
+            background: #87CEEB; 
+            display: flex; 
+            flex-direction: column;
+        }
+        
+        .hr-bg-grass { 
+            height: 20%; 
+            width: 100%; 
+            background: #2a8f3d; 
+            border-bottom: 4px solid white; 
+            z-index: 1; 
+            position: relative;
+        }
+        
+        .hr-bg-dirt { 
+            height: 80%; 
+            width: 200%; 
+            background: repeating-linear-gradient(90deg, #4a3026 0px, #4a3026 40px, #3d251d 40px, #3d251d 80px); 
+            z-index: 2; 
+            position: relative;
+        }
+        
         .track-moving .hr-bg-dirt { animation: scrollTrack 0.3s linear infinite; }
-        @keyframes scrollTrack { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .track-slowing .hr-bg-dirt { animation: scrollTrack 1.5s linear infinite; }
+        @keyframes scrollTrack { 
+            from { transform: translateX(0); } 
+            to { transform: translateX(-80px); } 
+        }
 
-        .hr-starting-gate { position: absolute; left: 0; top: 30%; bottom: 0; width: 15%; background: repeating-linear-gradient(to bottom, #555 0px, #555 15px, #444 15px, #444 20px); border-right: 8px solid #222; z-index: 20; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 20px rgba(0,0,0,0.8);}
-        .gate-open { transform: translateX(-100%); }
-
-        .hr-finish-line { position: absolute; right: -100px; top: 30%; bottom: 0; width: 40px; background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-color: #fff; z-index: 5; border-left: 6px solid #ffcc00; box-shadow: -15px 0 30px rgba(0,0,0,0.6); }
+        .hr-finish-line { 
+            position: absolute; 
+            right: -100px; 
+            top: 20%; 
+            bottom: 0; 
+            width: 40px; 
+            background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); 
+            background-size: 20px 20px; 
+            background-position: 0 0, 10px 10px; 
+            background-color: #fff; 
+            z-index: 5; 
+            border-left: 6px solid #ffcc00; 
+        }
         
-        .hr-lanes-grid { position: absolute; top: 30%; bottom: 0; width: 100%; display: grid; grid-template-rows: repeat(6, 1fr); z-index: 10; }
-        .hr-lane { width: 100%; height: 100%; border-bottom: 2px dashed rgba(255,255,255,0.15); display: flex; align-items: center; position: relative; }
+        /* Grid Architecture prevents vertical escapes */
+        .hr-lanes-grid { 
+            position: absolute; 
+            top: 20%; 
+            bottom: 0; 
+            width: 100%; 
+            display: grid; 
+            grid-template-rows: repeat(6, 1fr); 
+            z-index: 10; 
+        }
         
-        .hr-horse-group { position: absolute; left: 5%; display: flex; align-items: center; justify-content: center; z-index: 15; transition: left 0.1s linear, opacity 1s; transform: scaleX(-1); }
+        .hr-lane { 
+            width: 100%; 
+            height: 100%; 
+            border-bottom: 2px dashed rgba(255,255,255,0.15); 
+            display: flex; 
+            align-items: center; 
+            position: relative; 
+        }
         
-        .hr-horse-group.running::after { content: ''; position: absolute; bottom: -5px; left: -15px; width: 15px; height: 10px; background: rgba(92, 58, 33, 0.6); border-radius: 50%; animation: kick 0.3s infinite; pointer-events: none; }
-        @keyframes kick { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(-30px, -10px) scale(3); opacity: 0; } }
+        .hr-horse-group { 
+            position: absolute; 
+            left: 5%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 15; 
+            transition: left 0.1s linear, opacity 1s; 
+            transform: scaleX(-1); 
+        }
+        
+        .hr-gif { 
+            height: 50px; 
+            pointer-events: none;
+        }
+        
+        /* Exact Filter Adjustments to get Vivid Colors */
+        .horse-Red .hr-gif { filter: drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Blue .hr-gif { filter: hue-rotate(210deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Green .hr-gif { filter: hue-rotate(100deg) saturate(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Yellow .hr-gif { filter: hue-rotate(60deg) saturate(3) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Purple .hr-gif { filter: hue-rotate(270deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Orange .hr-gif { filter: hue-rotate(30deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
 
-        .hr-gif { height: 45px; filter: drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); pointer-events: none;}
-        .horse-Red .hr-gif { filter: saturate(3) hue-rotate(0deg) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Blue .hr-gif { filter: saturate(3) hue-rotate(220deg) brightness(1.2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Green .hr-gif { filter: saturate(3) hue-rotate(120deg) brightness(1.1) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Yellow .hr-gif { filter: saturate(3) hue-rotate(50deg) brightness(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Purple .hr-gif { filter: saturate(3) hue-rotate(280deg) brightness(1.1) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Orange .hr-gif { filter: saturate(3) hue-rotate(30deg) brightness(1.2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-
-        .winner-glow { filter: drop-shadow(0 0 15px white); transform: scaleX(-1) scale(1.1) !important; z-index: 50 !important; }
+        .winner-glow { 
+            filter: drop-shadow(0 0 15px white); 
+            transform: scaleX(-1) scale(1.1) !important; 
+            z-index: 50 !important; 
+        }
+        
         .loser-fade { opacity: 0.3; }
 
-        .hr-controls-area { margin-top: 15px; display: flex; flex-direction: column; gap: 15px; }
-        .hr-bet-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; width: 100%; }
-        .hr-bet-btn { background: #111; border: 2px solid #444; color: white; padding: 15px 5px; font-family: 'Rajdhani', sans-serif; font-weight: 900; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: 0.1s; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
-        .hr-bet-btn:hover:not(:disabled) { transform: translateY(-3px); border-color: white; }
-        .hr-bet-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .hr-controls-area { 
+            margin-top: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+        }
+        
+        .hr-bet-grid { 
+            display: grid; 
+            grid-template-columns: repeat(6, 1fr); 
+            gap: 10px; 
+        }
+        
+        .hr-bet-btn { 
+            background: #111; 
+            border: 2px solid #444; 
+            color: white; 
+            padding: 15px 5px; 
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: 900; 
+            font-size: 1.1rem; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: 0.1s; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 4px; 
+            position: relative; 
+        }
+        
+        .hr-bet-btn:hover:not(:disabled) { 
+            transform: translateY(-3px); 
+            border-color: white; 
+        }
+        
+        .hr-bet-btn:disabled { 
+            opacity: 0.4; 
+            cursor: not-allowed; 
+        }
+        
         .flash-bet { animation: flashBet 0.2s; }
-        @keyframes flashBet { 0% { background: white; color: black; } 100% { background: #111; color: white; } }
-        .hr-odds-text { color: var(--success); font-size: 0.9rem; text-shadow: 0 0 5px var(--success); }
+        @keyframes flashBet { 
+            0% { background: white; color: black; } 
+            100% { background: #111; color: white; } 
+        }
+        
+        .hr-odds-text { 
+            color: var(--success); 
+            font-size: 0.9rem; 
+            text-shadow: 0 0 5px var(--success); 
+        }
+        
+        .bet-badge {
+            font-size: 0.8rem;
+            color: var(--credits);
+            margin-top: 5px;
+            display: block;
+        }
     </style>
 </head>
 <body>
 
   <header class="topbar">
-      <div class="brand-title" onclick="backToHub()">STICK N' TRADE</div>
-      <div style="font-weight: 800; font-size: 1.1rem;"><i class="fas fa-user-circle" style="color:var(--ps-glow)"></i> <span id="player-name-display">Loading...</span></div>
+      <div class="brand-title" onclick="switchView('casino')">STICK N' TRADE</div>
+      <div style="font-weight: 800; font-size: 1.1rem;">
+          <i class="fas fa-user-circle" style="color:var(--ps-glow)"></i> 
+          <span id="player-name-display">Loading...</span>
+      </div>
   </header>
 
   <div class="main-wrapper">
       
-      <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()"><i class="fas fa-arrow-left"></i> LEAVE TABLE</button>
+      <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()">
+          <i class="fas fa-arrow-left"></i> LEAVE TABLE
+      </button>
       
       <div id="view-casino" class="view-container">
-        <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 15px rgba(0,0,0,0.8);">SELECT TABLE</h1>
+        <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">SELECT TABLE</h1>
         <div class="lobby-modes-container">
             <div class="game-card" onclick="openGame('mbj')">
                 <i class="fas fa-cards" style="font-size:4rem;"></i>
                 <div>
-                    <div class="game-title" style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Rigid Flexbox Alignment</div>
+                    <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Layout</div>
                 </div>
             </div>
             <div class="game-card" onclick="openGame('horserace')">
                 <i class="fas fa-horse-head" style="font-size:4rem; color: var(--danger);"></i>
                 <div>
-                    <div class="game-title" style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Grid Architecture & Gates</div>
+                    <div style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Smooth Physics Engine</div>
                 </div>
             </div>
         </div>
       </div>
 
       <div id="view-mbj" class="view-container hidden">
+          
+          <div class="mbj-top-ui">
+              <div class="mbj-top-capsule">
+                  <div style="font-size:0.7rem; color:gray; font-weight:900;">BALANCE</div>
+                  <div id="bj-bal" style="font-size:1.5rem; font-weight:900; color:var(--credits);">0 TC</div>
+              </div>
+              <div class="mbj-top-capsule">
+                  <div style="font-size:0.7rem; color:gray; font-weight:900;">TIMER</div>
+                  <div id="bj-timer" style="font-size:1.5rem; font-weight:900; color:white; font-family:'Rajdhani';">15</div>
+              </div>
+          </div>
+          
           <div class="mbj-board">
               <div class="mbj-table-line"></div>
               
-              <div class="mbj-table-text">
+              <div class="mbj-logo">
                   <h1>BLACKJACK</h1>
-                  <p>BLACKJACK PAYS 3 TO 2<br>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
-              </div>
-
-              <div class="mbj-timer-display" id="mbj-timer-box">
-                  <div class="hud-title" id="mbj-timer-title">PLACE BETS</div>
-                  <div class="hud-val" id="mbj-timer">15</div>
+                  <p>PAYS 3 TO 2</p>
               </div>
 
               <div class="mbj-dealer-area">
@@ -222,22 +906,21 @@
               </div>
               
               <div class="mbj-shoe"></div>
-              
-              <div class="mbj-internal-balance">
-                  <div class="hud-title">BALANCE</div>
-                  <div class="hud-val" id="mbj-hud-balance">0 TC</div>
-              </div>
 
               <div id="mbj-seats-row"></div>
           </div>
 
           <div class="chip-rack-container" id="mbj-chip-rack">
               <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
-              <div class="rack-chip chip-10" onclick="addLocalBet(10)">10</div>
-              <div class="rack-chip chip-100" onclick="addLocalBet(100)">100</div>
-              <div class="rack-chip chip-1k" onclick="addLocalBet(1000)">1K</div>
-              <div class="rack-chip chip-10k" onclick="addLocalBet(10000)">10K</div>
-              <div class="rack-chip chip-50k" onclick="addLocalBet(50000)">50K</div>
+              <div class="rack-chip" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
+              <div class="rack-chip" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
+              <div class="rack-chip" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
+              <div class="rack-chip" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
+              <div class="rack-chip" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
+              
+              <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
+              <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
+              
               <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
           </div>
       </div>
@@ -245,28 +928,28 @@
       <div id="view-horserace" class="view-container hidden">
           <div class="hr-board">
               <div class="hr-top-bar">
-                  <div style="background:rgba(0,0,0,0.8); border:1px solid var(--glass-border); padding: 10px 20px; border-radius: 8px; color:white; font-weight:900; font-size:1.2rem; font-family: 'Rajdhani', sans-serif;" id="hr-timer-box"><i class="fas fa-clock" style="margin-right:10px;"></i> <span id="hr-timer">15</span></div>
+                  <div class="hr-timer-box">
+                      <i class="fas fa-clock"></i>
+                      <span id="hr-timer">15</span>
+                  </div>
                   <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
-                  <div style="background: rgba(0,0,0,0.7); border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 8px;">
-                      <div style="font-family:'Outfit'; font-size:0.7rem; color:var(--text-muted); font-weight:800;">BALANCE</div>
+                  <div style="background: rgba(0,0,0,0.7); border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 8px; text-align: right;">
+                      <div style="font-family:'Outfit'; font-size:0.7rem; color:gray; font-weight:800;">BALANCE</div>
                       <div id="hr-my-bal" style="font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:900; color:var(--credits);">0 TC</div>
                   </div>
               </div>
               
               <div class="hr-track-window" id="hr-environment">
-                  <div class="hr-hills"></div>
-                  <div class="hr-fence"></div>
+                  <div class="hr-bg-grass"></div>
                   <div class="hr-bg-dirt"></div>
                   
-                  <div class="hr-starting-gate" id="hr-gate"></div>
                   <div class="hr-finish-line" id="hr-finish-line"></div>
-
                   <div class="hr-lanes-grid" id="hr-lanes-container"></div>
               </div>
 
               <div class="hr-controls-area">
                   <div style="display:flex; gap:15px; justify-content:center;">
-                      <input type="number" id="hr-bet-input" class="input-control bet-input" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
+                      <input type="number" id="hr-bet-input" class="input-control" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';" value="100">
                   </div>
                   <div class="hr-bet-grid" id="hr-bet-grid"></div>
               </div>
@@ -286,23 +969,26 @@
     let localPendingBet = 0;
     let localSeatId = null;
     let renderedCardCount = {}; 
+    let myHRBets = {};
 
     window.onload = () => { socket.emit('login', { username: 'VIP_Tester', password: '123' }); };
     
     socket.on('loginSuccess', (data) => { 
         myUsername = data.username; 
-        myCredits = data.credits; 
-        document.getElementById('mbj-hud-balance').innerText = myCredits.toLocaleString() + ' TC';
-        document.getElementById('hr-my-bal').innerText = myCredits.toLocaleString() + ' TC';
+        updateBalance(data.credits);
         document.getElementById('player-name-display').innerText = myUsername;
         switchView('casino'); 
     });
     
     socket.on('balanceUpdateData', (data) => {
-        myCredits = data.credits;
-        document.getElementById('mbj-hud-balance').innerText = myCredits.toLocaleString() + ' TC';
-        document.getElementById('hr-my-bal').innerText = myCredits.toLocaleString() + ' TC';
+        updateBalance(data.credits);
     });
+
+    function updateBalance(amt) {
+        myCredits = amt;
+        document.getElementById('bj-bal').innerText = amt.toLocaleString() + ' TC';
+        document.getElementById('hr-my-bal').innerText = amt.toLocaleString() + ' TC';
+    }
 
     function showLocalFlash(msg, type='error') {
         let f = document.getElementById('flash-msg');
@@ -322,8 +1008,14 @@
     }
 
     function backToHub() {
-        if(activeGame === 'mbj') { socket.emit('mbjLeaveSeat'); document.getElementById('mbj-chip-rack').style.display='none'; }
-        if(activeGame === 'horserace' && hrState.status === 'RACING') { showLocalFlash("Wait for race to finish!", "error"); return; }
+        if(activeGame === 'mbj') { 
+            socket.emit('mbjLeaveSeat'); 
+            document.getElementById('mbj-chip-rack').style.display='none'; 
+        }
+        if(activeGame === 'horserace' && document.getElementById('hr-ticker').innerText === "AND THEY'RE OFF!") { 
+            showLocalFlash("Wait for race to finish!", "error"); 
+            return; 
+        }
         if(activeGame) socket.emit('leaveRoom', activeGame);
         activeGame = null;
         switchView('casino');
@@ -345,7 +1037,7 @@
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // VIP BLACKJACK (Vertical Flexbox Seats)
+    // VIP BLACKJACK 
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
@@ -387,15 +1079,24 @@
             let clickAction = canSit ? `socket.emit('mbjTakeSeat', ${i})` : ``; 
 
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
-            html += `<div class="seat-glow"></div>`;
             
             // 1. CARDS (Top)
             html += `<div class="mbj-hand-container">`;
             if (s && s.hands && s.hands.length > 0) {
                 let currentHandCount = s.hands[0].cards.length;
                 let previouslyRendered = renderedCardCount[i] || 0;
+                
+                // Score Badge above hand
+                if(hand.cards.length > 0 && hand.status !== 'BUST') { 
+                    html += `<div class="mbj-hand-score">${hand.score}</div>`; 
+                }
+                
+                // Turn Badge
+                if(isMySeatTurn) {
+                    html += `<div class="turn-badge">YOUR TURN</div>`;
+                }
+
                 s.hands.forEach((hand, hIdx) => {
-                    if(hand.cards.length > 0 && hand.status !== 'BUST') { html += `<div class="mbj-hand-score">${hand.score}</div>`; }
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
                         html += generateCardHTML(c, false, animateThisCard, false);
@@ -421,15 +1122,20 @@
                 let totalSeatBet = s.hands && s.hands.length > 0 ? s.hands.reduce((sum, h)=>sum+h.bet, 0) : s.bet || 0;
                 let displayBet = totalSeatBet;
                 if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && totalSeatBet === 0) displayBet = localPendingBet;
-                if (displayBet > 0) { html += `<div class="mbj-chip" style="${totalSeatBet===0?'opacity:0.5; border-color:#00a2ff;':''}">${displayBet}</div>`; }
+                
+                // Centered Chip
+                if (displayBet > 0) { 
+                    let cBg = displayBet >= 10000 ? '#00e676' : displayBet >= 1000 ? '#ff3366' : displayBet >= 100 ? '#00a2ff' : '#444';
+                    html += `<div class="mbj-chip ${totalSeatBet===0?'ghost':''}" style="--c-bg:${cBg};">${displayBet}</div>`; 
+                }
             } else {
                 html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
             }
             html += `</div></div>`; 
 
-            // 4. NAME & PAYOUT (Very Bottom)
+            // 4. NAME & PAYOUT
             let nameHTML = s ? s.username : 'EMPTY';
-            html += `<div class="mbj-seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${mbjGameState==='BETTING' || s ? 1 : 0.2};" id="seat-name-${i}">`;
+            html += `<div class="mbj-seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${s || mbjGameState==='BETTING' ? 1 : 0.3};" id="seat-name-${i}">`;
             html += nameHTML;
             html += `</div>`;
 
@@ -454,32 +1160,41 @@
         if(myCredits >= localPendingBet + amt) { localPendingBet += amt; renderMBJSeats(); } 
         else { showLocalFlash('Not enough credits', 'error'); }
     }
+    
+    function addCustomBet() {
+        let v = parseInt(document.getElementById('custom-bet').value);
+        if(!isNaN(v) && v > 0) {
+            addLocalBet(v);
+        }
+        document.getElementById('custom-bet').value = '';
+    }
+
     function clearLocalBet() { localPendingBet = 0; renderMBJSeats(); }
+    
     function confirmLocalBet() {
         if(localPendingBet < 10) return showLocalFlash('Min Bet 10 TC', 'error');
         socket.emit('mbjPlaceBet', localPendingBet);
-        localPendingBet = 0; document.getElementById('mbj-chip-rack').style.display = 'none';
+        localPendingBet = 0; 
+        document.getElementById('mbj-chip-rack').style.display = 'none';
     }
 
     socket.on('mbjUpdate', async (data) => {
         if(activeGame !== 'mbj') return;
         let dBadge = document.getElementById('mbj-d-score-val');
-        let tTitle = document.getElementById('mbj-timer-title');
-        let tVal = document.getElementById('mbj-timer');
-        let tBox = document.getElementById('mbj-timer-box');
+        let tVal = document.getElementById('bj-timer');
 
         if(data.event === 'timer') {
             mbjGameState = 'BETTING'; 
             dBadge.style.display = 'none';
-            if(data.active) {
-                tBox.style.display = 'flex';
-                if (tVal) tVal.innerText = data.time; 
-                tTitle.innerText = "PLACE BETS"; tTitle.style.color = "var(--ps-glow)";
-            } else { tBox.style.display = 'none'; }
+            tVal.innerText = data.time; 
             renderMBJSeats(data.seats); 
         } 
         else if (data.event === 'sync_seats') { renderMBJSeats(data.seats, data.activeTurn); } 
-        else if (data.event === 'lock_bets') { mbjGameState = 'DEALING'; tTitle.innerText = "DEALING"; tTitle.style.color = "var(--danger)"; if (tVal) tVal.innerText = '--'; document.getElementById('mbj-chip-rack').style.display='none';} 
+        else if (data.event === 'lock_bets') { 
+            mbjGameState = 'DEALING'; 
+            tVal.innerText = '--'; 
+            document.getElementById('mbj-chip-rack').style.display='none';
+        } 
         else if (data.event === 'deal') {
             renderMBJSeats(data.seats, null); 
             let dHand = document.getElementById('mbj-fs-dealer-hand');
@@ -491,13 +1206,15 @@
             } 
         } 
         else if (data.event === 'turn') {
-            mbjGameState = 'PLAYER_TURN'; tTitle.innerText = "PLAYER TURN"; tTitle.style.color = "white";
-            if (tVal) tVal.innerText = data.time; 
+            mbjGameState = 'PLAYER_TURN'; 
+            tVal.innerText = data.time || '--'; 
             renderMBJSeats(data.seats, data.activeTurn);
         } 
-        else if (data.event === 'turn_timer') { if (tVal) tVal.innerText = data.time; }
+        else if (data.event === 'turn_timer') { 
+            tVal.innerText = data.time; 
+        }
         else if (data.event === 'dealer_resolved') {
-            mbjGameState = 'RESOLVING'; tBox.style.display = 'none'; 
+            mbjGameState = 'RESOLVING'; 
             renderMBJSeats(data.seats); 
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
             if(dHand) {
@@ -532,9 +1249,10 @@
             }
         } 
         else if (data.event === 'new_round') {
-            mbjGameState = 'BETTING'; tBox.style.display = 'none';
+            mbjGameState = 'BETTING'; 
             document.getElementById('mbj-fs-dealer-hand').innerHTML = ''; 
-            dBadge.style.display = 'none'; renderedCardCount = {};
+            dBadge.style.display = 'none'; 
+            renderedCardCount = {};
             renderMBJSeats(data.seats); 
         }
     });
@@ -564,13 +1282,18 @@
             bg.innerHTML = '';
             ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach((c) => {
                 let oText = hrState.currentOdds && hrState.currentOdds[c] ? hrState.currentOdds[c] + 'x' : '?x';
-                bg.innerHTML += `<button class="hr-bet-btn" data-choice="${c}" style="border-bottom-color:${hexColors[c]};" onclick="placeHRBet('${c}', this)">${c}<span class="hr-odds-text" id="odds-${c}">${oText}</span></button>`;
+                let myB = myHRBets[c] || 0;
+                
+                bg.innerHTML += `
+                <button class="hr-bet-btn" style="border-bottom-color:${hexColors[c]};" onclick="placeHRBet('${c}', this)">
+                    ${c} 
+                    <span class="hr-odds-text" id="odds-${c}">${oText}</span>
+                    <span class="bet-badge" id="b-${c}">${myB > 0 ? myB + ' TC' : ''}</span>
+                </button>`;
             });
         }
         let fLineEl = document.getElementById('hr-finish-line');
         if(fLineEl) fLineEl.style.right = '-100px'; 
-        let gate = document.getElementById('hr-gate');
-        if(gate) gate.classList.remove('gate-open');
     }
 
     function placeHRBet(c, btnElement) {
@@ -585,10 +1308,17 @@
         socket.emit('placeSharedBet', { room: 'horserace', choice: c, amount: a });
     }
 
+    socket.on('sharedBetConfirmed', (data) => {
+        if(data.room !== 'horserace') return;
+        myHRBets[data.choice] = (myHRBets[data.choice] || 0) + data.amount;
+        let e = document.getElementById('b-' + data.choice);
+        if(e) e.innerText = myHRBets[data.choice] + ' TC';
+    });
+
     socket.on('hrTimerUpdate', (data) => {
         hrState.time = data.time;
         if (data.odds) hrState.currentOdds = data.odds;
-        if(activeGame === 'horserace' && hrState.status === 'BETTING') {
+        if(activeGame === 'horserace' && document.getElementById('hr-ticker').innerText !== "AND THEY'RE OFF!") {
             let s = document.getElementById('hr-timer');
             if(s) s.innerText = data.time;
             ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach(c => {
@@ -614,10 +1344,7 @@
 
         let duration = data.duration; let startTime = Date.now();
         
-        let gate = document.getElementById('hr-gate');
-        if(gate) gate.classList.add('gate-open');
-        document.getElementById('hr-environment').classList.add('track-moving');
-        
+        document.getElementById('hr-environment').className = 'hr-track-window track-moving';
         let fLineEl = document.getElementById('hr-finish-line');
         if(fLineEl) { fLineEl.style.transition = 'right 2s ease-out'; fLineEl.style.right = '-100px'; }
         
@@ -625,7 +1352,7 @@
 
         horses.forEach(h => {
             let el = document.getElementById('horse-' + h);
-            if (el) { el.style.left = '5%'; el.classList.add('running'); el.classList.remove('loser-fade', 'winner-glow'); }
+            if (el) { el.classList.remove('loser-fade', 'winner-glow'); }
         });
 
         let nextTargetUpdate = startTime + 500;
@@ -636,15 +1363,15 @@
 
             if (timeRemaining > 3000) {
                 if (now > nextTargetUpdate) {
-                    horses.forEach(h => { targetPos[h] = 40 + (Math.random() * 15); });
+                    horses.forEach(h => { targetPos[h] = 40 + (Math.random() * 20); });
                     nextTargetUpdate = now + 600 + Math.random() * 600; 
                 }
             } else {
                 if (!sprintTriggered) {
                     sprintTriggered = true;
-                    document.getElementById('hr-environment').classList.remove('track-moving'); 
+                    document.getElementById('hr-environment').className = 'hr-track-window track-slowing'; 
                     if (fLineEl) { fLineEl.style.transition = 'none'; fLineEl.style.right = '5%'; }
-                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 90 : 45 + (Math.random() * 15); });
+                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 90 : 40 + (Math.random() * 20); });
                 }
             }
 
@@ -654,15 +1381,16 @@
                     let el = document.getElementById('horse-' + h);
                     if(el) { 
                         el.style.left = (h === data.winner ? 90 : Math.min(currentPos[h], 80)) + '%'; 
-                        el.classList.remove('running'); 
                     }
                 });
                 return;
             }
 
             horses.forEach(h => {
-                let speed = (timeRemaining <= 3000 && h === data.winner) ? 0.08 : 0.05;
+                // Slower interpolation for smooth realistic movement
+                let speed = (timeRemaining <= 3000 && h === data.winner) ? 0.04 : 0.015;
                 currentPos[h] += (targetPos[h] - currentPos[h]) * speed;
+                
                 let el = document.getElementById('horse-' + h);
                 if(el) el.style.left = currentPos[h] + '%';
             });
@@ -693,7 +1421,8 @@
             hrState.status = 'BETTING'; hrState.time = 15;
             if (data && data.odds) hrState.currentOdds = data.odds;
             document.getElementById('hr-ticker').innerText = "WAITING FOR NEXT RACE...";
-            document.getElementById('hr-ticker').style.color = "var(--credits)";
+            document.getElementById('hr-ticker').style.color = "white";
+            myHRBets = {};
             setupDerbyUI(); 
             document.querySelectorAll('.hr-bet-btn').forEach(b => b.disabled = false);
         }
