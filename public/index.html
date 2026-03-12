@@ -41,7 +41,7 @@
         .local-flash.success { color: var(--success); border-color: var(--success); }
         @keyframes flashAnim { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
-        /* ================= VIP BLACKJACK - RIGID SIMULATOR UI ================= */
+        /* ================= VIP BLACKJACK ================= */
         .mbj-board { width: 1100px; height: 580px; background: #111; border-radius: 20px; position: relative; box-shadow: 0 25px 80px rgba(0,0,0,0.9); overflow: hidden; margin-top: -30px; border: 4px solid #222; }
         .mbj-felt { position: absolute; inset: 15px; background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); border: 20px solid #2e1a10; border-radius: 300px; box-shadow: inset 0 0 60px rgba(0,0,0,0.9); pointer-events: none; }
         .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(255,255,255,0.15); border-radius: 300px; pointer-events: none; }
@@ -69,6 +69,9 @@
         .seat-glow { position: absolute; top: -50px; left: -50px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
         .active-turn { opacity: 1 !important; z-index: 100; filter: grayscale(0) !important; }
         .active-turn .seat-glow { display: block; animation: pulseGlow 2s infinite; }
+        
+        .seat-status-loss { animation: pulseLoss 1.5s forwards; }
+        @keyframes pulseLoss { 0% { filter: drop-shadow(0 0 0 transparent); } 50% { filter: drop-shadow(0 0 20px #ff3366); } 100% { filter: drop-shadow(0 0 0 transparent); } }
 
         .mbj-seat-circle { width: 65px; height: 65px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.5); z-index: 5; position: relative;}
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
@@ -77,6 +80,7 @@
         .chip-stack { background: #222; border: 3px dashed #ffcc00; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; font-weight: 900; color: white; position: absolute; box-shadow: 0 5px 10px rgba(0,0,0,0.9); }
         .seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; margin-top: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white;}
 
+        /* True Card Animation Logic */
         .mbj-hand-cards { position: absolute; bottom: 85px; left: -10px; display: flex; z-index: 10; pointer-events: none; }
         .mbj-card { width: 55px; height: 80px; background: white; border-radius: 6px; box-shadow: -3px 3px 10px rgba(0,0,0,0.6); position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; transform: translateZ(0); }
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; font-weight: 900;}
@@ -104,8 +108,8 @@
         .mbj-action-btn.stand { background: #9b0022; border-color: #ff3366; }
         .mbj-action-btn.double { background: #997a00; border-color: #ffcc00; color: black; font-size: 0.8rem; }
 
-        /* THE CHIP RACK UI (FIXED POINTER EVENTS!) */
-        .chip-rack-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: none; background: rgba(0,0,0,0.85); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--glass-border); gap: 15px; align-items: center; z-index: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.9); pointer-events: auto; }
+        /* THE CHIP RACK UI (GUARANTEED CLICKABLE, HIGHEST Z-INDEX) */
+        .chip-rack-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: none; background: rgba(0,0,0,0.85); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--glass-border); gap: 15px; align-items: center; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.9); pointer-events: auto !important; }
         .rack-chip { width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9); border: 4px dashed rgba(255,255,255,0.5); }
         .rack-chip:hover { transform: translateY(-5px) scale(1.1); border-color: white; }
         .chip-10 { background: #444; color: white; }
@@ -127,28 +131,31 @@
         .hr-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .hr-ticker { flex: 1; text-align: center; color: var(--credits); font-family: 'Press Start 2P', monospace; font-size: 1.1rem; text-shadow: 0 0 10px var(--credits); padding: 10px; background: #111; border: 2px solid #333; border-radius: 8px; margin: 0 20px; text-transform: uppercase;}
         
-        .hr-track-window { flex: 1; border: 4px solid #222; position: relative; overflow: hidden; border-radius: 8px; background: #87CEEB; }
-        .hr-hills { position: absolute; bottom: 70%; width: 200%; height: 30%; background: radial-gradient(circle at 50% 100%, #228B22 0%, #006400 100%); border-radius: 50% 50% 0 0; opacity: 0.8; }
-        .hr-fence { position: absolute; bottom: 70%; width: 200%; height: 15px; border-top: 3px solid white; border-bottom: 3px solid white; background: rgba(255,255,255,0.2); }
-        .hr-track-bg { position: absolute; bottom: 0; width: 200%; height: 70%; background: repeating-linear-gradient(90deg, #5c3a21 0px, #5c3a21 40px, #4a2e1b 40px, #4a2e1b 80px); }
+        .hr-track-window { flex: 1; border: 4px solid #222; position: relative; overflow: hidden; border-radius: 8px; background: #4eb2e8; /* Sky Background */ }
         
-        .track-moving .hr-hills { animation: scrollTrack 15s linear infinite; }
-        .track-moving .hr-fence { animation: scrollTrack 3s linear infinite; }
-        .track-moving .hr-track-bg { animation: scrollTrack 0.4s linear infinite; }
+        /* Realistic Track Layers based on provided image */
+        .hr-grass-bg { position: absolute; top: 15%; width: 100%; height: 15%; background: #2a8f3d; border-bottom: 4px solid white; z-index: 1;}
+        .hr-dirt-bg { position: absolute; bottom: 0; width: 200%; height: 70%; background: repeating-linear-gradient(90deg, #4a3026 0px, #4a3026 40px, #3d251d 40px, #3d251d 80px); z-index: 2;}
+        
+        .track-moving .hr-dirt-bg { animation: scrollTrack 0.3s linear infinite; }
         @keyframes scrollTrack { from { transform: translateX(0); } to { transform: translateX(-80px); } }
 
-        .hr-finish-line { position: absolute; right: -100px; top: 0; bottom: 0; width: 40px; background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-color: #fff; z-index: 5; border-left: 6px solid #ffcc00; box-shadow: -15px 0 30px rgba(0,0,0,0.6); }
+        .hr-finish-line { position: absolute; right: -100px; top: 30%; bottom: 0; width: 40px; background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-color: #fff; z-index: 5; border-left: 6px solid #ffcc00; box-shadow: -15px 0 30px rgba(0,0,0,0.6); }
         
         .hr-lanes-overlay { position: absolute; bottom: 0; width: 100%; height: 70%; display: flex; flex-direction: column; justify-content: space-evenly; z-index: 10; }
-        .hr-lane { width: 100%; height: 16%; border-bottom: 2px dashed rgba(255,255,255,0.15); position: relative; }
+        .hr-lane { width: 100%; height: 16.6%; border-bottom: 2px dashed rgba(255,255,255,0.1); position: relative; }
         
-        .hr-horse-group { position: absolute; left: 10%; display: flex; align-items: center; justify-content: center; z-index: 15; transition: left 0.1s linear; transform: scale(1.2); }
+        /* The GIF Horse Engine! */
+        .hr-horse-group { position: absolute; left: 10%; bottom: 0; display: flex; align-items: flex-end; justify-content: center; z-index: 15; transition: left 0.1s linear; }
+        .hr-gif { height: 60px; /* Scales the GIF to fit the lane */ transform: scaleX(-1); filter: drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
         
-        .hr-sprite-box { position: relative; width: 80px; height: 60px; overflow: hidden; transform: scaleX(-1); }
-        .hr-sprite-sheet { position: absolute; top: 0; left: 0; width: 960px; height: 60px; background-image: url('https://via.placeholder.com/960x60/8B4513/ffffff?text=Replace+With+Horse+Sprite'); background-size: cover; background-repeat: no-repeat; }
-        .running .hr-sprite-sheet { animation: spritePlay 0.6s steps(12) infinite; }
-        @keyframes spritePlay { from { transform: translateX(0); } to { transform: translateX(-960px); } }
-        .hr-saddle-tint { position: absolute; top: 20%; left: 35%; width: 20px; height: 20px; background: var(--h-color); border-radius: 50%; opacity: 0.9; mix-blend-mode: multiply; z-index: 2; pointer-events: none;}
+        /* MATHEMATICAL HUE ROTATION TO COLORIZE THE RED GIF FOR EVERY LANE! */
+        .horse-Red .hr-gif { filter: hue-rotate(0deg) drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Blue .hr-gif { filter: hue-rotate(220deg) brightness(1.2) drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Green .hr-gif { filter: hue-rotate(120deg) brightness(1.1) drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Yellow .hr-gif { filter: hue-rotate(50deg) brightness(1.5) drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Purple .hr-gif { filter: hue-rotate(280deg) brightness(1.1) drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Orange .hr-gif { filter: hue-rotate(30deg) brightness(1.2) drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); }
 
         .hr-controls-area { margin-top: 15px; display: flex; flex-direction: column; gap: 15px; }
         .hr-bet-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; width: 100%; }
@@ -179,14 +186,14 @@
                     <i class="fas fa-cards"></i>
                     <div>
                         <div class="game-title">VIP BLACKJACK</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Chip Rack Fix</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Fixed Chip Rack Integration</div>
                     </div>
                 </div>
                 <div class="game-card" onclick="openGame('horserace')">
                     <i class="fas fa-horse-head" style="color: var(--danger);"></i>
                     <div>
                         <div class="game-title">RETRO DERBY</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Sprite Engine Placeholder</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Colorized GIF Physics Engine</div>
                     </div>
                 </div>
             </div>
@@ -223,19 +230,20 @@
                       <div class="hud-title">BALANCE</div>
                       <div class="hud-val" id="mbj-hud-balance">0 TC</div>
                   </div>
-                  <div class="chip-rack-container" id="mbj-chip-rack">
-                      <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
-                      <div class="rack-chip chip-10" onclick="addLocalBet(10)">10</div>
-                      <div class="rack-chip chip-100" onclick="addLocalBet(100)">100</div>
-                      <div class="rack-chip chip-1k" onclick="addLocalBet(1000)">1K</div>
-                      <div class="rack-chip chip-10k" onclick="addLocalBet(10000)">10K</div>
-                      <div class="rack-chip chip-50k" onclick="addLocalBet(50000)">50K</div>
-                      <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
-                  </div>
                   <div class="hud-capsule" style="align-items:flex-end;">
                       <div class="hud-title">TOTAL BET</div>
                       <div class="hud-val" id="mbj-hud-bet">0 TC</div>
                   </div>
+              </div>
+
+              <div class="chip-rack-container" id="mbj-chip-rack">
+                  <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
+                  <div class="rack-chip chip-10" onclick="addLocalBet(10)">10</div>
+                  <div class="rack-chip chip-100" onclick="addLocalBet(100)">100</div>
+                  <div class="rack-chip chip-1k" onclick="addLocalBet(1000)">1K</div>
+                  <div class="rack-chip chip-10k" onclick="addLocalBet(10000)">10K</div>
+                  <div class="rack-chip chip-50k" onclick="addLocalBet(50000)">50K</div>
+                  <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
               </div>
 
               <div id="flash-mbj" class="local-flash"></div> 
@@ -246,16 +254,15 @@
                   <div class="hr-top-bar">
                       <div style="background:rgba(0,0,0,0.8); border:1px solid var(--glass-border); padding: 10px 20px; border-radius: 8px; color:white; font-weight:900; font-size:1.2rem; font-family: 'Rajdhani', monospace;" id="hr-timer-box"><i class="fas fa-clock" style="margin-right:10px;"></i> <span id="hr-timer">15</span></div>
                       <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
-                      <div class="hud-capsule" style="width: 140px; padding: 5px; background: #111;">
+                      <div class="hud-capsule" style="width: 140px; padding: 5px; background: #111; pointer-events:none;">
                           <div class="hud-title" style="font-family:'Outfit'; font-size:0.7rem; color:var(--text-muted);">TOTAL BET</div>
                           <div class="hud-val" id="hr-my-bet" style="font-family:'Press Start 2P'; font-size:0.8rem; color:white; margin-top:5px;">0 TC</div>
                       </div>
                   </div>
                   
                   <div class="hr-track-window" id="hr-environment">
-                      <div class="hr-hills"></div>
-                      <div class="hr-fence"></div>
-                      <div class="hr-track-bg" id="hr-track-bg"></div>
+                      <div class="hr-grass-bg"></div>
+                      <div class="hr-dirt-bg" id="hr-track-bg"></div>
                       <div class="hr-lanes-overlay">
                           <div class="hr-finish-line" id="hr-finish-line"></div>
                           <div id="hr-lanes-container" style="width: 100%; height: 100%; position: absolute;"></div>
@@ -445,6 +452,7 @@
             cont.innerHTML += html;
         }
 
+        // Show/Hide Chip Rack based on active seating status
         let rack = document.getElementById('mbj-chip-rack');
         if (localSeatId && mbjGameState === 'BETTING' && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
             rack.style.display = 'flex';
@@ -474,9 +482,13 @@
         let tBox = document.getElementById('mbj-timer-box');
 
         if(data.event === 'timer') {
-            mbjGameState = 'BETTING'; dBadge.style.display = 'none';
-            if(data.active) { tBox.style.display = 'flex'; if (tVal) tVal.innerText = data.time; tTitle.innerText = "PLACE BETS"; tTitle.style.color = "var(--ps-glow)"; } 
-            else { tBox.style.display = 'none'; }
+            mbjGameState = 'BETTING'; 
+            dBadge.style.display = 'none';
+            if(data.active) {
+                tBox.style.display = 'flex';
+                if (tVal) tVal.innerText = data.time; 
+                tTitle.innerText = "PLACE BETS"; tTitle.style.color = "var(--ps-glow)";
+            } else { tBox.style.display = 'none'; }
             renderMBJSeats(data.seats); 
         } 
         else if (data.event === 'sync_seats') { renderMBJSeats(data.seats, data.activeTurn); } 
@@ -536,26 +548,29 @@
     });
 
     // =========================================================================
-    // RETRO HORSE DERBY
+    // RETRO HORSE DERBY LOGIC (GIF Engine & CSS Filtering)
     // =========================================================================
+    // Colors mapped to lanes.
     const hexColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
     
     function setupDerbyUI() {
         let container = document.getElementById('hr-lanes-container');
         if(!container) return;
+        
         let trackHTML = ''; let laneHeight = 100 / 6; 
+        
+        // This loop injects the uploaded giphy.gif into every lane!
+        // The "horse-COLOR" class applies the hue-rotate filter to dye the red horse.
         ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach((c, index) => {
             trackHTML += `
             <div class="hr-lane" style="top: ${index * laneHeight}%; height: ${laneHeight}%;">
-                <div id="horse-${c}" class="hr-horse-group">
-                    <div class="hr-sprite-box">
-                        <div class="hr-sprite-sheet"></div>
-                        <div class="hr-saddle-tint" style="--h-color:${hexColors[c]};"></div>
-                    </div>
+                <div id="horse-${c}" class="hr-horse-group horse-${c}">
+                    <img src="./giphy.gif" class="hr-gif" alt="Horse">
                 </div>
             </div>`;
         });
         container.innerHTML = trackHTML;
+        
         let bg = document.getElementById('hr-bet-grid');
         if(bg) {
             bg.innerHTML = '';
@@ -624,7 +639,7 @@
 
         horses.forEach(h => {
             let el = document.getElementById('horse-' + h);
-            if (el) { el.style.left = '10%'; el.classList.add('running'); }
+            if (el) { el.style.left = '10%'; }
         });
 
         let nextTargetUpdate = startTime + 500;
@@ -651,7 +666,7 @@
                 clearInterval(hrRaceInterval);
                 horses.forEach(h => {
                     let el = document.getElementById('horse-' + h);
-                    if(el) { el.classList.remove('running'); el.style.left = (h === data.winner ? 88 : Math.min(currentPos[h], 80)) + '%'; }
+                    if(el) { el.style.left = (h === data.winner ? 88 : Math.min(currentPos[h], 80)) + '%'; }
                 });
                 return;
             }
