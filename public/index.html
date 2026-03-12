@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Stick N' Trade | Premium Test Build</title>
+    <title>Stick N' Trade | VIP Test Build</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -16,48 +18,74 @@
             --ps-bg: #000814; --ps-glow: #00a2ff;
             --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15);
             --danger: #ff3366; --success: #00e676; --credits: #ffb400;
+            --table-green: #0a4f28; --table-dark: #042410; --table-wood: #1a0f0a;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; user-select: none; }
         
-        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh !important; width: 100vw !important; overflow: hidden !important; }
+        /* Removed user-select:none from the universal selector to fix inputs */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
+        
+        body { 
+            background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
+            color: white; 
+            height: 100vh !important; 
+            width: 100vw !important; 
+            overflow: hidden !important; 
+            user-select: none; 
+            -webkit-user-select: none; 
+        }
+        
+        /* Explicitly re-enable clicking and typing in inputs */
+        input, textarea { user-select: auto; -webkit-user-select: auto; }
+
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
+        .custom-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
 
-        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        /* ================= UI COMPONENTS ================= */
+        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         .btn-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
         .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; }
         .input-control:focus { border-color: var(--ps-glow); }
 
-        #auth-container { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999; background: rgba(0, 5, 15, 0.95); backdrop-filter: blur(15px); }
-        .auth-box { width: 400px; background: rgba(0,0,0,0.8); padding: 2.5rem; border-radius: 16px; border-top: 3px solid var(--ps-glow); border: 1px solid var(--glass-border); text-align: center; }
+        /* ================= AUTHENTICATION ================= */
+        #auth-container { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 99999; background: rgba(0, 5, 15, 0.95); backdrop-filter: blur(15px); }
+        .auth-box { width: 400px; background: rgba(0,0,0,0.8); padding: 2.5rem; border-radius: 16px; border-top: 3px solid var(--ps-glow); border: 1px solid var(--glass-border); text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.9); }
 
+        /* ================= TOP NAVIGATION ================= */
+        #app-container { display: none; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
+        
         .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer;}
-        
+        .wallet-pill { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,180,0,0.4); padding: 5px 15px; height: 45px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-weight: 900; color: var(--credits); font-size: 1.1rem; }
+
+        /* ================= MAIN LAYOUT ================= */
         .main-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 75px); margin-top: 75px; width: 100%; position: relative; }
         .view-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; }
         
         .btn-back-fixed { position: fixed; top: 95px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .btn-back-fixed:hover { background: white; color: black; }
 
+        /* LOBBY CARDS */
         .lobby-modes-container { display: flex; gap: 40px; }
         .game-card { width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
 
+        /* ================= ALERTS ================= */
         .local-flash { position: fixed; bottom: 25px; right: 25px; z-index: 9999; color: var(--danger); font-size: 1.2rem; font-weight: 900; text-transform: uppercase; opacity: 0; display: none; text-shadow: 0 2px 10px rgba(0,0,0,0.9); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 8px; border: 1px solid var(--danger); }
         .local-flash.show { display: block; animation: flashAnim 2.5s forwards; }
         .local-flash.success { color: var(--success); border-color: var(--success); }
         @keyframes flashAnim { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
         /* ================================================================= */
-        /* VIP BLACKJACK - SIMULATOR STYLE (Flat Curve, Contextual Buttons)  */
+        /* VIP BLACKJACK - SIMULATOR STYLE                                   */
         /* ================================================================= */
         .mbj-board { width: 1100px; height: 600px; background: #050505; border: 2px solid var(--glass-border); border-radius: 12px; position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.9); overflow: hidden; margin-top: 20px; }
         
-        /* Flatter Table Arc with Leather Rim */
         .mbj-table { position: absolute; bottom: -300px; left: -10%; width: 120%; height: 750px; background: radial-gradient(ellipse at center, #0a5a2a 0%, #043314 100%); border-bottom: 40px solid #1a0f0a; border-top: 6px solid #3e2723; border-radius: 50%; box-shadow: inset 0 0 80px rgba(0,0,0,0.9); pointer-events: none; }
-        
+        .mbj-table-line { position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 2px solid rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
+
         .mbj-stakes-plate { position: absolute; top: 150px; left: 150px; background: linear-gradient(to bottom, #e0e0e0, #999); border: 2px solid #555; padding: 10px 15px; border-radius: 6px; color: black; font-weight: 900; font-family: 'Outfit'; font-size: 0.8rem; text-align: center; box-shadow: 2px 5px 15px rgba(0,0,0,0.5); pointer-events: none; }
         .mbj-stakes-plate span { display: block; font-size: 1.1rem; }
 
@@ -86,9 +114,9 @@
 
         .mbj-seat-circle { width: 70px; height: 70px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2); z-index: 5; position: relative;}
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.1); }
-        .mbj-seat-circle.occupied { border: 3px solid rgba(255,255,255,0.6); background: transparent; cursor: default; }
+        .mbj-seat-circle.occupied { border: 3px solid var(--credits); background: rgba(0,0,0,0.6); cursor: default; box-shadow: 0 0 15px rgba(255,180,0,0.3); }
 
-        /* FANNED CARDS (Simulator layout) */
+        /* FANNED CARDS */
         .mbj-hand-cards { position: absolute; bottom: 85px; left: 10px; width: 100px; height: 80px; pointer-events: none; z-index: 10; }
         .mbj-card { width: 55px; height: 80px; background: white; border-radius: 6px; box-shadow: -3px 3px 10px rgba(0,0,0,0.6); position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; opacity: 0; transform: translateZ(0); border: 1px solid #ccc; }
         
@@ -98,16 +126,14 @@
         .card-red { color: #e60000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
 
-        /* Floating Value Badges */
+        /* Badges */
         .mbj-hand-score { position: absolute; top: -10px; left: -15px; width: 24px; height: 24px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 0.85rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8);}
         .dealer-score-badge { width: 28px; height: 28px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 1rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8); margin-bottom: 5px;}
         
-        /* Banners (Bust/BJ) */
         .mbj-status { position: absolute; top: 30px; left: -10px; background: var(--ps-bg); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; border: 1px solid var(--glass-border); white-space: nowrap; z-index: 25; pointer-events: none; }
         .status-bust { color: var(--danger); border-color: var(--danger); animation: shakeRed 0.5s forwards; }
         .status-bj { color: #000; background: var(--credits); border-color: #fff; box-shadow: 0 0 20px var(--credits); }
         
-        /* Slide Deal Animation (Arcing) */
         .anim-fly-in { animation: flyIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flyIn {
             0% { opacity: 0; transform: translate(400px, -300px) scale(0.3) rotate(45deg); }
@@ -117,7 +143,7 @@
         @keyframes flipCard { 0% { transform: rotateY(180deg); } 100% { transform: rotateY(0deg); } }
         @keyframes shakeRed { 0% { transform: translateX(0); filter: grayscale(0); } 25% { transform: translateX(-5px); filter: grayscale(50%) sepia(1) hue-rotate(-50deg) saturate(5); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); filter: grayscale(50%) sepia(1) hue-rotate(-50deg) saturate(5); } }
 
-        /* CONTEXTUAL ACTION BUTTONS (Directly Under Seat) */
+        /* CONTEXTUAL ACTION BUTTONS */
         .seat-actions-wrapper { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 15px; display: flex; gap: 8px; z-index: 100; pointer-events: auto; animation: popUp 0.3s ease-out; }
         @keyframes popUp { from { transform: translateX(-50%) scale(0.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
         
@@ -131,10 +157,9 @@
 
         .seat-bet-ui { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 15px; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.8); pointer-events: auto; width: 140px;}
 
-        /* Visual Chip Stack Representation */
         .chip-stack { background: #333; border: 2px dashed #ffcc00; border-radius: 50%; padding: 4px 8px; font-size: 0.75rem; font-weight: 900; color: white; position: absolute; bottom: 15px; z-index: 20; box-shadow: 0 3px 5px rgba(0,0,0,0.8); }
 
-        /* HUD Capsules at Bottom */
+        /* HUD Capsules */
         .mbj-hud-bottom { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; pointer-events: none; }
         .hud-capsule { background: rgba(0,0,0,0.85); border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 50px; display: flex; flex-direction: column; align-items: center; color: white; font-family: 'Outfit'; pointer-events: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
         .hud-title { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
@@ -148,7 +173,6 @@
         
         .hr-track-window { flex: 1; border: 4px solid #444; position: relative; overflow: hidden; border-radius: 8px; background: #222; }
         
-        /* The scrolling dirt background */
         .hr-track-bg { position: absolute; top: 0; left: 0; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, #382415, #382415 40px, #2a1a0f 40px, #2a1a0f 80px); }
         .track-moving { animation: scrollTrack 0.6s linear infinite; }
         @keyframes scrollTrack { from { transform: translateX(0); } to { transform: translateX(-80px); } }
@@ -157,8 +181,6 @@
         .hr-lane { width: 100%; height: 16%; border-bottom: 2px dashed rgba(255,255,255,0.2); position: relative; display: flex; align-items: center; }
         
         .hr-horse-group { position: absolute; left: 10%; display: flex; align-items: center; z-index: 10; }
-        
-        /* Tinted Emoji Technique (No Badges) */
         .hr-sprite { font-size: 3.5rem; transform: scaleX(-1); color: transparent; text-shadow: 0 0 0 var(--h-color); filter: drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); transition: left 0.1s linear; }
         
         .retro-gallop { animation: retroBounce 0.3s infinite linear; }
@@ -217,7 +239,7 @@
             <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 15px rgba(0,0,0,0.8);">SELECT TABLE</h1>
             <div class="lobby-modes-container">
                 <div class="game-card" onclick="openGame('mbj')">
-                    <i class="fas fa-coins"></i>
+                    <i class="fas fa-cards"></i>
                     <div>
                         <div class="game-title">VIP BLACKJACK</div>
                         <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Simulator Layout & Phasing</div>
@@ -300,7 +322,7 @@
 
                   <div class="hr-controls-area">
                       <div style="display:flex; gap:15px; justify-content:center;">
-                          <input type="number" id="hr-bet-input" class="input-control bet-input" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
+                          <input type="number" id="hr-bet-input" class="input-control" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';">
                       </div>
                       <div class="hr-bet-grid" id="hr-bet-grid"></div>
                   </div>
@@ -443,13 +465,11 @@
             if (s && s.hands && s.hands.length > 0) {
                 s.hands.forEach((hand, hIdx) => {
                     
-                    // Inject Score Badge inside the card container so it floats
                     if(hand.cards.length > 0 && hand.status !== 'BUST') {
                         html += `<div class="mbj-hand-score" style="left: ${(hIdx * 60) - 10}px;">${hand.score}</div>`;
                     }
 
                     hand.cards.forEach((c, cIdx) => { 
-                        // Fanning offsets: x=15px, y=-5px per card
                         let offsetLeft = (hIdx * 80) + (cIdx * 15); 
                         let offsetBottom = (cIdx * -5);
                         
@@ -565,7 +585,6 @@
             if(dHand) { 
                 dHand.innerHTML = ''; 
                 
-                // Dealer cards animate last based on total players
                 let totalPlayerCards = Object.values(data.seats).reduce((count, s) => {
                     if (s && s.hands && s.hands.length > 0) return count + s.hands[0].cards.length;
                     return count;
@@ -580,10 +599,9 @@
 
                 // Dealer Card 2 (Hole Card)
                 let c2Html = generateCardHTML(data.dealerHand[1], true, baseDelay + 0.4);
-                c2Html = c2Html.replace('style="', 'style="position:relative; left:-30px; '); // Tighter overlap for dealer
+                c2Html = c2Html.replace('style="', 'style="position:relative; left:-30px; ');
                 dHand.innerHTML += c2Html; 
                 
-                // Show badge for first card after it lands
                 setTimeout(() => {
                     dBadge.style.display = 'flex';
                     dBadge.innerText = data.dealerHand[0].bjVal;
@@ -605,33 +623,30 @@
             tTitle.innerText = "RESOLVING";
             if (tVal) tVal.innerText = '--'; 
             
-            renderMBJSeats(data.seats); // Undim all seats
+            renderMBJSeats(data.seats); 
             
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
             
             if(dHand) {
-                // Keep first card static
                 dHand.innerHTML = generateCardHTML(data.dealerHand[0]).replace('anim-fly-in', '');
                 dHand.innerHTML = dHand.innerHTML.replace('style="', 'style="position:relative; ');
                 
-                // Flip second card
                 let revealHtml = generateCardHTML(data.dealerHand[1]).replace('anim-fly-in', 'anim-flip');
                 dHand.innerHTML += revealHtml.replace('style="', 'style="position:relative; left:-30px; ');
                 
                 dBadge.innerText = getBJScore(data.dealerHand.slice(0,2));
 
                 const drawRemaining = async () => {
-                    // Pause for dramatic effect before hitting
                     await delay(800);
 
                     for(let i=2; i<data.dealerHand.length; i++) { 
                         let c = data.dealerHand[i]; 
                         let slideHtml = generateCardHTML(c);
-                        let offset = (i * 30) - 30; // Stack dealer cards tighter
+                        let offset = (i * 30) - 30; 
                         dHand.innerHTML += slideHtml.replace('style="', `style="position:absolute; left:${offset}px; z-index:${i}; `); 
                         
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
-                        await delay(800); // 0.8s breath between hits
+                        await delay(800); 
                     }
                     
                     dBadge.innerText = data.dealerScore;
