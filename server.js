@@ -60,7 +60,7 @@ function isNaturalBlackjack(handCards) { return (handCards.length === 2 && getBJ
 // =========================================================================
 // PREMIUM DERBY LOGIC (Strict 15s Betting)
 // =========================================================================
-let hrState = { time: 15, status: 'BETTING', bets: [], currentOdds: {} }; // 15s timer
+let hrState = { time: 15, status: 'BETTING', bets: [], currentOdds: {} }; 
 
 function generateHorseOdds() {
     const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
@@ -104,7 +104,7 @@ setInterval(() => {
 
                 setTimeout(() => {
                     generateHorseOdds(); 
-                    hrState.time = 15; // Reset to 15s
+                    hrState.time = 15; 
                     hrState.status = 'BETTING';
                     hrState.bets = [];
                     io.emit('hrNewRound', { odds: hrState.currentOdds }); 
@@ -115,7 +115,7 @@ setInterval(() => {
 }, 1000);
 
 // =========================================================================
-// VIP BLACKJACK ENGINE (Intelligent Timer & Multi-Hit Fix)
+// VIP BLACKJACK ENGINE
 // =========================================================================
 let mbjState = {
     status: 'BETTING', time: 15, turnTimer: 0, 
@@ -227,20 +227,19 @@ async function mbjResolveDealer() {
         }
         mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 12000); 
+    }, 10000); 
 }
 
 // Timer Loop
 setInterval(() => {
     if (mbjState.status === 'BETTING') {
-        // Only count down if someone has placed a bet
         let hasBets = Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0);
         
         if (hasBets) {
             mbjState.time--;
             io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true });
         } else {
-            mbjState.time = 15; // Hold at 15
+            mbjState.time = 15; 
             io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false });
         }
         
@@ -300,9 +299,7 @@ setInterval(() => {
 
 io.on('connection', (socket) => {
     socket.emit('hrTimerUpdate', { time: hrState.time, odds: hrState.currentOdds });
-    if(mbjState.status === 'BETTING') socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
 
-    // AUTO-LOGIN LISTENER
     socket.on('login', (data) => {
         let user = mockUsers[data.username];
         if(!user) {
@@ -313,7 +310,16 @@ io.on('connection', (socket) => {
         socket.emit('loginSuccess', { username: user.username, credits: user.credits, playable: user.playableCredits });
     });
 
-    socket.on('joinRoom', (room) => { socket.join(room); });
+    socket.on('joinRoom', (room) => { 
+        socket.join(room); 
+        // BUG FIX: Force sync the state immediately so the player can see empty seats and sit down
+        if (room === 'mbj') {
+            socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
+            socket.emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
+            if (mbjState.status === 'PLAYER_TURN') socket.emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
+        }
+    });
+
     socket.on('leaveRoom', (room) => { socket.leave(room); });
 
     socket.on('placeSharedBet', (data) => {
@@ -375,7 +381,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // BUG FIX: Sends activeTurn correctly after EVERY hit so buttons stay visible
     socket.on('mbjAction', (actionData) => {
         if (!socket.user || mbjState.status !== 'PLAYER_TURN' || mbjState.activeTurn.seat === null) return;
         let seatNum = mbjState.activeTurn.seat;
