@@ -19,21 +19,37 @@ app.get('/', (req, res) => {
 
 const formatTC = (amount) => Math.round(amount * 10) / 10;
 
-// Temporary Mock DB for Test Build
-let mockUsers = {
-    'Player1': { username: 'Player1', password: 'password', credits: 100000, playableCredits: 5000 }
-};
+let mockUsers = {};
 let connectedUsers = {};
 
-// --- CARD LOGIC ---
-function drawCard() {
+// =========================================================================
+// 6-DECK SHOE LOGIC
+// =========================================================================
+let shoe = [];
+function buildShoe() {
+    shoe = [];
     const vs = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
     const ss = ['♠','♣','♥','♦'];
-    let v = vs[crypto.randomInt(vs.length)];
-    let s = ss[crypto.randomInt(ss.length)];
-    let bj = isNaN(parseInt(v)) ? (v === 'A' ? 11 : 10) : parseInt(v);
-    let colorClass = (s === '♥' || s === '♦') ? `card-red` : `card-black`;
-    return { val: v, suit: s, bjVal: bj, raw: v, suitHtml: `<span class="${colorClass}">${s}</span>` };
+    for(let d=0; d<6; d++) {
+        for(let s of ss) {
+            for(let v of vs) {
+                let bj = isNaN(parseInt(v)) ? (v === 'A' ? 11 : 10) : parseInt(v);
+                let colorClass = (s === '♥' || s === '♦') ? `card-red` : `card-black`;
+                shoe.push({ val: v, suit: s, bjVal: bj, raw: v, suitHtml: `<span class="${colorClass}">${s}</span>` });
+            }
+        }
+    }
+    // Shuffle
+    for (let i = shoe.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
+    }
+}
+buildShoe();
+
+function drawCard() {
+    if(shoe.length < 52) buildShoe(); // Reshuffle when 1 deck remains
+    return shoe.pop();
 }
 
 function getBJScore(hand) {
@@ -83,7 +99,7 @@ setInterval(() => {
                 let cumulative = 0;
                 for(let w of weights) { cumulative += w.weight; if(randomVal <= cumulative) { winner = w.horse; break; } }
 
-                io.emit('hrRaceStart', { winner: winner, duration: 15000 }); // 15 sec race for better pacing
+                io.emit('hrRaceStart', { winner: winner, duration: 15000 }); 
 
                 setTimeout(async () => {
                     hrState.bets.forEach(b => {
@@ -167,7 +183,9 @@ async function mbjResolveDealer() {
         }
     }
     mbjState.dealer.score = dScore;
+    
     let dealerNatural = isNaturalBlackjack(mbjState.dealer.hand);
+    let dealerUpcardVal = mbjState.dealer.hand[0].bjVal;
 
     let seatResults = {}; 
     for (let i=1; i<=5; i++) {
@@ -178,20 +196,30 @@ async function mbjResolveDealer() {
             seat.hands.forEach(h => {
                 if (h.status === 'BUST') return; 
                 let pScore = h.score;
-                let payout = 0, isPush = false;
+                let payout = 0, isPush = false, refundAmount = 0;
+                let playerNatural = isNaturalBlackjack(h.cards) && !h.isSplitHand;
                 
-                if (h.status === 'BLACKJACK' || (isNaturalBlackjack(h.cards) && !h.isSplitHand)) {
-                    if (dealerNatural) isPush = true;
-                    else payout = h.bet * 2.5; 
+                if (dealerNatural) {
+                    if (playerNatural) {
+                        isPush = true;
+                    } else {
+                        // The OBO Rule (Original Bets Only)
+                        if (dealerUpcardVal === 10 && h.doubledAmount > 0) {
+                            refundAmount += h.doubledAmount; // Return the doubled portion
+                        }
+                        // If dealer upcard is 'A', they lose everything including double.
+                        payout = 0; 
+                    }
+                } else if (playerNatural) {
+                    payout = h.bet * 2.5; // Pays 3 to 2
                 } else if (dScore > 21 || pScore > dScore) {
                     payout = h.bet * 2;
                 } else if (pScore === dScore) {
-                    if (dealerNatural && !isNaturalBlackjack(h.cards)) payout = 0; 
-                    else isPush = true;
+                    isPush = true;
                 }
 
                 if (isPush) totalPush += h.bet; 
-                else totalWin += payout;
+                else totalWin += (payout + refundAmount);
             });
 
             seatResults[i] = { win: totalWin, push: totalPush };
@@ -240,7 +268,6 @@ setInterval(() => {
                     let c1 = drawCard(), c2 = drawCard();
                     mbjState.seats[k].hands[0].cards = [c1, c2];
                     mbjState.seats[k].hands[0].isSplitHand = false;
-                    mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet;
                     let score = getBJScore([c1, c2]);
                     mbjState.seats[k].hands[0].score = score;
                     mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
@@ -248,10 +275,11 @@ setInterval(() => {
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
                 
-                // Allow frontend time to run the sequential animation
-                io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
+                // 0.4s sequential animation calculation
+                let totalCardsToDeal = (activeSeats.length * 2) + 2;
+                let animTime = (totalCardsToDeal * 400) + 1000; 
 
-                let animTime = (activeSeats.length * 2 + 2) * 400 + 1000; 
+                io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
                 setTimeout(() => {
                     mbjState.activeOrder = activeSeats.filter(k => mbjState.seats[k].hands[0].status === 'PLAYING');
@@ -346,8 +374,10 @@ io.on('connection', (socket) => {
         if(user && user.credits >= amt) {
             user.credits -= amt;
             let s = mbjState.seats[seatNum];
-            if (s.hands.length === 0) s.hands.push({ bet: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false, isSplitAce: false });
+            if (s.hands.length === 0) s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false });
+            
             s.hands[0].bet += amt;
+            s.hands[0].originalBet += amt;
             
             socket.emit('balanceUpdateData', { credits: user.credits });
             io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
@@ -364,7 +394,6 @@ io.on('connection', (socket) => {
         let hand = seat.hands[handIdx];
 
         if (actionData.type === 'hit') {
-            if (hand.isSplitAce) return; 
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
             if (hand.score > 21) { hand.status = 'BUST'; io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats }); mbjNextTurn(); } 
@@ -381,7 +410,10 @@ io.on('connection', (socket) => {
             if (user && user.credits >= hand.bet) {
                 user.credits -= hand.bet;
                 socket.emit('balanceUpdateData', { credits: user.credits });
+                
+                hand.doubledAmount = hand.bet; // Track the doubled portion
                 hand.bet *= 2;
+                
                 hand.cards.push(drawCard());
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
@@ -399,12 +431,16 @@ io.on('connection', (socket) => {
                 let splitCard = hand.cards.pop();
                 hand.cards.push(drawCard());
                 hand.score = getBJScore(hand.cards);
-                hand.isSplitHand = true; hand.isSplitAce = (splitCard.raw === 'A');
+                hand.isSplitHand = true; 
                 
-                seat.hands.push({ bet: hand.bet, cards: [splitCard, drawCard()], score: getBJScore([splitCard, drawCard()]), status: 'PLAYING', isSplitHand: true, isSplitAce: (splitCard.raw === 'A') });
+                let newHand = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard, drawCard()], score: 0, status: 'PLAYING', isSplitHand: true };
+                newHand.score = getBJScore(newHand.cards);
+                seat.hands.push(newHand);
                 
                 if (splitCard.raw === 'A') {
-                    hand.status = 'STAND'; seat.hands[1].status = 'STAND';
+                    // Split Aces only receive 1 card each, force stand immediately
+                    hand.status = 'STAND'; 
+                    seat.hands[1].status = 'STAND';
                     io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats });
                     mbjNextTurn();
                 } else {
