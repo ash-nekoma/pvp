@@ -57,7 +57,7 @@ function getBJScore(hand) {
 function isNaturalBlackjack(handCards) { return (handCards.length === 2 && getBJScore(handCards) === 21); }
 
 // =========================================================================
-// PREMIUM DERBY LOGIC (Strict 15s Betting)
+// PREMIUM DERBY LOGIC
 // =========================================================================
 let hrState = { time: 15, status: 'BETTING', bets: [], currentOdds: {} }; 
 
@@ -229,7 +229,7 @@ async function mbjResolveDealer() {
         }
         mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 8000); 
+    }, 10000); 
 }
 
 setInterval(() => {
@@ -267,7 +267,6 @@ setInterval(() => {
                 });
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
-                
                 let totalCardsToDeal = (activeSeats.length * 2) + 2;
                 let animTime = (totalCardsToDeal * 400) + 1000; 
 
