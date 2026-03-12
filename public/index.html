@@ -12,104 +12,71 @@
     
     <style>
         /* ================= BASE STYLES ================= */
-        :root {
-            --ps-bg: #000814; --ps-glow: #00a2ff;
-            --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15);
-            --danger: #ff3366; --success: #00e676; --credits: #ffb400;
-        }
+        :root { --ps-bg: #000814; --ps-glow: #00a2ff; --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15); --danger: #ff3366; --success: #00e676; --credits: #ffb400; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
-        
-        body { 
-            background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
-            color: white; height: 100vh !important; width: 100vw !important; overflow: hidden !important; 
-            user-select: none; -webkit-user-select: none;
-        }
+        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh; overflow: hidden; user-select: none; -webkit-user-select: none; }
         input, textarea { user-select: auto; -webkit-user-select: auto; }
-
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
-
-        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         .btn-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
         .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; }
 
         /* ================= TOP NAVIGATION ================= */
-        #app-container { display: block; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
-        
+        #app-container { display: block; height: 100vh; width: 100vw; position: relative; }
         .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer;}
-        
         .main-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 75px); margin-top: 75px; width: 100%; position: relative; }
         .view-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; }
-        
         .btn-back-fixed { position: fixed; top: 95px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .btn-back-fixed:hover { background: white; color: black; }
-
         .lobby-modes-container { display: flex; gap: 40px; }
         .game-card { width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
-
         .local-flash { position: fixed; bottom: 25px; right: 25px; z-index: 9999; color: var(--danger); font-size: 1.2rem; font-weight: 900; text-transform: uppercase; opacity: 0; display: none; text-shadow: 0 2px 10px rgba(0,0,0,0.9); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 8px; border: 1px solid var(--danger); }
         .local-flash.show { display: block; animation: flashAnim 2.5s forwards; }
         .local-flash.success { color: var(--success); border-color: var(--success); }
         @keyframes flashAnim { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
-        /* ================================================================= */
-        /* VIP BLACKJACK - OBLONG PILL SHAPE & HUD SYSTEM                    */
-        /* ================================================================= */
-        .mbj-board { 
-            width: 1100px; height: 580px; background: #111; border-radius: 20px; 
-            position: relative; box-shadow: 0 25px 80px rgba(0,0,0,0.9); 
-            overflow: hidden; margin-top: 10px; border: 4px solid #222;
-        }
-        
-        .mbj-felt { 
-            position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; 
-            background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); 
-            border: 20px solid #2e1a10; border-radius: 300px; 
-            box-shadow: inset 0 0 60px rgba(0,0,0,0.9); pointer-events: none; 
-        }
-        .mbj-table-line { position: absolute; top: 15px; left: 25px; right: 25px; bottom: 15px; border: 2px solid rgba(255,255,255,0.15); border-radius: 300px; pointer-events: none; }
-
+        /* ================= VIP BLACKJACK - GUARANTEED SEAT VISIBILITY ================= */
+        .mbj-board { width: 1100px; height: 580px; background: #111; border-radius: 20px; position: relative; box-shadow: 0 25px 80px rgba(0,0,0,0.9); overflow: hidden; margin-top: 10px; border: 4px solid #222; }
+        .mbj-felt { position: absolute; inset: 15px; background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); border: 20px solid #2e1a10; border-radius: 300px; box-shadow: inset 0 0 60px rgba(0,0,0,0.9); pointer-events: none; }
+        .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(255,255,255,0.15); border-radius: 300px; pointer-events: none; }
         .mbj-table-text { position: absolute; top: 240px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; width: 100%; z-index: 1; }
         .mbj-table-text h1 { font-size: 3.2rem; letter-spacing: 8px; margin-bottom: 5px; color: rgba(255,255,255,0.15); font-family: 'Outfit'; }
-        .mbj-table-text p { font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; color: rgba(255,215,0,0.3); }
+        .mbj-table-text p { font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,215,0,0.3); }
 
-        .mbj-interactive-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        #mbj-seats-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none; }
         
-        .mbj-dealer-area { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
+        .mbj-dealer-area { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 20; }
         .mbj-shoe { position: absolute; top: 40px; right: 60px; width: 65px; height: 100px; background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 4px solid #555; border-radius: 8px; box-shadow: -10px 15px 25px rgba(0,0,0,0.8); z-index: 5; }
 
-        .mbj-timer-display { position: absolute; top: 150px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); padding: 5px 30px; border-radius: 50px; border: 1px solid var(--ps-glow); display: none; flex-direction: column; align-items: center; box-shadow: 0 5px 15px rgba(0,162,255,0.3); pointer-events: auto; z-index: 20; }
+        .mbj-timer-display { position: absolute; top: 150px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); padding: 5px 30px; border-radius: 50px; border: 1px solid var(--ps-glow); display: none; flex-direction: column; align-items: center; box-shadow: 0 5px 15px rgba(0,162,255,0.3); z-index: 20; }
         .mbj-timer-display .hud-title { color: var(--ps-glow); font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; }
         .mbj-timer-display .hud-val { color: white; font-family: 'Rajdhani', monospace; font-size: 1.8rem; font-weight: 900; line-height: 1; }
-        .mbj-timer-display.closing { border-color: var(--danger); box-shadow: 0 5px 15px rgba(255,51,102,0.3); animation: pulseRed 1s infinite; }
-        .mbj-timer-display.closing .hud-title { color: var(--danger); }
 
-        .mbj-seat-anchor { position: absolute; display: flex; flex-direction: column; align-items: center; pointer-events: auto; transition: opacity 0.3s; width: 80px; }
-        
+        .mbj-seat-anchor { position: absolute; display: flex; flex-direction: column; align-items: center; width: 80px; pointer-events: auto; }
         #mbj-anchor-1 { bottom: 120px; left: 120px; }
         #mbj-anchor-2 { bottom: 60px; left: 280px; }
         #mbj-anchor-3 { bottom: 40px; left: 50%; transform: translateX(-50%); }
         #mbj-anchor-4 { bottom: 60px; right: 280px; }
         #mbj-anchor-5 { bottom: 120px; right: 120px; }
 
-        .dimmed { opacity: 0.3; filter: grayscale(80%); pointer-events: none; }
+        .dimmed { opacity: 0.4; filter: grayscale(80%); }
         .seat-glow { position: absolute; top: -50px; left: -50px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
-        .active-turn { opacity: 1 !important; z-index: 100; }
+        .active-turn { opacity: 1 !important; z-index: 100; filter: grayscale(0) !important; }
         .active-turn .seat-glow { display: block; animation: pulseGlow 2s infinite; }
 
-        .mbj-seat-circle { width: 65px; height: 65px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; position: relative;}
-        .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.1); }
+        .mbj-seat-circle { width: 65px; height: 65px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.5); z-index: 5; position: relative;}
+        .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 3px solid var(--credits); background: transparent; cursor: default; box-shadow: inset 0 0 15px rgba(255,180,0,0.2); }
-
+        
         .chip-stack { background: #222; border: 3px dashed #ffcc00; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; font-weight: 900; color: white; position: absolute; box-shadow: 0 5px 10px rgba(0,0,0,0.9); }
+        .seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; margin-top: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white;}
 
         .mbj-hand-cards { position: absolute; bottom: 85px; left: -10px; display: flex; z-index: 10; pointer-events: none; }
         .mbj-card { width: 55px; height: 80px; background: white; border-radius: 6px; box-shadow: -3px 3px 10px rgba(0,0,0,0.6); position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; opacity: 0; border: 1px solid #ccc; }
-        
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; font-weight: 900;}
         .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; font-weight: 900; transform: rotate(180deg); }
         .card-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; }
@@ -118,82 +85,71 @@
 
         .mbj-hand-score { position: absolute; top: -12px; left: -12px; width: 24px; height: 24px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 0.85rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8);}
         .dealer-score-badge { position: absolute; top: -10px; left: -25px; width: 28px; height: 28px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 1rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8); margin-bottom: 5px;}
-        
         .mbj-status { position: absolute; top: 15px; left: -20px; background: var(--ps-bg); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; border: 1px solid var(--glass-border); white-space: nowrap; z-index: 25; pointer-events: none; }
         .status-bust { color: var(--danger); border-color: var(--danger); animation: shakeRed 0.5s forwards; }
-        .status-bj { color: #000; background: var(--credits); border-color: #fff; box-shadow: 0 0 20px var(--credits); }
         
         .anim-fly-in { animation: flyIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translate(300px, -300px) scale(0.3) rotate(45deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } }
         .anim-flip { animation: flipCard 0.5s ease-in-out forwards; }
         @keyframes flipCard { 0% { transform: rotateY(180deg); } 100% { transform: rotateY(0deg); } }
-        @keyframes shakeRed { 0% { transform: translateX(0); filter: grayscale(0); } 25% { transform: translateX(-5px); filter: grayscale(50%) sepia(1) hue-rotate(-50deg) saturate(5); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); filter: grayscale(50%) sepia(1) hue-rotate(-50deg) saturate(5); } }
-
-        .seat-bet-ui { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.8); pointer-events: auto; width: 140px; }
         
+        .seat-bet-ui { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.8); pointer-events: auto; width: 140px; }
         .seat-actions-wrapper { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; background: rgba(0,0,0,0.9); padding: 8px; border-radius: 50px; border: 1px solid var(--glass-border); z-index: 100; pointer-events: auto; animation: popUp 0.3s ease-out; }
         @keyframes popUp { from { transform: translateX(-50%) scale(0.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
-        
         .mbj-action-btn { width: 45px; height: 45px; border-radius: 50%; background: #111; border: 2px solid rgba(255,255,255,0.3); color: white; font-size: 1.2rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.9); }
         .mbj-action-btn:hover:not(:disabled) { transform: scale(1.15); border-color: white; }
-        .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); }
         .mbj-action-btn.hit { background: #008040; border-color: #00e676; }
         .mbj-action-btn.stand { background: #9b0022; border-color: #ff3366; }
         .mbj-action-btn.double { background: #997a00; border-color: #ffcc00; color: black; font-size: 0.9rem; }
-        .mbj-action-btn.split { background: #5900b3; border-color: #b366ff; }
 
         .mbj-hud-container { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; pointer-events: none; z-index: 10; }
         .hud-capsule { background: rgba(0,0,0,0.85); border: 1px solid var(--glass-border); padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.8); width: 160px; pointer-events: auto; }
         .hud-capsule .hud-title { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; }
         .hud-capsule .hud-val { font-size: 1.2rem; font-weight: 900; color: var(--credits); }
 
-        /* ================= RETRO HORSE DERBY (Racing Dirt & Camera Stop Physics) ================= */
+        /* ================= RETRO HORSE DERBY - PIXEL TRACK & SVG HORSES ================= */
         .hr-board { width: 900px; height: 600px; background: #0a0a0a; border: 4px solid #333; border-radius: 12px; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); margin-top: 20px;}
-        
         .hr-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .hr-ticker { flex: 1; text-align: center; color: var(--credits); font-family: 'Press Start 2P', monospace; font-size: 1.1rem; text-shadow: 0 0 10px var(--credits); padding: 10px; background: #111; border: 2px solid #333; border-radius: 8px; margin: 0 20px; text-transform: uppercase;}
         
-        .hr-track-window { flex: 1; border: 4px solid #444; position: relative; overflow: hidden; border-radius: 8px; background: #87CEEB; }
+        .hr-track-window { flex: 1; border: 4px solid #222; position: relative; overflow: hidden; border-radius: 8px; background: #4eb2e8; /* Sky */ }
         
-        /* The Parallax Environment */
-        .hr-hills { position: absolute; bottom: 70%; width: 200%; height: 30%; background: radial-gradient(circle at 50% 100%, #228B22 0%, #006400 100%); border-radius: 50% 50% 0 0; opacity: 0.8; }
-        .hr-fence { position: absolute; bottom: 70%; width: 200%; height: 15px; border-top: 3px solid white; border-bottom: 3px solid white; background: rgba(255,255,255,0.2); }
+        /* The Environment Layers (From Ref image) */
+        .hr-grass-bg { position: absolute; top: 20%; width: 100%; height: 25%; background: #2a8f3d; border-bottom: 4px solid white; z-index: 1;}
+        .hr-dirt-bg { position: absolute; bottom: 0; width: 200%; height: 55%; background: repeating-linear-gradient(90deg, #4a3026 0px, #4a3026 40px, #3d251d 40px, #3d251d 80px); z-index: 2;}
         
-        /* Authentic Dirt Track Texture */
-        .hr-track-bg { position: absolute; bottom: 0; width: 200%; height: 70%; background: repeating-linear-gradient(90deg, #3E2723 0px, #3E2723 40px, #2b1b17 40px, #2b1b17 80px); }
-        
-        /* Class attached when the camera is 'moving' */
-        .track-moving .hr-hills { animation: scrollTrack 15s linear infinite; }
-        .track-moving .hr-fence { animation: scrollTrack 3s linear infinite; }
-        .track-moving .hr-track-bg { animation: scrollTrack 0.4s linear infinite; }
+        .track-moving .hr-dirt-bg { animation: scrollTrack 0.3s linear infinite; }
         @keyframes scrollTrack { from { transform: translateX(0); } to { transform: translateX(-80px); } }
 
-        /* The Checkered Finish Line */
-        .hr-finish-line { position: absolute; right: -100px; top: 0; bottom: 0; width: 40px; background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-color: #fff; z-index: 5; border-left: 6px solid #ffcc00; box-shadow: -15px 0 30px rgba(0,0,0,0.6); }
+        /* Finish Line perfectly mapped to the dirt area */
+        .hr-finish-line { position: absolute; right: -100px; top: 45%; bottom: 0; width: 40px; background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-color: #fff; z-index: 5; border-left: 6px solid #ffcc00; box-shadow: -15px 0 30px rgba(0,0,0,0.6); }
         
-        .hr-lanes-overlay { position: absolute; bottom: 0; width: 100%; height: 70%; display: flex; flex-direction: column; justify-content: space-evenly; }
-        .hr-lane { width: 100%; height: 16%; border-bottom: 2px dashed rgba(255,255,255,0.15); position: relative; display: flex; align-items: center; }
+        /* 6 Equal Lanes on the dirt */
+        .hr-lanes-overlay { position: absolute; bottom: 0; width: 100%; height: 55%; display: flex; flex-direction: column; justify-content: space-evenly; z-index: 10; }
+        .hr-lane { width: 100%; height: 16.6%; border-bottom: 2px dashed rgba(255,255,255,0.1); position: relative; }
         
-        /* The Horse and Realistic Mix-Blend Silk */
-        .hr-horse-group { position: absolute; left: 10%; display: flex; align-items: center; justify-content: center; z-index: 10; transition: left 0.1s linear; }
-        .hr-sprite-wrapper { position: relative; display: inline-block; transform: scaleX(-1); }
-        .hr-sprite { font-size: 3.5rem; filter: drop-shadow(-5px 5px 2px rgba(0,0,0,0.5)); z-index: 1; position: relative;}
+        /* The SVG Horse Grounded accurately */
+        .hr-horse-group { position: absolute; left: 10%; bottom: 0; display: flex; align-items: flex-end; justify-content: center; transition: left 0.1s linear; z-index: 15; }
         
-        /* This physically dyes the jockey's shirt area */
-        .hr-saddle-tint { position: absolute; top: 15%; left: 35%; width: 25%; height: 35%; background: var(--h-color); border-radius: 50%; opacity: 0.9; mix-blend-mode: multiply; z-index: 2; pointer-events: none;}
+        /* SVG Leg Animation & Body Physics */
+        .horse-svg .b-leg1 { transform-origin: 16px 28px; }
+        .horse-svg .b-leg2 { transform-origin: 24px 28px; }
+        .horse-svg .f-leg1 { transform-origin: 40px 28px; }
+        .horse-svg .f-leg2 { transform-origin: 48px 28px; }
         
-        /* High-Action Running Physics (Rotational Leg Motion) */
-        .retro-gallop { animation: premiumGallop 0.3s infinite; transform-origin: bottom center; }
-        @keyframes premiumGallop { 
-            0%, 100% { transform: scaleX(-1) rotate(0deg) translateY(0); } 
-            25% { transform: scaleX(-1) rotate(-8deg) translateY(-4px); } 
-            50% { transform: scaleX(-1) rotate(0deg) translateY(0); } 
-            75% { transform: scaleX(-1) rotate(5deg) translateY(2px) scaleX(1.05); } 
-        }
+        .running .b-leg1 { animation: gallopB 0.25s infinite linear; }
+        .running .b-leg2 { animation: gallopB 0.25s infinite linear reverse; }
+        .running .f-leg1 { animation: gallopF 0.25s infinite linear; }
+        .running .f-leg2 { animation: gallopF 0.25s infinite linear reverse; }
+        .running .horse-body { animation: bodyBob 0.25s infinite alternate linear; }
+        
+        @keyframes gallopB { 0%, 100% { transform: rotate(-25deg); } 50% { transform: rotate(35deg); } }
+        @keyframes gallopF { 0%, 100% { transform: rotate(35deg); } 50% { transform: rotate(-25deg); } }
+        @keyframes bodyBob { 0% { transform: translateY(0); } 100% { transform: translateY(2px); } }
 
         .hr-controls-area { margin-top: 15px; display: flex; flex-direction: column; gap: 15px; }
         .hr-bet-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; width: 100%; }
-        .hr-bet-btn { background: #111; border: 2px solid #444; color: white; padding: 15px 5px; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+        .hr-bet-btn { background: #111; border: 2px solid #444; color: white; padding: 15px 5px; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .hr-bet-btn:hover:not(:disabled) { transform: translateY(-3px); border-color: white; }
         .hr-bet-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .hr-odds-text { color: var(--success); font-size: 0.9rem; text-shadow: 0 0 5px var(--success); }
@@ -227,7 +183,7 @@
                     <i class="fas fa-horse-head" style="color: var(--danger);"></i>
                     <div>
                         <div class="game-title">RETRO DERBY</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Leg Physics & Camera Stop</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Vector Running Legs & Parallax</div>
                     </div>
                 </div>
             </div>
@@ -235,12 +191,7 @@
 
           <div id="view-mbj" class="view-container hidden">
               <div class="mbj-board">
-                  
-                  <div class="mbj-table-surface">
-                      <div class="mbj-felt">
-                          <div class="mbj-table-line"></div>
-                      </div>
-                  </div>
+                  <div class="mbj-table-surface"><div class="mbj-felt"><div class="mbj-table-line"></div></div></div>
                   
                   <div class="mbj-table-text">
                       <h1>BLACKJACK</h1>
@@ -248,7 +199,6 @@
                   </div>
 
                   <div class="mbj-interactive-layer">
-                      
                       <div class="mbj-timer-display" id="mbj-timer-box">
                           <div class="hud-title" id="mbj-timer-title">PLACE BETS</div>
                           <div class="hud-val" id="mbj-timer">15</div>
@@ -265,14 +215,8 @@
                   </div>
 
                   <div class="mbj-hud-container">
-                      <div class="hud-capsule">
-                          <div class="hud-title">BALANCE</div>
-                          <div class="hud-val" id="mbj-hud-balance">0 TC</div>
-                      </div>
-                      <div class="hud-capsule">
-                          <div class="hud-title">TOTAL BET</div>
-                          <div class="hud-val" id="mbj-hud-bet">0 TC</div>
-                      </div>
+                      <div class="hud-capsule"><div class="hud-title">BALANCE</div><div class="hud-val" id="mbj-hud-balance">0 TC</div></div>
+                      <div class="hud-capsule"><div class="hud-title">TOTAL BET</div><div class="hud-val" id="mbj-hud-bet">0 TC</div></div>
                   </div>
 
                   <div id="flash-mbj" class="local-flash"></div> 
@@ -281,7 +225,6 @@
 
           <div id="view-horserace" class="view-container hidden">
               <div class="hr-board">
-                  
                   <div class="hr-top-bar">
                       <div style="background:rgba(0,0,0,0.8); border:1px solid var(--glass-border); padding: 10px 20px; border-radius: 8px; color:white; font-weight:900; font-size:1.2rem; font-family: 'Rajdhani', monospace;" id="hr-timer-box"><i class="fas fa-clock" style="margin-right:10px;"></i> <span id="hr-timer">15</span></div>
                       <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
@@ -292,13 +235,12 @@
                   </div>
                   
                   <div class="hr-track-window" id="hr-environment">
-                      <div class="hr-hills"></div>
-                      <div class="hr-fence"></div>
-                      <div class="hr-track-bg" id="hr-track-bg"></div>
+                      <div class="hr-grass-bg"></div>
+                      <div class="hr-dirt-bg"></div>
                       
                       <div class="hr-lanes-overlay">
                           <div class="hr-finish-line" id="hr-finish-line"></div>
-                          <div id="hr-lanes-container" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly;"></div>
+                          <div id="hr-lanes-container" style="width: 100%; height: 100%; position: absolute;"></div>
                       </div>
                   </div>
 
@@ -308,7 +250,6 @@
                       </div>
                       <div class="hr-bet-grid" id="hr-bet-grid"></div>
                   </div>
-
                   <div id="flash-horserace" class="local-flash" style="bottom: 10px;"></div> 
               </div>
           </div>
@@ -321,12 +262,10 @@
     const socket = io(); 
     let myUsername = '', myCredits = 0;
     let activeGame = null;
-    
     let mbjGameState = 'BETTING';
     let hrState = { time: 15, status: 'BETTING', currentOdds: {} };
     let mySBets = {};
 
-    // INSTANT AUTO-LOGIN
     window.onload = () => { socket.emit('login', { username: 'VIP_Tester', password: '123' }); };
     
     socket.on('loginSuccess', (data) => { 
@@ -353,24 +292,17 @@
             setTimeout(() => f.classList.remove('show'), 2500);
         }
     }
-    socket.on('localGameError', (data) => showLocalFlash(data.game, data.msg, "error"));
 
     function switchView(viewId) { 
         document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden')); 
         let v = document.getElementById('view-' + viewId); 
         if (v) v.classList.remove('hidden'); 
-        
-        let backBtn = document.getElementById('global-back-btn'); 
-        if (viewId === 'casino') backBtn.classList.add('hidden'); 
-        else backBtn.classList.remove('hidden'); 
+        document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino');
     }
 
     function backToHub() {
         if(activeGame === 'mbj') socket.emit('mbjLeaveSeat');
-        if(activeGame === 'horserace' && hrState.status === 'RACING') {
-            showLocalFlash('horserace', "Wait for race to finish!", "error");
-            return;
-        }
+        if(activeGame === 'horserace' && hrState.status === 'RACING') { showLocalFlash('horserace', "Wait for race to finish!", "error"); return; }
         if(activeGame) socket.emit('leaveRoom', activeGame);
         activeGame = null;
         switchView('casino');
@@ -380,7 +312,7 @@
         activeGame = id;
         socket.emit('joinRoom', id);
         if (id === 'mbj') {
-            renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
+            renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null }); // Render empties instantly
             switchView('mbj');
         } else if (id === 'horserace') {
             setupDerbyUI();
@@ -391,17 +323,15 @@
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // VIP BLACKJACK LOGIC (Playability & Logic Fix)
+    // VIP BLACKJACK (Bulletproof Seat Rendering)
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
     function generateCardHTML(c, isHidden = false, animDelay = 0) {
         let styleStr = `animation-delay: ${animDelay}s;`;
         if(isHidden) return `<div class="mbj-card card-back anim-fly-in" style="${styleStr}"></div>`;
-        
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
-
         return `<div class="mbj-card anim-fly-in ${colorClass}" style="${styleStr}">
                     <div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
                     <div class="card-center">${cleanSuit}</div>
@@ -409,8 +339,8 @@
                 </div>`;
     }
     
-    function renderMBJSeats(seats, activeTurnObj = null, turnTime = 0, isInitialDeal = false) {
-        currentMBJSeats = seats; 
+    function renderMBJSeats(seats, activeTurnObj = null, time = 0, isInitialDeal = false) {
+        currentMBJSeats = seats || currentMBJSeats; 
         let cont = document.getElementById('mbj-seats-container'); 
         if(!cont) return; 
         cont.innerHTML = '';
@@ -420,41 +350,32 @@
         let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null;
 
         for(let i=1; i<=5; i++) {
-            let s = seats[i]; 
+            let s = currentMBJSeats[i]; 
             let isMe = s && s.username === myUsername; 
             let isMySeatTurn = activeSeatNum == i;
-            
             let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
             let activeClass = isMySeatTurn ? 'active-turn' : '';
             let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
             
-            // Allow seating ONLY if you aren't seated, seat is empty, and game is in Betting mode
-            let clickAction = ``;
-            if (!s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername)) {
-                clickAction = `socket.emit('mbjTakeSeat', ${i})`;
-            }
+            // Allow click if empty AND betting AND I am not seated elsewhere
+            let canSit = !s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername);
+            let clickAction = canSit ? `socket.emit('mbjTakeSeat', ${i})` : ``; 
 
+            // Create seat container explicitly
             let html = `<div class="mbj-seat-anchor ${activeClass} ${dimClass}" id="mbj-anchor-${i}">`;
             html += `<div class="seat-glow"></div>`;
             
-            // CARDS (+20px Horizontal Fan)
+            // Render Cards
             html += `<div class="mbj-hand-cards">`;
             if (s && s.hands && s.hands.length > 0) {
                 s.hands.forEach((hand, hIdx) => {
-                    
-                    if(hand.cards.length > 0 && hand.status !== 'BUST') {
-                        html += `<div class="mbj-hand-score" style="left: ${(hIdx * 100) - 12}px;">${hand.score}</div>`;
-                    }
-
+                    if(hand.cards.length > 0 && hand.status !== 'BUST') { html += `<div class="mbj-hand-score" style="left: ${(hIdx * 100) - 12}px;">${hand.score}</div>`; }
                     hand.cards.forEach((c, cIdx) => { 
                         let offsetLeft = (hIdx * 100) + (cIdx * 20); 
                         let animDelay = isInitialDeal ? (cardSequenceIdx * 0.4) : 0; 
-                        let cardHtml = generateCardHTML(c, false, animDelay);
-                        cardHtml = cardHtml.replace('style="', `style="left: ${offsetLeft}px; `);
-                        html += cardHtml;
+                        html += generateCardHTML(c, false, animDelay).replace('style="', `style="left: ${offsetLeft}px; `);
                         if(isInitialDeal) cardSequenceIdx++;
                     });
-                    
                     if(hand.status && hand.status !== 'WAITING' && hand.status !== 'PLAYING') {
                         let stClass = hand.status === 'BUST' ? 'status-bust' : (hand.status === 'BLACKJACK' ? 'status-bj' : '');
                         html += `<div class="mbj-status ${stClass}" style="left: ${(hIdx * 100) - 10}px;">${hand.status}</div>`;
@@ -463,56 +384,48 @@
             }
             html += `</div>`;
 
-            // SEAT CIRCLE & CHIPS
-            html += `<div class="${boxClass}" onclick="${clickAction}">`;
+            // Render Circle
+            html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
             if (s) {
                 let totalSeatBet = s.hands && s.hands.length > 0 ? s.hands.reduce((sum, h)=>sum+h.bet, 0) : s.bet || 0;
                 if (totalSeatBet > 0) { html += `<div class="chip-stack">${totalSeatBet}</div>`; }
                 if(isMe) myTotalBet += totalSeatBet;
-                html += `</div>`; 
-
-                html += `<div style="text-align: center; margin-top: 8px;">`;
-                html += `<div style="font-weight: 900; color: ${isMe ? 'var(--ps-glow)' : 'white'}; font-size: 0.85rem; text-transform: uppercase; white-space:nowrap; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${s.username}</div>`;
-                html += `</div>`;
-                
-                // DETACHED BETTING POD
-                if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
-                    html += `<div class="seat-bet-ui">
-                                <input type="number" id="mbj-bet-input-${i}" class="input-control" placeholder="Amount" style="padding:6px; font-size:0.9rem;">
-                                <div style="display:flex; gap:5px; width:100%;">
-                                    <button class="btn-play" onclick="event.stopPropagation(); placeMBJBet(${i})" style="flex:1; padding:6px; background:var(--success); color:black; font-size:0.8rem; border:none;">BET</button>
-                                    <button class="btn-play" onclick="event.stopPropagation(); socket.emit('mbjLeaveSeat');" style="flex:1; padding:6px; background:var(--danger); color:white; font-size:0.8rem; border:none;">LEAVE</button>
-                                </div>
-                             </div>`;
-                }
-
-                // HORIZONTAL CONTEXTUAL ACTION BUTTONS (Multi-Hit Enabled)
-                if (isMySeatTurn && mbjGameState === 'PLAYER_TURN' && isMe) {
-                    let activeHand = s.hands[activeTurnObj.handIdx];
-                    let canDouble = activeHand && activeHand.cards.length === 2;
-                    let canSplit = canDouble && activeHand.cards[0].raw === activeHand.cards[1].raw;
-
-                    html += `<div class="seat-actions-wrapper">
-                                <button class="mbj-action-btn hit" onclick="handleMBJClick('hit')" title="Hit"><i class="fas fa-plus"></i></button>
-                                <button class="mbj-action-btn stand" onclick="handleMBJClick('stand')" title="Stand"><i class="fas fa-hand-paper"></i></button>
-                                <button class="mbj-action-btn double" onclick="handleMBJClick('double')" ${canDouble ? '' : 'disabled'} title="Double">x2</button>
-                                <button class="mbj-action-btn split" onclick="handleMBJClick('split')" ${canSplit ? '' : 'disabled'} title="Split"><i class="fas fa-arrows-alt-h"></i></button>
-                             </div>`;
-                }
-
-            } else { 
-                // BUG FIX: Empty seats are always clearly visible and clickable during BETTING phase
-                if (mbjGameState === 'BETTING') {
-                    html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:0.5; color: white;"></i></div>`; 
-                    html += `<div style="color:var(--text-muted); font-weight:800; font-size:0.75rem; margin-top: 5px; text-transform: uppercase;">Empty</div>`;
-                } else {
-                    html += `</div>`; 
-                }
+            } else {
+                // BUG FIX: ALWAYS draw the plus, just make it opaque if it's betting time
+                html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
             }
+            html += `</div>`; 
+
+            // Render Name/Label
+            html += `<div class="seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${mbjGameState==='BETTING' || s ? 1 : 0.2};">`;
+            html += s ? s.username : 'EMPTY';
+            html += `</div>`;
+                
+            // Render Betting Pod
+            if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
+                html += `<div class="seat-bet-ui">
+                            <input type="number" id="mbj-bet-input-${i}" class="input-control" placeholder="Amount" style="padding:6px; font-size:0.9rem;">
+                            <div style="display:flex; gap:5px; width:100%;">
+                                <button class="btn-play" onclick="event.stopPropagation(); placeMBJBet(${i})" style="flex:1; padding:6px; background:var(--success); color:black; font-size:0.8rem; border:none;">BET</button>
+                                <button class="btn-play" onclick="event.stopPropagation(); socket.emit('mbjLeaveSeat');" style="flex:1; padding:6px; background:var(--danger); color:white; font-size:0.8rem; border:none;">LEAVE</button>
+                            </div>
+                         </div>`;
+            }
+
+            // Render Hit/Stand
+            if (isMySeatTurn && mbjGameState === 'PLAYER_TURN' && isMe) {
+                let activeHand = s.hands[activeTurnObj.handIdx];
+                let canDouble = activeHand && activeHand.cards.length === 2;
+                html += `<div class="seat-actions-wrapper">
+                            <button class="mbj-action-btn hit" onclick="socket.emit('mbjAction', {type:'hit'})"><i class="fas fa-plus"></i></button>
+                            <button class="mbj-action-btn stand" onclick="socket.emit('mbjAction', {type:'stand'})"><i class="fas fa-hand-paper"></i></button>
+                            <button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})" ${canDouble ? '' : 'disabled'}>x2</button>
+                         </div>`;
+            }
+
             html += `</div>`; 
             cont.innerHTML += html;
         }
-        
         document.getElementById('mbj-hud-bet').innerText = myTotalBet + ' TC';
     }
 
@@ -524,13 +437,8 @@
         socket.emit('mbjPlaceBet', a); 
     }
 
-    function handleMBJClick(actionType) { 
-        socket.emit('mbjAction', { type: actionType }); 
-    }
-
     socket.on('mbjUpdate', async (data) => {
         if(activeGame !== 'mbj') return;
-        
         let dBadge = document.getElementById('mbj-d-score-val');
         let tTitle = document.getElementById('mbj-timer-title');
         let tVal = document.getElementById('mbj-timer');
@@ -539,107 +447,55 @@
         if(data.event === 'timer') {
             mbjGameState = 'BETTING'; 
             dBadge.style.display = 'none';
-            // Only show timer if actively counting down (active = true)
             if(data.active) {
                 tBox.style.display = 'flex';
                 if (tVal) tVal.innerText = data.time; 
-                tTitle.innerText = "PLACE BETS";
-                tTitle.style.color = "var(--ps-glow)";
-            } else {
-                tBox.style.display = 'none';
-            }
-            // Passing null turn logic to clear old highlights
-            renderMBJSeats(data.seats, null, data.time); 
+                tTitle.innerText = "PLACE BETS"; tTitle.style.color = "var(--ps-glow)";
+            } else { tBox.style.display = 'none'; }
+            renderMBJSeats(data.seats); 
         } 
-        else if (data.event === 'sync_seats') {
-            renderMBJSeats(data.seats, data.activeTurn, data.time);
-        } 
-        else if (data.event === 'lock_bets') {
-            mbjGameState = 'DEALING'; 
-            tTitle.innerText = "DEALING";
-            tTitle.style.color = "var(--danger)";
-            if (tVal) tVal.innerText = '--'; 
-        } 
+        else if (data.event === 'sync_seats') { renderMBJSeats(data.seats, data.activeTurn); } 
+        else if (data.event === 'lock_bets') { mbjGameState = 'DEALING'; tTitle.innerText = "DEALING"; tTitle.style.color = "var(--danger)"; if (tVal) tVal.innerText = '--'; } 
         else if (data.event === 'deal') {
             renderMBJSeats(data.seats, null, 0, true); 
-            
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                
-                let totalPlayerCards = Object.values(data.seats).reduce((count, s) => {
-                    if (s && s.hands && s.hands.length > 0) return count + s.hands[0].cards.length;
-                    return count;
-                }, 0);
-                
-                let baseDelay = totalPlayerCards * 0.4; 
-
-                // Dealer Card 1 
-                let c1Html = generateCardHTML(data.dealerHand[0], false, baseDelay);
-                c1Html = c1Html.replace('style="', 'style="position:absolute; left: 0px; ');
-                dHand.innerHTML += c1Html; 
-
-                // Dealer Card 2 
-                let c2Html = generateCardHTML(data.dealerHand[1], true, baseDelay + 0.4);
-                c2Html = c2Html.replace('style="', 'style="position:absolute; left: 20px; ');
-                dHand.innerHTML += c2Html; 
-                
-                setTimeout(() => {
-                    dBadge.style.display = 'flex';
-                    dBadge.innerText = data.dealerHand[0].bjVal;
-                }, (baseDelay + 0.4) * 1000);
+                let baseDelay = Object.values(data.seats).reduce((cnt, s) => count + (s && s.hands[0] ? s.hands[0].cards.length : 0), 0) * 0.4; 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, baseDelay).replace('style="', 'style="position:absolute; left: 0px; '); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, baseDelay + 0.4).replace('style="', 'style="position:absolute; left: 20px; '); 
+                setTimeout(() => { dBadge.style.display = 'flex'; dBadge.innerText = data.dealerHand[0].bjVal; }, (baseDelay + 0.4) * 1000);
             } 
         } 
         else if (data.event === 'turn') {
             mbjGameState = 'PLAYER_TURN'; 
-            tTitle.innerText = "PLAYER TURN";
-            tTitle.style.color = "white";
+            tTitle.innerText = "PLAYER TURN"; tTitle.style.color = "white";
             if (tVal) tVal.innerText = data.time; 
-            renderMBJSeats(data.seats, data.activeTurn, data.time);
+            renderMBJSeats(data.seats, data.activeTurn);
         } 
-        else if (data.event === 'turn_timer') {
-            if (tVal) tVal.innerText = data.time; 
-        }
+        else if (data.event === 'turn_timer') { if (tVal) tVal.innerText = data.time; }
         else if (data.event === 'dealer_resolved') {
-            mbjGameState = 'RESOLVING'; 
-            tBox.style.display = 'none'; 
-            
+            mbjGameState = 'RESOLVING'; tBox.style.display = 'none'; 
             renderMBJSeats(data.seats); 
-            
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
-            
             if(dHand) {
-                dHand.innerHTML = generateCardHTML(data.dealerHand[0]).replace('anim-fly-in', '');
-                dHand.innerHTML = dHand.innerHTML.replace('style="', 'style="position:absolute; left: 0px; ');
-                
-                let revealHtml = generateCardHTML(data.dealerHand[1]).replace('anim-fly-in', 'anim-flip');
-                dHand.innerHTML += revealHtml.replace('style="', 'style="position:absolute; left: 20px; ');
-                
+                dHand.innerHTML = generateCardHTML(data.dealerHand[0]).replace('anim-fly-in', '').replace('style="', 'style="position:absolute; left: 0px; ');
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1]).replace('anim-fly-in', 'anim-flip').replace('style="', 'style="position:absolute; left: 20px; ');
                 dBadge.innerText = getBJScore(data.dealerHand.slice(0,2));
-
                 const drawRemaining = async () => {
                     await delay(800);
-
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        let c = data.dealerHand[i]; 
-                        let slideHtml = generateCardHTML(c);
-                        let offset = (i * 20); 
-                        dHand.innerHTML += slideHtml.replace('style="', `style="position:absolute; left:${offset}px; z-index:${i}; `); 
-                        
+                        dHand.innerHTML += generateCardHTML(data.dealerHand[i]).replace('style="', `style="position:absolute; left:${i * 20}px; z-index:${i}; `); 
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
                         await delay(800); 
                     }
-                    
                     dBadge.innerText = data.dealerScore;
-                    
                     let myNet = 0;
                     for(let i=1; i<=5; i++) {
                         let seat = data.seats[i];
                         if (seat && seat.username === myUsername && data.results && data.results[i]) {
                             let tb = seat.hands.reduce((sum, h)=>sum+h.bet, 0);
-                            let tw = data.results[i].win;
-                            let tp = data.results[i].push;
-                            myNet = tw - (tb - tp);
+                            myNet = data.results[i].win - (tb - data.results[i].push);
                         }
                     }
                     if (myNet > 0) showLocalFlash('mbj', `WON +${myNet} TC`, 'success');
@@ -649,37 +505,50 @@
             }
         } 
         else if (data.event === 'new_round') {
-            mbjGameState = 'BETTING'; 
-            tBox.style.display = 'none';
-            tTitle.innerText = "PLACE BETS";
-            tTitle.style.color = "var(--ps-glow)";
-            
-            let dHand = document.getElementById('mbj-fs-dealer-hand'); 
-            if(dHand) dHand.innerHTML = ''; 
+            mbjGameState = 'BETTING'; tBox.style.display = 'none';
+            document.getElementById('mbj-fs-dealer-hand').innerHTML = ''; 
             dBadge.style.display = 'none';
             renderMBJSeats(data.seats); 
         }
     });
 
     // =========================================================================
-    // RETRO HORSE DERBY LOGIC (Leg Physics & Camera Stop)
+    // RETRO HORSE DERBY LOGIC (Pure SVG Vector Horses)
     // =========================================================================
     const hexColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
     
+    // A customized, perfectly grounded 2D pixel-style horse SVG
+    function getHorseSVG(color) {
+        return `
+        <svg viewBox="0 0 64 48" width="70" height="52" class="horse-svg">
+            <g class="b-leg2"><rect x="22" y="28" width="4" height="18" rx="2" fill="#3a2518"/></g>
+            <g class="b-leg1"><rect x="14" y="28" width="4" height="18" rx="2" fill="#5c3a21"/></g>
+            <g class="f-leg2"><rect x="46" y="28" width="4" height="18" rx="2" fill="#3a2518"/></g>
+            <g class="f-leg1"><rect x="38" y="28" width="4" height="18" rx="2" fill="#5c3a21"/></g>
+            <g class="horse-body">
+                <path d="M 10 18 Q 4 18 6 30" stroke="#221100" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <rect x="14" y="14" width="34" height="16" rx="8" fill="#7a4b2b"/>
+                <path d="M 40 20 L 54 6 L 60 8 L 56 16 L 48 24 Z" fill="#7a4b2b"/>
+                <path d="M 54 6 Q 58 2 60 8" fill="#7a4b2b"/>
+                <rect x="28" y="6" width="12" height="12" rx="3" fill="${color}"/>
+                <circle cx="34" cy="4" r="5" fill="${color}"/>
+                <rect x="30" y="12" width="5" height="10" rx="2" fill="#fff" transform="rotate(20 30 12)"/>
+            </g>
+        </svg>`;
+    }
+
     function setupDerbyUI() {
         let container = document.getElementById('hr-lanes-container');
         if(!container) return;
         
         let trackHTML = '';
-        ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach((c) => {
-            // Detailed Jockey with Multiply Blend Mode Silk
+        let laneHeight = 100 / 6; // 6 lanes
+        
+        ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach((c, index) => {
             trackHTML += `
-            <div class="hr-lane">
+            <div class="hr-lane" style="top: ${index * laneHeight}%; height: ${laneHeight}%;">
                 <div id="horse-${c}" class="hr-horse-group">
-                    <div class="hr-sprite-wrapper">
-                        <div class="hr-sprite">🏇</div>
-                        <div class="hr-saddle-tint" style="--h-color:${hexColors[c]};"></div>
-                    </div>
+                    ${getHorseSVG(hexColors[c])}
                 </div>
             </div>`;
         });
@@ -710,11 +579,8 @@
         let c = data.choice;
         if (!mySBets[c]) mySBets[c] = 0;
         mySBets[c] += data.amount;
-        
-        let tot = Object.values(mySBets).reduce((sum, val) => sum + val, 0);
         let mb = document.getElementById('hr-my-bet');
-        if (mb) mb.innerHTML = `${tot} TC`;
-
+        if (mb) mb.innerHTML = `${Object.values(mySBets).reduce((sum, val) => sum + val, 0)} TC`;
         let badge = document.getElementById('badge-' + c);
         if (badge) { badge.innerText = mySBets[c]; badge.style.display = 'block'; }
     });
@@ -725,7 +591,6 @@
         if(activeGame === 'horserace' && hrState.status === 'BETTING') {
             let s = document.getElementById('hr-timer');
             if(s) s.innerText = data.time;
-            
             ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach(c => {
                 let el = document.getElementById('odds-' + c);
                 if(el && hrState.currentOdds[c]) el.innerText = hrState.currentOdds[c] + 'x';
@@ -737,83 +602,56 @@
         if(activeGame !== 'horserace') return;
         hrState.status = 'RACING';
         document.getElementById('hr-ticker').innerText = "AND THEY'RE OFF!";
-        document.getElementById('hr-ticker').style.color = "white";
         document.querySelectorAll('.hr-bet-btn').forEach(b => b.disabled = true);
     });
 
     let hrRaceInterval;
     socket.on('hrRaceStart', (data) => {
         if(activeGame !== 'horserace') return;
-        
         const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
         let currentPos = { Red: 10, Blue: 10, Green: 10, Yellow: 10, Purple: 10, Orange: 10 };
         let targetPos = { Red: 10, Blue: 10, Green: 10, Yellow: 10, Purple: 10, Orange: 10 };
 
-        let duration = data.duration; 
-        let startTime = Date.now();
-        
+        let duration = data.duration; let startTime = Date.now();
         document.getElementById('hr-environment').classList.add('track-moving');
-
         let fLineEl = document.getElementById('hr-finish-line');
-        if(fLineEl) {
-            fLineEl.style.transition = 'right 1.5s ease-out';
-            fLineEl.style.right = '-100px'; 
-        }
-
+        if(fLineEl) { fLineEl.style.transition = 'right 1.5s ease-out'; fLineEl.style.right = '-100px'; }
         if(hrRaceInterval) clearInterval(hrRaceInterval);
 
         horses.forEach(h => {
             let el = document.getElementById('horse-' + h);
-            if (el) el.style.left = '10%';
-            let sprite = el.querySelector('.hr-sprite-wrapper');
-            if(sprite) { sprite.classList.add('retro-gallop'); }
+            if (el) { el.style.left = '10%'; el.classList.add('running'); }
         });
 
         let nextTargetUpdate = startTime + 500;
         let sprintTriggered = false;
 
         hrRaceInterval = setInterval(() => {
-            let now = Date.now();
-            let elapsed = now - startTime;
-            let timeRemaining = duration - elapsed;
+            let now = Date.now(); let elapsed = now - startTime; let timeRemaining = duration - elapsed;
 
-            // Phase 1/2: Camera Treadmill (Horses stay in Left-Center)
             if (timeRemaining > 3000) {
                 if (now > nextTargetUpdate) {
                     horses.forEach(h => { targetPos[h] = 10 + (Math.random() * 40); });
                     nextTargetUpdate = now + 800 + Math.random() * 800; 
                 }
-            }
-            // Phase 3: Camera Stops, Checkered Line apperas, Horses Sprint right
-            else {
+            } else {
                 if (!sprintTriggered) {
                     sprintTriggered = true;
-                    document.getElementById('hr-environment').classList.remove('track-moving'); // STOP TRACK
-                    
-                    if (fLineEl) {
-                        fLineEl.style.transition = 'none';
-                        fLineEl.style.right = '10%'; 
-                    }
-                    horses.forEach(h => {
-                        if (h === data.winner) { targetPos[h] = 88; } 
-                        else { targetPos[h] = 30 + (Math.random() * 40); } 
-                    });
+                    document.getElementById('hr-environment').classList.remove('track-moving'); 
+                    if (fLineEl) { fLineEl.style.transition = 'none'; fLineEl.style.right = '10%'; }
+                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 88 : 30 + (Math.random() * 40); });
                 }
             }
 
-            // End Race
             if(elapsed >= duration) {
                 clearInterval(hrRaceInterval);
                 horses.forEach(h => {
                     let el = document.getElementById('horse-' + h);
-                    let sprite = el.querySelector('.hr-sprite-wrapper');
-                    if(sprite) sprite.classList.remove('retro-gallop'); // STOP LEGS
-                    if(el) el.style.left = (h === data.winner ? 88 : Math.min(currentPos[h], 80)) + '%';
+                    if(el) { el.classList.remove('running'); el.style.left = (h === data.winner ? 88 : Math.min(currentPos[h], 80)) + '%'; }
                 });
                 return;
             }
 
-            // Apply calculated movement
             horses.forEach(h => {
                 let speed = (timeRemaining <= 3000 && h === data.winner) ? 0.08 : 0.03;
                 currentPos[h] += (targetPos[h] - currentPos[h]) * speed;
@@ -826,36 +664,24 @@
     socket.on('hrRaceResults', (data) => {
         if(activeGame !== 'horserace') return;
         let w = data.winner;
-        let msg = `${w.toUpperCase()} WINS!`;
-        document.getElementById('hr-ticker').innerText = msg;
+        document.getElementById('hr-ticker').innerText = `${w.toUpperCase()} WINS!`;
         document.getElementById('hr-ticker').style.color = hexColors[w];
-        
         let tba = Object.values(mySBets).reduce((a,b)=>a+b,0);
-        if (mySBets[w]) {
-            let winAmt = mySBets[w] * hrState.currentOdds[w];
-            let net = winAmt - tba;
-            showLocalFlash('horserace', `WON +${net} TC`, 'success');
-        } else if (tba > 0) {
-            showLocalFlash('horserace', `LOST -${tba} TC`, 'error');
-        }
+        if (mySBets[w]) showLocalFlash('horserace', `WON +${mySBets[w] * hrState.currentOdds[w] - tba} TC`, 'success');
+        else if (tba > 0) showLocalFlash('horserace', `LOST -${tba} TC`, 'error');
     });
 
     socket.on('hrNewRound', (data) => {
         if(activeGame === 'horserace') {
             hrState.status = 'BETTING'; hrState.time = 15;
             if (data && data.odds) hrState.currentOdds = data.odds;
-            
             document.getElementById('hr-ticker').innerText = "WAITING FOR NEXT RACE...";
             document.getElementById('hr-ticker').style.color = "var(--credits)";
-            
-            setupDerbyUI();
-            mySBets = {};
-            let m = document.getElementById('hr-my-bet'); 
-            if (m) m.innerHTML = '0 TC'; 
+            setupDerbyUI(); mySBets = {};
+            let m = document.getElementById('hr-my-bet'); if (m) m.innerHTML = '0 TC'; 
             document.querySelectorAll('.hr-bet-btn').forEach(b => b.disabled = false);
         }
     });
-
   </script>
 </body>
 </html>
