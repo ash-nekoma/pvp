@@ -266,8 +266,9 @@ setInterval(() => {
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
                 
+                // Slightly faster deal time
                 let totalCardsToDeal = (activeSeats.length * 2) + 2;
-                let animTime = (totalCardsToDeal * 400) + 1000; 
+                let animTime = (totalCardsToDeal * 300) + 1000; 
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
@@ -395,8 +396,7 @@ io.on('connection', (socket) => {
                 hand.status = 'BUST'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
                 mbjNextTurn(); 
-            } 
-            else { 
+            } else { 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
         } 
@@ -414,7 +414,6 @@ io.on('connection', (socket) => {
                 
                 hand.doubledAmount = hand.bet; 
                 hand.bet *= 2;
-                
                 hand.cards.push(drawCard());
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
