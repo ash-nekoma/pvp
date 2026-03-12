@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Stick N' Trade | VIP Test Build</title>
+    <title>Stick N' Trade | Premium Test Build</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,13 +16,11 @@
             --ps-bg: #000814; --ps-glow: #00a2ff;
             --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15);
             --danger: #ff3366; --success: #00e676; --credits: #ffb400;
+            --table-green: #0a4f28; --table-dark: #042410;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; user-select: none; }
         
-        body { 
-            background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
-            color: white; height: 100vh !important; width: 100vw !important; overflow: hidden !important; 
-        }
+        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh !important; width: 100vw !important; overflow: hidden !important; }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
 
@@ -30,16 +28,10 @@
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         .btn-play:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; }
-        .input-control:focus { border-color: var(--ps-glow); }
 
         /* ================= TOP NAVIGATION ================= */
         .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); height: 75px; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer;}
-        .wallet-pill { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,180,0,0.4); padding: 5px 15px; height: 45px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-weight: 900; color: var(--credits); font-size: 1.1rem; }
-
-        /* ================= MAIN LAYOUT ================= */
-        /* Changed from none to block so it bypasses login */
-        #app-container { display: block; height: 100vh; width: 100vw; overflow: hidden; position: relative; }
         
         .main-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 75px); margin-top: 75px; width: 100%; position: relative; }
         .view-container { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; }
@@ -57,46 +49,64 @@
         @keyframes flashAnim { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
         /* ================================================================= */
-        /* VIP BLACKJACK - SIMULATOR STYLE                                   */
+        /* VIP BLACKJACK - FULLY CONTAINED "PREMIUM" UI                      */
         /* ================================================================= */
-        .mbj-board { width: 1100px; height: 600px; background: #050505; border: 2px solid var(--glass-border); border-radius: 12px; position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.9); overflow: hidden; margin-top: 20px; }
+        .mbj-board { 
+            width: 1000px; height: 600px; background: #111; border-radius: 20px; 
+            position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.9); 
+            overflow: hidden; /* STRICT CLIP so felt/cards never spill out */
+            margin-top: 10px;
+        }
         
-        .mbj-table { position: absolute; bottom: -300px; left: -10%; width: 120%; height: 750px; background: radial-gradient(ellipse at center, #0a5a2a 0%, #043314 100%); border-bottom: 40px solid #1a0f0a; border-top: 6px solid #3e2723; border-radius: 50%; box-shadow: inset 0 0 80px rgba(0,0,0,0.9); pointer-events: none; }
-        .mbj-table-line { position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 2px solid rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
-
-        .mbj-stakes-plate { position: absolute; top: 150px; left: 150px; background: linear-gradient(to bottom, #e0e0e0, #999); border: 2px solid #555; padding: 10px 15px; border-radius: 6px; color: black; font-weight: 900; font-family: 'Outfit'; font-size: 0.8rem; text-align: center; box-shadow: 2px 5px 15px rgba(0,0,0,0.5); pointer-events: none; }
-        .mbj-stakes-plate span { display: block; font-size: 1.1rem; }
+        /* The Rounded Felt - Placed neatly inside the board */
+        .mbj-felt { 
+            position: absolute; top: 20px; left: 20px; right: 20px; bottom: -200px; 
+            background: radial-gradient(ellipse at center, var(--table-green) 0%, var(--table-dark) 100%); 
+            border: 20px solid #1a0f0a; border-radius: 500px 500px 0 0; 
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.9); pointer-events: none; 
+        }
+        .mbj-table-line { position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 2px solid rgba(255,255,255,0.1); border-radius: 500px 500px 0 0; pointer-events: none; }
 
         .mbj-table-text { position: absolute; top: 220px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; width: 100%; z-index: 1; }
-        .mbj-table-text h1 { font-size: 2.8rem; letter-spacing: 6px; margin-bottom: 5px; color: rgba(255,255,255,0.4); font-family: 'Outfit'; }
-        .mbj-table-text p { font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; color: rgba(255,215,0,0.6); }
+        .mbj-table-text h1 { font-size: 2.8rem; letter-spacing: 6px; margin-bottom: 5px; color: rgba(255,255,255,0.2); font-family: 'Outfit'; }
+        .mbj-table-text p { font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4; color: rgba(255,215,0,0.4); }
 
         .mbj-interactive-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
         
-        .mbj-dealer-area { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
-        .mbj-shoe { position: absolute; top: 20px; right: 100px; width: 65px; height: 100px; background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 4px solid #555; border-radius: 8px; box-shadow: -10px 15px 25px rgba(0,0,0,0.8); }
+        .mbj-dealer-area { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: auto; }
+        .mbj-shoe { position: absolute; top: 40px; right: 60px; width: 65px; height: 100px; background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); border: 4px solid #555; border-radius: 8px; box-shadow: -10px 15px 25px rgba(0,0,0,0.8); }
 
-        /* ABSOLUTE SEAT ANCHORS */
-        .mbj-seat-anchor { position: absolute; width: 120px; display: flex; flex-direction: column; align-items: center; pointer-events: auto; transition: opacity 0.3s; }
+        /* ELEVATED CENTER TIMER to prevent overlapping Seat 3 */
+        .mbj-timer-display { position: absolute; top: 160px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); padding: 5px 20px; border-radius: 50px; border: 1px solid var(--ps-glow); display: flex; flex-direction: column; align-items: center; box-shadow: 0 5px 15px rgba(0,162,255,0.3); pointer-events: auto; z-index: 20; }
+        .mbj-timer-display .hud-title { color: var(--ps-glow); font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; }
+        .mbj-timer-display .hud-val { color: white; font-family: 'Rajdhani', monospace; font-size: 1.5rem; font-weight: 900; line-height: 1; }
+        .mbj-timer-display.closing { border-color: var(--danger); box-shadow: 0 5px 15px rgba(255,51,102,0.3); animation: pulseRed 1s infinite; }
+        .mbj-timer-display.closing .hud-title { color: var(--danger); }
+
+        /* PERFECT ARC SEAT ANCHORS */
+        .mbj-seat-anchor { position: absolute; display: flex; flex-direction: column; align-items: center; pointer-events: auto; transition: opacity 0.3s; width: 80px; }
         
-        #mbj-anchor-1 { bottom: 120px; left: 60px; }
-        #mbj-anchor-2 { bottom: 60px; left: 270px; }
-        #mbj-anchor-3 { bottom: 30px; left: 50%; transform: translateX(-50%); }
-        #mbj-anchor-4 { bottom: 60px; right: 270px; }
-        #mbj-anchor-5 { bottom: 120px; right: 60px; }
+        #mbj-anchor-1 { bottom: 120px; left: 100px; }
+        #mbj-anchor-2 { bottom: 60px; left: 300px; }
+        #mbj-anchor-3 { bottom: 40px; left: 50%; transform: translateX(-50%); }
+        #mbj-anchor-4 { bottom: 60px; right: 300px; }
+        #mbj-anchor-5 { bottom: 120px; right: 100px; }
 
         .dimmed { opacity: 0.4; filter: grayscale(50%); pointer-events: none; }
-        .seat-glow { position: absolute; top: -50px; left: -50px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
+        .seat-glow { position: absolute; top: -50px; left: -50px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
         .active-turn { opacity: 1 !important; z-index: 100; }
         .active-turn .seat-glow { display: block; animation: pulseGlow 2s infinite; }
 
-        .mbj-seat-circle { width: 70px; height: 70px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2); z-index: 5; position: relative;}
+        .mbj-seat-circle { width: 70px; height: 70px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; position: relative;}
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.1); }
         .mbj-seat-circle.occupied { border: 3px solid var(--credits); background: rgba(0,0,0,0.6); cursor: default; box-shadow: 0 0 15px rgba(255,180,0,0.3); }
 
-        /* FANNED CARDS */
-        .mbj-hand-cards { position: absolute; bottom: 85px; left: 10px; width: 100px; height: 80px; pointer-events: none; z-index: 10; }
-        .mbj-card { width: 55px; height: 80px; background: white; border-radius: 6px; box-shadow: -3px 3px 10px rgba(0,0,0,0.6); position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; opacity: 0; transform: translateZ(0); border: 1px solid #ccc; }
+        /* PERFECT CIRCLE CHIP STACK */
+        .chip-stack { background: #333; border: 2px dashed #ffcc00; width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; color: white; position: absolute; box-shadow: 0 3px 5px rgba(0,0,0,0.8); }
+
+        /* HORIZONTAL FANNED CARDS */
+        .mbj-hand-cards { position: absolute; bottom: 80px; left: 0px; display: flex; z-index: 10; pointer-events: none; }
+        .mbj-card { width: 55px; height: 80px; background: white; border-radius: 6px; box-shadow: -3px 3px 10px rgba(0,0,0,0.6); position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; opacity: 0; border: 1px solid #ccc; }
         
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; font-weight: 900;}
         .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; font-weight: 900; transform: rotate(180deg); }
@@ -104,46 +114,40 @@
         .card-red { color: #e60000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
 
-        /* Badges */
-        .mbj-hand-score { position: absolute; top: -10px; left: -15px; width: 24px; height: 24px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 0.85rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8);}
-        .dealer-score-badge { width: 28px; height: 28px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 1rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8); margin-bottom: 5px;}
+        /* Relocated Floating Score Badges */
+        .mbj-hand-score { position: absolute; top: -15px; left: -15px; width: 24px; height: 24px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 0.85rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8);}
+        .dealer-score-badge { position: absolute; top: -10px; left: -25px; width: 28px; height: 28px; background: #222; border: 2px solid white; border-radius: 50%; font-weight: 900; font-size: 1rem; color: white; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.8); margin-bottom: 5px;}
         
-        .mbj-status { position: absolute; top: 30px; left: -10px; background: var(--ps-bg); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; border: 1px solid var(--glass-border); white-space: nowrap; z-index: 25; pointer-events: none; }
+        .mbj-status { position: absolute; top: -25px; left: 10px; background: var(--ps-bg); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; border: 1px solid var(--glass-border); white-space: nowrap; z-index: 25; pointer-events: none; }
         .status-bust { color: var(--danger); border-color: var(--danger); animation: shakeRed 0.5s forwards; }
         .status-bj { color: #000; background: var(--credits); border-color: #fff; box-shadow: 0 0 20px var(--credits); }
         
         .anim-fly-in { animation: flyIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes flyIn {
-            0% { opacity: 0; transform: translate(400px, -300px) scale(0.3) rotate(45deg); }
-            100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
-        }
+        @keyframes flyIn { 0% { opacity: 0; transform: translate(300px, -300px) scale(0.3) rotate(45deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } }
         .anim-flip { animation: flipCard 0.5s ease-in-out forwards; }
         @keyframes flipCard { 0% { transform: rotateY(180deg); } 100% { transform: rotateY(0deg); } }
         @keyframes shakeRed { 0% { transform: translateX(0); filter: grayscale(0); } 25% { transform: translateX(-5px); filter: grayscale(50%) sepia(1) hue-rotate(-50deg) saturate(5); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); filter: grayscale(50%) sepia(1) hue-rotate(-50deg) saturate(5); } }
 
-        /* CONTEXTUAL ACTION BUTTONS */
-        .seat-actions-wrapper { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 15px; display: flex; gap: 8px; z-index: 100; pointer-events: auto; animation: popUp 0.3s ease-out; }
+        /* FLOATING BET POD & ACTIONS (Properly unstacked, detached from seat cards) */
+        .seat-bet-ui { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.8); pointer-events: auto; width: 150px; }
+        
+        .seat-actions-wrapper { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; background: rgba(0,0,0,0.9); padding: 8px; border-radius: 50px; border: 1px solid var(--glass-border); z-index: 100; pointer-events: auto; animation: popUp 0.3s ease-out; }
         @keyframes popUp { from { transform: translateX(-50%) scale(0.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
         
-        .mbj-action-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(0,0,0,0.8); border: 3px solid rgba(255,255,255,0.3); color: white; font-size: 1.5rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.9); }
+        .mbj-action-btn { width: 45px; height: 45px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); color: white; font-size: 1.2rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.9); }
         .mbj-action-btn:hover:not(:disabled) { transform: scale(1.15); border-color: white; }
         .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); }
-        .mbj-action-btn.hit { background: radial-gradient(circle, #00e676, #008040); }
-        .mbj-action-btn.stand { background: radial-gradient(circle, #ff3366, #9b0022); }
-        .mbj-action-btn.double { background: radial-gradient(circle, #ffcc00, #997a00); color: black; font-size: 1.1rem; }
-        .mbj-action-btn.split { background: radial-gradient(circle, #b366ff, #5900b3); }
+        .mbj-action-btn.hit { background: radial-gradient(circle, #00e676, #008040); color: black; border: none; }
+        .mbj-action-btn.stand { background: radial-gradient(circle, #ff3366, #9b0022); border: none; }
+        .mbj-action-btn.double { background: radial-gradient(circle, #ffcc00, #997a00); color: black; font-size: 0.9rem; border: none; }
+        .mbj-action-btn.split { background: radial-gradient(circle, #b366ff, #5900b3); border: none; }
 
-        .seat-bet-ui { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 15px; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.9); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.8); pointer-events: auto; width: 140px;}
+        /* Minimal Personal HUD (Corner Locked) */
+        .mbj-hud-corner { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.85); border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.8); z-index: 10; }
+        .mbj-hud-corner .hud-title { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; }
+        .mbj-hud-corner .hud-val { font-size: 1.2rem; font-weight: 900; color: var(--credits); }
 
-        .chip-stack { background: #333; border: 2px dashed #ffcc00; border-radius: 50%; padding: 4px 8px; font-size: 0.75rem; font-weight: 900; color: white; position: absolute; bottom: 15px; z-index: 20; box-shadow: 0 3px 5px rgba(0,0,0,0.8); }
-
-        /* HUD Capsules */
-        .mbj-hud-bottom { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; pointer-events: none; }
-        .hud-capsule { background: rgba(0,0,0,0.85); border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 50px; display: flex; flex-direction: column; align-items: center; color: white; font-family: 'Outfit'; pointer-events: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
-        .hud-title { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .hud-val { font-size: 1.3rem; font-weight: 900; color: var(--credits); }
-
-        /* ================= RETRO HORSE DERBY (Treadmill Effect) ================= */
+        /* ================= RETRO HORSE DERBY (Treadmill Effect & Emotes) ================= */
         .hr-board { width: 900px; height: 600px; background: #0a0a0a; border: 4px solid #333; border-radius: 12px; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); margin-top: 20px;}
         
         .hr-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -151,9 +155,8 @@
         
         .hr-track-window { flex: 1; border: 4px solid #444; position: relative; overflow: hidden; border-radius: 8px; background: #222; }
         
-        /* The scrolling dirt background */
-        .hr-track-bg { position: absolute; top: 0; left: 0; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, #382415, #382415 40px, #2a1a0f 40px, #2a1a0f 80px); }
-        .track-moving { animation: scrollTrack 0.6s linear infinite; }
+        .hr-track-bg { position: absolute; top: 0; left: 0; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, #382415 0px, #382415 40px, #2a1a0f 40px, #2a1a0f 80px); }
+        .track-moving { animation: scrollTrack 0.5s linear infinite; }
         @keyframes scrollTrack { from { transform: translateX(0); } to { transform: translateX(-80px); } }
 
         .hr-lanes-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; }
@@ -185,11 +188,11 @@
 </head>
 <body>
 
-  <div id="app-container">
+  <div id="app-container" style="display:block;">
       <header class="topbar">
           <div class="brand-title" onclick="backToHub()">STICK N' TRADE</div>
           <div class="topbar-right" style="display:flex; gap:15px; align-items:center;">
-              <div style="font-weight: 800; font-size: 1.1rem;"><i class="fas fa-user-circle" style="color:var(--ps-glow)"></i> <span id="player-name-display">Player</span></div>
+              <div style="font-weight: 800; font-size: 1.1rem;"><i class="fas fa-user-circle" style="color:var(--ps-glow)"></i> <span id="player-name-display">Loading...</span></div>
           </div>
       </header>
 
@@ -204,14 +207,14 @@
                     <i class="fas fa-cards"></i>
                     <div>
                         <div class="game-title">VIP BLACKJACK</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Simulator Layout & Phasing</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Contained UI & Fanned Cards</div>
                     </div>
                 </div>
                 <div class="game-card" onclick="openGame('horserace')">
                     <i class="fas fa-horse-head" style="color: var(--danger);"></i>
                     <div>
                         <div class="game-title">RETRO DERBY</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Treadmill Track Physics</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Treadmill Dirt Track Physics</div>
                     </div>
                 </div>
             </div>
@@ -226,8 +229,9 @@
                       </div>
                   </div>
                   
-                  <div class="mbj-stakes-plate">
-                      MIN <span>10 TC</span><br>MAX <span>50K TC</span>
+                  <div class="mbj-hud-corner">
+                      <div class="hud-title">BALANCE</div>
+                      <div class="hud-val" id="mbj-hud-balance">0 TC</div>
                   </div>
 
                   <div class="mbj-table-text">
@@ -236,29 +240,20 @@
                   </div>
 
                   <div class="mbj-interactive-layer">
+                      
+                      <div class="mbj-timer-display" id="mbj-timer-box">
+                          <div class="hud-title" id="mbj-timer-title" style="color: var(--ps-glow);">PLACE BETS</div>
+                          <div class="hud-val" id="mbj-timer">15</div>
+                      </div>
+
                       <div class="mbj-dealer-area">
                           <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
-                          <div id="mbj-fs-dealer-hand" style="display:flex; gap:15px; height:85px; z-index:10; position:relative;"></div>
+                          <div id="mbj-fs-dealer-hand" style="display:flex; height:85px; z-index:10; position:relative;"></div>
                       </div>
                       
                       <div class="mbj-shoe"></div>
                       
                       <div id="mbj-seats-container"></div>
-                  </div>
-
-                  <div class="mbj-hud-bottom">
-                      <div class="hud-capsule">
-                          <div class="hud-title">BALANCE</div>
-                          <div class="hud-val" id="mbj-hud-balance">0 TC</div>
-                      </div>
-                      <div class="hud-capsule" style="width: 150px; background: rgba(0,0,0,0.9); border-color: var(--ps-glow);">
-                          <div class="hud-title" id="mbj-timer-title" style="color: var(--ps-glow);">PLACE BETS</div>
-                          <div class="hud-val" id="mbj-timer" style="color: white; font-family: 'Rajdhani', monospace;">15</div>
-                      </div>
-                      <div class="hud-capsule">
-                          <div class="hud-title">TOTAL BET</div>
-                          <div class="hud-val" id="mbj-hud-bet">0 TC</div>
-                      </div>
                   </div>
 
                   <div id="flash-mbj" class="local-flash"></div> 
@@ -373,7 +368,7 @@
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // VIP BLACKJACK LOGIC
+    // VIP BLACKJACK LOGIC (Simulator Style UI - Fixes Applied)
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
@@ -397,7 +392,6 @@
         if(!cont) return; 
         cont.innerHTML = '';
         
-        let myTotalBet = 0;
         let cardSequenceIdx = 0; 
         let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null;
 
@@ -416,42 +410,41 @@
             let html = `<div class="mbj-seat-anchor ${activeClass} ${dimClass}" id="mbj-anchor-${i}">`;
             html += `<div class="seat-glow"></div>`;
             
-            // CARDS (Fanned out)
+            // CARDS (Fanned out horizontally)
             html += `<div class="mbj-hand-cards">`;
             if (s && s.hands && s.hands.length > 0) {
                 s.hands.forEach((hand, hIdx) => {
                     
+                    // Floating Badge Top-Left of Fan
                     if(hand.cards.length > 0 && hand.status !== 'BUST') {
-                        html += `<div class="mbj-hand-score" style="left: ${(hIdx * 60) - 10}px;">${hand.score}</div>`;
+                        html += `<div class="mbj-hand-score" style="left: ${(hIdx * 100) - 15}px;">${hand.score}</div>`;
                     }
 
                     hand.cards.forEach((c, cIdx) => { 
-                        let offsetLeft = (hIdx * 80) + (cIdx * 15); 
-                        let offsetBottom = (cIdx * -5);
+                        // Fan logic: left: 18px per card. Hand gap: 100px.
+                        let offsetLeft = (hIdx * 100) + (cIdx * 18); 
                         
                         let animDelay = isInitialDeal ? (cardSequenceIdx * 0.4) : 0; 
                         let cardHtml = generateCardHTML(c, false, animDelay);
-                        cardHtml = cardHtml.replace('style="', `style="left: ${offsetLeft}px; bottom: ${offsetBottom}px; `);
+                        cardHtml = cardHtml.replace('style="', `style="left: ${offsetLeft}px; `);
                         html += cardHtml;
                         
                         if(isInitialDeal) cardSequenceIdx++;
                     });
                     
+                    // Status Banner
                     if(hand.status && hand.status !== 'WAITING' && hand.status !== 'PLAYING') {
                         let stClass = hand.status === 'BUST' ? 'status-bust' : (hand.status === 'BLACKJACK' ? 'status-bj' : '');
-                        html += `<div class="mbj-status ${stClass}" style="left: ${(hIdx * 80) - 10}px;">${hand.status}</div>`;
+                        html += `<div class="mbj-status ${stClass}" style="left: ${(hIdx * 100)}px;">${hand.status}</div>`;
                     }
                 });
             }
             html += `</div>`;
 
-            // SEAT CIRCLE
+            // SEAT CIRCLE & CHIPS
             html += `<div class="${boxClass}" onclick="${clickAction}">`;
             if (s) {
-                html += `<div style="font-weight:900; font-size:1.5rem; color:white; opacity:0.2;">${i}</div>`;
-                
                 let totalSeatBet = s.hands && s.hands.length > 0 ? s.hands.reduce((sum, h)=>sum+h.bet, 0) : s.bet || 0;
-                if(isMe) myTotalBet += totalSeatBet;
 
                 if (totalSeatBet > 0) {
                     html += `<div class="chip-stack">${totalSeatBet}</div>`;
@@ -463,7 +456,7 @@
                 html += `<div style="font-weight: 900; color: ${isMe ? 'var(--ps-glow)' : 'white'}; font-size: 0.85rem; text-transform: uppercase; white-space:nowrap; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">${s.username}</div>`;
                 html += `</div>`;
                 
-                // BETTING CONTROLS
+                // DETACHED BETTING POD
                 if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
                     html += `<div class="seat-bet-ui">
                                 <input type="number" id="mbj-bet-input-${i}" class="input-control" placeholder="Amount" style="padding:6px; font-size:0.9rem;">
@@ -474,7 +467,7 @@
                              </div>`;
                 }
 
-                // ACTION BUTTONS (Spawn directly below seat circle)
+                // HORIZONTAL CONTEXTUAL ACTION BUTTONS (Spawn outside the card zone)
                 if (isMySeatTurn && mbjGameState === 'PLAYER_TURN' && isMe) {
                     let activeHand = s.hands[activeTurnObj.handIdx];
                     let canDouble = activeHand && activeHand.cards.length === 2;
@@ -489,14 +482,17 @@
                 }
 
             } else { 
-                html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:0.5; color: white;"></i></div>`; 
-                html += `<div style="color:var(--text-muted); font-weight:800; font-size:0.75rem; margin-top: 5px; text-transform: uppercase;">Empty</div>`;
+                // STRICTION LOGIC: "EMPTY" labels only show if seat is actually null and we are in BETTING
+                if (mbjGameState === 'BETTING') {
+                    html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:0.5; color: white;"></i></div>`; 
+                    html += `<div style="color:var(--text-muted); font-weight:800; font-size:0.75rem; margin-top: 5px; text-transform: uppercase;">Empty</div>`;
+                } else {
+                    html += `</div>`; // Just a transparent circle when game is running
+                }
             }
             html += `</div>`; 
             cont.innerHTML += html;
         }
-        
-        document.getElementById('mbj-hud-bet').innerText = myTotalBet + ' TC';
     }
 
     function placeMBJBet(seatNum) { 
@@ -517,10 +513,12 @@
         let dBadge = document.getElementById('mbj-d-score-val');
         let tTitle = document.getElementById('mbj-timer-title');
         let tVal = document.getElementById('mbj-timer');
+        let tBox = document.getElementById('mbj-timer-box');
 
         if(data.event === 'timer') {
             mbjGameState = 'BETTING'; 
             dBadge.style.display = 'none';
+            tBox.style.display = 'flex';
             if (tVal) tVal.innerText = data.time; 
             tTitle.innerText = "PLACE BETS";
             tTitle.style.color = "var(--ps-glow)";
@@ -550,12 +548,12 @@
 
                 // Dealer Card 1 (Face Up)
                 let c1Html = generateCardHTML(data.dealerHand[0], false, baseDelay);
-                c1Html = c1Html.replace('style="', 'style="position:relative; ');
+                c1Html = c1Html.replace('style="', 'style="position:absolute; left: 0px; ');
                 dHand.innerHTML += c1Html; 
 
                 // Dealer Card 2 (Hole Card)
                 let c2Html = generateCardHTML(data.dealerHand[1], true, baseDelay + 0.4);
-                c2Html = c2Html.replace('style="', 'style="position:relative; left:-30px; ');
+                c2Html = c2Html.replace('style="', 'style="position:absolute; left: 18px; ');
                 dHand.innerHTML += c2Html; 
                 
                 setTimeout(() => {
@@ -576,8 +574,7 @@
         }
         else if (data.event === 'dealer_resolved') {
             mbjGameState = 'RESOLVING'; 
-            tTitle.innerText = "RESOLVING";
-            if (tVal) tVal.innerText = '--'; 
+            tBox.style.display = 'none'; // Hide timer box completely during resolve
             
             renderMBJSeats(data.seats); 
             
@@ -585,10 +582,10 @@
             
             if(dHand) {
                 dHand.innerHTML = generateCardHTML(data.dealerHand[0]).replace('anim-fly-in', '');
-                dHand.innerHTML = dHand.innerHTML.replace('style="', 'style="position:relative; ');
+                dHand.innerHTML = dHand.innerHTML.replace('style="', 'style="position:absolute; left: 0px; ');
                 
                 let revealHtml = generateCardHTML(data.dealerHand[1]).replace('anim-fly-in', 'anim-flip');
-                dHand.innerHTML += revealHtml.replace('style="', 'style="position:relative; left:-30px; ');
+                dHand.innerHTML += revealHtml.replace('style="', 'style="position:absolute; left: 18px; ');
                 
                 dBadge.innerText = getBJScore(data.dealerHand.slice(0,2));
 
@@ -598,7 +595,7 @@
                     for(let i=2; i<data.dealerHand.length; i++) { 
                         let c = data.dealerHand[i]; 
                         let slideHtml = generateCardHTML(c);
-                        let offset = (i * 30) - 30; 
+                        let offset = (i * 18); 
                         dHand.innerHTML += slideHtml.replace('style="', `style="position:absolute; left:${offset}px; z-index:${i}; `); 
                         
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
@@ -625,6 +622,7 @@
         } 
         else if (data.event === 'new_round') {
             mbjGameState = 'BETTING'; 
+            tBox.style.display = 'flex';
             tTitle.innerText = "PLACE BETS";
             tTitle.style.color = "var(--ps-glow)";
             
