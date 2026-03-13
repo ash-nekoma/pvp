@@ -45,6 +45,8 @@ function buildShoe() {
             }
         }
     }
+    
+    // Shuffle
     for (let i = shoe.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
@@ -88,7 +90,10 @@ function generateHorseOdds() {
     const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
     const multipliers = [2, 4, 6, 11, 16, 31].sort(() => Math.random() - 0.5);
     let oddsMap = {}; 
-    horses.forEach((h, i) => { oddsMap[h] = multipliers[i]; });
+    
+    horses.forEach((h, i) => { 
+        oddsMap[h] = multipliers[i]; 
+    });
     hrState.currentOdds = oddsMap;
 }
 generateHorseOdds(); 
@@ -125,13 +130,19 @@ setInterval(() => {
                         if (user && b.choice === winner) {
                             let payout = b.amount * hrState.currentOdds[winner];
                             user.credits += formatTC(payout);
+                            
                             if(connectedUsers[b.username]) {
                                 io.to(connectedUsers[b.username]).emit('balanceUpdateData', { credits: user.credits });
                             }
                             payouts[b.username] = (payouts[b.username] || 0) + payout;
                         }
                     });
-                    io.emit('hrRaceResults', { winner: winner, payoutMult: hrState.currentOdds[winner], payouts: payouts });
+                    
+                    io.emit('hrRaceResults', { 
+                        winner: winner, 
+                        payoutMult: hrState.currentOdds[winner], 
+                        payouts: payouts 
+                    });
                 }, 15500); 
 
                 setTimeout(() => {
@@ -167,7 +178,12 @@ function mbjNextTurn() {
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') {
             mbjState.activeTurn.handIdx++;
             mbjState.turnTimer = 15; 
-            io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
+            io.to('mbj').emit('mbjUpdate', { 
+                event: 'turn', 
+                activeTurn: mbjState.activeTurn, 
+                time: mbjState.turnTimer, 
+                seats: mbjState.seats 
+            });
             return;
         }
     }
@@ -183,7 +199,12 @@ function mbjNextTurn() {
     if (nextSeatNum !== null) {
         mbjState.activeTurn = { seat: nextSeatNum, handIdx: 0 };
         mbjState.turnTimer = 15;
-        io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
+        io.to('mbj').emit('mbjUpdate', { 
+            event: 'turn', 
+            activeTurn: mbjState.activeTurn, 
+            time: mbjState.turnTimer, 
+            seats: mbjState.seats 
+        });
     } else {
         mbjResolveDealer();
     }
@@ -253,13 +274,22 @@ async function mbjResolveDealer() {
         }
     }
 
-    io.to('mbj').emit('mbjUpdate', { event: 'dealer_resolved', dealerHand: mbjState.dealer.hand, dealerScore: dScore, seats: mbjState.seats, results: seatResults });
+    io.to('mbj').emit('mbjUpdate', { 
+        event: 'dealer_resolved', 
+        dealerHand: mbjState.dealer.hand, 
+        dealerScore: dScore, 
+        seats: mbjState.seats, 
+        results: seatResults 
+    });
     
     setTimeout(() => {
         for (let i=1; i<=5; i++) {
             if (mbjState.seats[i]) {
-                if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) mbjState.seats[i] = null;
-                else mbjState.seats[i].hands = []; 
+                if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) {
+                    mbjState.seats[i] = null;
+                } else { 
+                    mbjState.seats[i].hands = []; 
+                }
             }
         }
         mbjState.dealer.hand = []; 
@@ -267,7 +297,7 @@ async function mbjResolveDealer() {
         mbjState.status = 'BETTING';
         
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 10000); 
+    }, 8000); 
 }
 
 setInterval(() => {
@@ -469,11 +499,8 @@ io.on('connection', (socket) => {
             
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
+            mbjState.turnTimer = 15; // Reset timer on Hit
             
-            // TIMER RESET ON HIT
-            mbjState.turnTimer = 15; 
-            
-            // AUTO STAND LOGIC
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
@@ -501,8 +528,7 @@ io.on('connection', (socket) => {
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 
-                // TIMER RESET ON DOUBLE
-                mbjState.turnTimer = 15; 
+                mbjState.turnTimer = 15; // Reset timer on Double
                 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
