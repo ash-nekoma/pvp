@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stick N' Trade | Premium VIP Blackjack</title>
+    <title>Stick N' Trade | Premium Casino</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
@@ -41,7 +40,6 @@
             flex: 0 0 75px; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid rgba(255,255,255,0.15); 
             display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; 
         }
-        
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer; }
         
         .main-wrapper { flex: 1; position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
@@ -65,13 +63,11 @@
         }
         .auth-btn:hover { background: white; transform: translateY(-2px); }
 
-        /* ================= BUTTONS ================= */
         .btn-play { 
             background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.15); 
             padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; 
         }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
-        .btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-back-fixed { 
             position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); 
@@ -111,6 +107,16 @@
         .global-screen-alert.success { border-color: var(--success); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3); color: var(--success); }
         .global-screen-alert.error { border-color: var(--danger); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3); color: var(--danger); }
         @keyframes popupAlert { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } }
+
+        /* ================= LOBBY GAME CARDS ================= */
+        .lobby-modes-container { display: flex; gap: 40px; }
+        .game-card { 
+            width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; 
+            padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+        }
+        .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
+
 
         /* ================= VIP BLACKJACK UI ================= */
         .game-board-wrapper { display: flex; flex-direction: column; align-items: center; }
@@ -163,6 +169,7 @@
         .card-red { color: #cc0000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
         
+        /* STRICT DOUBLE DOWN FIX: Static class retains transform, animation handles entry */
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
 
         .score-badge {
@@ -182,6 +189,14 @@
 
         .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        /* NEW DEDICATED DOUBLE DOWN ANIMATION (Directly creates the horizontal drop) */
+        .anim-fly-in-doubled { animation: flyInDoubled 0.3s ease-out forwards; }
+        @keyframes flyInDoubled { 
+            0% { opacity: 0; transform: translate(30px, -150px) rotate(90deg) scale(0.8); } 
+            100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } 
+        }
+
         .anim-reveal { animation: revealCard 0.4s ease-out forwards; }
         @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
 
@@ -304,7 +319,19 @@
                     <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Playtech Engine</div>
                 </div>
             </div>
+            <div class="game-card" onclick="openGame('derby')">
+                <i class="fas fa-horse-head" style="font-size:4rem;"></i>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight:900;">HORSE DERBY</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Virtual Racing</div>
+                </div>
+            </div>
         </div>
+      </div>
+
+      <div id="view-derby" class="view-container hidden">
+          <h1 style="font-size: 3rem; font-weight: 900; color: var(--ps-glow);">HORSE DERBY</h1>
+          <p style="font-size: 1.2rem;">Virtual Racing Engine Loading...</p>
       </div>
 
       <div id="view-mbj" class="view-container hidden">
@@ -378,7 +405,6 @@
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
-    // RESTORED MATH FUNCTION
     function getBJScore(hand) {
         let score = 0, aces = 0;
         for (let card of hand) { 
@@ -480,6 +506,8 @@
             renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
             renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
             switchView('mbj');
+        } else if (id === 'derby') {
+            switchView('derby');
         }
     }
 
@@ -507,15 +535,17 @@
 
     function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
-        if(animateIn) animClass = 'anim-fly-in';
+        if(animateIn) {
+            animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in';
+        }
         if(animateReveal) animClass = 'anim-reveal'; 
-        if(isDoubled) animClass += ' card-doubled';
+        let doubleClass = isDoubled ? 'card-doubled' : '';
         
         let styleStr = `left: ${leftOffset}px;`;
-        if(isHidden) return `<div class="mbj-card card-back ${animClass}" style="${styleStr}"></div>`;
+        if(isHidden) return `<div class="mbj-card card-back ${animClass} ${doubleClass}" style="${styleStr}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
-        return `<div class="mbj-card ${colorClass} ${animClass}" style="${styleStr}"><div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div><div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div></div>`;
+        return `<div class="mbj-card ${colorClass} ${animClass} ${doubleClass}" style="${styleStr}"><div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div><div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div></div>`;
     }
     
     function getChipStackHTML(amount, isGhost = false) {
@@ -673,7 +703,7 @@
         if (mbjGameState === 'BETTING') {
             rack.classList.remove('chip-rack-locked');
             if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
-                // Keep unlocked for betting
+                // Keep unlocked
             } else {
                 rack.classList.add('chip-rack-locked');
             }
@@ -724,7 +754,6 @@
         else if (data.event === 'deal') {
             mbjGameState = 'DEALING';
             let targetSeats = JSON.parse(JSON.stringify(data.seats));
-            
             for (let i = 1; i <= 5; i++) {
                 if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) {
                     currentMBJSeats[i].hands[0].cards = [];
@@ -741,11 +770,9 @@
                 dHand.innerHTML = ''; 
                 dHand.style.width = '70px'; 
                 
-                // TRUE ROUND ROBIN DEALING ANIMATION
                 const dealSequence = async () => {
                     let activeKeys = Object.keys(targetSeats).filter(k => targetSeats[k] !== null);
                     
-                    // 1st Card loop
                     for (let k of activeKeys) {
                         currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]);
                         currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards);
@@ -753,13 +780,11 @@
                         await delay(300);
                     }
                     
-                    // Dealer 1st card
                     let html = `<div class="score-badge score-inactive" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
                     html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
                     dHand.innerHTML = html; 
                     await delay(300);
                     
-                    // 2nd Card loop
                     for (let k of activeKeys) {
                         currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]);
                         currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score;
@@ -768,7 +793,6 @@
                         await delay(300);
                     }
                     
-                    // Dealer Hole card
                     html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
                     dHand.style.width = '90px'; 
                     dHand.innerHTML = html; 
@@ -810,7 +834,7 @@
                 else htmlStr += `<div class="score-badge score-inactive" id="d-score-badge"><span>${initialDScore}</span></div>`;
 
                 htmlStr += generateCardHTML(data.dealerHand[0], false, false, false, 0);
-                htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); // Flip Trigger
+                htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
                 
                 dHand.innerHTML = htmlStr;
                 
@@ -831,7 +855,7 @@
                         await delay(300); 
                     }
                     
-                    await delay(800);
+                    await delay(400);
                     let myNet = 0;
                     
                     for(let i = 1; i <= 5; i++) {
@@ -845,13 +869,13 @@
                             } 
                             else if (res.status === 'WIN') {
                                 animateChipSequence('dealer-area', `circle-${i}-0`, '#00e676');
-                                setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; }, 600);
+                                setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; }, 400);
                             }
                             else if (res.status === 'PUSH') {
-                                setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; }, 600);
+                                setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; }, 400);
                             }
                             if (seat.username === myUsername) myNet = res.net;
-                            await delay(400); 
+                            await delay(150); 
                         }
                     }
 
