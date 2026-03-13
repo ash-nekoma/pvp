@@ -92,6 +92,7 @@ function mbjNextTurn() {
     let seatNum = mbjState.activeTurn.seat;
     let handIdx = mbjState.activeTurn.handIdx;
 
+    // Check if current seat has a split hand to play
     if (seatNum !== null) {
         let seat = mbjState.seats[seatNum];
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') {
@@ -107,6 +108,7 @@ function mbjNextTurn() {
         }
     }
 
+    // Move to next player
     let nextSeatNum = null;
     let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
     
@@ -211,6 +213,7 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
+    // Gives plenty of time for physical coin animations before resetting
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -229,6 +232,7 @@ async function mbjResolveDealer() {
     }, 12000); 
 }
 
+// MAIN ENGINE INTERVAL
 setInterval(() => {
     if (mbjState.status === 'BETTING') {
         let hasBets = Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0);
@@ -241,6 +245,7 @@ setInterval(() => {
             io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false, seats: mbjState.seats });
         }
         
+        // Timer hits 0, Lock Bets and Deal
         if (mbjState.time <= 0 && hasBets) {
             for (let i = 1; i <= 5; i++) {
                 if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) {
@@ -263,6 +268,7 @@ setInterval(() => {
                     mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet;
                     let score = getBJScore([c1, c2]);
                     mbjState.seats[k].hands[0].score = score;
+                    // Auto-Flag Blackjacks
                     mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
                 });
 
@@ -294,6 +300,7 @@ setInterval(() => {
         mbjState.turnTimer--;
         io.to('mbj').emit('mbjUpdate', { event: 'turn_timer', time: mbjState.turnTimer });
         
+        // Ghost Player Protection
         if (mbjState.turnTimer <= 0) {
             let seat = mbjState.seats[mbjState.activeTurn.seat];
             if(seat && seat.hands[mbjState.activeTurn.handIdx]) {
@@ -304,6 +311,9 @@ setInterval(() => {
     }
 }, 1000);
 
+// =========================================================================
+// SOCKET CONNECTION & CHAT
+// =========================================================================
 io.on('connection', (socket) => {
 
     socket.on('login', (data) => {
@@ -422,6 +432,7 @@ io.on('connection', (socket) => {
             
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
+            
             mbjState.turnTimer = 15; 
             
             if (hand.score >= 21) { 
@@ -460,6 +471,7 @@ io.on('connection', (socket) => {
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2) return;
             
+            // Allows splitting identical cards or any two 10-value cards
             let val1 = hand.cards[0].bjVal;
             let val2 = hand.cards[1].bjVal;
             if (val1 !== val2) return; 
