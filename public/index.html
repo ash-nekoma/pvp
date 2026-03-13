@@ -7,7 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
@@ -31,6 +30,7 @@
             user-select: none;
         }
         
+        /* 100vh strict body prevents vertical blank screen collapse */
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
             color: white; 
@@ -65,8 +65,8 @@
             text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); 
             cursor: pointer;
         }
-
-        /* 100vh absolute center prevents blank screen collapse */
+        
+        /* Forces the view containers to fill remaining space perfectly */
         .main-wrapper { 
             flex: 1; 
             position: relative; 
@@ -89,7 +89,59 @@
             height: 100%; 
         }
 
-        /* ================= DOCKED LIVE CHAT (FLOATING OUTSIDE BOARD) ================= */
+        .btn-play { 
+            background: rgba(255,255,255,0.1); 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.15); 
+            padding: 12px 15px; 
+            border-radius: 8px; 
+            font-weight: 900; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            text-transform: uppercase; 
+        }
+        .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
+        .btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-back-fixed { 
+            position: absolute; 
+            top: 20px; 
+            left: 25px; 
+            z-index: 1000; 
+            background: rgba(0,0,0,0.8); 
+            border: 1px solid rgba(255,255,255,0.15); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .btn-back-fixed:hover { background: white; color: black; }
+        
+        .lobby-modes-container { display: flex; gap: 40px; }
+        
+        .game-card { 
+            width: 320px; 
+            height: 380px; 
+            background: #020813; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            padding: 30px 20px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+        }
+        .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
+
+        /* ================= DOCKED LIVE CHAT (STRICTLY OUTSIDE BOARD) ================= */
         .chat-widget {
             position: fixed;
             bottom: 20px;
@@ -212,18 +264,8 @@
             align-items: center;
             animation: popupAlert 3s forwards; 
         }
-        
-        .global-screen-alert.success { 
-            border-color: var(--success); 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3);
-            color: var(--success);
-        }
-        
-        .global-screen-alert.error { 
-            border-color: var(--danger); 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3);
-            color: var(--danger);
-        }
+        .global-screen-alert.success { border-color: var(--success); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3); color: var(--success); }
+        .global-screen-alert.error { border-color: var(--danger); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3); color: var(--danger); }
         
         @keyframes popupAlert { 
             0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 
@@ -243,11 +285,11 @@
         /* Classic Premium Rectangular Table */
         .mbj-board { 
             width: 1100px; 
-            height: 520px; 
+            height: 550px; 
             background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
             border-radius: 20px; 
             position: relative; 
-            border: 15px solid #3e2723; /* Mahogany Wood */
+            border: 15px solid #3e2723; 
             box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 5px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(0,0,0,0.8);
             overflow: hidden; 
         }
@@ -311,36 +353,24 @@
             display: none; 
         }
 
-        .mbj-global-timer h2 {
-            color: var(--ps-glow);
-            font-size: 1.2rem;
-            letter-spacing: 4px;
-            margin-bottom: 10px;
-        }
+        .mbj-global-timer h2 { color: var(--ps-glow); font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 10px; }
+        .mbj-global-timer .time-val { color: white; font-family: 'Rajdhani', monospace; font-size: 4rem; font-weight: 900; line-height: 1; }
 
-        .mbj-global-timer .time-val {
-            color: white;
-            font-family: 'Rajdhani', monospace;
-            font-size: 4rem;
-            font-weight: 900;
-            line-height: 1;
-        }
-
-        /* Top Right Shoe */
+        /* 3D REALISTIC DECK OF CARDS (SHOE) */
         .mbj-shoe { 
             position: absolute; 
             top: 20px; 
             right: 20px; 
-            width: 60px; 
-            height: 90px; 
-            background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); 
-            border: 4px solid #555; 
-            border-radius: 8px; 
-            box-shadow: -10px 15px 25px rgba(0,0,0,0.8); 
+            width: 70px; 
+            height: 100px; 
+            border-radius: 6px; 
+            background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); 
+            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: -2px 2px 0 #fff, -4px 4px 0 #333, -6px 6px 0 #fff, -8px 8px 0 #333, -12px 12px 20px rgba(0,0,0,0.9);
             z-index: 5; 
         }
 
-        /* Dealer Area */
+        /* DEALER AREA */
         .mbj-dealer-area { 
             position: absolute; 
             top: 30px; 
@@ -352,10 +382,10 @@
             z-index: 20; 
         }
 
-        /* Seats Wrapper */
+        /* SEATS WRAPPER */
         #mbj-seats-row { 
             position: absolute; 
-            bottom: 25px; 
+            bottom: 20px; 
             left: 0; 
             width: 100%; 
             display: flex; 
@@ -375,47 +405,31 @@
             position: relative; 
         }
 
-        /* Container for Split Hands */
-        .mbj-hands-row {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            width: 100%;
-        }
-        
-        .mbj-hand-column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
+        .mbj-hands-row { display: flex; justify-content: center; gap: 15px; width: 100%; }
+        .mbj-hand-column { display: flex; flex-direction: column; align-items: center; position: relative; }
 
-        /* EXACT HORIZONTAL ALIGNMENT (Tethered to bottom of container) */
+        /* EXACT HORIZONTAL CARD CENTERING (Bottom Anchored) */
         .mbj-hand-container { 
             position: relative; 
             margin-bottom: 5px; 
             pointer-events: none;
             display: flex;
-            justify-content: center;
-            align-items: flex-end; /* Locks cards to bottom */
+            align-items: flex-end; 
             height: 100px;
         }
         
-        /* Realistic cards */
         .mbj-card { 
             width: 70px; 
             height: 100px; 
             background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
             border-radius: 6px; 
             box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
-            position: absolute; /* Horizontally Stacked */
-            top: 0; /* Ensures they stay perfectly level */
+            position: absolute; 
+            bottom: 0; /* Keeps all normal cards strictly flat and level */
             font-family: 'Outfit', sans-serif; 
             color: black; 
             border: 1px solid #ccc; 
-            transform: translateZ(0); 
             font-weight: 900;
-            z-index: 2;
         }
         
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
@@ -424,43 +438,33 @@
         .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
         
-        /* The sideways Double Down card */
+        /* EXACT DOUBLE DOWN MATH (Bottom edge stays flush) */
         .card-doubled {
-            transform-origin: center left;
-            transform: rotate(90deg) translate(15px, -35px);
+            transform: translate(20px, 15px) rotate(90deg);
             z-index: 10;
         }
 
-        /* PERFECT LEFT-EDGE SCORE BADGE (Supports dynamic pill width for Soft Scores) */
+        /* PERFECT CIRCLE SCORE BADGES (Anchored Middle-Left) */
         .score-badge {
             position: absolute; 
             top: 50%; 
             transform: translateY(-50%);
-            left: -15px; 
-            min-width: 32px;
-            height: 32px;
-            padding: 0 8px;
-            border-radius: 16px; 
+            left: -17px; 
+            width: 35px;
+            height: 35px;
+            border-radius: 50%; 
             border: 1px solid #000; 
             font-weight: 900; 
-            font-size: 0.9rem; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             box-shadow: 2px 2px 6px rgba(0,0,0,0.6);
             z-index: 50; 
-            white-space: nowrap;
+            line-height: 1;
         }
         
-        .score-active { 
-            background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
-            color: black; 
-        }
-        
-        .score-inactive {
-            background: linear-gradient(to bottom, #555, #333);
-            color: white; 
-        }
+        .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
+        .score-inactive { background: linear-gradient(to bottom, #555, #333); color: white; }
         
         /* BUST AND BLACKJACK CENTER OVERLAYS */
         .status-pill {
@@ -488,7 +492,7 @@
             100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } 
         }
 
-        /* 3D Arcade Buttons */
+        /* 3D ACTION BUTTONS */
         .mbj-action-row { 
             display: flex; 
             justify-content: center;
@@ -527,7 +531,7 @@
         .mbj-action-btn.split { background: linear-gradient(to bottom, #00a2ff, #005080); border-color: #00a2ff; font-size: 0.75rem; }
         .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); transform: none; box-shadow: none; }
 
-        /* Betting Circle */
+        /* BETTING CIRCLE & THICK TIMER */
         .mbj-circle-container { 
             position: relative; 
             width: 75px; 
@@ -536,6 +540,46 @@
             justify-content: center;
             align-items: center;
         }
+
+        /* SVG Circular Timer perfectly mapped to 45px radius */
+        .circle-timer-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+            z-index: 2;
+            display: none;
+            pointer-events: none;
+        }
+        
+        .circle-timer-bg { fill: none; stroke: rgba(0,0,0,0.5); stroke-width: 6; }
+        .circle-timer-path {
+            fill: none;
+            stroke: var(--success);
+            stroke-width: 6;
+            stroke-dasharray: 282.7; 
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+        }
+        .active-turn .circle-timer-svg { display: block; }
+        
+        .mbj-seat-circle { 
+            width: 65px; 
+            height: 65px; 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            background: rgba(0,0,0,0.4); 
+            z-index: 5; 
+        }
+        .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
+        .mbj-seat-circle.occupied { border: 2px solid transparent; background: transparent; cursor: default; }
 
         /* BLACK BET PILL */
         .bet-pill {
@@ -552,23 +596,6 @@
             font-family: 'Rajdhani', sans-serif;
             letter-spacing: 1px;
         }
-
-        .mbj-seat-circle { 
-            width: 65px; 
-            height: 65px; 
-            border: 2px solid rgba(255,255,255,0.3); 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            background: rgba(0,0,0,0.4); 
-            z-index: 5; 
-        }
-        
-        .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
-        .mbj-seat-circle.occupied { border: 2px solid transparent; background: transparent; cursor: default; }
         
         /* DYNAMIC 3D CHIP STACK WRAPPER */
         .chip-stack-wrapper {
@@ -596,7 +623,6 @@
                         repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%);
             border: 2px solid var(--c-bg);
         }
-        
         .mbj-chip-3d.ghost { opacity: 0.5; filter: grayscale(80%); }
 
         .mbj-seat-name { 
@@ -665,7 +691,6 @@
             transition: 0.3s;
             position: relative;
         }
-        
         .chip-rack-locked { opacity: 0.5; pointer-events: none; }
 
         .rack-error-tooltip {
@@ -704,11 +729,7 @@
             cursor: pointer; 
             transition: 0.2s; 
         }
-        
-        .rack-chip:hover { 
-            transform: translateY(-5px) scale(1.1); 
-            box-shadow: 0 10px 15px rgba(255,255,255,0.3); 
-        }
+        .rack-chip:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 15px rgba(255,255,255,0.3); }
         
         .rack-btn { 
             padding: 10px 20px; 
@@ -723,35 +744,12 @@
             transition: 0.2s;
             text-transform: uppercase;
         }
-        
         .rack-btn-clear { background: rgba(255,255,255,0.1); color: white; }
         .rack-btn-clear:hover { background: rgba(255,51,102, 0.8); }
         .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
         .rack-btn-confirm:hover { background: white; }
         
-        .custom-input {
-            width: 100px;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.3);
-            background: #111;
-            color: white;
-            font-weight: 900;
-            text-align: center;
-        }
-
-        .btn-play { 
-            background: rgba(255,255,255,0.1); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.15); 
-            padding: 8px 12px; 
-            border-radius: 8px; 
-            font-weight: 900; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            text-transform: uppercase; 
-        }
-        .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
+        .custom-input { width: 100px; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: #111; color: white; font-weight: 900; text-align: center; }
     </style>
 </head>
 <body>
@@ -855,8 +853,7 @@
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
-    // FRONT-END SOFT SCORE LOGIC
-    // Computes if a hand has a flexible Ace (e.g., returns "10/20")
+    // FRONT-END SOFT SCORE LOGIC (Dynamically formats font size for perfect circle fit)
     function getDisplayScore(handCards) {
         let score = 0, aces = 0;
         for (let c of handCards) {
@@ -870,11 +867,10 @@
             aces--;
         }
         
-        // If an Ace is still being counted as 11, and the total is under 21, it's a soft hand
         if (aces > 0 && score < 21) {
-            return `${score - 10}/${score}`;
+            return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`;
         }
-        return score;
+        return `<span style="font-size:1rem;">${score}</span>`;
     }
 
     const socket = io(); 
@@ -1009,15 +1005,14 @@
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-    // PERFECT HORIZONTAL CARD ALIGNMENT
+    // PERFECT HORIZONTAL CARD ALIGNMENT (Top is 0, Z-index inherently matches rendering order)
     function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
         if(animateFlip) animClass = 'anim-flip';
         if(isDoubled) animClass += ' card-doubled';
         
-        // Exact horizontal placement (top is ALWAYS 0)
-        let styleStr = `left: ${leftOffset}px; top: 0px;`;
+        let styleStr = `left: ${leftOffset}px;`;
         
         if(isHidden) return `<div class="mbj-card card-back ${animClass}" style="${styleStr}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
@@ -1125,9 +1120,8 @@
                     let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx;
                     let cardCount = hand.cards.length;
                     
-                    // Container Dynamic Width (Horizontal Stacking)
+                    // Center horizontal stack width logic
                     let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
-                    
                     let scaleTransform = s.hands.length > 1 ? 'transform: scale(0.85); transform-origin: bottom center;' : '';
                     
                     html += `<div class="mbj-hand-column" style="display:flex; flex-direction:column; align-items:center;">`;
@@ -1137,17 +1131,16 @@
                         html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
                     }
 
-                    // Status Pills vs Score Badges
-                    if(hand.cards.length > 0) { 
+                    // Score Badges or Overlays
+                    if(hand.cards.length > 0 && hand.status !== 'BUST') { 
                         if(hand.status === 'BLACKJACK') {
                             html += `<div class="status-pill pill-bj">BLACKJACK</div>`;
-                        } else if(hand.status === 'BUST') {
-                            html += `<div class="status-pill pill-bust">${hand.score} BUST</div>`;
                         } else {
                             let badgeClass = isThisHandActive ? 'score-active' : 'score-inactive';
-                            // Utilize front-end soft score mechanic
                             html += `<div class="score-badge ${badgeClass}">${getDisplayScore(hand.cards)}</div>`; 
                         }
+                    } else if (hand.status === 'BUST') {
+                        html += `<div class="status-pill pill-bust">${hand.score} BUST</div>`;
                     }
 
                     let previouslyRendered = renderedCardCount[i] || 0;
@@ -1159,7 +1152,7 @@
                     });
                     html += `</div>`; // End hand-container
                     
-                    // BUTTONS
+                    // ACTION BUTTONS (Level below cards)
                     let btnClass = (isThisHandActive && mbjGameState === 'PLAYER_TURN' && isMe) ? 'show' : '';
                     let canDouble = hand.cards.length === 2;
                     let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal);
@@ -1171,11 +1164,16 @@
                     if (canSplit) html += `<button class="mbj-action-btn split" onclick="socket.emit('mbjAction', {type:'split'})"><i class="fas fa-arrows-alt-h"></i></button>`;
                     html += `</div>`;
 
-                    // CIRCLE / CHIPS
+                    // THICK SVG TIMER & CHIPS
                     let displayBet = hand.bet;
                     if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && s.hands.length === 1 && s.hands[0].bet === 0) displayBet = localPendingBet;
                     
                     html += `<div class="mbj-circle-container" id="circle-${i}-${hIdx}">`;
+                    html += `<svg class="circle-timer-svg" viewBox="0 0 100 100">
+                                <circle class="circle-timer-bg" cx="50" cy="50" r="45"></circle>
+                                <circle class="circle-timer-path" id="svg-timer-${i}-${hIdx}" cx="50" cy="50" r="45"></circle>
+                             </svg>`;
+                    
                     html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
                     
                     if (displayBet > 0) { 
@@ -1300,19 +1298,36 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
+                // Width for 2 horizontally stacked cards
                 dHand.style.width = '90px'; 
                 
-                dHand.innerHTML += `<div class="dealer-score-badge" style="display:flex;">${data.dealerHand[0].bjVal}</div>`;
-                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0, 0); 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20, 0); 
+                // Dealer specific score badge anchored left
+                dHand.innerHTML += `<div class="score-badge score-inactive" id="mbj-d-score-val" style="display:flex;"><span style="font-size:1rem;">${data.dealerHand[0].bjVal}</span></div>`;
+                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
             } 
         } 
         else if (data.event === 'turn') {
             mbjGameState = 'PLAYER_TURN'; 
             renderMBJSeats(data.seats, data.activeTurn);
+            
+            // Activate fast SVG Timer Ring
+            if (data.activeTurn && data.activeTurn.seat) {
+                let svgPath = document.getElementById(`svg-timer-${data.activeTurn.seat}-${data.activeTurn.handIdx}`);
+                if (svgPath) {
+                    let offset = 282.7 - ((data.time / 15) * 282.7);
+                    svgPath.style.strokeDashoffset = offset;
+                }
+            }
         } 
         else if (data.event === 'turn_timer') { 
-            // Handled backend
+            if (mbjState && mbjState.activeTurn && mbjState.activeTurn.seat) {
+                let svgPath = document.getElementById(`svg-timer-${mbjState.activeTurn.seat}-${mbjState.activeTurn.handIdx}`);
+                if (svgPath) {
+                    let offset = 282.7 - ((data.time / 15) * 282.7);
+                    svgPath.style.strokeDashoffset = offset;
+                }
+            }
         }
         else if (data.event === 'dealer_resolved') {
             mbjGameState = 'RESOLVING'; 
@@ -1324,11 +1339,11 @@
                 let initialDScore = getBJScore(data.dealerHand.slice(0,2));
                 let badgeHTML = (initialDScore === 21 && data.dealerHand.length === 2) 
                                 ? `<div class="status-pill pill-bj">BLACKJACK</div>` 
-                                : `<div class="dealer-score-badge" style="display:flex;">${initialDScore}</div>`;
+                                : `<div class="score-badge score-inactive" id="mbj-d-score-val" style="display:flex;"><span style="font-size:1rem;">${initialDScore}</span></div>`;
 
                 dHand.innerHTML = badgeHTML;
-                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, false, false, 0, 0);
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 20, 0); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, false, false, 0);
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
                 
                 const drawRemaining = async () => {
                     await delay(800);
@@ -1338,12 +1353,12 @@
                         let currentScore = getBJScore(data.dealerHand.slice(0, i+1));
                         let currentBadge = currentScore > 21 
                                          ? `<div class="status-pill pill-bust">${currentScore} BUST</div>` 
-                                         : `<div class="dealer-score-badge" style="display:flex;">${currentScore}</div>`;
+                                         : `<div class="score-badge score-inactive" id="mbj-d-score-val" style="display:flex;"><span style="font-size:1rem;">${currentScore}</span></div>`;
                                          
                         dHand.innerHTML = currentBadge;
                         
                         for(let k=0; k<=i; k++) {
-                            dHand.innerHTML += generateCardHTML(data.dealerHand[k], false, k===i, false, k * 20, 0); 
+                            dHand.innerHTML += generateCardHTML(data.dealerHand[k], false, k===i, false, k * 20); 
                         }
                         await delay(800); 
                     }
