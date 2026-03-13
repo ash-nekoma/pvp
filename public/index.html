@@ -125,10 +125,8 @@
         .card-red { color: #cc0000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
         
-        /* STRICT DOUBLE DOWN GEOMETRY */
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
 
-        /* DEAD CENTER BADGES */
         .score-badge { position: absolute; top: 50%; transform: translateY(-50%); left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif; }
         .score-badge span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; line-height: 0; text-align: center; width: 100%; }
         .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
@@ -140,14 +138,8 @@
 
         .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        
-        /* HORIZONTAL DOUBLE DOWN ANIMATION */
         .anim-fly-in-doubled { animation: flyInDoubled 0.3s ease-out forwards; }
-        @keyframes flyInDoubled { 
-            0% { opacity: 0; transform: translate(30px, -150px) rotate(90deg) scale(0.8); } 
-            100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } 
-        }
-
+        @keyframes flyInDoubled { 0% { opacity: 0; transform: translate(30px, -150px) rotate(90deg) scale(0.8); } 100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } }
         .anim-reveal { animation: revealCard 0.4s ease-out forwards; }
         @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
 
@@ -514,11 +506,7 @@
         panel.innerHTML = '';
 
         state.horses.forEach(h => {
-            track.innerHTML += `
-                <div class="derby-lane">
-                    <i class="fas fa-horse-head derby-horse" style="color: ${h.color}; left: ${h.pos}%"></i>
-                </div>
-            `;
+            track.innerHTML += `<div class="derby-lane"><i class="fas fa-horse-head derby-horse" style="color: ${h.color}; left: ${h.pos}%"></i></div>`;
             
             let myTotalBet = (state.bets[myUsername] && state.bets[myUsername][h.id]) ? state.bets[myUsername][h.id] : 0;
             let betInfo = myTotalBet > 0 ? `<div style="margin-top:5px; color:var(--credits); font-weight:900;">${myTotalBet} TC</div>` : '';
@@ -618,7 +606,7 @@
         setTimeout(() => { if(chip.parentNode) chip.remove(); }, 650);
     }
 
-    // OPTIMISTIC UI: Instantly hide buttons on click to remove input lag
+    // OPTIMISTIC UI BUTTON HANDLER: Kills input lag
     function sendMBJAction(type) {
         document.querySelectorAll('.mbj-action-row.show').forEach(el => el.classList.remove('show'));
         socket.emit('mbjAction', { type: type });
@@ -671,7 +659,6 @@
                     let canDouble = hand.cards.length === 2;
                     let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1;
 
-                    // USING OPTIMISTIC UI FUNCTION "sendMBJAction"
                     html += `<div class="mbj-action-row ${btnClass}">
                                 <button class="mbj-action-btn hit" onclick="sendMBJAction('hit')"><i class="fas fa-plus"></i></button>
                                 <button class="mbj-action-btn stand" onclick="sendMBJAction('stand')"><i class="fas fa-hand-paper"></i></button>`;
@@ -765,13 +752,26 @@
     
     function clearLocalBet() { localPendingBet = 0; renderMBJSeats(); }
     
+    // OPTIMISTIC UI: Instantly converts pending bets to active local chips to fix ping flickering
     function confirmLocalBet() {
         let customInput = document.getElementById('custom-bet').value;
         let v = parseInt(customInput);
         if (!isNaN(v) && v > 0) { localPendingBet += v; document.getElementById('custom-bet').value = ''; }
-        if(localPendingBet < 10) return showRackAlert('Min Bet 10 TC');
+        
+        if(localPendingBet < 10) return showRackAlert('Min Bet 10 TC', 'rack-alert');
+
+        if (localSeatId && currentMBJSeats[localSeatId]) {
+            let s = currentMBJSeats[localSeatId];
+            if (!s.hands) s.hands = [];
+            if (s.hands.length === 0) {
+                s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false });
+            }
+            s.hands[0].bet += localPendingBet;
+        }
+
         socket.emit('mbjPlaceBet', localPendingBet);
-        localPendingBet = 0; renderMBJSeats(); 
+        localPendingBet = 0; 
+        renderMBJSeats(); 
     }
 
     socket.on('mbjUpdate', async (data) => {
