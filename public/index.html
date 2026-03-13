@@ -31,7 +31,6 @@
             user-select: none;
         }
         
-        /* 100vh strict body prevents vertical blank screen collapse */
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
             color: white; 
@@ -66,12 +65,13 @@
             text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); 
             cursor: pointer;
         }
-        
-        /* Forces the view containers to fill remaining space */
+
+        /* 100vh absolute center prevents blank screen collapse */
         .main-wrapper { 
             flex: 1; 
             position: relative; 
             width: 100%; 
+            height: 100%;
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -89,60 +89,7 @@
             height: 100%; 
         }
 
-        .btn-play { 
-            background: rgba(255,255,255,0.1); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.15); 
-            padding: 12px 15px; 
-            border-radius: 8px; 
-            font-weight: 900; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            text-transform: uppercase; 
-        }
-        .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
-        .btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-back-fixed { 
-            position: absolute; 
-            top: 20px; 
-            left: 25px; 
-            z-index: 1000; 
-            background: rgba(0,0,0,0.8); 
-            border: 1px solid rgba(255,255,255,0.15); 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        .btn-back-fixed:hover { background: white; color: black; }
-        
-        .lobby-modes-container { display: flex; gap: 40px; }
-        
-        .game-card { 
-            width: 320px; 
-            height: 380px; 
-            background: #020813; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            padding: 30px 20px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            text-align: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
-        }
-        .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
-
-        /* ================= DOCKED LIVE CHAT (FLOATING & SMALL) ================= */
-        /* Completely detached from the DOM flexbox so it never blocks the table */
+        /* ================= DOCKED LIVE CHAT (FLOATING OUTSIDE BOARD) ================= */
         .chat-widget {
             position: fixed;
             bottom: 20px;
@@ -296,7 +243,7 @@
         /* Classic Premium Rectangular Table */
         .mbj-board { 
             width: 1100px; 
-            height: 550px; 
+            height: 520px; 
             background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
             border-radius: 20px; 
             position: relative; 
@@ -314,7 +261,7 @@
             z-index: 1;
         }
         
-        /* Clean Embossed Felt Typography (NO DEALER H1) */
+        /* Clean Embossed Felt Typography */
         .mbj-logo { 
             position: absolute; 
             top: 40%; 
@@ -393,10 +340,10 @@
             z-index: 5; 
         }
 
-        /* Dealer Area (No Text Header) */
+        /* Dealer Area */
         .mbj-dealer-area { 
             position: absolute; 
-            top: 40px; 
+            top: 30px; 
             left: 50%; 
             transform: translateX(-50%); 
             display: flex; 
@@ -405,7 +352,7 @@
             z-index: 20; 
         }
 
-        /* Flexible row ensures no horizontal overlaps */
+        /* Seats Wrapper */
         #mbj-seats-row { 
             position: absolute; 
             bottom: 25px; 
@@ -443,30 +390,34 @@
             position: relative;
         }
 
-        /* EXACT DIAGONAL CASCADING CONTAINER */
-        /* Dynamic width/height calculation from JS ensures absolute center */
+        /* EXACT HORIZONTAL ALIGNMENT (Tethered to bottom of container) */
         .mbj-hand-container { 
             position: relative; 
-            margin-bottom: 10px; 
+            margin-bottom: 5px; 
             pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Locks cards to bottom */
+            height: 100px;
         }
         
-        /* Larger, realistic cards */
+        /* Realistic cards */
         .mbj-card { 
             width: 70px; 
             height: 100px; 
             background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
             border-radius: 6px; 
             box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
-            position: absolute; /* Stacked */
+            position: absolute; /* Horizontally Stacked */
+            top: 0; /* Ensures they stay perfectly level */
             font-family: 'Outfit', sans-serif; 
             color: black; 
             border: 1px solid #ccc; 
+            transform: translateZ(0); 
             font-weight: 900;
             z-index: 2;
         }
         
-        /* Clean symbols: top left and bottom right only */
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
         .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; transform: rotate(180deg); }
         .card-red { color: #cc0000; } 
@@ -475,19 +426,21 @@
         
         /* The sideways Double Down card */
         .card-doubled {
-            transform-origin: center;
-            transform: rotate(90deg) translate(20px, 0);
-            z-index: 1;
+            transform-origin: center left;
+            transform: rotate(90deg) translate(15px, -35px);
+            z-index: 10;
         }
 
-        /* SCORE BADGE - ANCHORED LEFT MIDDLE */
+        /* PERFECT LEFT-EDGE SCORE BADGE (Supports dynamic pill width for Soft Scores) */
         .score-badge {
             position: absolute; 
-            top: 35px; 
-            left: -16px; 
-            width: 32px;
+            top: 50%; 
+            transform: translateY(-50%);
+            left: -15px; 
+            min-width: 32px;
             height: 32px;
-            border-radius: 50%; 
+            padding: 0 8px;
+            border-radius: 16px; 
             border: 1px solid #000; 
             font-weight: 900; 
             font-size: 0.9rem; 
@@ -496,6 +449,7 @@
             align-items: center; 
             box-shadow: 2px 2px 6px rgba(0,0,0,0.6);
             z-index: 50; 
+            white-space: nowrap;
         }
         
         .score-active { 
@@ -508,7 +462,7 @@
             color: white; 
         }
         
-        /* BUST AND BLACKJACK PILL OVERLAYS */
+        /* BUST AND BLACKJACK CENTER OVERLAYS */
         .status-pill {
             position: absolute;
             top: 50%;
@@ -525,43 +479,13 @@
             letter-spacing: 1px;
         }
         
-        .pill-bj {
-            background: linear-gradient(to bottom, #00b359, #008040);
-            border: 2px solid #00e676;
-        }
-        
-        .pill-bust {
-            background: linear-gradient(to bottom, #cc0033, #9b0022);
-            border: 2px solid #ff3366;
-        }
+        .pill-bj { background: linear-gradient(to bottom, #00b359, #008040); border: 2px solid #00e676; }
+        .pill-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); border: 2px solid #ff3366; }
 
         .anim-fly-in { animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; opacity: 0; }
         @keyframes flyIn { 
             0% { opacity: 0; transform: translate(400px, -200px) scale(0.3) rotate(90deg); } 
             100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } 
-        }
-        
-        .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
-        @keyframes flipCard { 
-            0% { transform: rotateY(180deg); } 
-            100% { transform: rotateY(0deg); } 
-        }
-
-        /* Sleek Glowing Chevron (Your Turn) */
-        .turn-chevron {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--success);
-            font-size: 1.5rem;
-            z-index: 30;
-            animation: floatChevron 1s infinite;
-            text-shadow: 0 0 15px var(--success);
-        }
-        @keyframes floatChevron {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-8px); }
         }
 
         /* 3D Arcade Buttons */
@@ -724,7 +648,7 @@
             100% { opacity: 0; transform: translate(-50%, -60px); } 
         }
 
-        /* THE CHIP RACK UI (Matches table width exactly) */
+        /* THE CHIP RACK UI */
         .chip-rack-container { 
             width: 1100px;
             margin-top: 15px;
@@ -815,6 +739,19 @@
             font-weight: 900;
             text-align: center;
         }
+
+        .btn-play { 
+            background: rgba(255,255,255,0.1); 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.15); 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            font-weight: 900; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            text-transform: uppercase; 
+        }
+        .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -918,16 +855,24 @@
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
-    // Front-end Math to prevent crashes
-    function getBJScore(hand) {
+    // FRONT-END SOFT SCORE LOGIC
+    // Computes if a hand has a flexible Ace (e.g., returns "10/20")
+    function getDisplayScore(handCards) {
         let score = 0, aces = 0;
-        for (let card of hand) { 
-            score += card.bjVal; 
-            if (card.raw === 'A') aces += 1; 
+        for (let c of handCards) {
+            score += c.bjVal; 
+            if (c.raw === 'A') aces++;
         }
-        while (score > 21 && aces > 0) { 
-            score -= 10; 
-            aces -= 1; 
+        
+        let softScore = score;
+        while (score > 21 && aces > 0) {
+            score -= 10;
+            aces--;
+        }
+        
+        // If an Ace is still being counted as 11, and the total is under 21, it's a soft hand
+        if (aces > 0 && score < 21) {
+            return `${score - 10}/${score}`;
         }
         return score;
     }
@@ -1064,14 +1009,15 @@
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0, topOffset = 0, isDoubled = false) {
+    // PERFECT HORIZONTAL CARD ALIGNMENT
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
         if(animateFlip) animClass = 'anim-flip';
         if(isDoubled) animClass += ' card-doubled';
         
-        // Exact cascading math applied directly to the card
-        let styleStr = `left: ${leftOffset}px; top: ${topOffset}px;`;
+        // Exact horizontal placement (top is ALWAYS 0)
+        let styleStr = `left: ${leftOffset}px; top: 0px;`;
         
         if(isHidden) return `<div class="mbj-card card-back ${animClass}" style="${styleStr}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
@@ -1131,10 +1077,7 @@
         
         document.body.appendChild(chip);
         
-        // Force CSS Reflow
         void chip.offsetWidth;
-        
-        // Mario Arc Effect
         chip.style.transform = 'scale(1.5)';
         
         setTimeout(() => {
@@ -1182,30 +1125,29 @@
                     let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx;
                     let cardCount = hand.cards.length;
                     
-                    // Dynamic Diagonal Container Width/Height Calculation
-                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 15) + 70 : 70; 
-                    let containerHeight = cardCount > 0 ? ((cardCount - 1) * 15) + 100 : 100;
+                    // Container Dynamic Width (Horizontal Stacking)
+                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
                     
-                    // Scale down slightly if player has split hands
-                    let scaleTransform = s.hands.length > 1 ? 'transform: scale(0.9); transform-origin: bottom center;' : '';
+                    let scaleTransform = s.hands.length > 1 ? 'transform: scale(0.85); transform-origin: bottom center;' : '';
                     
                     html += `<div class="mbj-hand-column" style="display:flex; flex-direction:column; align-items:center;">`;
-                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px; height: ${containerHeight}px; ${scaleTransform}">`;
+                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px; ${scaleTransform}">`;
                     
                     if (isThisHandActive && mbjGameState === 'PLAYER_TURN') {
                         html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
                     }
 
-                    // Score Badges or Overlays
-                    if(hand.cards.length > 0 && hand.status !== 'BUST') { 
+                    // Status Pills vs Score Badges
+                    if(hand.cards.length > 0) { 
                         if(hand.status === 'BLACKJACK') {
                             html += `<div class="status-pill pill-bj">BLACKJACK</div>`;
+                        } else if(hand.status === 'BUST') {
+                            html += `<div class="status-pill pill-bust">${hand.score} BUST</div>`;
                         } else {
                             let badgeClass = isThisHandActive ? 'score-active' : 'score-inactive';
-                            html += `<div class="score-badge ${badgeClass}">${hand.score}</div>`; 
+                            // Utilize front-end soft score mechanic
+                            html += `<div class="score-badge ${badgeClass}">${getDisplayScore(hand.cards)}</div>`; 
                         }
-                    } else if (hand.status === 'BUST') {
-                        html += `<div class="status-pill pill-bust">${hand.score} BUST</div>`;
                     }
 
                     let previouslyRendered = renderedCardCount[i] || 0;
@@ -1213,7 +1155,7 @@
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
                         let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
-                        html += generateCardHTML(c, false, animateThisCard, false, cIdx * 15, cIdx * 15, isDoubledCard);
+                        html += generateCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard);
                     });
                     html += `</div>`; // End hand-container
                     
@@ -1235,6 +1177,7 @@
                     
                     html += `<div class="mbj-circle-container" id="circle-${i}-${hIdx}">`;
                     html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
+                    
                     if (displayBet > 0) { 
                         html += `<div id="chip-stack-${i}-${hIdx}" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">${getChipStackHTML(displayBet, hand.bet === 0)}</div>`;
                     } else if (hIdx === 0) {
@@ -1251,10 +1194,10 @@
                 });
                 renderedCardCount[i] = s.hands[0].cards.length; 
             } else { 
-                // EMPTY SEAT
+                // EMPTY SEAT BETTING PHASE
                 renderedCardCount[i] = 0; 
                 html += `<div class="mbj-hand-column" style="display:flex; flex-direction:column; align-items:center;">`;
-                html += `<div class="mbj-hand-container" style="width: 70px; height: 100px;"></div>`;
+                html += `<div class="mbj-hand-container" style="width: 70px;"></div>`;
                 html += `<div class="mbj-action-row"></div>`;
                 html += `<div class="mbj-circle-container" id="circle-${i}-0">`;
                 html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
@@ -1357,13 +1300,11 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                // Container width for two diagonal cards
-                dHand.style.width = '85px'; 
-                dHand.style.height = '115px';
+                dHand.style.width = '90px'; 
                 
                 dHand.innerHTML += `<div class="dealer-score-badge" style="display:flex;">${data.dealerHand[0].bjVal}</div>`;
                 dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0, 0); 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 15, 15); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20, 0); 
             } 
         } 
         else if (data.event === 'turn') {
@@ -1371,8 +1312,7 @@
             renderMBJSeats(data.seats, data.activeTurn);
         } 
         else if (data.event === 'turn_timer') { 
-            // Optional: You could link this to an SVG ring if desired, but 
-            // global mechanics manage turn transition safely now.
+            // Handled backend
         }
         else if (data.event === 'dealer_resolved') {
             mbjGameState = 'RESOLVING'; 
@@ -1388,13 +1328,12 @@
 
                 dHand.innerHTML = badgeHTML;
                 dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, false, false, 0, 0);
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 15, 15); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 20, 0); 
                 
                 const drawRemaining = async () => {
                     await delay(800);
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.style.width = `${(i * 15) + 70}px`;
-                        dHand.style.height = `${(i * 15) + 100}px`;
+                        dHand.style.width = `${(i * 20) + 70}px`;
                         
                         let currentScore = getBJScore(data.dealerHand.slice(0, i+1));
                         let currentBadge = currentScore > 21 
@@ -1404,7 +1343,7 @@
                         dHand.innerHTML = currentBadge;
                         
                         for(let k=0; k<=i; k++) {
-                            dHand.innerHTML += generateCardHTML(data.dealerHand[k], false, k===i, false, k * 15, k * 15); 
+                            dHand.innerHTML += generateCardHTML(data.dealerHand[k], false, k===i, false, k * 20, 0); 
                         }
                         await delay(800); 
                     }
