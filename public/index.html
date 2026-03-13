@@ -31,7 +31,7 @@
             user-select: none;
         }
         
-        /* Strict column layout guarantees no blank screens */
+        /* Strict flex column prevents the blank screen zero-height collapse */
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
             color: white; 
@@ -40,6 +40,8 @@
             overflow: hidden; 
             display: flex; 
             flex-direction: column; 
+            margin: 0;
+            padding: 0;
         }
         
         input, textarea { user-select: auto; }
@@ -49,7 +51,7 @@
         .topbar { 
             flex: 0 0 75px; 
             background: rgba(0, 5, 15, 0.95); 
-            border-bottom: 1px solid var(--glass-border); 
+            border-bottom: 1px solid rgba(255,255,255,0.15); 
             display: flex; 
             align-items: center; 
             justify-content: space-between; 
@@ -65,7 +67,7 @@
             cursor: pointer;
         }
         
-        /* Main wrapper automatically calculates height */
+        /* Fills remaining screen space */
         .main-wrapper { 
             flex: 1; 
             position: relative; 
@@ -76,7 +78,7 @@
             overflow: hidden;
         }
         
-        /* View container forces games to center */
+        /* Keeps games perfectly in the middle */
         .view-container { 
             position: absolute; 
             inset: 0; 
@@ -91,7 +93,7 @@
         .btn-play { 
             background: rgba(255,255,255,0.1); 
             color: white; 
-            border: 1px solid var(--glass-border); 
+            border: 1px solid rgba(255,255,255,0.15); 
             padding: 12px 15px; 
             border-radius: 8px; 
             font-weight: 900; 
@@ -115,7 +117,7 @@
             width: 100%; 
             padding: 12px 15px; 
             background: rgba(0,0,0,0.5); 
-            border: 1px solid var(--glass-border); 
+            border: 1px solid rgba(255,255,255,0.15); 
             color: white; 
             border-radius: 8px; 
             font-size: 1rem; 
@@ -129,7 +131,7 @@
             left: 25px; 
             z-index: 1000; 
             background: rgba(0,0,0,0.8); 
-            border: 1px solid var(--glass-border); 
+            border: 1px solid rgba(255,255,255,0.15); 
             color: white; 
             padding: 10px 20px; 
             border-radius: 8px; 
@@ -209,27 +211,10 @@
         }
 
         /* ================= VIP BLACKJACK UI ================= */
-        .mbj-top-ui { 
-            width: 1200px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px; 
-            z-index: 100; 
-        }
-        
-        .mbj-top-capsule { 
-            background: rgba(0,0,0,0.8); 
-            border: 1px solid var(--glass-border); 
-            padding: 8px 30px; 
-            border-radius: 50px; 
-            text-align: center; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
-        }
         
         .mbj-board { 
-            width: 1200px; 
-            height: 550px; 
+            width: 1100px; 
+            height: 520px; 
             background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); 
             border-radius: 20px; 
             position: relative; 
@@ -271,28 +256,61 @@
             letter-spacing: 2px;
         }
 
+        /* Top Left Balance */
+        .mbj-balance-hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 8px 20px;
+            border-radius: 12px;
+            z-index: 20;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Center Timer */
+        .mbj-timer-hud {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--ps-glow);
+            padding: 5px 30px;
+            border-radius: 50px;
+            z-index: 20;
+            box-shadow: 0 5px 15px rgba(0,162,255,0.3);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Top Right Shoe & Dealer */
+        .mbj-shoe { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            width: 60px; 
+            height: 90px; 
+            background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); 
+            border: 4px solid #555; 
+            border-radius: 8px; 
+            box-shadow: -10px 15px 25px rgba(0,0,0,0.8); 
+            z-index: 5; 
+        }
+
         .mbj-dealer-area { 
             position: absolute; 
-            top: 40px; 
+            top: 80px; 
             left: 50%; 
             transform: translateX(-50%); 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             z-index: 20; 
-        }
-        
-        .mbj-shoe { 
-            position: absolute; 
-            top: 30px; 
-            right: 30px; 
-            width: 65px; 
-            height: 100px; 
-            background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); 
-            border: 4px solid #555; 
-            border-radius: 8px; 
-            box-shadow: -10px 15px 25px rgba(0,0,0,0.8); 
-            z-index: 5; 
         }
 
         /* HORIZONTAL FLEXBOX ROW FOR SEATS */
@@ -306,21 +324,19 @@
             align-items: flex-end; 
             padding: 0 20px; 
             z-index: 10; 
-            pointer-events: none;
         }
         
-        /* VERTICAL FLEXBOX FOR SEAT TO PREVENT OVERLAPS */
+        /* VERTICAL FLEXBOX FOR SEAT */
         .mbj-seat-wrapper { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-end; 
-            width: 140px; 
-            pointer-events: auto; 
+            width: 130px; 
             position: relative; 
         }
 
-        /* Cards Flexbox */
+        /* Centered Cards Container */
         .mbj-hand-container { 
             display: flex; 
             justify-content: center; 
@@ -328,6 +344,7 @@
             margin-bottom: 10px; 
             min-height: 85px; 
             width: 100%; 
+            pointer-events: none;
         }
         
         /* Action buttons below cards, above circle */
@@ -363,13 +380,17 @@
             box-shadow: 0 5px 10px rgba(0,0,0,0.9); 
         }
         
-        .mbj-action-btn:hover:not(:disabled) { transform: scale(1.15); border-color: white; }
+        .mbj-action-btn:hover:not(:disabled) { 
+            transform: scale(1.15); 
+            border-color: white; 
+        }
+        
         .mbj-action-btn.hit { background: #008040; } 
         .mbj-action-btn.stand { background: #9b0022; } 
         .mbj-action-btn.double { background: #997a00; font-size: 0.7rem; }
-        .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); }
 
-        /* The Circle */
+        /* The Betting Circle */
         .mbj-circle-container { 
             position: relative; 
             width: 65px; 
@@ -394,32 +415,45 @@
             z-index: 5; 
         }
         
-        .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
-        .mbj-seat-circle.occupied { border: 3px solid var(--credits); background: transparent; cursor: default; }
+        .mbj-seat-circle:hover { 
+            border-color: rgba(255,255,255,0.8); 
+            background: rgba(255,255,255,0.2); 
+        }
         
-        /* The Center Chip - Positioned perfectly in the middle of the circle */
+        .mbj-seat-circle.occupied { 
+            border: 3px solid var(--credits); 
+            background: transparent; 
+            cursor: default; 
+        }
+        
+        /* PREMIUM CHIP - Placed exactly in the middle of the circle */
         .mbj-chip { 
             position: absolute; 
             top: 50%; 
             left: 50%; 
             transform: translate(-50%, -50%); 
-            width: 40px; 
-            height: 40px; 
+            width: 45px; 
+            height: 45px; 
             border-radius: 50%; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            font-size: 0.65rem; 
+            font-size: 0.7rem; 
             font-weight: 900; 
             color: white; 
-            box-shadow: 0 5px 10px rgba(0,0,0,0.9); 
+            box-shadow: inset 0 0 0 4px rgba(0,0,0,0.3), 0 5px 10px rgba(0,0,0,0.9); 
             z-index: 10;
-            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.2) 0deg 20deg, transparent 20deg 40deg), var(--c-bg);
+            background: var(--c-bg);
             border: 2px solid white;
+            outline: 2px dashed white;
+            outline-offset: -6px;
             text-shadow: 1px 1px 2px black;
         }
         
-        .mbj-chip.ghost { opacity: 0.6; border-color: #00a2ff; }
+        .mbj-chip.ghost { 
+            opacity: 0.6; 
+            border-color: #00a2ff; 
+        }
 
         .mbj-seat-name { 
             font-weight: 900; 
@@ -439,7 +473,6 @@
             border-radius: 6px; 
             box-shadow: -3px 3px 10px rgba(0,0,0,0.6); 
             position: relative; 
-            font-family: 'Outfit', sans-serif; 
             color: black; 
             border: 1px solid #ccc; 
             margin-left: -35px; 
@@ -447,18 +480,51 @@
             font-weight: 900;
         }
         
-        .mbj-card:first-child { margin-left: 0; } 
+        .mbj-card:first-child { 
+            margin-left: 0; 
+        } 
         
-        .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; }
-        .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; transform: rotate(180deg); }
-        .card-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; }
+        .card-tl { 
+            position: absolute; 
+            top: 4px; 
+            left: 4px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            line-height: 0.9; 
+            font-size: 0.9rem; 
+        }
+        
+        .card-br { 
+            position: absolute; 
+            bottom: 4px; 
+            right: 4px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            line-height: 0.9; 
+            font-size: 0.9rem; 
+            transform: rotate(180deg); 
+        }
+        
+        .card-center { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            font-size: 2rem; 
+        }
+        
         .card-red { color: #e60000; } 
         .card-black { color: #000; }
-        .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
+        .card-back { 
+            background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); 
+            border: 2px solid rgba(255,255,255,0.8); 
+        }
 
         .mbj-hand-score { 
             position: absolute; 
-            top: -10px; 
+            top: -15px; 
             left: 50%; 
             transform: translateX(-50%);
             background: #222; 
@@ -477,8 +543,8 @@
         
         .dealer-score-badge { 
             position: absolute; 
-            top: -5px; 
-            left: -25px; 
+            top: -10px; 
+            left: -35px; 
             width: 28px; 
             height: 28px; 
             background: #222; 
@@ -494,13 +560,21 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.8);
         }
 
-        .anim-fly-in { animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; opacity: 0; }
+        /* Animations */
+        .anim-fly-in { 
+            animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; 
+            opacity: 0; 
+        }
+        
         @keyframes flyIn { 
             0% { opacity: 0; transform: translate(500px, -200px) scale(0.3) rotate(90deg); } 
             100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } 
         }
         
-        .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
+        .anim-flip { 
+            animation: flipCard 0.4s ease-in-out forwards; 
+        }
+        
         @keyframes flipCard { 
             0% { transform: rotateY(180deg); } 
             100% { transform: rotateY(0deg); } 
@@ -529,9 +603,24 @@
         }
 
         .dimmed { opacity: 0.3; filter: grayscale(80%); }
-        .seat-glow { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 145px; height: 145px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 1; display: none; }
+        
+        .seat-glow { 
+            position: absolute; 
+            top: -40px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 145px; 
+            height: 145px; 
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); 
+            border-radius: 50%; 
+            pointer-events: none; 
+            z-index: 1; 
+            display: none; 
+        }
+        
         .active-turn { opacity: 1 !important; z-index: 100; filter: grayscale(0) !important; }
         .active-turn .seat-glow { display: block; animation: pulseGlow 2s infinite; }
+        
         @keyframes pulseGlow { 
             0% { transform: translateX(-50%) scale(0.9); opacity: 0.5;} 
             50% { transform: translateX(-50%) scale(1.1); opacity: 1;} 
@@ -552,26 +641,32 @@
             z-index: 30;
             animation: floatBadge 1s infinite;
         }
+        
         @keyframes floatBadge {
             0%, 100% { transform: translateX(-50%) translateY(0); }
             50% { transform: translateX(-50%) translateY(-5px); }
         }
 
-        /* THE CHIP RACK UI (Below the table) */
+        /* THE CHIP RACK UI (Locks when dealing) */
         .chip-rack-container { 
-            width: 1200px;
+            width: 1100px;
             margin-top: 15px;
-            display: none; 
+            display: flex; 
             background: rgba(0,0,0,0.85); 
             padding: 15px 20px; 
             border-radius: 20px; 
-            border: 1px solid var(--glass-border); 
+            border: 1px solid rgba(255,255,255,0.15); 
             justify-content: center;
             gap: 15px; 
             align-items: center; 
             z-index: 9999; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.9); 
-            pointer-events: auto; 
+            transition: 0.3s;
+        }
+        
+        .chip-rack-locked {
+            opacity: 0.5;
+            pointer-events: none;
         }
         
         .rack-chip { 
@@ -585,14 +680,19 @@
             font-weight: 900; 
             cursor: pointer; 
             transition: 0.2s; 
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9); 
             border: 3px solid white; 
             color: white;
             text-shadow: 1px 1px 2px black;
-            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.2) 0deg 20deg, transparent 20deg 40deg), var(--c-bg);
+            background: var(--c-bg);
+            box-shadow: inset 0 0 0 4px rgba(0,0,0,0.3), 0 5px 10px rgba(0,0,0,0.9); 
+            outline: 2px dashed white;
+            outline-offset: -6px;
         }
         
-        .rack-chip:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 0 15px white; }
+        .rack-chip:hover { 
+            transform: translateY(-5px) scale(1.1); 
+            box-shadow: 0 0 15px white; 
+        }
         
         .rack-btn { 
             padding: 10px 20px; 
@@ -665,7 +765,7 @@
             align-items: center;
             gap: 10px;
             background: rgba(0,0,0,0.8);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255,255,255,0.15);
             padding: 10px 20px;
             border-radius: 8px;
             font-family: 'Rajdhani', sans-serif;
@@ -710,11 +810,28 @@
         }
         
         .track-moving .hr-bg-dirt { animation: scrollTrack 0.3s linear infinite; }
-        .track-slowing .hr-bg-dirt { animation: scrollTrack 1.5s linear infinite; }
+        
         @keyframes scrollTrack { 
             from { transform: translateX(0); } 
             to { transform: translateX(-80px); } 
         }
+
+        /* The Starting Gate Bar */
+        .hr-starting-gate { 
+            position: absolute; 
+            left: 5%; 
+            top: 20%; 
+            bottom: 0; 
+            width: 20px; 
+            background: repeating-linear-gradient(to bottom, #777 0px, #777 15px, #444 15px, #444 30px); 
+            border-right: 5px solid #222; 
+            border-left: 2px solid #aaa;
+            z-index: 20; 
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 10px 0 20px rgba(0,0,0,0.8);
+        }
+        
+        .gate-open { transform: translateY(-100%); }
 
         .hr-finish-line { 
             position: absolute; 
@@ -730,7 +847,7 @@
             border-left: 6px solid #ffcc00; 
         }
         
-        /* Grid Architecture prevents vertical escapes */
+        /* Grid Architecture */
         .hr-lanes-grid { 
             position: absolute; 
             top: 20%; 
@@ -752,12 +869,11 @@
         
         .hr-horse-group { 
             position: absolute; 
-            left: 5%; 
+            left: 0%; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             z-index: 15; 
-            transition: left 0.1s linear, opacity 1s; 
             transform: scaleX(-1); 
         }
         
@@ -796,10 +912,10 @@
         }
         
         .hr-bet-btn { 
-            background: #111; 
-            border: 2px solid #444; 
+            background: var(--h-bg); 
+            border: 2px solid white; 
             color: white; 
-            padding: 15px 5px; 
+            padding: 10px 5px; 
             font-family: 'Rajdhani', sans-serif; 
             font-weight: 900; 
             font-size: 1.1rem; 
@@ -811,11 +927,13 @@
             align-items: center; 
             gap: 4px; 
             position: relative; 
+            text-shadow: 1px 1px 2px black;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
         
         .hr-bet-btn:hover:not(:disabled) { 
             transform: translateY(-3px); 
-            border-color: white; 
+            box-shadow: 0 5px 15px rgba(255,255,255,0.3); 
         }
         
         .hr-bet-btn:disabled { 
@@ -826,20 +944,17 @@
         .flash-bet { animation: flashBet 0.2s; }
         @keyframes flashBet { 
             0% { background: white; color: black; } 
-            100% { background: #111; color: white; } 
-        }
-        
-        .hr-odds-text { 
-            color: var(--success); 
-            font-size: 0.9rem; 
-            text-shadow: 0 0 5px var(--success); 
+            100% { background: var(--h-bg); color: white; } 
         }
         
         .bet-badge {
             font-size: 0.8rem;
-            color: var(--credits);
+            color: white;
             margin-top: 5px;
             display: block;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 8px;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -881,17 +996,6 @@
 
       <div id="view-mbj" class="view-container hidden">
           
-          <div class="mbj-top-ui">
-              <div class="mbj-top-capsule">
-                  <div style="font-size:0.7rem; color:gray; font-weight:900;">BALANCE</div>
-                  <div id="bj-bal" style="font-size:1.5rem; font-weight:900; color:var(--credits);">0 TC</div>
-              </div>
-              <div class="mbj-top-capsule">
-                  <div style="font-size:0.7rem; color:gray; font-weight:900;">TIMER</div>
-                  <div id="bj-timer" style="font-size:1.5rem; font-weight:900; color:white; font-family:'Rajdhani';">15</div>
-              </div>
-          </div>
-          
           <div class="mbj-board">
               <div class="mbj-table-line"></div>
               
@@ -900,23 +1004,33 @@
                   <p>PAYS 3 TO 2</p>
               </div>
 
+              <div class="mbj-balance-hud">
+                  <div style="font-size:0.7rem; color:gray; font-weight:900;">BALANCE</div>
+                  <div id="bj-bal" style="font-size:1.3rem; font-weight:900; color:var(--credits);">0 TC</div>
+              </div>
+
+              <div class="mbj-timer-hud" id="bj-timer-box">
+                  <div style="color:var(--ps-glow); font-size:0.7rem; font-weight:900; letter-spacing:1px;">PLACE BETS</div>
+                  <div id="bj-timer" style="font-family:'Rajdhani', monospace; font-size:1.8rem; font-weight:900; color:white; line-height:1;">15</div>
+              </div>
+
+              <div class="mbj-shoe"></div>
+
               <div class="mbj-dealer-area">
                   <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
                   <div id="mbj-fs-dealer-hand" style="display:flex; justify-content:center; position:relative; min-width:100px;"></div>
               </div>
               
-              <div class="mbj-shoe"></div>
-
               <div id="mbj-seats-row"></div>
           </div>
 
           <div class="chip-rack-container" id="mbj-chip-rack">
               <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
-              <div class="rack-chip" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
-              <div class="rack-chip" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
-              <div class="rack-chip" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
-              <div class="rack-chip" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
-              <div class="rack-chip" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
+              <div class="rack-chip chip-10" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
+              <div class="rack-chip chip-100" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
+              <div class="rack-chip chip-1k" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
+              <div class="rack-chip chip-10k" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
+              <div class="rack-chip chip-50k" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
               
               <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
               <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
@@ -933,7 +1047,7 @@
                       <span id="hr-timer">15</span>
                   </div>
                   <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
-                  <div style="background: rgba(0,0,0,0.7); border: 1px solid var(--glass-border); padding: 5px 15px; border-radius: 8px; text-align: right;">
+                  <div style="background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.15); padding: 5px 15px; border-radius: 8px; text-align: right;">
                       <div style="font-family:'Outfit'; font-size:0.7rem; color:gray; font-weight:800;">BALANCE</div>
                       <div id="hr-my-bal" style="font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:900; color:var(--credits);">0 TC</div>
                   </div>
@@ -944,6 +1058,8 @@
                   <div class="hr-bg-dirt"></div>
                   
                   <div class="hr-finish-line" id="hr-finish-line"></div>
+                  <div class="hr-starting-gate" id="hr-gate"></div>
+                  
                   <div class="hr-lanes-grid" id="hr-lanes-container"></div>
               </div>
 
@@ -961,6 +1077,20 @@
   <div id="flash-msg" class="local-flash"></div> 
 
   <script>
+    // Include Frontend BJ Math to prevent Blank Screen Crashes
+    function getBJScore(hand) {
+        let score = 0, aces = 0;
+        for (let card of hand) { 
+            score += card.bjVal; 
+            if (card.raw === 'A') aces += 1; 
+        }
+        while (score > 21 && aces > 0) { 
+            score -= 10; 
+            aces -= 1; 
+        }
+        return score;
+    }
+
     const socket = io(); 
     let myUsername = '', myCredits = 0;
     let activeGame = null;
@@ -971,7 +1101,9 @@
     let renderedCardCount = {}; 
     let myHRBets = {};
 
-    window.onload = () => { socket.emit('login', { username: 'VIP_Tester', password: '123' }); };
+    window.onload = () => { 
+        socket.emit('login', { username: 'VIP_Tester', password: '123' }); 
+    };
     
     socket.on('loginSuccess', (data) => { 
         myUsername = data.username; 
@@ -1010,7 +1142,6 @@
     function backToHub() {
         if(activeGame === 'mbj') { 
             socket.emit('mbjLeaveSeat'); 
-            document.getElementById('mbj-chip-rack').style.display='none'; 
         }
         if(activeGame === 'horserace' && document.getElementById('hr-ticker').innerText === "AND THEY'RE OFF!") { 
             showLocalFlash("Wait for race to finish!", "error"); 
@@ -1037,7 +1168,7 @@
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // VIP BLACKJACK 
+    // VIP BLACKJACK RENDERING
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
@@ -1087,12 +1218,12 @@
                 let previouslyRendered = renderedCardCount[i] || 0;
                 
                 // Score Badge above hand
-                if(hand.cards.length > 0 && hand.status !== 'BUST') { 
-                    html += `<div class="mbj-hand-score">${hand.score}</div>`; 
+                if(s.hands[0].cards.length > 0 && s.hands[0].status !== 'BUST') { 
+                    html += `<div class="mbj-hand-score">${s.hands[0].score}</div>`; 
                 }
                 
                 // Turn Badge
-                if(isMySeatTurn) {
+                if(isMySeatTurn && mbjGameState === 'PLAYER_TURN') {
                     html += `<div class="turn-badge">YOUR TURN</div>`;
                 }
 
@@ -1123,7 +1254,7 @@
                 let displayBet = totalSeatBet;
                 if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && totalSeatBet === 0) displayBet = localPendingBet;
                 
-                // Centered Chip
+                // Premium Centered Chip
                 if (displayBet > 0) { 
                     let cBg = displayBet >= 10000 ? '#00e676' : displayBet >= 1000 ? '#ff3366' : displayBet >= 100 ? '#00a2ff' : '#444';
                     html += `<div class="mbj-chip ${totalSeatBet===0?'ghost':''}" style="--c-bg:${cBg};">${displayBet}</div>`; 
@@ -1148,17 +1279,26 @@
         }
 
         let rack = document.getElementById('mbj-chip-rack');
-        if (localSeatId && mbjGameState === 'BETTING' && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
-            rack.style.display = 'flex';
+        if (mbjGameState === 'BETTING') {
+            rack.classList.remove('chip-rack-locked');
+            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
+                // Allows betting
+            } else {
+                rack.classList.add('chip-rack-locked');
+            }
         } else {
-            rack.style.display = 'none';
+            rack.classList.add('chip-rack-locked');
             localPendingBet = 0;
         }
     }
 
     function addLocalBet(amt) {
-        if(myCredits >= localPendingBet + amt) { localPendingBet += amt; renderMBJSeats(); } 
-        else { showLocalFlash('Not enough credits', 'error'); }
+        if(myCredits >= localPendingBet + amt) { 
+            localPendingBet += amt; 
+            renderMBJSeats(); 
+        } else { 
+            showLocalFlash('Not enough credits', 'error'); 
+        }
     }
     
     function addCustomBet() {
@@ -1169,31 +1309,42 @@
         document.getElementById('custom-bet').value = '';
     }
 
-    function clearLocalBet() { localPendingBet = 0; renderMBJSeats(); }
+    function clearLocalBet() { 
+        localPendingBet = 0; 
+        renderMBJSeats(); 
+    }
     
     function confirmLocalBet() {
         if(localPendingBet < 10) return showLocalFlash('Min Bet 10 TC', 'error');
         socket.emit('mbjPlaceBet', localPendingBet);
         localPendingBet = 0; 
-        document.getElementById('mbj-chip-rack').style.display = 'none';
     }
 
     socket.on('mbjUpdate', async (data) => {
         if(activeGame !== 'mbj') return;
         let dBadge = document.getElementById('mbj-d-score-val');
         let tVal = document.getElementById('bj-timer');
+        let tBox = document.getElementById('bj-timer-box');
 
         if(data.event === 'timer') {
             mbjGameState = 'BETTING'; 
             dBadge.style.display = 'none';
-            tVal.innerText = data.time; 
+            
+            if(data.active) {
+                tBox.style.display = 'flex';
+                tVal.innerText = data.time; 
+            } else {
+                tBox.style.display = 'none';
+            }
             renderMBJSeats(data.seats); 
         } 
-        else if (data.event === 'sync_seats') { renderMBJSeats(data.seats, data.activeTurn); } 
+        else if (data.event === 'sync_seats') { 
+            renderMBJSeats(data.seats, data.activeTurn); 
+        } 
         else if (data.event === 'lock_bets') { 
             mbjGameState = 'DEALING'; 
             tVal.innerText = '--'; 
-            document.getElementById('mbj-chip-rack').style.display='none';
+            renderMBJSeats(data.seats, null);
         } 
         else if (data.event === 'deal') {
             renderMBJSeats(data.seats, null); 
@@ -1202,7 +1353,10 @@
                 dHand.innerHTML = ''; 
                 dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false); 
                 dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false); 
-                setTimeout(() => { dBadge.style.display = 'flex'; dBadge.innerText = data.dealerHand[0].bjVal; }, 1000);
+                setTimeout(() => { 
+                    dBadge.style.display = 'flex'; 
+                    dBadge.innerText = data.dealerHand[0].bjVal; 
+                }, 1000);
             } 
         } 
         else if (data.event === 'turn') {
@@ -1215,7 +1369,9 @@
         }
         else if (data.event === 'dealer_resolved') {
             mbjGameState = 'RESOLVING'; 
+            tBox.style.display = 'none';
             renderMBJSeats(data.seats); 
+            
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
             if(dHand) {
                 dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false);
@@ -1235,7 +1391,9 @@
                         let seat = data.seats[i];
                         if (seat && data.results && data.results[i]) {
                             let tw = data.results[i].win;
-                            if (tw > 0) { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${tw}</div>`; }
+                            if (tw > 0) { 
+                                document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${tw}</div>`; 
+                            }
                             if (seat.username === myUsername) {
                                 let tb = seat.hands.reduce((sum, h)=>sum+h.bet, 0);
                                 myNet = tw - (tb - data.results[i].push);
@@ -1258,9 +1416,9 @@
     });
 
     // =========================================================================
-    // RETRO HORSE DERBY LOGIC (Grid Architecture)
+    // RETRO HORSE DERBY LOGIC
     // =========================================================================
-    const hexColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
+    const btnColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
     
     function setupDerbyUI() {
         let container = document.getElementById('hr-lanes-container');
@@ -1270,7 +1428,7 @@
         ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach((c) => {
             trackHTML += `
             <div class="hr-lane">
-                <div id="horse-${c}" class="hr-horse-group horse-${c}">
+                <div id="horse-${c}" class="hr-horse-group horse-${c}" style="left: 0%;">
                     <img src="./giphy.gif" class="hr-gif" alt="Horse">
                 </div>
             </div>`;
@@ -1285,15 +1443,17 @@
                 let myB = myHRBets[c] || 0;
                 
                 bg.innerHTML += `
-                <button class="hr-bet-btn" style="border-bottom-color:${hexColors[c]};" onclick="placeHRBet('${c}', this)">
+                <button class="hr-bet-btn" style="--h-bg:${btnColors[c]};" onclick="placeHRBet('${c}', this)">
                     ${c} 
-                    <span class="hr-odds-text" id="odds-${c}">${oText}</span>
+                    <span style="color: white; text-shadow: 1px 1px 2px black;">${oText}</span>
                     <span class="bet-badge" id="b-${c}">${myB > 0 ? myB + ' TC' : ''}</span>
                 </button>`;
             });
         }
         let fLineEl = document.getElementById('hr-finish-line');
         if(fLineEl) fLineEl.style.right = '-100px'; 
+        let gate = document.getElementById('hr-gate');
+        if(gate) gate.classList.remove('gate-open');
     }
 
     function placeHRBet(c, btnElement) {
@@ -1321,10 +1481,6 @@
         if(activeGame === 'horserace' && document.getElementById('hr-ticker').innerText !== "AND THEY'RE OFF!") {
             let s = document.getElementById('hr-timer');
             if(s) s.innerText = data.time;
-            ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach(c => {
-                let el = document.getElementById('odds-' + c);
-                if(el && hrState.currentOdds[c]) el.innerText = hrState.currentOdds[c] + 'x';
-            });
         }
     });
 
@@ -1339,12 +1495,16 @@
     socket.on('hrRaceStart', (data) => {
         if(activeGame !== 'horserace') return;
         const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
-        let currentPos = { Red: 5, Blue: 5, Green: 5, Yellow: 5, Purple: 5, Orange: 5 };
-        let targetPos = { Red: 5, Blue: 5, Green: 5, Yellow: 5, Purple: 5, Orange: 5 };
+        
+        let currentPos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
+        let targetPos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
 
         let duration = data.duration; let startTime = Date.now();
         
+        let gate = document.getElementById('hr-gate');
+        if(gate) gate.classList.add('gate-open');
         document.getElementById('hr-environment').className = 'hr-track-window track-moving';
+        
         let fLineEl = document.getElementById('hr-finish-line');
         if(fLineEl) { fLineEl.style.transition = 'right 2s ease-out'; fLineEl.style.right = '-100px'; }
         
@@ -1363,15 +1523,15 @@
 
             if (timeRemaining > 3000) {
                 if (now > nextTargetUpdate) {
-                    horses.forEach(h => { targetPos[h] = 40 + (Math.random() * 20); });
-                    nextTargetUpdate = now + 600 + Math.random() * 600; 
+                    horses.forEach(h => { targetPos[h] = Math.random() * 60 - 10; });
+                    nextTargetUpdate = now + 800 + Math.random() * 1000; 
                 }
             } else {
                 if (!sprintTriggered) {
                     sprintTriggered = true;
                     document.getElementById('hr-environment').className = 'hr-track-window track-slowing'; 
                     if (fLineEl) { fLineEl.style.transition = 'none'; fLineEl.style.right = '5%'; }
-                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 90 : 40 + (Math.random() * 20); });
+                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 95 : 60 + (Math.random() * 20); });
                 }
             }
 
@@ -1380,15 +1540,14 @@
                 horses.forEach(h => {
                     let el = document.getElementById('horse-' + h);
                     if(el) { 
-                        el.style.left = (h === data.winner ? 90 : Math.min(currentPos[h], 80)) + '%'; 
+                        el.style.left = (h === data.winner ? 95 : Math.min(currentPos[h], 85)) + '%'; 
                     }
                 });
                 return;
             }
 
             horses.forEach(h => {
-                // Slower interpolation for smooth realistic movement
-                let speed = (timeRemaining <= 3000 && h === data.winner) ? 0.04 : 0.015;
+                let speed = (timeRemaining <= 3000) ? 0.03 : 0.015; 
                 currentPos[h] += (targetPos[h] - currentPos[h]) * speed;
                 
                 let el = document.getElementById('horse-' + h);
@@ -1401,7 +1560,7 @@
         if(activeGame !== 'horserace') return;
         let w = data.winner;
         document.getElementById('hr-ticker').innerText = `${w.toUpperCase()} WINS!`;
-        document.getElementById('hr-ticker').style.color = hexColors[w];
+        document.getElementById('hr-ticker').style.color = btnColors[w];
         
         ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach(c => {
             let el = document.getElementById('horse-' + c);
