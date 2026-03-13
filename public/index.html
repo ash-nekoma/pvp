@@ -125,8 +125,10 @@
         .card-red { color: #cc0000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
         
+        /* STRICT DOUBLE DOWN GEOMETRY */
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
 
+        /* DEAD CENTER BADGES */
         .score-badge { position: absolute; top: 50%; transform: translateY(-50%); left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif; }
         .score-badge span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; line-height: 0; text-align: center; width: 100%; }
         .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
@@ -138,6 +140,14 @@
 
         .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        /* HORIZONTAL DOUBLE DOWN ANIMATION */
+        .anim-fly-in-doubled { animation: flyInDoubled 0.3s ease-out forwards; }
+        @keyframes flyInDoubled { 
+            0% { opacity: 0; transform: translate(30px, -150px) rotate(90deg) scale(0.8); } 
+            100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } 
+        }
+
         .anim-reveal { animation: revealCard 0.4s ease-out forwards; }
         @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
 
@@ -226,7 +236,14 @@
                 <i class="fas fa-cards" style="font-size:4rem;"></i>
                 <div>
                     <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Playtech Engine</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Multiplayer Table</div>
+                </div>
+            </div>
+            <div class="game-card" onclick="openGame('solo')">
+                <i class="fas fa-user" style="font-size:4rem;"></i>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight:900;">SOLO BLACKJACK</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Private Table</div>
                 </div>
             </div>
             <div class="game-card" onclick="openGame('derby')">
@@ -245,10 +262,9 @@
               
               <div class="derby-track-container" id="derby-track">
                   <div class="finish-line"></div>
-                  </div>
+              </div>
               
-              <div class="derby-bet-panel" id="derby-horses-panel">
-                  </div>
+              <div class="derby-bet-panel" id="derby-horses-panel"></div>
           </div>
           
           <div class="chip-rack-container" id="derby-chip-rack" style="margin-top: 15px;">
@@ -268,6 +284,11 @@
                   <button class="rack-btn rack-btn-confirm" onclick="confirmDerbyBet()">BET <i class="fas fa-check"></i></button>
               </div>
           </div>
+      </div>
+
+      <div id="view-solo" class="view-container hidden">
+          <h1 style="font-size: 3rem; font-weight: 900; color: var(--ps-glow);">SOLO BLACKJACK</h1>
+          <p style="font-size: 1.2rem;">Private Table Initializing...</p>
       </div>
 
       <div id="view-mbj" class="view-container hidden">
@@ -447,6 +468,8 @@
             switchView('mbj');
         } else if (id === 'derby') {
             switchView('derby');
+        } else if (id === 'solo') {
+            switchView('solo');
         }
     }
 
@@ -515,7 +538,7 @@
         else rack.classList.add('chip-rack-locked');
     }
 
-    function selectHorse(id) { selectedHorseId = id; socket.emit('joinRoom', 'derby'); } // Re-renders cleanly
+    function selectHorse(id) { selectedHorseId = id; socket.emit('joinRoom', 'derby'); }
     function addDerbyBet(amt) {
         if(!selectedHorseId) return showRackAlert('SELECT HORSE FIRST', 'derby-rack-alert');
         if(myCredits >= localDerbyBet + amt) { localDerbyBet += amt; document.getElementById('derby-custom-bet').value = localDerbyBet; } 
@@ -555,7 +578,7 @@
     // =========================================================================
     function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
-        if(animateIn) animClass = 'anim-fly-in';
+        if(animateIn) { animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in'; }
         if(animateReveal) animClass = 'anim-reveal'; 
         let doubleClass = isDoubled ? 'card-doubled' : '';
         
@@ -565,6 +588,43 @@
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
         return `<div class="mbj-card ${colorClass} ${animClass} ${doubleClass}" style="${styleStr}"><div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div><div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div></div>`;
     }
+
+    function getChipStackHTML(amount, isGhost = false) {
+        let html = ''; let remaining = amount;
+        let chips = [{val: 50000, col: '#ffcc00', text: 'black'}, {val: 10000, col: '#00e676', text: 'black'}, {val: 1000, col: '#ff3366', text: 'white'}, {val: 100, col: '#00a2ff', text: 'white'}, {val: 10, col: '#444', text: 'white'}];
+        let offset = 0; let visualCount = 0;
+        
+        for(let c of chips) {
+            while(remaining >= c.val && visualCount < 6) { 
+                let label = c.val >= 1000 ? (c.val/1000)+'K' : c.val;
+                html += `<div class="mbj-chip-3d ${isGhost ? 'ghost' : ''}" style="--c-bg:${c.col}; color:${c.text}; bottom:${offset}px; z-index:${visualCount};">${label}</div>`;
+                remaining -= c.val; offset += 4; visualCount++;
+            }
+        }
+        return `<div class="chip-stack-wrapper" style="height: ${45 + offset}px;">${html}</div>`;
+    }
+
+    function animateChipSequence(fromId, toId, color) {
+        let fromEl = document.getElementById(fromId); let toEl = document.getElementById(toId);
+        if(!fromEl || !toEl) return;
+        let fRect = fromEl.getBoundingClientRect(); let tRect = toEl.getBoundingClientRect();
+        let chip = document.createElement('div'); chip.className = `animated-chip`;
+        chip.style.cssText = `--c-bg: ${color}; left: ${fRect.left + (fRect.width/2)}px; top: ${fRect.top + (fRect.height/2)}px; margin-left: -22.5px; margin-top: -22.5px;`;
+        document.body.appendChild(chip);
+        
+        void chip.offsetWidth;
+        chip.style.transform = 'scale(1.5)';
+        setTimeout(() => { chip.style.left = `${tRect.left + (tRect.width/2)}px`; chip.style.top = `${tRect.top + (tRect.height/2)}px`; chip.style.transform = 'scale(0.5)'; chip.style.opacity = '0'; }, 50);
+        setTimeout(() => { if(chip.parentNode) chip.remove(); }, 650);
+    }
+
+    // OPTIMISTIC UI: Instantly hide buttons on click to remove input lag
+    function sendMBJAction(type) {
+        document.querySelectorAll('.mbj-action-row.show').forEach(el => el.classList.remove('show'));
+        socket.emit('mbjAction', { type: type });
+    }
+
+    let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
     function renderMBJSeats(seats, activeTurnObj = null) {
         currentMBJSeats = seats || currentMBJSeats; 
@@ -581,7 +641,9 @@
             let isMe = s && s.username === myUsername; 
             if (isMe) localSeatId = i;
 
-            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { continue; }
+            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) {
+                continue; 
+            }
 
             let isMySeatTurn = activeSeatNum == i;
             let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
@@ -592,6 +654,7 @@
             let clickAction = canSit ? `socket.emit('mbjTakeSeat', ${i})` : ``; 
 
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
+            
             html += `<div class="mbj-split-col">`;
             
             if (s && s.hands && s.hands.length > 0) {
@@ -608,11 +671,12 @@
                     let canDouble = hand.cards.length === 2;
                     let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1;
 
+                    // USING OPTIMISTIC UI FUNCTION "sendMBJAction"
                     html += `<div class="mbj-action-row ${btnClass}">
-                                <button class="mbj-action-btn hit" onclick="socket.emit('mbjAction', {type:'hit'})"><i class="fas fa-plus"></i></button>
-                                <button class="mbj-action-btn stand" onclick="socket.emit('mbjAction', {type:'stand'})"><i class="fas fa-hand-paper"></i></button>`;
-                    if (canDouble) html += `<button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})">x2</button>`;
-                    if (canSplit) html += `<button class="mbj-action-btn split" onclick="socket.emit('mbjAction', {type:'split'})"><i class="fas fa-arrows-alt-h"></i></button>`;
+                                <button class="mbj-action-btn hit" onclick="sendMBJAction('hit')"><i class="fas fa-plus"></i></button>
+                                <button class="mbj-action-btn stand" onclick="sendMBJAction('stand')"><i class="fas fa-hand-paper"></i></button>`;
+                    if (canDouble) html += `<button class="mbj-action-btn double" onclick="sendMBJAction('double')">x2</button>`;
+                    if (canSplit) html += `<button class="mbj-action-btn split" onclick="sendMBJAction('split')"><i class="fas fa-arrows-alt-h"></i></button>`;
                     html += `</div>`;
                     
                     html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
@@ -629,6 +693,7 @@
                     }
 
                     let previouslyRendered = renderedCardCount[i][hIdx] || 0;
+
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
                         let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
@@ -679,6 +744,7 @@
             html += `</div>`; 
             htmlBuffer += html;
         }
+        
         cont.innerHTML = htmlBuffer;
 
         let rack = document.getElementById('mbj-chip-rack');
@@ -687,7 +753,8 @@
             if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
             } else { rack.classList.add('chip-rack-locked'); }
         } else {
-            rack.classList.add('chip-rack-locked'); localPendingBet = 0;
+            rack.classList.add('chip-rack-locked');
+            localPendingBet = 0;
         }
     }
 
@@ -715,7 +782,6 @@
             mbjGameState = 'BETTING'; 
             if(data.active) { dTimerText.style.display = 'block'; dTimerText.innerText = data.time; } 
             else { dTimerText.style.display = 'none'; }
-            // REMOVED renderMBJSeats(data.seats) -> This perfectly fixes the flicker/input loss bug!
         } 
         else if (data.event === 'sync_seats') { 
             renderMBJSeats(data.seats, data.activeTurn); 
@@ -724,13 +790,52 @@
             mbjGameState = 'DEALING'; dTimerText.style.display = 'none'; renderMBJSeats(data.seats, null);
         } 
         else if (data.event === 'deal') {
-            renderMBJSeats(data.seats, null); 
+            mbjGameState = 'DEALING';
+            let targetSeats = JSON.parse(JSON.stringify(data.seats));
+            for (let i = 1; i <= 5; i++) {
+                if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) {
+                    currentMBJSeats[i].hands[0].cards = [];
+                    currentMBJSeats[i].hands[0].score = 0;
+                    currentMBJSeats[i].hands[0].status = 'WAITING';
+                }
+            }
+            
+            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
+            renderMBJSeats(currentMBJSeats, null); 
+            
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
-                let html = `<div class="score-badge score-inactive" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
-                html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
-                html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
-                dHand.style.width = '90px'; dHand.innerHTML = html; 
+                dHand.innerHTML = ''; dHand.style.width = '70px'; 
+                
+                const dealSequence = async () => {
+                    let activeKeys = Object.keys(targetSeats).filter(k => targetSeats[k] !== null);
+                    
+                    for (let k of activeKeys) {
+                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]);
+                        currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards);
+                        renderMBJSeats(currentMBJSeats, null);
+                        await delay(300);
+                    }
+                    
+                    let html = `<div class="score-badge score-inactive" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
+                    html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
+                    dHand.innerHTML = html; 
+                    await delay(300);
+                    
+                    for (let k of activeKeys) {
+                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]);
+                        currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score;
+                        currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status;
+                        renderMBJSeats(currentMBJSeats, null);
+                        await delay(300);
+                    }
+                    
+                    html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
+                    dHand.style.width = '90px'; 
+                    dHand.innerHTML = html; 
+                };
+                
+                dealSequence();
             } 
         } 
         else if (data.event === 'turn') {
