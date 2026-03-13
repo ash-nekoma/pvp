@@ -267,7 +267,6 @@ setInterval(() => {
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
                 
-                // Matches the exact duration of the new round-robin frontend animation
                 let animTime = ((activeSeats.length * 2) + 2) * 300 + 500; 
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
@@ -426,11 +425,11 @@ io.on('connection', (socket) => {
             hand.score = getBJScore(hand.cards);
             mbjState.turnTimer = 15; 
             
-            // INJECTS 1.2 SECOND BREATHING PAUSE ON AUTO-STANDS
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                setTimeout(() => mbjNextTurn(), 1200); 
+                // DELAY SLASHED TO 400ms
+                setTimeout(() => mbjNextTurn(), 400); 
             } else { 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
@@ -452,10 +451,8 @@ io.on('connection', (socket) => {
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 mbjState.turnTimer = 15; 
-                
-                // INJECTS 1.2 SECOND BREATHING PAUSE
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                setTimeout(() => mbjNextTurn(), 1200);
+                setTimeout(() => mbjNextTurn(), 400);
             }
         }
         else if (actionData.type === 'split') {
@@ -486,7 +483,7 @@ io.on('connection', (socket) => {
                 mbjState.turnTimer = 15; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 
-                if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200);
+                if(hand.score === 21) setTimeout(() => mbjNextTurn(), 400);
             }
         }
     });
@@ -511,4 +508,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Premium VIP Blackjack Server Running`));
+server.listen(PORT, () => console.log(`🚀 Premium VIP Casino Server Running`));
