@@ -35,6 +35,8 @@ function buildShoe() {
             for(let v of vs) {
                 let bj = isNaN(parseInt(v)) ? (v === 'A' ? 11 : 10) : parseInt(v);
                 let colorClass = (s === '♥' || s === '♦') ? `card-red` : `card-black`;
+                
+                // Note: Center HTML removed for cleaner premium look
                 shoe.push({ 
                     val: v, 
                     suit: s, 
@@ -46,7 +48,7 @@ function buildShoe() {
         }
     }
     
-    // Shuffle the shoe
+    // Shuffle the deck
     for (let i = shoe.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
@@ -77,89 +79,6 @@ function isNaturalBlackjack(handCards) {
 }
 
 // =========================================================================
-// PREMIUM DERBY LOGIC
-// =========================================================================
-let hrState = { 
-    time: 15, 
-    status: 'BETTING', 
-    bets: [], 
-    currentOdds: {} 
-}; 
-
-function generateHorseOdds() {
-    const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
-    const multipliers = [2, 4, 6, 11, 16, 31].sort(() => Math.random() - 0.5);
-    let oddsMap = {}; 
-    
-    horses.forEach((h, i) => { 
-        oddsMap[h] = multipliers[i]; 
-    });
-    hrState.currentOdds = oddsMap;
-}
-generateHorseOdds(); 
-
-setInterval(() => {
-    if (hrState.status === 'BETTING') {
-        hrState.time--;
-        io.emit('hrTimerUpdate', { time: hrState.time, odds: hrState.currentOdds });
-
-        if (hrState.time <= 0) {
-            hrState.status = 'RACING';
-            io.emit('hrLockBets');
-
-            setTimeout(async () => {
-                const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
-                let weights = horses.map(h => ({ horse: h, weight: 1 / hrState.currentOdds[h] }));
-                
-                let totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
-                let randomVal = Math.random() * totalWeight;
-                let winner = weights[0].horse;
-                let cumulative = 0;
-                
-                for(let w of weights) { 
-                    cumulative += w.weight; 
-                    if(randomVal <= cumulative) { winner = w.horse; break; } 
-                }
-
-                io.emit('hrRaceStart', { winner: winner, duration: 15000 }); 
-
-                // Race finishes
-                setTimeout(async () => {
-                    let payouts = {};
-                    hrState.bets.forEach(b => {
-                        let user = mockUsers[b.username];
-                        if (user && b.choice === winner) {
-                            let payout = b.amount * hrState.currentOdds[winner];
-                            user.credits += formatTC(payout);
-                            
-                            if(connectedUsers[b.username]) {
-                                io.to(connectedUsers[b.username]).emit('balanceUpdateData', { credits: user.credits });
-                            }
-                            payouts[b.username] = (payouts[b.username] || 0) + payout;
-                        }
-                    });
-                    
-                    io.emit('hrRaceResults', { 
-                        winner: winner, 
-                        payoutMult: hrState.currentOdds[winner], 
-                        payouts: payouts 
-                    });
-                }, 15500); 
-
-                // Reset Round
-                setTimeout(() => {
-                    generateHorseOdds(); 
-                    hrState.time = 15; 
-                    hrState.status = 'BETTING';
-                    hrState.bets = [];
-                    io.emit('hrNewRound', { odds: hrState.currentOdds }); 
-                }, 22000);
-            }, 500);
-        }
-    }
-}, 1000);
-
-// =========================================================================
 // VIP BLACKJACK ENGINE
 // =========================================================================
 let mbjState = {
@@ -175,6 +94,7 @@ function mbjNextTurn() {
     let seatNum = mbjState.activeTurn.seat;
     let handIdx = mbjState.activeTurn.handIdx;
 
+    // Check if current seat has another hand (Split scenarios)
     if (seatNum !== null) {
         let seat = mbjState.seats[seatNum];
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') {
@@ -190,12 +110,16 @@ function mbjNextTurn() {
         }
     }
 
+    // Move to next player
     let nextSeatNum = null;
     let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
     
     for (let i = startIdx; i <= 5; i++) {
         let s = mbjState.seats[i];
-        if (s && s.hands.some(h => h.status === 'PLAYING')) { nextSeatNum = i; break; }
+        if (s && s.hands.some(h => h.status === 'PLAYING')) { 
+            nextSeatNum = i; 
+            break; 
+        }
     }
 
     if (nextSeatNum !== null) {
@@ -239,13 +163,11 @@ async function mbjResolveDealer() {
     for (let i = 1; i <= 5; i++) {
         let seat = mbjState.seats[i];
         if (seat && seat.hands.length > 0) {
-            let totalWin = 0; let totalPush = 0; 
+            let totalWin = 0; 
+            let totalPush = 0; 
             
             seat.hands.forEach(h => {
-                if (h.status === 'BUST') {
-                    // Bust counts as immediate loss (payout 0)
-                    return; 
-                }
+                if (h.status === 'BUST') return; 
                 
                 let pScore = h.score;
                 let payout = 0, isPush = false, refundAmount = 0;
@@ -269,7 +191,9 @@ async function mbjResolveDealer() {
                 else totalWin += (payout + refundAmount);
             });
 
-            seatResults[i] = { win: totalWin, push: totalPush, status: (totalWin > 0 ? 'WIN' : (totalPush > 0 ? 'PUSH' : 'LOSS')) };
+            // Assign status string for the sequential animations
+            let statusStr = totalWin > 0 ? 'WIN' : (totalPush > 0 ? 'PUSH' : 'LOSS');
+            seatResults[i] = { win: totalWin, push: totalPush, status: statusStr };
             
             let user = mockUsers[seat.username];
             if(user) {
@@ -289,7 +213,7 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
-    // Increased to 12 seconds to allow full chip routing animations to play out
+    // Increased timeout heavily to allow the step-by-step Mario Coin chip animations
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -305,7 +229,7 @@ async function mbjResolveDealer() {
         mbjState.status = 'BETTING';
         
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 12000); 
+    }, 13000); 
 }
 
 setInterval(() => {
@@ -340,6 +264,7 @@ setInterval(() => {
                     mbjState.seats[k].hands[0].cards = [c1, c2];
                     mbjState.seats[k].hands[0].isSplitHand = false;
                     mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet;
+                    
                     let score = getBJScore([c1, c2]);
                     mbjState.seats[k].hands[0].score = score;
                     mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
@@ -387,7 +312,6 @@ setInterval(() => {
 // SOCKET CONNECTION & CHAT
 // =========================================================================
 io.on('connection', (socket) => {
-    socket.emit('hrTimerUpdate', { time: hrState.time, odds: hrState.currentOdds });
 
     socket.on('login', (data) => {
         let user = mockUsers[data.username];
@@ -400,7 +324,7 @@ io.on('connection', (socket) => {
         socket.emit('loginSuccess', { username: user.username, credits: user.credits });
     });
 
-    // Dedicated Live Chat Channel
+    // Chat System
     socket.on('sendChatMessage', (msg) => {
         if(socket.user) {
             let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -428,18 +352,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('leaveRoom', (room) => { socket.leave(room); });
-
-    socket.on('placeSharedBet', (data) => {
-        if (!socket.user || hrState.status !== 'BETTING') return;
-        let amt = formatTC(data.amount);
-        let user = mockUsers[socket.user.username];
-        if(user && user.credits >= amt) {
-            user.credits -= amt;
-            hrState.bets.push({ username: user.username, choice: data.choice, amount: amt });
-            socket.emit('sharedBetConfirmed', { room: data.room, choice: data.choice, amount: amt });
-            socket.emit('balanceUpdateData', { credits: user.credits });
-        }
-    });
 
     socket.on('mbjTakeSeat', (seatNum) => {
         if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
@@ -519,8 +431,10 @@ io.on('connection', (socket) => {
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
             
-            mbjState.turnTimer = 15; // Reset timer on Hit
+            // TIMER RESET ON HIT
+            mbjState.turnTimer = 15; 
             
+            // Auto-stand if 21 or Bust
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
@@ -548,7 +462,8 @@ io.on('connection', (socket) => {
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 
-                mbjState.turnTimer = 15; // Reset timer on Double
+                // TIMER RESET ON DOUBLE
+                mbjState.turnTimer = 15; 
                 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
@@ -562,4 +477,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Premium Backend running on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Premium VIP Blackjack Server Running`));
