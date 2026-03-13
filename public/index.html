@@ -31,7 +31,6 @@
             user-select: none;
         }
         
-        /* Strict column layout guarantees NO blank screen collapse */
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
             color: white; 
@@ -67,17 +66,17 @@
             cursor: pointer;
         }
 
-        /* NEW LAYOUT: Flex row positions Board and Chat side by side perfectly */
-        .app-body {
-            flex: 1;
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            height: calc(100vh - 75px);
+        /* RESTORED MAIN WRAPPER 
+           Forces the game boards to sit dead center of the screen independently 
+        */
+        .main-wrapper { 
+            flex: 1; 
+            position: relative; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
             overflow: hidden;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
         }
         
         .view-container { 
@@ -91,94 +90,6 @@
             height: 100%; 
         }
 
-        /* ================= DOCKED LIVE CHAT ================= */
-        .chat-widget {
-            width: 320px;
-            height: 650px;
-            background: rgba(0, 10, 25, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            z-index: 100;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-            margin-right: 20px;
-        }
-
-        .chat-header {
-            padding: 15px;
-            background: rgba(0, 162, 255, 0.1);
-            border-bottom: 1px solid var(--glass-border);
-            font-weight: 900;
-            font-size: 1.1rem;
-            text-align: center;
-            letter-spacing: 2px;
-            color: var(--ps-glow);
-            border-radius: 15px 15px 0 0;
-            text-transform: uppercase;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            font-size: 0.85rem;
-        }
-
-        .chat-msg-row { display: flex; flex-direction: column; }
-        .chat-meta { font-size: 0.7rem; color: #aaa; margin-bottom: 4px; }
-        .chat-text { 
-            background: rgba(255,255,255,0.05); 
-            padding: 10px 14px; 
-            border-radius: 12px; 
-            line-height: 1.4; 
-            word-wrap: break-word;
-        }
-        .chat-text.me { 
-            background: rgba(0, 162, 255, 0.2); 
-            color: white; 
-            border-bottom-right-radius: 0;
-        }
-        .chat-text.other { 
-            border-bottom-left-radius: 0; 
-        }
-
-        .chat-input-area {
-            padding: 15px;
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            gap: 10px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 0 0 15px 15px;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            background: #111;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-family: 'Outfit';
-        }
-
-        .chat-input-area button {
-            background: var(--ps-glow);
-            color: black;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: 900;
-            transition: 0.2s;
-        }
-        .chat-input-area button:hover { transform: scale(1.1); }
-
         /* ================= GENERAL UI COMPONENTS ================= */
         .btn-play { 
             background: rgba(255,255,255,0.1); 
@@ -191,7 +102,39 @@
             transition: 0.2s; 
             text-transform: uppercase; 
         }
-        .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
+        
+        .btn-play:hover:not(:disabled) { 
+            background: white; 
+            color: black; 
+            transform: translateY(-2px); 
+        }
+        
+        .btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-back-fixed { 
+            position: absolute; 
+            top: 20px; 
+            left: 25px; 
+            z-index: 1000; 
+            background: rgba(0,0,0,0.8); 
+            border: 1px solid rgba(255,255,255,0.15); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        
+        .btn-back-fixed:hover { 
+            background: white; 
+            color: black; 
+        }
+        
+        .lobby-modes-container { display: flex; gap: 40px; }
         
         .game-card { 
             width: 320px; 
@@ -208,7 +151,164 @@
             text-align: center; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
         }
-        .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
+        
+        .game-card:hover { 
+            transform: translateY(-8px); 
+            border-color: var(--ps-glow); 
+            box-shadow: 0 15px 40px rgba(0,162,255,0.2); 
+        }
+
+        /* ================= DOCKED LIVE CHAT (FLOATING & SMALL) ================= */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 280px; /* Small panel width */
+            height: 380px; /* Short panel height */
+            background: rgba(0, 10, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10000;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            transform-origin: bottom right;
+        }
+
+        .chat-widget.minimized {
+            transform: scale(0.2) translate(120px, 120px);
+            opacity: 0.8;
+            cursor: pointer;
+        }
+
+        .chat-header {
+            padding: 12px;
+            background: rgba(0, 162, 255, 0.1);
+            border-bottom: 1px solid var(--glass-border);
+            font-weight: 900;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--ps-glow);
+            border-radius: 15px 15px 0 0;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .chat-msg-row { display: flex; flex-direction: column; }
+        .chat-meta { font-size: 0.65rem; color: #aaa; margin-bottom: 2px; }
+        .chat-text { 
+            background: rgba(255,255,255,0.05); 
+            padding: 8px 12px; 
+            border-radius: 10px; 
+            line-height: 1.3; 
+            word-wrap: break-word;
+        }
+        .chat-text.me { 
+            background: rgba(0, 162, 255, 0.2); 
+            color: white; 
+            border-bottom-right-radius: 0;
+        }
+        .chat-text.other { 
+            border-bottom-left-radius: 0; 
+        }
+
+        .chat-input-area {
+            padding: 10px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 8px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 0 0 15px 15px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-family: 'Outfit';
+            font-size: 0.8rem;
+        }
+
+        .chat-input-area button {
+            background: var(--ps-glow);
+            color: black;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 900;
+            transition: 0.2s;
+        }
+        
+        .chat-input-area button:hover { 
+            transform: scale(1.1); 
+        }
+
+        /* ================= CENTERED SCREEN ALERTS ================= */
+        .global-screen-alert {
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--ps-glow); 
+            border-radius: 15px;
+            padding: 30px 60px; 
+            font-size: 2.5rem; 
+            font-weight: 900;
+            text-transform: uppercase; 
+            color: white; 
+            text-shadow: 0 5px 15px rgba(0,0,0,1);
+            z-index: 99999; 
+            display: none; 
+            opacity: 0;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
+            text-align: center;
+        }
+        
+        .global-screen-alert.show { 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            animation: popupAlert 3s forwards; 
+        }
+        
+        .global-screen-alert.success { 
+            border-color: var(--success); 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3);
+            color: var(--success);
+        }
+        
+        .global-screen-alert.error { 
+            border-color: var(--danger); 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3);
+            color: var(--danger);
+        }
+        
+        @keyframes popupAlert { 
+            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 
+            10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
+            90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
+            100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } 
+        }
 
         /* ================= VIP BLACKJACK UI ================= */
         
@@ -221,7 +321,7 @@
         /* Thick Mahogany Wood Rim & Green Casino Felt */
         .mbj-board { 
             width: 1100px; 
-            height: 600px; 
+            height: 520px; 
             background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
             border-radius: 20px; 
             position: relative; 
@@ -360,7 +460,7 @@
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-end; 
-            width: 150px; 
+            width: 140px; 
             pointer-events: auto; 
             position: relative; 
         }
@@ -374,6 +474,7 @@
         }
 
         /* FIXED ABSOLUTE CARD POSITIONING */
+        /* Container has dynamic width via JS to keep absolute cards perfectly centered */
         .mbj-hand-container { 
             position: relative; 
             height: 100px; 
@@ -400,6 +501,7 @@
             z-index: 2;
         }
         
+        /* Clean symbols: top left and bottom right only */
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
         .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; transform: rotate(180deg); }
         .card-red { color: #cc0000; } 
@@ -639,6 +741,28 @@
             border: 2px solid var(--c-bg);
         }
 
+        /* Payout flare floating text */
+        .payout-flare { 
+            position: absolute; 
+            bottom: 100%; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            color: #00e676; 
+            font-size: 1.5rem; 
+            font-weight: 900; 
+            text-shadow: 0 2px 5px black; 
+            animation: floatUp 2s forwards; 
+            z-index: 500; 
+            pointer-events: none; 
+            white-space: nowrap;
+        }
+        @keyframes floatUp { 
+            0% { opacity: 0; transform: translate(-50%, 0); } 
+            20% { opacity: 1; transform: translate(-50%, -20px); } 
+            80% { opacity: 1; transform: translate(-50%, -40px); } 
+            100% { opacity: 0; transform: translate(-50%, -60px); } 
+        }
+
         /* THE CHIP RACK UI (Matches table width exactly) */
         .chip-rack-container { 
             width: 1100px;
@@ -657,7 +781,10 @@
             position: relative;
         }
         
-        .chip-rack-locked { opacity: 0.5; pointer-events: none; }
+        .chip-rack-locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
 
         /* Error Tooltip attached to Rack */
         .rack-error-tooltip {
@@ -758,7 +885,7 @@
                     <i class="fas fa-cards" style="font-size:4rem;"></i>
                     <div>
                         <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Layout</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Table Dynamics</div>
                     </div>
                 </div>
             </div>
@@ -820,16 +947,17 @@
           </div>
       </div>
 
-      <div class="chat-widget" id="chat-widget" style="display: none;">
+      <div class="chat-widget minimized" id="chat-widget" onclick="toggleChat(event)">
           <div class="chat-header">
-              <i class="fas fa-comments"></i> LIVE CHAT
+              <span><i class="fas fa-comments"></i> LIVE CHAT</span>
+              <i class="fas fa-chevron-up" id="chat-toggle-icon"></i>
           </div>
           <div class="chat-messages" id="chat-messages">
               <div class="chat-msg-row" style="align-items: center; opacity: 0.5;">
                   <span style="font-size:0.7rem; margin-top:10px;">Welcome to VIP Premium.</span>
               </div>
           </div>
-          <div class="chat-input-area">
+          <div class="chat-input-area" onclick="event.stopPropagation()">
               <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKey(event)">
               <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
           </div>
@@ -936,6 +1064,25 @@
     // =========================================================================
     // LIVE CHAT WIDGET
     // =========================================================================
+    let chatOpen = false;
+    function toggleChat(e) {
+        // Prevent toggle if clicking inside the input area
+        if(e.target.closest('.chat-input-area') || e.target.closest('.chat-messages')) return;
+        
+        let w = document.getElementById('chat-widget');
+        let i = document.getElementById('chat-toggle-icon');
+        chatOpen = !chatOpen;
+        
+        if(chatOpen) {
+            w.classList.remove('minimized');
+            i.className = 'fas fa-chevron-down';
+            document.getElementById('chat-input').focus();
+        } else {
+            w.classList.add('minimized');
+            i.className = 'fas fa-chevron-up';
+        }
+    }
+
     function handleChatKey(e) {
         if(e.key === 'Enter') sendChat();
     }
@@ -1085,9 +1232,14 @@
                 s.hands.forEach((hand, hIdx) => {
                     let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx;
                     let cardCount = hand.cards.length;
+                    
+                    // Dynamic width calculation to keep absolute cards perfectly centered
                     let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
                     
-                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px; ${s.hands.length > 1 ? 'transform: scale(0.85); transform-origin: bottom center;' : ''}">`;
+                    // Scale down slightly if player has split hands to fit the seat wrapper
+                    let scaleTransform = s.hands.length > 1 ? 'transform: scale(0.85); transform-origin: bottom center;' : '';
+                    
+                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px; ${scaleTransform}">`;
                     
                     if (isThisHandActive && mbjGameState === 'PLAYER_TURN') {
                         html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
@@ -1241,7 +1393,8 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                dHand.style.width = '90px'; // 2 cards width
+                // Set container width dynamically based on 2 cards
+                dHand.style.width = '90px'; 
                 dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
                 dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
                 setTimeout(() => { 
@@ -1306,11 +1459,13 @@
                         
                         if (seat && res) {
                             if (res.status === 'LOSS') {
+                                // Animate chip flying from Player up to Dealer
                                 animateChipSequence(`circle-${i}`, 'dealer-area', '#444', false);
                                 let cEl = document.getElementById(`chip-stack-${i}`);
-                                if(cEl) cEl.style.opacity = '0'; 
+                                if(cEl) cEl.style.opacity = '0'; // Hide the original
                             } 
                             else if (res.status === 'WIN') {
+                                // Animate chip flying from Dealer down to Player
                                 animateChipSequence('dealer-area', `circle-${i}`, '#00e676', true);
                                 setTimeout(() => {
                                     document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; 
@@ -1322,10 +1477,12 @@
                                 }, 600);
                             }
                             
+                            // Calculate local banner total
                             if (seat.username === myUsername) {
                                 myNet = res.net;
                             }
                             
+                            // Wait 800ms before doing the next player's animation
                             await delay(800);
                         }
                     }
