@@ -46,7 +46,6 @@ function buildShoe() {
         }
     }
     
-    // Shuffle the shoe
     for (let i = shoe.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
@@ -292,7 +291,7 @@ setInterval(() => {
         }
     } else if (mbjState.status === 'PLAYER_TURN') {
         mbjState.turnTimer--;
-        io.to('mbj').emit('mbjUpdate', { event: 'turn_timer', time: mbjState.turnTimer });
+        io.to('mbj').emit('mbjUpdate', { event: 'turn_timer', time: mbjState.turnTimer, activeTurn: mbjState.activeTurn });
         
         if (mbjState.turnTimer <= 0) {
             let seat = mbjState.seats[mbjState.activeTurn.seat];
