@@ -59,6 +59,7 @@ function drawCard() {
     return shoe.pop();
 }
 
+// Server-side strict scoring (Always returns best hard score for game logic)
 function getBJScore(hand) {
     let score = 0, aces = 0;
     for (let card of hand) { 
@@ -213,7 +214,7 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
-    // Gives plenty of time for physical coin animations before resetting
+    // Resolution timeout gives front-end animations time to run
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -425,6 +426,7 @@ io.on('connection', (socket) => {
             
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
+            
             mbjState.turnTimer = 15; 
             
             if (hand.score >= 21) { 
@@ -463,6 +465,7 @@ io.on('connection', (socket) => {
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2) return;
             
+            // Allows splitting identical cards or any two 10-value cards
             let val1 = hand.cards[0].bjVal;
             let val2 = hand.cards[1].bjVal;
             if (val1 !== val2) return; 
