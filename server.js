@@ -17,6 +17,7 @@ app.get('/', (req, res) => {
 
 const formatTC = (amount) => Math.round(amount * 10) / 10;
 
+// In-memory database for testing
 let mockUsers = {};
 let connectedUsers = {};
 
@@ -210,7 +211,6 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
-    // DELAY SLAHSED TO 4 SECONDS FOR FAST RESET
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -305,15 +305,33 @@ setInterval(() => {
 }, 1000);
 
 io.on('connection', (socket) => {
+
+    // =========================================================================
+    // DYNAMIC LOGIN & SIGNUP
+    // =========================================================================
     socket.on('login', (data) => {
         let user = mockUsers[data.username];
         if(!user) {
+            // User doesn't exist -> Create them (Signup)
             user = { username: data.username, password: data.password, credits: 10000 };
             mockUsers[data.username] = user;
+        } else {
+            // User exists -> Check password (Login)
+            if (user.password !== data.password) {
+                return socket.emit('loginError', 'Incorrect Password.');
+            }
         }
+        
         socket.user = user; 
         connectedUsers[user.username] = socket.id;
         socket.emit('loginSuccess', { username: user.username, credits: user.credits });
+    });
+
+    socket.on('sendChatMessage', (msg) => {
+        if(socket.user) {
+            let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            io.emit('receiveChatMessage', { username: socket.user.username, message: msg, time: time });
+        }
     });
 
     socket.on('joinRoom', (room) => { 
@@ -443,8 +461,6 @@ io.on('connection', (socket) => {
         }
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2) return;
-            
-            // MAX 1 SPLIT STRICT RULE
             if (seat.hands.length >= 2) return; 
             
             let val1 = hand.cards[0].bjVal;
@@ -475,7 +491,24 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('disconnect', () => { delete connectedUsers[socket.user?.username]; });
+    socket.on('disconnect', () => { 
+        // Simple cleanup: Leave seat if they completely close the tab while betting
+        if (socket.user) {
+            for(let i = 1; i <= 5; i++) {
+                let s = mbjState.seats[i];
+                if (s && s.username === socket.user.username && mbjState.status === 'BETTING') {
+                    if (s.hands.length > 0 && s.hands[0].bet > 0) {
+                        let user = mockUsers[socket.user.username];
+                        if (user) { user.credits += s.hands[0].bet; }
+                    }
+                    mbjState.seats[i] = null;
+                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(st => st && st.hands.length > 0 && st.hands[0].bet > 0) });
+                    break;
+                }
+            }
+            delete connectedUsers[socket.user.username]; 
+        }
+    });
 });
 
 const PORT = process.env.PORT || 3000;
