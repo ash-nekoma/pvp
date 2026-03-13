@@ -31,6 +31,7 @@
             user-select: none;
         }
         
+        /* Strict column layout guarantees NO blank screen collapse */
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
             color: white; 
@@ -65,10 +66,8 @@
             text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); 
             cursor: pointer;
         }
-
-        /* RESTORED MAIN WRAPPER 
-           Forces the game boards to sit dead center of the screen independently 
-        */
+        
+        /* Fills remaining screen space perfectly */
         .main-wrapper { 
             flex: 1; 
             position: relative; 
@@ -79,6 +78,7 @@
             overflow: hidden;
         }
         
+        /* Keeps games perfectly in the middle of the screen */
         .view-container { 
             position: absolute; 
             inset: 0; 
@@ -90,7 +90,6 @@
             height: 100%; 
         }
 
-        /* ================= GENERAL UI COMPONENTS ================= */
         .btn-play { 
             background: rgba(255,255,255,0.1); 
             color: white; 
@@ -109,8 +108,23 @@
             transform: translateY(-2px); 
         }
         
-        .btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-play:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
         
+        .input-control { 
+            width: 100%; 
+            padding: 12px 15px; 
+            background: rgba(0,0,0,0.5); 
+            border: 1px solid rgba(255,255,255,0.15); 
+            color: white; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            text-align: center; 
+        }
+
         .btn-back-fixed { 
             position: absolute; 
             top: 20px; 
@@ -163,8 +177,8 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 280px; /* Small panel width */
-            height: 380px; /* Short panel height */
+            width: 300px;
+            height: 400px;
             background: rgba(0, 10, 25, 0.85);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
@@ -473,15 +487,15 @@
             width: 100%;
         }
 
-        /* FIXED ABSOLUTE CARD POSITIONING */
-        /* Container has dynamic width via JS to keep absolute cards perfectly centered */
+        /* FLEXBOX CARD CENTERING (Fixes the moving card bug cleanly) */
         .mbj-hand-container { 
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
             position: relative; 
             height: 100px; 
             margin-bottom: 10px; 
             pointer-events: none;
-            display: flex;
-            justify-content: center;
         }
         
         /* Larger, realistic cards */
@@ -491,14 +505,18 @@
             background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
             border-radius: 6px; 
             box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
-            position: absolute; 
-            bottom: 0;
+            position: relative; /* Normal document flow */
+            margin-left: -40px; /* Negative margin stacks them */
             font-family: 'Outfit', sans-serif; 
             color: black; 
             border: 1px solid #ccc; 
             transform: translateZ(0); 
             font-weight: 900;
             z-index: 2;
+        }
+        
+        .mbj-card:first-child {
+            margin-left: 0;
         }
         
         /* Clean symbols: top left and bottom right only */
@@ -537,8 +555,8 @@
         
         .dealer-score-badge { 
             position: absolute; 
-            top: 25px; 
-            left: -40px; 
+            top: -15px; 
+            left: -45px; 
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
@@ -741,28 +759,6 @@
             border: 2px solid var(--c-bg);
         }
 
-        /* Payout flare floating text */
-        .payout-flare { 
-            position: absolute; 
-            bottom: 100%; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            color: #00e676; 
-            font-size: 1.5rem; 
-            font-weight: 900; 
-            text-shadow: 0 2px 5px black; 
-            animation: floatUp 2s forwards; 
-            z-index: 500; 
-            pointer-events: none; 
-            white-space: nowrap;
-        }
-        @keyframes floatUp { 
-            0% { opacity: 0; transform: translate(-50%, 0); } 
-            20% { opacity: 1; transform: translate(-50%, -20px); } 
-            80% { opacity: 1; transform: translate(-50%, -40px); } 
-            100% { opacity: 0; transform: translate(-50%, -60px); } 
-        }
-
         /* THE CHIP RACK UI (Matches table width exactly) */
         .chip-rack-container { 
             width: 1100px;
@@ -781,10 +777,7 @@
             position: relative;
         }
         
-        .chip-rack-locked {
-            opacity: 0.5;
-            pointer-events: none;
-        }
+        .chip-rack-locked { opacity: 0.5; pointer-events: none; }
 
         /* Error Tooltip attached to Rack */
         .rack-error-tooltip {
@@ -885,7 +878,7 @@
                     <i class="fas fa-cards" style="font-size:4rem;"></i>
                     <div>
                         <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Table Dynamics</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Layout</div>
                     </div>
                 </div>
             </div>
@@ -932,11 +925,11 @@
 
                       <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
                       
-                      <div class="rack-chip chip-10" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
-                      <div class="rack-chip chip-100" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
-                      <div class="rack-chip chip-1k" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
-                      <div class="rack-chip chip-10k" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
-                      <div class="rack-chip chip-50k" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
+                      <div class="rack-chip" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
+                      <div class="rack-chip" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
+                      <div class="rack-chip" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
+                      <div class="rack-chip" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
+                      <div class="rack-chip" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
                       
                       <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
                       <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
@@ -1115,19 +1108,16 @@
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0, isDoubled = false) {
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, isDoubled = false) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
         if(animateFlip) animClass = 'anim-flip';
         if(isDoubled) animClass += ' card-doubled';
         
-        // Absolute positioning prevents flexbox shift.
-        let styleStr = `left: ${leftOffset}px;`;
-        
-        if(isHidden) return `<div class="mbj-card card-back ${animClass}" style="${styleStr}"></div>`;
+        if(isHidden) return `<div class="mbj-card card-back ${animClass}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
-        return `<div class="mbj-card ${colorClass} ${animClass}" style="${styleStr}">
+        return `<div class="mbj-card ${colorClass} ${animClass}">
                     <div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
                     <div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
                 </div>`;
@@ -1231,15 +1221,11 @@
             if (s && s.hands && s.hands.length > 0) {
                 s.hands.forEach((hand, hIdx) => {
                     let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx;
-                    let cardCount = hand.cards.length;
-                    
-                    // Dynamic width calculation to keep absolute cards perfectly centered
-                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
                     
                     // Scale down slightly if player has split hands to fit the seat wrapper
                     let scaleTransform = s.hands.length > 1 ? 'transform: scale(0.85); transform-origin: bottom center;' : '';
                     
-                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px; ${scaleTransform}">`;
+                    html += `<div class="mbj-hand-container" style="${scaleTransform}">`;
                     
                     if (isThisHandActive && mbjGameState === 'PLAYER_TURN') {
                         html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
@@ -1254,7 +1240,7 @@
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
                         let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
-                        html += generateCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard);
+                        html += generateCardHTML(c, false, animateThisCard, false, isDoubledCard);
                     });
                     html += `</div>`;
                 });
@@ -1262,7 +1248,7 @@
             } else { 
                 renderedCardCount[i] = 0; 
                 // Empty placeholder to keep height
-                html += `<div class="mbj-hand-container" style="width: 70px;"></div>`;
+                html += `<div class="mbj-hand-container"></div>`;
             }
             html += `</div>`; // End hands row
 
@@ -1393,10 +1379,8 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                // Set container width dynamically based on 2 cards
-                dHand.style.width = '90px'; 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false); 
                 setTimeout(() => { 
                     dBadge.style.display = 'flex'; 
                     dBadge.innerText = data.dealerHand[0].bjVal; 
@@ -1433,15 +1417,14 @@
             let dealerArea = document.getElementById('dealer-area');
 
             if(dHand) {
-                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false, 0);
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
+                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false);
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true); 
                 dBadge.innerText = getBJScore(data.dealerHand.slice(0,2));
                 
                 const drawRemaining = async () => {
                     await delay(800);
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.style.width = `${(i * 20) + 70}px`;
-                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false, i * 20); 
+                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false); 
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
                         await delay(800); 
                     }
