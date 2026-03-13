@@ -57,26 +57,6 @@
         }
         .btn-back-fixed:hover { background: white; color: black; }
 
-        /* ================= DOCKED LIVE CHAT ================= */
-        .chat-widget {
-            position: fixed; bottom: 20px; right: 20px; width: 280px; height: 380px; 
-            background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 15px;
-            display: flex; flex-direction: column; z-index: 10000; box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; transform-origin: bottom right;
-        }
-        .chat-widget.minimized { transform: scale(0.2) translate(120px, 120px); opacity: 0.8; cursor: pointer; }
-        .chat-header { padding: 12px; background: rgba(0, 162, 255, 0.1); border-bottom: 1px solid var(--glass-border); font-weight: 900; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; color: var(--ps-glow); border-radius: 15px 15px 0 0; cursor: pointer; }
-        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem; }
-        .chat-msg-row { display: flex; flex-direction: column; }
-        .chat-meta { font-size: 0.65rem; color: #aaa; margin-bottom: 2px; }
-        .chat-text { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; line-height: 1.3; word-wrap: break-word; }
-        .chat-text.me { background: rgba(0, 162, 255, 0.2); color: white; border-bottom-right-radius: 0; }
-        .chat-text.other { border-bottom-left-radius: 0; }
-        .chat-input-area { padding: 10px; border-top: 1px solid var(--glass-border); display: flex; gap: 8px; background: rgba(0,0,0,0.5); border-radius: 0 0 15px 15px; }
-        .chat-input-area input { flex: 1; background: #111; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 15px; font-family: 'Outfit'; font-size: 0.8rem; }
-        .chat-input-area button { background: var(--ps-glow); color: black; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-weight: 900; transition: 0.2s; }
-        .chat-input-area button:hover { transform: scale(1.1); }
-
         /* ================= CENTERED SCREEN ALERTS ================= */
         .global-screen-alert {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
@@ -89,7 +69,7 @@
         .global-screen-alert.error { border-color: var(--danger); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3); color: var(--danger); }
         @keyframes popupAlert { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } }
 
-        /* ================= VIP BLACKJACK UI (Spacious Dimensions) ================= */
+        /* ================= VIP BLACKJACK UI ================= */
         .game-board-wrapper { display: flex; flex-direction: column; align-items: center; }
 
         .mbj-board { 
@@ -104,7 +84,7 @@
         }
         .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(212, 175, 55, 0.4); border-radius: 10px; pointer-events: none; z-index: 1; }
         
-        .mbj-logo { position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.3; mix-blend-mode: overlay; pointer-events: none; width: 100%; z-index: 2; }
+        .mbj-logo { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.3; mix-blend-mode: overlay; pointer-events: none; width: 100%; z-index: 2; }
         .mbj-logo h1 { font-size: 3.5rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
         .mbj-logo p { font-weight: 900; font-size: 1rem; letter-spacing: 4px; color: #000; margin-bottom: 5px;}
         .mbj-logo .limits { font-weight: 900; font-size: 0.8rem; letter-spacing: 2px; color: #000; }
@@ -114,9 +94,9 @@
             padding: 8px 20px; border-radius: 12px; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column;
         }
 
-        /* DEALER TEXT TIMER (Giant glowing timer replaces center box) */
+        /* GIANT DEALER TIMER NUMBER */
         .dealer-timer-text {
-            color: var(--credits); font-size: 4rem; font-family: 'Rajdhani', monospace; font-weight: 900; 
+            color: white; font-size: 4rem; font-family: 'Rajdhani', monospace; font-weight: 900; 
             text-shadow: 0 5px 15px black, 0 0 20px rgba(255, 180, 0, 0.5); margin-bottom: 10px; display: none; line-height: 1;
         }
 
@@ -152,15 +132,18 @@
         .card-red { color: #cc0000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
         
-        /* FLAWLESS DOUBLE DOWN GEOMETRY */
+        /* FLAWLESS DOUBLE DOWN GEOMETRY (Flush Bottom) */
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
 
-        /* STRICT PERFECT CIRCLE BADGES */
+        /* STRICT PERFECT CIRCLE BADGES (Absolute Centered Text) */
         .score-badge {
             position: absolute; top: 50%; transform: translateY(-50%); left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; 
-            display: flex; justify-content: center; align-items: center; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif;
         }
-        .score-badge span { position: relative; top: 1px; font-weight: 900; line-height: 0; text-align: center; }
+        .score-badge span { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); /* Force absolute center */
+            font-weight: 900; line-height: 0; text-align: center; width: 100%;
+        }
         .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
         .score-inactive { background: linear-gradient(to bottom, #555, #333); color: white; }
         
@@ -171,13 +154,13 @@
         .pill-bj { background: linear-gradient(to bottom, #00b359, #008040); border: 2px solid #00e676; }
         .pill-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); border: 2px solid #ff3366; }
 
-        .anim-fly-in { animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards; }
-        @keyframes flyIn { 0% { opacity: 0; transform: translate(300px, -200px) scale(0.3) rotate(45deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } }
+        .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
+        @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
         
-        .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
-        @keyframes flipCard { 0% { transform: rotateY(180deg) scale(1.05); } 100% { transform: rotateY(0deg) scale(1); } }
+        .anim-reveal { animation: revealCard 0.4s ease-out forwards; }
+        @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
 
-        /* PERFECTLY CENTERED ACTION BUTTONS */
+        /* ACTION BUTTONS */
         .mbj-action-row { 
             position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; 
             display: flex; justify-content: center; gap: 10px; height: 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
@@ -226,7 +209,7 @@
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
         .animated-chip {
-            position: fixed; z-index: 99999; pointer-events: none; transition: left 0.6s linear, top 0.6s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.6s linear, opacity 0.2s ease-in 0.4s;
+            position: fixed; z-index: 99999; pointer-events: none; transition: left 0.4s linear, top 0.4s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.4s linear, opacity 0.2s ease-in 0.2s;
             width: 45px; height: 45px; border-radius: 50%; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); 
             background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg);
         }
@@ -336,33 +319,16 @@
       </div>
   </div>
 
-  <div class="chat-widget minimized" id="chat-widget" onclick="toggleChat(event)">
-      <div class="chat-header">
-          <span><i class="fas fa-comments"></i> LIVE CHAT</span>
-          <i class="fas fa-chevron-up" id="chat-toggle-icon"></i>
-      </div>
-      <div class="chat-messages" id="chat-messages">
-          <div class="chat-msg-row" style="align-items: center; opacity: 0.5;">
-              <span style="font-size:0.7rem; margin-top:10px;">Welcome to VIP Premium.</span>
-          </div>
-      </div>
-      <div class="chat-input-area" onclick="event.stopPropagation()">
-          <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKey(event)">
-          <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
-      </div>
-  </div>
-
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
-    // EXACT SIZING FOR PERFECT BADGE CIRCLES
+    // EXACT SIZING FOR PERFECT BADGE CIRCLES (Dynamic font scaling for soft hands)
     function getDisplayScore(handCards) {
         let score = 0, aces = 0;
         for (let c of handCards) {
             score += c.bjVal; 
             if (c.raw === 'A') aces++;
         }
-        let softScore = score;
         while (score > 21 && aces > 0) { score -= 10; aces--; }
         
         if (aces > 0 && score < 21) {
@@ -390,15 +356,13 @@
 
     function showRackAlert(msg) {
         let r = document.getElementById('rack-alert');
-        r.innerText = msg;
-        r.classList.add('show');
+        r.innerText = msg; r.classList.add('show');
         setTimeout(() => r.classList.remove('show'), 2000);
     }
     
     function showGlobalAlert(msg, type='success') {
         let f = document.getElementById('global-alert');
-        f.innerText = msg;
-        f.className = `global-screen-alert show ${type}`;
+        f.innerText = msg; f.className = `global-screen-alert show ${type}`;
         setTimeout(() => f.className = 'global-screen-alert', 3000);
     }
 
@@ -407,20 +371,16 @@
         let v = document.getElementById('view-' + viewId); 
         if (v) v.classList.remove('hidden'); 
         document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino');
-        let chat = document.getElementById('chat-widget');
-        if (viewId === 'casino') chat.style.display = 'none'; else chat.style.display = 'flex';
     }
 
     function backToHub() {
         if(activeGame === 'mbj') { socket.emit('mbjLeaveSeat'); document.getElementById('mbj-chip-rack').style.display='none'; }
         if(activeGame) socket.emit('leaveRoom', activeGame);
-        activeGame = null;
-        switchView('casino');
+        activeGame = null; switchView('casino');
     }
 
     function openGame(id) {
-        activeGame = id;
-        socket.emit('joinRoom', id);
+        activeGame = id; socket.emit('joinRoom', id);
         if (id === 'mbj') {
             renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
             renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
@@ -430,30 +390,10 @@
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
-    let chatOpen = false;
-    function toggleChat(e) {
-        if(e.target.closest('.chat-input-area') || e.target.closest('.chat-messages')) return;
-        let w = document.getElementById('chat-widget'); let i = document.getElementById('chat-toggle-icon'); chatOpen = !chatOpen;
-        if(chatOpen) { w.classList.remove('minimized'); i.className = 'fas fa-chevron-down'; document.getElementById('chat-input').focus(); } 
-        else { w.classList.add('minimized'); i.className = 'fas fa-chevron-up'; }
-    }
-
-    function handleChatKey(e) { if(e.key === 'Enter') sendChat(); }
-    function sendChat() {
-        let input = document.getElementById('chat-input'); let msg = input.value.trim();
-        if(msg.length > 0) { socket.emit('sendChatMessage', msg); input.value = ''; }
-    }
-
-    socket.on('receiveChatMessage', (data) => {
-        let box = document.getElementById('chat-messages'); let isMe = data.username === myUsername;
-        let html = `<div class="chat-msg-row" style="align-items: ${isMe ? 'flex-end' : 'flex-start'};"><div class="chat-meta">${isMe ? 'You' : data.username} • ${data.time}</div><div class="chat-text ${isMe ? 'me' : 'other'}">${data.message}</div></div>`;
-        box.innerHTML += html; box.scrollTop = box.scrollHeight;
-    });
-
-    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0, isDoubled = false) {
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
-        if(animateFlip) animClass += ' anim-flip';
+        if(animateReveal) animClass = 'anim-reveal'; // Hole card flip
         if(isDoubled) animClass += ' card-doubled';
         
         let styleStr = `left: ${leftOffset}px;`;
@@ -509,10 +449,8 @@
             let isMe = s && s.username === myUsername; 
             if (isMe) localSeatId = i;
 
-            // Removes Empty Seats During Play
-            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) {
-                continue; 
-            }
+            // DYNAMIC EMPTY SEAT HIDING
+            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { continue; }
 
             let isMySeatTurn = activeSeatNum == i;
             let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
@@ -537,11 +475,11 @@
                     
                     html += `<div class="mbj-hand-column">`;
                     
-                    // CLEARED UNAVAILABLE BUTTONS
                     let btnClass = (isThisHandActive && mbjGameState === 'PLAYER_TURN' && isMe) ? 'show' : '';
                     let canDouble = hand.cards.length === 2;
-                    let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal);
+                    let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1;
 
+                    // DYNAMIC BUTTON CENTERING (Hidden buttons deleted from dom)
                     html += `<div class="mbj-action-row ${btnClass}">
                                 <button class="mbj-action-btn hit" onclick="socket.emit('mbjAction', {type:'hit'})"><i class="fas fa-plus"></i></button>
                                 <button class="mbj-action-btn stand" onclick="socket.emit('mbjAction', {type:'stand'})"><i class="fas fa-hand-paper"></i></button>`;
@@ -685,9 +623,13 @@
             }
         } 
         else if (data.event === 'turn_timer') { 
-            if (mbjState && mbjState.activeTurn && mbjState.activeTurn.seat) {
-                let bar = document.getElementById(`timer-fill-${mbjState.activeTurn.seat}`);
-                if (bar) bar.style.width = ((data.time / 15) * 100) + '%';
+            // Fix: Replaced missing state ref with data.activeTurn to prevent JS Crash
+            if (data.activeTurn && data.activeTurn.seat) {
+                let bar = document.getElementById(`timer-fill-${data.activeTurn.seat}`);
+                if (bar) {
+                    bar.style.transition = 'width 1s linear';
+                    bar.style.width = ((data.time / 15) * 100) + '%';
+                }
             }
         }
         else if (data.event === 'dealer_resolved') {
@@ -704,17 +646,15 @@
                 else htmlStr += `<div class="score-badge score-inactive" id="d-score-badge"><span>${initialDScore}</span></div>`;
 
                 htmlStr += generateCardHTML(data.dealerHand[0], false, false, false, 0);
-                htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); // FLIP ANIMATION
+                htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); // FLIP ANIMATION APPLIED
                 
                 dHand.innerHTML = htmlStr;
                 
                 const drawRemaining = async () => {
-                    await delay(800);
+                    await delay(500); // reduced delay
                     for(let i=2; i<data.dealerHand.length; i++) { 
                         dHand.style.width = `${(i * 20) + 70}px`;
-                        
                         let currentScore = getBJScore(data.dealerHand.slice(0, i+1));
-                        
                         let badge = document.getElementById('d-score-badge');
                         if (currentScore > 21) {
                             if(badge) badge.outerHTML = `<div class="status-pill pill-bust" id="d-score-badge">${currentScore} BUST</div>`;
@@ -722,12 +662,12 @@
                             if(badge) badge.innerHTML = `<span>${currentScore}</span>`;
                         }
                         
+                        // Append ONE card to trigger exact CSS animation without freezing existing cards
                         dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dealerHand[i], false, true, false, i * 20));
-                        
-                        await delay(800); 
+                        await delay(300); // snappy dealer draws
                     }
                     
-                    await delay(1000);
+                    await delay(800);
                     let myNet = 0;
                     
                     for(let i = 1; i <= 5; i++) {
@@ -735,11 +675,9 @@
                         let res = data.results && data.results[i];
                         if (seat && res) {
                             let chipCont = document.getElementById(`chip-stack-${i}-0`);
-                            if (!chipCont) continue;
-
                             if (res.status === 'LOSS') {
                                 animateChipSequence(`circle-${i}-0`, 'dealer-area', '#444');
-                                chipCont.style.opacity = '0'; 
+                                if (chipCont) chipCont.style.opacity = '0'; 
                             } 
                             else if (res.status === 'WIN') {
                                 animateChipSequence('dealer-area', `circle-${i}-0`, '#00e676');
@@ -749,7 +687,7 @@
                                 setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; }, 600);
                             }
                             if (seat.username === myUsername) myNet = res.net;
-                            await delay(800);
+                            await delay(400); // fast sequential payout
                         }
                     }
 
