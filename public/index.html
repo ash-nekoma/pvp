@@ -31,7 +31,7 @@
             user-select: none;
         }
         
-        /* Strict flex column prevents the blank screen zero-height collapse */
+        /* Strict column layout guarantees NO blank screen collapse */
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
             color: white; 
@@ -67,7 +67,7 @@
             cursor: pointer;
         }
         
-        /* Fills remaining screen space */
+        /* Fills remaining screen space perfectly */
         .main-wrapper { 
             flex: 1; 
             position: relative; 
@@ -78,7 +78,7 @@
             overflow: hidden;
         }
         
-        /* Keeps games perfectly in the middle */
+        /* Keeps games perfectly in the middle of the screen */
         .view-container { 
             position: absolute; 
             inset: 0; 
@@ -175,93 +175,111 @@
             box-shadow: 0 15px 40px rgba(0,162,255,0.2); 
         }
         
-        .local-flash { 
-            position: fixed; 
-            bottom: 25px; 
-            right: 25px; 
-            z-index: 9999; 
-            color: var(--danger); 
-            font-size: 1.2rem; 
-            font-weight: 900; 
+        /* Localized Game Board Alerts - Perfectly Centered IN the board */
+        .board-center-alert {
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--ps-glow); 
+            border-radius: 15px;
+            padding: 30px 60px; 
+            font-size: 2.5rem; 
+            font-weight: 900;
             text-transform: uppercase; 
-            opacity: 0; 
+            color: white; 
+            text-shadow: 0 5px 15px rgba(0,0,0,1);
+            z-index: 9999; 
             display: none; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.9); 
-            background: rgba(0,0,0,0.8); 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            border: 1px solid var(--danger); 
+            opacity: 0;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
         }
         
-        .local-flash.show { 
-            display: block; 
-            animation: flashAnim 2.5s forwards; 
+        .board-center-alert.show { 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            animation: popupAlert 3s forwards; 
         }
         
-        .local-flash.success { 
-            color: var(--success); 
+        .board-center-alert.success { 
             border-color: var(--success); 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3);
+            color: var(--success);
         }
         
-        @keyframes flashAnim { 
-            0% { opacity: 0; transform: translateY(20px); } 
-            15% { opacity: 1; transform: translateY(0); } 
-            85% { opacity: 1; transform: translateY(0); } 
-            100% { opacity: 0; transform: translateY(-10px); } 
+        .board-center-alert.error { 
+            border-color: var(--danger); 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3);
+            color: var(--danger);
+        }
+        
+        @keyframes popupAlert { 
+            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 
+            10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
+            90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
+            100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } 
         }
 
         /* ================= VIP BLACKJACK UI ================= */
         
+        /* Thick Mahogany Wood Rim & Green Casino Felt */
         .mbj-board { 
             width: 1100px; 
-            height: 520px; 
-            background: radial-gradient(ellipse at center, #0a5a2a 0%, #032b11 100%); 
+            height: 550px; 
+            background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
             border-radius: 20px; 
             position: relative; 
-            box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8); 
-            border: 15px solid #2e1a10; 
+            border: 20px solid #2b1810;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,1), inset 0 0 0 5px rgba(255,215,0,0.3);
             overflow: hidden; 
         }
         
         .mbj-table-line { 
             position: absolute; 
-            inset: 15px; 
+            inset: 20px; 
             border: 2px solid rgba(255,255,255,0.15); 
             border-radius: 10px; 
             pointer-events: none; 
             z-index: 1;
         }
         
+        /* Embossed Felt Typography */
         .mbj-logo { 
             position: absolute; 
             top: 45%; 
             left: 50%; 
             transform: translate(-50%, -50%); 
             text-align: center; 
-            opacity: 0.15; 
+            opacity: 0.3; 
+            mix-blend-mode: overlay;
             pointer-events: none; 
             width: 100%;
             z-index: 2;
         }
         
         .mbj-logo h1 {
-            font-size: 3.5rem; 
-            letter-spacing: 8px; 
+            font-size: 4rem; 
+            letter-spacing: 12px; 
             margin-bottom: 5px;
+            color: #000;
         }
         
         .mbj-logo p {
-            font-weight: 800; 
-            font-size: 0.85rem; 
-            letter-spacing: 2px;
+            font-weight: 900; 
+            font-size: 1rem; 
+            letter-spacing: 4px;
+            color: #000;
         }
 
         /* Top Left Balance */
         .mbj-balance-hud {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.8);
+            top: 25px;
+            left: 25px;
+            background: rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.15);
             padding: 8px 20px;
             border-radius: 12px;
@@ -274,7 +292,7 @@
         /* Top Center Timer */
         .mbj-timer-hud {
             position: absolute;
-            top: 20px;
+            top: 25px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.8);
@@ -288,11 +306,11 @@
             align-items: center;
         }
 
-        /* Top Right Shoe & Dealer */
+        /* Top Right Shoe */
         .mbj-shoe { 
             position: absolute; 
-            top: 20px; 
-            right: 20px; 
+            top: 25px; 
+            right: 25px; 
             width: 60px; 
             height: 90px; 
             background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); 
@@ -302,9 +320,10 @@
             z-index: 5; 
         }
 
+        /* Dealer Hand perfectly centered below the timer */
         .mbj-dealer-area { 
             position: absolute; 
-            top: 80px; 
+            top: 90px; 
             left: 50%; 
             transform: translateX(-50%); 
             display: flex; 
@@ -316,7 +335,7 @@
         /* HORIZONTAL FLEXBOX ROW FOR SEATS */
         #mbj-seats-row { 
             position: absolute; 
-            bottom: 20px; 
+            bottom: 25px; 
             left: 0; 
             width: 100%; 
             display: flex; 
@@ -324,19 +343,21 @@
             align-items: flex-end; 
             padding: 0 20px; 
             z-index: 10; 
+            pointer-events: none;
         }
         
-        /* VERTICAL FLEXBOX FOR SEAT */
+        /* VERTICAL FLEXBOX FOR SEAT TO PREVENT OVERLAPS */
         .mbj-seat-wrapper { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-end; 
-            width: 130px; 
+            width: 140px; 
+            pointer-events: auto; 
             position: relative; 
         }
 
-        /* Centered Cards Container */
+        /* Cards Flexbox Centered */
         .mbj-hand-container { 
             display: flex; 
             justify-content: center; 
@@ -347,7 +368,7 @@
             pointer-events: none;
         }
         
-        /* Action buttons below cards, above circle */
+        /* Action buttons pushed safely below cards */
         .mbj-action-row { 
             display: flex; 
             gap: 6px; 
@@ -380,17 +401,13 @@
             box-shadow: 0 5px 10px rgba(0,0,0,0.9); 
         }
         
-        .mbj-action-btn:hover:not(:disabled) { 
-            transform: scale(1.15); 
-            border-color: white; 
-        }
-        
+        .mbj-action-btn:hover:not(:disabled) { transform: scale(1.15); border-color: white; }
         .mbj-action-btn.hit { background: #008040; } 
         .mbj-action-btn.stand { background: #9b0022; } 
         .mbj-action-btn.double { background: #997a00; font-size: 0.7rem; }
         .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); }
 
-        /* The Betting Circle */
+        /* The Circle */
         .mbj-circle-container { 
             position: relative; 
             width: 65px; 
@@ -415,18 +432,10 @@
             z-index: 5; 
         }
         
-        .mbj-seat-circle:hover { 
-            border-color: rgba(255,255,255,0.8); 
-            background: rgba(255,255,255,0.2); 
-        }
+        .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
+        .mbj-seat-circle.occupied { border: 3px solid var(--credits); background: transparent; cursor: default; }
         
-        .mbj-seat-circle.occupied { 
-            border: 3px solid var(--credits); 
-            background: transparent; 
-            cursor: default; 
-        }
-        
-        /* PREMIUM CHIP - Placed exactly in the middle of the circle */
+        /* PREMIUM CHIP - Dead center in the circle */
         .mbj-chip { 
             position: absolute; 
             top: 50%; 
@@ -443,10 +452,8 @@
             color: white; 
             box-shadow: inset 0 0 0 4px rgba(0,0,0,0.3), 0 5px 10px rgba(0,0,0,0.9); 
             z-index: 10;
-            background: var(--c-bg);
+            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.2) 0deg 20deg, transparent 20deg 40deg), var(--c-bg);
             border: 2px solid white;
-            outline: 2px dashed white;
-            outline-offset: -6px;
             text-shadow: 1px 1px 2px black;
         }
         
@@ -465,14 +472,15 @@
             position: relative;
         }
 
-        /* Card Styles */
+        /* Premium Card Styles */
         .mbj-card { 
             width: 55px; 
             height: 80px; 
-            background: white; 
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
             border-radius: 6px; 
             box-shadow: -3px 3px 10px rgba(0,0,0,0.6); 
             position: relative; 
+            font-family: 'Outfit', sans-serif; 
             color: black; 
             border: 1px solid #ccc; 
             margin-left: -35px; 
@@ -480,51 +488,18 @@
             font-weight: 900;
         }
         
-        .mbj-card:first-child { 
-            margin-left: 0; 
-        } 
+        .mbj-card:first-child { margin-left: 0; } 
         
-        .card-tl { 
-            position: absolute; 
-            top: 4px; 
-            left: 4px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            line-height: 0.9; 
-            font-size: 0.9rem; 
-        }
-        
-        .card-br { 
-            position: absolute; 
-            bottom: 4px; 
-            right: 4px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            line-height: 0.9; 
-            font-size: 0.9rem; 
-            transform: rotate(180deg); 
-        }
-        
-        .card-center { 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            font-size: 2rem; 
-        }
-        
-        .card-red { color: #e60000; } 
+        .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; }
+        .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; transform: rotate(180deg); }
+        .card-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; }
+        .card-red { color: #cc0000; } 
         .card-black { color: #000; }
-        .card-back { 
-            background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); 
-            border: 2px solid rgba(255,255,255,0.8); 
-        }
+        .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
 
         .mbj-hand-score { 
             position: absolute; 
-            top: -15px; 
+            top: -10px; 
             left: 50%; 
             transform: translateX(-50%);
             background: #222; 
@@ -543,8 +518,8 @@
         
         .dealer-score-badge { 
             position: absolute; 
-            top: -10px; 
-            left: -35px; 
+            top: -5px; 
+            left: -30px; 
             width: 28px; 
             height: 28px; 
             background: #222; 
@@ -560,50 +535,19 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.8);
         }
 
-        /* Animations */
-        .anim-fly-in { 
-            animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; 
-            opacity: 0; 
-        }
-        
+        .anim-fly-in { animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; opacity: 0; }
         @keyframes flyIn { 
-            0% { opacity: 0; transform: translate(500px, -200px) scale(0.3) rotate(90deg); } 
+            0% { opacity: 0; transform: translate(400px, -200px) scale(0.3) rotate(90deg); } 
             100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } 
         }
         
-        .anim-flip { 
-            animation: flipCard 0.4s ease-in-out forwards; 
-        }
-        
+        .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
         @keyframes flipCard { 
             0% { transform: rotateY(180deg); } 
             100% { transform: rotateY(0deg); } 
         }
         
-        .payout-flare { 
-            position: absolute; 
-            bottom: 100%; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            color: #00e676; 
-            font-size: 1.2rem; 
-            font-weight: 900; 
-            text-shadow: 0 2px 5px black; 
-            animation: floatUp 2s forwards; 
-            z-index: 500; 
-            pointer-events: none; 
-            white-space: nowrap;
-        }
-        
-        @keyframes floatUp { 
-            0% { opacity: 0; transform: translate(-50%, 0); } 
-            20% { opacity: 1; transform: translate(-50%, -20px); } 
-            80% { opacity: 1; transform: translate(-50%, -40px); } 
-            100% { opacity: 0; transform: translate(-50%, -60px); } 
-        }
-
         .dimmed { opacity: 0.3; filter: grayscale(80%); }
-        
         .seat-glow { 
             position: absolute; 
             top: -40px; 
@@ -617,10 +561,8 @@
             z-index: 1; 
             display: none; 
         }
-        
         .active-turn { opacity: 1 !important; z-index: 100; filter: grayscale(0) !important; }
         .active-turn .seat-glow { display: block; animation: pulseGlow 2s infinite; }
-        
         @keyframes pulseGlow { 
             0% { transform: translateX(-50%) scale(0.9); opacity: 0.5;} 
             50% { transform: translateX(-50%) scale(1.1); opacity: 1;} 
@@ -641,7 +583,6 @@
             z-index: 30;
             animation: floatBadge 1s infinite;
         }
-        
         @keyframes floatBadge {
             0%, 100% { transform: translateX(-50%) translateY(0); }
             50% { transform: translateX(-50%) translateY(-5px); }
@@ -663,7 +604,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.9); 
             transition: 0.3s;
         }
-        
         .chip-rack-locked {
             opacity: 0.5;
             pointer-events: none;
@@ -683,16 +623,10 @@
             border: 3px solid white; 
             color: white;
             text-shadow: 1px 1px 2px black;
-            background: var(--c-bg);
+            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.2) 0deg 20deg, transparent 20deg 40deg), var(--c-bg);
             box-shadow: inset 0 0 0 4px rgba(0,0,0,0.3), 0 5px 10px rgba(0,0,0,0.9); 
-            outline: 2px dashed white;
-            outline-offset: -6px;
         }
-        
-        .rack-chip:hover { 
-            transform: translateY(-5px) scale(1.1); 
-            box-shadow: 0 0 15px white; 
-        }
+        .rack-chip:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 0 15px white; }
         
         .rack-btn { 
             padding: 10px 20px; 
@@ -707,7 +641,6 @@
             transition: 0.2s;
             text-transform: uppercase;
         }
-        
         .rack-btn-clear { background: rgba(255,255,255,0.1); color: white; }
         .rack-btn-clear:hover { background: rgba(255,51,102, 0.8); }
         .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
@@ -735,6 +668,7 @@
             flex-direction: column; 
             padding: 20px; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+            position: relative;
         }
         
         .hr-top-bar { 
@@ -760,6 +694,7 @@
             text-transform: uppercase;
         }
         
+        /* Inline Clock and Timer */
         .hr-timer-box {
             display: flex;
             align-items: center;
@@ -810,13 +745,30 @@
         }
         
         .track-moving .hr-bg-dirt { animation: scrollTrack 0.3s linear infinite; }
-        
+        .track-slowing .hr-bg-dirt { animation: scrollTrack 2s ease-out forwards; }
         @keyframes scrollTrack { 
             from { transform: translateX(0); } 
             to { transform: translateX(-80px); } 
         }
 
-        /* The Starting Gate Bar */
+        /* HD Finish Line - Fine Checkerboard and Gold Wire */
+        .hr-finish-line { 
+            position: absolute; 
+            right: -100px; 
+            top: 20%; 
+            bottom: 0; 
+            width: 25px; 
+            background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), 
+                              linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); 
+            background-size: 10px 10px; 
+            background-position: 0 0, 5px 5px; 
+            background-color: #fff; 
+            z-index: 5; 
+            border-left: 4px solid #FFD700; 
+            box-shadow: -10px 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* Steel Starting Gate */
         .hr-starting-gate { 
             position: absolute; 
             left: 5%; 
@@ -830,24 +782,8 @@
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); 
             box-shadow: 10px 0 20px rgba(0,0,0,0.8);
         }
-        
         .gate-open { transform: translateY(-100%); }
-
-        .hr-finish-line { 
-            position: absolute; 
-            right: -100px; 
-            top: 20%; 
-            bottom: 0; 
-            width: 40px; 
-            background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); 
-            background-size: 20px 20px; 
-            background-position: 0 0, 10px 10px; 
-            background-color: #fff; 
-            z-index: 5; 
-            border-left: 6px solid #ffcc00; 
-        }
         
-        /* Grid Architecture */
         .hr-lanes-grid { 
             position: absolute; 
             top: 20%; 
@@ -867,6 +803,7 @@
             position: relative; 
         }
         
+        /* Horses locked to their lane grid */
         .hr-horse-group { 
             position: absolute; 
             left: 0%; 
@@ -882,7 +819,7 @@
             pointer-events: none;
         }
         
-        /* Exact Filter Adjustments to get Vivid Colors */
+        /* Fine-tuned accurate color masking to exactly match buttons */
         .horse-Red .hr-gif { filter: drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Blue .hr-gif { filter: hue-rotate(210deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Green .hr-gif { filter: hue-rotate(100deg) saturate(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
@@ -895,7 +832,6 @@
             transform: scaleX(-1) scale(1.1) !important; 
             z-index: 50 !important; 
         }
-        
         .loser-fade { opacity: 0.3; }
 
         .hr-controls-area { 
@@ -911,6 +847,7 @@
             gap: 10px; 
         }
         
+        /* Colored Button with the Bet amount directly inside */
         .hr-bet-btn { 
             background: var(--h-bg); 
             border: 2px solid white; 
@@ -926,7 +863,6 @@
             flex-direction: column; 
             align-items: center; 
             gap: 4px; 
-            position: relative; 
             text-shadow: 1px 1px 2px black;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
@@ -988,7 +924,7 @@
                 <i class="fas fa-horse-head" style="font-size:4rem; color: var(--danger);"></i>
                 <div>
                     <div style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Smooth Physics Engine</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Smooth Photo Finish</div>
                 </div>
             </div>
         </div>
@@ -996,7 +932,10 @@
 
       <div id="view-mbj" class="view-container hidden">
           
-          <div class="mbj-board">
+          <div class="mbj-board" id="mbj-board-container">
+              
+              <div id="mbj-center-alert" class="board-center-alert"></div>
+
               <div class="mbj-table-line"></div>
               
               <div class="mbj-logo">
@@ -1026,6 +965,7 @@
 
           <div class="chip-rack-container" id="mbj-chip-rack">
               <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
+              
               <div class="rack-chip chip-10" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
               <div class="rack-chip chip-100" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
               <div class="rack-chip chip-1k" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
@@ -1041,6 +981,9 @@
 
       <div id="view-horserace" class="view-container hidden">
           <div class="hr-board">
+              
+              <div id="hr-center-alert" class="board-center-alert"></div>
+
               <div class="hr-top-bar">
                   <div class="hr-timer-box">
                       <i class="fas fa-clock"></i>
@@ -1077,7 +1020,7 @@
   <div id="flash-msg" class="local-flash"></div> 
 
   <script>
-    // Include Frontend BJ Math to prevent Blank Screen Crashes
+    // Required mathematical functions for client-side scoring to prevent crashes
     function getBJScore(hand) {
         let score = 0, aces = 0;
         for (let card of hand) { 
@@ -1122,14 +1065,20 @@
         document.getElementById('hr-my-bal').innerText = amt.toLocaleString() + ' TC';
     }
 
-    function showLocalFlash(msg, type='error') {
+    function showGlobalFlash(msg, type='error') {
         let f = document.getElementById('flash-msg');
         f.innerText = msg;
-        f.classList.remove('show', 'success');
-        void f.offsetWidth;
-        f.classList.add('show');
-        if(type === 'success') f.classList.add('success');
-        setTimeout(() => f.classList.remove('show'), 2500);
+        f.className = `local-flash show ${type}`;
+        setTimeout(() => f.className = 'local-flash', 2500);
+    }
+    
+    // Centered Game Board Alerts
+    function showBoardAlert(game, msg, type='success') {
+        let f = document.getElementById(game === 'mbj' ? 'mbj-center-alert' : 'hr-center-alert');
+        if(!f) return;
+        f.innerText = msg;
+        f.className = `board-center-alert show ${type}`;
+        setTimeout(() => f.className = 'board-center-alert', 3000);
     }
 
     function switchView(viewId) { 
@@ -1142,9 +1091,10 @@
     function backToHub() {
         if(activeGame === 'mbj') { 
             socket.emit('mbjLeaveSeat'); 
+            document.getElementById('mbj-chip-rack').style.display='none'; 
         }
         if(activeGame === 'horserace' && document.getElementById('hr-ticker').innerText === "AND THEY'RE OFF!") { 
-            showLocalFlash("Wait for race to finish!", "error"); 
+            showGlobalFlash("Wait for race to finish!", "error"); 
             return; 
         }
         if(activeGame) socket.emit('leaveRoom', activeGame);
@@ -1217,12 +1167,10 @@
                 let currentHandCount = s.hands[0].cards.length;
                 let previouslyRendered = renderedCardCount[i] || 0;
                 
-                // Score Badge above hand
                 if(s.hands[0].cards.length > 0 && s.hands[0].status !== 'BUST') { 
                     html += `<div class="mbj-hand-score">${s.hands[0].score}</div>`; 
                 }
                 
-                // Turn Badge
                 if(isMySeatTurn && mbjGameState === 'PLAYER_TURN') {
                     html += `<div class="turn-badge">YOUR TURN</div>`;
                 }
@@ -1282,7 +1230,7 @@
         if (mbjGameState === 'BETTING') {
             rack.classList.remove('chip-rack-locked');
             if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
-                // Allows betting
+                // Keep unlocked for betting
             } else {
                 rack.classList.add('chip-rack-locked');
             }
@@ -1297,7 +1245,7 @@
             localPendingBet += amt; 
             renderMBJSeats(); 
         } else { 
-            showLocalFlash('Not enough credits', 'error'); 
+            showGlobalFlash('Not enough credits', 'error'); 
         }
     }
     
@@ -1315,7 +1263,7 @@
     }
     
     function confirmLocalBet() {
-        if(localPendingBet < 10) return showLocalFlash('Min Bet 10 TC', 'error');
+        if(localPendingBet < 10) return showGlobalFlash('Min Bet 10 TC', 'error');
         socket.emit('mbjPlaceBet', localPendingBet);
         localPendingBet = 0; 
     }
@@ -1400,8 +1348,9 @@
                             }
                         }
                     }
-                    if (myNet > 0) showLocalFlash(`WON +${myNet} TC`, 'success');
-                    else if (myNet < 0) showLocalFlash(`LOST ${Math.abs(myNet)} TC`, 'error');
+                    // CENTERED NOTIFICATION INSIDE BOARD
+                    if (myNet > 0) showBoardAlert('mbj', `WON +${myNet} TC`, 'success');
+                    else if (myNet < 0) showBoardAlert('mbj', `LOST ${Math.abs(myNet)} TC`, 'error');
                 }; 
                 drawRemaining();
             }
@@ -1442,6 +1391,7 @@
                 let oText = hrState.currentOdds && hrState.currentOdds[c] ? hrState.currentOdds[c] + 'x' : '?x';
                 let myB = myHRBets[c] || 0;
                 
+                // Matches horse color exactly
                 bg.innerHTML += `
                 <button class="hr-bet-btn" style="--h-bg:${btnColors[c]};" onclick="placeHRBet('${c}', this)">
                     ${c} 
@@ -1496,11 +1446,13 @@
         if(activeGame !== 'horserace') return;
         const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
         
+        // Start hidden behind the steel gate
         let currentPos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
         let targetPos = { Red: 0, Blue: 0, Green: 0, Yellow: 0, Purple: 0, Orange: 0 };
 
         let duration = data.duration; let startTime = Date.now();
         
+        // Gate rockets up, track starts moving
         let gate = document.getElementById('hr-gate');
         if(gate) gate.classList.add('gate-open');
         document.getElementById('hr-environment').className = 'hr-track-window track-moving';
@@ -1522,14 +1474,16 @@
             let now = Date.now(); let elapsed = now - startTime; let timeRemaining = duration - elapsed;
 
             if (timeRemaining > 3000) {
+                // Phase 2: Jostling smoothly between off-screen left and mid-screen
                 if (now > nextTargetUpdate) {
                     horses.forEach(h => { targetPos[h] = Math.random() * 60 - 10; });
                     nextTargetUpdate = now + 800 + Math.random() * 1000; 
                 }
             } else {
+                // Phase 3: Treadmill Stops, Finish Line appears, smooth sprint forward
                 if (!sprintTriggered) {
                     sprintTriggered = true;
-                    document.getElementById('hr-environment').className = 'hr-track-window track-slowing'; 
+                    document.getElementById('hr-environment').className = 'hr-track-window'; 
                     if (fLineEl) { fLineEl.style.transition = 'none'; fLineEl.style.right = '5%'; }
                     horses.forEach(h => { targetPos[h] = (h === data.winner) ? 95 : 60 + (Math.random() * 20); });
                 }
@@ -1547,6 +1501,7 @@
             }
 
             horses.forEach(h => {
+                // Gradual acceleration math for smooth running
                 let speed = (timeRemaining <= 3000) ? 0.03 : 0.015; 
                 currentPos[h] += (targetPos[h] - currentPos[h]) * speed;
                 
@@ -1562,6 +1517,7 @@
         document.getElementById('hr-ticker').innerText = `${w.toUpperCase()} WINS!`;
         document.getElementById('hr-ticker').style.color = btnColors[w];
         
+        // Spotlights the winner
         ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach(c => {
             let el = document.getElementById('horse-' + c);
             if (el) {
@@ -1570,9 +1526,10 @@
             }
         });
 
+        // CENTERED NOTIFICATION INSIDE BOARD
         let myPayout = data.payouts ? (data.payouts[myUsername] || 0) : 0;
-        if (myPayout > 0) showLocalFlash(`WON +${myPayout} TC`, 'success');
-        else showLocalFlash(`RACE FINISHED`, 'error');
+        if (myPayout > 0) showBoardAlert('horserace', `WON +${myPayout} TC`, 'success');
+        else showBoardAlert('horserace', `RACE FINISHED`, 'error');
     });
 
     socket.on('hrNewRound', (data) => {
@@ -1580,7 +1537,7 @@
             hrState.status = 'BETTING'; hrState.time = 15;
             if (data && data.odds) hrState.currentOdds = data.odds;
             document.getElementById('hr-ticker').innerText = "WAITING FOR NEXT RACE...";
-            document.getElementById('hr-ticker').style.color = "white";
+            document.getElementById('hr-ticker').style.color = "var(--credits)";
             myHRBets = {};
             setupDerbyUI(); 
             document.querySelectorAll('.hr-bet-btn').forEach(b => b.disabled = false);
