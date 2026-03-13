@@ -46,7 +46,7 @@ function buildShoe() {
         }
     }
     
-    // Shuffle the deck
+    // Shuffle the shoe
     for (let i = shoe.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
@@ -92,7 +92,6 @@ function mbjNextTurn() {
     let seatNum = mbjState.activeTurn.seat;
     let handIdx = mbjState.activeTurn.handIdx;
 
-    // Check if current seat has a split hand to play
     if (seatNum !== null) {
         let seat = mbjState.seats[seatNum];
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') {
@@ -108,7 +107,6 @@ function mbjNextTurn() {
         }
     }
 
-    // Move to next player
     let nextSeatNum = null;
     let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
     
@@ -213,7 +211,7 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
-    // Gives plenty of time for physical coin animations before resetting
+    // Physical Mario Coin Timeout
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -421,8 +419,6 @@ io.on('connection', (socket) => {
         let hand = seat.hands[handIdx];
 
         if (actionData.type === 'hit') {
-            if (hand.isSplitAce) return; 
-            
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
             
