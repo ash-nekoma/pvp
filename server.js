@@ -17,7 +17,6 @@ app.get('/', (req, res) => {
 
 const formatTC = (amount) => Math.round(amount * 10) / 10;
 
-// In-memory database for testing
 let mockUsers = {};
 let connectedUsers = {};
 
@@ -268,6 +267,7 @@ setInterval(() => {
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
                 
+                // Matches the exact duration of the new round-robin frontend animation
                 let animTime = ((activeSeats.length * 2) + 2) * 300 + 500; 
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
@@ -306,17 +306,12 @@ setInterval(() => {
 
 io.on('connection', (socket) => {
 
-    // =========================================================================
-    // DYNAMIC LOGIN & SIGNUP
-    // =========================================================================
     socket.on('login', (data) => {
         let user = mockUsers[data.username];
         if(!user) {
-            // User doesn't exist -> Create them (Signup)
             user = { username: data.username, password: data.password, credits: 10000 };
             mockUsers[data.username] = user;
         } else {
-            // User exists -> Check password (Login)
             if (user.password !== data.password) {
                 return socket.emit('loginError', 'Incorrect Password.');
             }
@@ -430,10 +425,12 @@ io.on('connection', (socket) => {
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
             mbjState.turnTimer = 15; 
+            
+            // INJECTS 1.2 SECOND BREATHING PAUSE ON AUTO-STANDS
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                mbjNextTurn(); 
+                setTimeout(() => mbjNextTurn(), 1200); 
             } else { 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
@@ -455,8 +452,10 @@ io.on('connection', (socket) => {
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 mbjState.turnTimer = 15; 
+                
+                // INJECTS 1.2 SECOND BREATHING PAUSE
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                mbjNextTurn();
+                setTimeout(() => mbjNextTurn(), 1200);
             }
         }
         else if (actionData.type === 'split') {
@@ -486,13 +485,13 @@ io.on('connection', (socket) => {
                 seat.hands.push(hand2);
                 mbjState.turnTimer = 15; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                if(hand.score === 21) mbjNextTurn();
+                
+                if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200);
             }
         }
     });
 
     socket.on('disconnect', () => { 
-        // Simple cleanup: Leave seat if they completely close the tab while betting
         if (socket.user) {
             for(let i = 1; i <= 5; i++) {
                 let s = mbjState.seats[i];
