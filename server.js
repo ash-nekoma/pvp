@@ -145,6 +145,7 @@ setInterval(() => {
                     });
                 }, 15500); 
 
+                // Reset Derby
                 setTimeout(() => {
                     generateHorseOdds(); 
                     hrState.time = 15; 
@@ -215,7 +216,7 @@ async function mbjResolveDealer() {
     mbjState.activeTurn = { seat: null, handIdx: 0 };
     
     let playersAlive = false;
-    for (let i=1; i<=5; i++) {
+    for (let i = 1; i <= 5; i++) {
         if(mbjState.seats[i]) {
             mbjState.seats[i].hands.forEach(h => { if(h.status === 'STAND') playersAlive = true; });
         }
@@ -234,7 +235,7 @@ async function mbjResolveDealer() {
     let dealerUpcardVal = mbjState.dealer.hand[0].bjVal;
 
     let seatResults = {}; 
-    for (let i=1; i<=5; i++) {
+    for (let i = 1; i <= 5; i++) {
         let seat = mbjState.seats[i];
         if (seat && seat.hands.length > 0) {
             let totalWin = 0; let totalPush = 0; 
@@ -282,8 +283,9 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
+    // Increased timeout to allow for chip collection/payout animations
     setTimeout(() => {
-        for (let i=1; i<=5; i++) {
+        for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
                 if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) {
                     mbjState.seats[i] = null;
@@ -297,7 +299,7 @@ async function mbjResolveDealer() {
         mbjState.status = 'BETTING';
         
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 10000); 
+    }, 12000); 
 }
 
 setInterval(() => {
@@ -313,7 +315,7 @@ setInterval(() => {
         }
         
         if (mbjState.time <= 0 && hasBets) {
-            for (let i=1; i<=5; i++) {
+            for (let i = 1; i <= 5; i++) {
                 if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) {
                     mbjState.seats[i] = null;
                 }
@@ -375,6 +377,9 @@ setInterval(() => {
     }
 }, 1000);
 
+// =========================================================================
+// SOCKET CONNECTION & CHAT
+// =========================================================================
 io.on('connection', (socket) => {
     socket.emit('hrTimerUpdate', { time: hrState.time, odds: hrState.currentOdds });
 
@@ -387,6 +392,14 @@ io.on('connection', (socket) => {
         socket.user = user; 
         connectedUsers[user.username] = socket.id;
         socket.emit('loginSuccess', { username: user.username, credits: user.credits });
+    });
+
+    // Chat System
+    socket.on('sendChatMessage', (msg) => {
+        if(socket.user) {
+            let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            io.emit('receiveChatMessage', { username: socket.user.username, message: msg, time: time });
+        }
     });
 
     socket.on('joinRoom', (room) => { 
@@ -424,7 +437,7 @@ io.on('connection', (socket) => {
 
     socket.on('mbjTakeSeat', (seatNum) => {
         if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
-        for(let i=1; i<=5; i++) { 
+        for(let i = 1; i <= 5; i++) { 
             if (mbjState.seats[i] && mbjState.seats[i].username === socket.user.username) return; 
         }
         mbjState.seats[seatNum] = { username: socket.user.username, hands: [] };
@@ -437,7 +450,7 @@ io.on('connection', (socket) => {
 
     socket.on('mbjLeaveSeat', () => {
         if (!socket.user) return;
-        for(let i=1; i<=5; i++) {
+        for(let i = 1; i <= 5; i++) {
             let s = mbjState.seats[i];
             if (s && s.username === socket.user.username && mbjState.status === 'BETTING') {
                 if (s.hands.length > 0 && s.hands[0].bet > 0) {
@@ -461,7 +474,7 @@ io.on('connection', (socket) => {
     socket.on('mbjPlaceBet', (amount) => {
         if (!socket.user || mbjState.status !== 'BETTING') return;
         let seatNum = null;
-        for(let i=1; i<=5; i++) { 
+        for(let i = 1; i <= 5; i++) { 
             if (mbjState.seats[i] && mbjState.seats[i].username === socket.user.username) seatNum = i; 
         }
         if (!seatNum) return;
@@ -500,10 +513,9 @@ io.on('connection', (socket) => {
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
             
-            // TIMER RESET ON HIT
-            mbjState.turnTimer = 15; 
+            mbjState.turnTimer = 15; // Reset timer on Hit
             
-            // AUTO STAND LOGIC
+            // Auto-Stand on 21 or Bust
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
@@ -531,8 +543,7 @@ io.on('connection', (socket) => {
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 
-                // TIMER RESET ON DOUBLE
-                mbjState.turnTimer = 15; 
+                mbjState.turnTimer = 15; // Reset timer
                 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
