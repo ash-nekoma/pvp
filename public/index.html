@@ -31,6 +31,7 @@
             user-select: none;
         }
         
+        /* Strict column layout guarantees NO blank screen collapse */
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
             color: white; 
@@ -66,7 +67,7 @@
             cursor: pointer;
         }
 
-        /* NEW LAYOUT: Flex row positions Board and Chat side by side */
+        /* NEW LAYOUT: Flex row positions Board and Chat side by side perfectly */
         .app-body {
             flex: 1;
             display: flex;
@@ -92,8 +93,8 @@
 
         /* ================= DOCKED LIVE CHAT ================= */
         .chat-widget {
-            width: 300px;
-            height: 600px;
+            width: 320px;
+            height: 650px;
             background: rgba(0, 10, 25, 0.85);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
@@ -102,6 +103,7 @@
             flex-direction: column;
             z-index: 100;
             box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            margin-right: 20px;
         }
 
         .chat-header {
@@ -109,11 +111,12 @@
             background: rgba(0, 162, 255, 0.1);
             border-bottom: 1px solid var(--glass-border);
             font-weight: 900;
-            font-size: 1rem;
+            font-size: 1.1rem;
             text-align: center;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             color: var(--ps-glow);
             border-radius: 15px 15px 0 0;
+            text-transform: uppercase;
         }
 
         .chat-messages {
@@ -190,8 +193,6 @@
         }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         
-        .lobby-modes-container { display: flex; gap: 40px; }
-        
         .game-card { 
             width: 320px; 
             height: 380px; 
@@ -209,55 +210,6 @@
         }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
 
-        /* CENTERED BOARD ALERTS */
-        .board-center-alert {
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.85); 
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--ps-glow); 
-            border-radius: 15px;
-            padding: 30px 60px; 
-            font-size: 2.5rem; 
-            font-weight: 900;
-            text-transform: uppercase; 
-            color: white; 
-            text-shadow: 0 5px 15px rgba(0,0,0,1);
-            z-index: 9999; 
-            display: none; 
-            opacity: 0;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
-            text-align: center;
-        }
-        
-        .board-center-alert.show { 
-            display: flex; 
-            flex-direction: column;
-            align-items: center;
-            animation: popupAlert 3s forwards; 
-        }
-        
-        .board-center-alert.success { 
-            border-color: var(--success); 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3);
-            color: var(--success);
-        }
-        
-        .board-center-alert.error { 
-            border-color: var(--danger); 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3);
-            color: var(--danger);
-        }
-        
-        @keyframes popupAlert { 
-            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 
-            10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
-            90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
-            100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } 
-        }
-
         /* ================= VIP BLACKJACK UI ================= */
         
         .game-board-wrapper {
@@ -268,8 +220,8 @@
 
         /* Thick Mahogany Wood Rim & Green Casino Felt */
         .mbj-board { 
-            width: 1000px; 
-            height: 520px; 
+            width: 1100px; 
+            height: 600px; 
             background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
             border-radius: 20px; 
             position: relative; 
@@ -291,7 +243,7 @@
         /* Embossed Felt Typography */
         .mbj-logo { 
             position: absolute; 
-            top: 40%; 
+            top: 45%; 
             left: 50%; 
             transform: translate(-50%, -50%); 
             text-align: center; 
@@ -303,7 +255,8 @@
         }
         
         .mbj-logo h1 { font-size: 3.5rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
-        .mbj-logo p { font-weight: 900; font-size: 0.9rem; letter-spacing: 2px; color: #000; }
+        .mbj-logo p { font-weight: 900; font-size: 0.9rem; letter-spacing: 2px; color: #000; margin-bottom: 5px;}
+        .mbj-logo .limits { font-weight: 900; font-size: 0.75rem; letter-spacing: 1px; color: #000; }
 
         /* Fixed Top Left Balance */
         .mbj-balance-hud {
@@ -327,13 +280,14 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
             border: 2px solid var(--ps-glow);
             padding: 30px 60px;
             border-radius: 20px;
             z-index: 100;
             box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
             text-align: center;
-            display: none; /* Only visible when betting */
+            display: none; 
         }
 
         .mbj-global-timer h2 {
@@ -406,16 +360,23 @@
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-end; 
-            width: 130px; 
+            width: 150px; 
             pointer-events: auto; 
             position: relative; 
         }
 
+        /* Container for Split Hands */
+        .mbj-hands-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+
         /* FIXED ABSOLUTE CARD POSITIONING */
-        /* Dynamic width applied via Javascript to center the absolute children perfectly */
         .mbj-hand-container { 
             position: relative; 
-            height: 95px; 
+            height: 100px; 
             margin-bottom: 10px; 
             pointer-events: none;
             display: flex;
@@ -424,8 +385,8 @@
         
         /* Larger, realistic cards */
         .mbj-card { 
-            width: 65px; 
-            height: 95px; 
+            width: 70px; 
+            height: 100px; 
             background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
             border-radius: 6px; 
             box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
@@ -439,12 +400,17 @@
             z-index: 2;
         }
         
-        /* Clean symbols: top left and bottom right only */
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
         .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; transform: rotate(180deg); }
         .card-red { color: #cc0000; } 
         .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
+        
+        /* The sideways Double Down card */
+        .card-doubled {
+            transform: rotate(90deg) translateX(15px);
+            z-index: 1;
+        }
 
         /* UNIFORM GOLD SCORE BADGES */
         .hand-score { 
@@ -455,11 +421,11 @@
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
-            border-radius: 4px; 
+            border-radius: 50%; 
             font-weight: 900; 
-            font-size: 0.9rem; 
+            font-size: 1rem; 
             width: 30px;
-            height: 25px;
+            height: 30px;
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -474,11 +440,11 @@
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
-            border-radius: 4px; 
+            border-radius: 50%; 
             font-weight: 900; 
-            font-size: 0.9rem; 
+            font-size: 1rem; 
             width: 30px;
-            height: 25px;
+            height: 30px;
             z-index: 20; 
             display: flex; 
             justify-content: center; 
@@ -556,9 +522,10 @@
         .mbj-action-btn.hit { background: linear-gradient(to bottom, #00e676, #008040); border-color: #00e676; } 
         .mbj-action-btn.stand { background: linear-gradient(to bottom, #ff3366, #9b0022); border-color: #ff3366; } 
         .mbj-action-btn.double { background: linear-gradient(to bottom, #ffcc00, #997a00); border-color: #ffcc00; font-size: 0.8rem; color: black;}
+        .mbj-action-btn.split { background: linear-gradient(to bottom, #00a2ff, #005080); border-color: #00a2ff; font-size: 0.8rem; }
         .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); transform: none; box-shadow: none; }
 
-        /* Circular Timer inside Betting Circle */
+        /* Circular Timer & Circle */
         .mbj-circle-container { 
             position: relative; 
             width: 75px; 
@@ -616,12 +583,19 @@
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 2px solid var(--credits); background: transparent; cursor: default; }
         
-        /* PREMIUM PAULSON CHIP (Dead Center) */
-        .mbj-chip { 
+        /* DYNAMIC 3D CHIP STACK WRAPPER */
+        .chip-stack-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 45px;
+            z-index: 10;
+        }
+        
+        .mbj-chip-3d { 
             position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
+            left: 0;
             width: 45px; 
             height: 45px; 
             border-radius: 50%; 
@@ -630,15 +604,13 @@
             align-items: center; 
             font-size: 0.75rem; 
             font-weight: 900; 
-            color: black; 
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9); 
-            z-index: 10;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 3px 5px rgba(0,0,0,0.8); 
             background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%),
                         repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%);
             border: 2px solid var(--c-bg);
         }
         
-        .mbj-chip.ghost { opacity: 0.5; filter: grayscale(80%); }
+        .mbj-chip-3d.ghost { opacity: 0.5; filter: grayscale(80%); }
 
         .mbj-seat-name { 
             font-weight: 900; 
@@ -649,7 +621,6 @@
             text-align: center; 
             position: relative;
         }
-
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
         /* THE MARIO COIN CHIP ANIMATION CLASS */
@@ -658,11 +629,19 @@
             z-index: 99999;
             pointer-events: none;
             transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth arc trajectory */
+            width: 45px; 
+            height: 45px; 
+            border-radius: 50%; 
+            font-weight: 900; 
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); 
+            background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%),
+                        repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%);
+            border: 2px solid var(--c-bg);
         }
 
         /* THE CHIP RACK UI (Matches table width exactly) */
         .chip-rack-container { 
-            width: 1000px;
+            width: 1100px;
             margin-top: 15px;
             display: flex; 
             background: rgba(0,0,0,0.85); 
@@ -678,10 +657,7 @@
             position: relative;
         }
         
-        .chip-rack-locked {
-            opacity: 0.5;
-            pointer-events: none;
-        }
+        .chip-rack-locked { opacity: 0.5; pointer-events: none; }
 
         /* Error Tooltip attached to Rack */
         .rack-error-tooltip {
@@ -792,8 +768,6 @@
               
               <div class="game-board-wrapper">
                   <div class="mbj-board" id="mbj-board-container">
-                      
-                      <div id="mbj-center-alert" class="board-center-alert"></div>
 
                       <div class="mbj-global-timer" id="bj-global-timer">
                           <h2>PLACE BETS</h2>
@@ -805,6 +779,8 @@
                       <div class="mbj-logo">
                           <h1>BLACKJACK</h1>
                           <p>PAYS 3 TO 2</p>
+                          <p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
+                          <div class="limits">MIN 10 TC | MAX 50,000 TC</div>
                       </div>
 
                       <div class="mbj-balance-hud">
@@ -861,6 +837,8 @@
 
   </div>
   
+  <div id="global-alert" class="global-screen-alert"></div> 
+
   <script>
     // Required mathematical functions for client-side scoring to prevent crashes
     function getBJScore(hand) {
@@ -911,12 +889,11 @@
         setTimeout(() => r.classList.remove('show'), 2000);
     }
     
-    function showBoardAlert(msg, type='success') {
-        let f = document.getElementById('mbj-center-alert');
-        if(!f) return;
+    function showGlobalAlert(msg, type='success') {
+        let f = document.getElementById('global-alert');
         f.innerText = msg;
-        f.className = `board-center-alert show ${type}`;
-        setTimeout(() => f.className = 'board-center-alert', 3000);
+        f.className = `global-screen-alert show ${type}`;
+        setTimeout(() => f.className = 'global-screen-alert', 3000);
     }
 
     function switchView(viewId) { 
@@ -926,7 +903,6 @@
         
         document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino');
         
-        // Show chat only when in game
         let chat = document.getElementById('chat-widget');
         if (viewId === 'casino') {
             chat.style.display = 'none';
@@ -992,10 +968,11 @@
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0) {
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
         if(animateFlip) animClass = 'anim-flip';
+        if(isDoubled) animClass += ' card-doubled';
         
         // Absolute positioning prevents flexbox shift.
         let styleStr = `left: ${leftOffset}px;`;
@@ -1009,7 +986,36 @@
                 </div>`;
     }
     
-    // The Mario Coin / Physical Chip Animation
+    // Dynamic 3D Chip Stack Generator
+    function getChipStackHTML(amount, isGhost = false) {
+        let html = '';
+        let remaining = amount;
+        let chips = [
+            {val: 50000, col: '#ffcc00', text: 'black'},
+            {val: 10000, col: '#00e676', text: 'black'},
+            {val: 1000, col: '#ff3366', text: 'white'},
+            {val: 100, col: '#00a2ff', text: 'white'},
+            {val: 10, col: '#444', text: 'white'}
+        ];
+        
+        let offset = 0;
+        let visualCount = 0;
+        
+        for(let c of chips) {
+            while(remaining >= c.val && visualCount < 6) { // Max 6 chips visually
+                let label = c.val >= 1000 ? (c.val/1000)+'K' : c.val;
+                html += `<div class="mbj-chip-3d ${isGhost ? 'ghost' : ''}" style="--c-bg:${c.col}; color:${c.text}; bottom:${offset}px; z-index:${visualCount};">${label}</div>`;
+                remaining -= c.val;
+                offset += 4; // 4px thickness per chip
+                visualCount++;
+            }
+        }
+        
+        let totalHeight = 45 + offset;
+        return `<div class="chip-stack-wrapper" style="height: ${totalHeight}px;">${html}</div>`;
+    }
+
+    // The Mario Coin / Physical Payout Animation
     function animateChipSequence(fromId, toId, color, isWin) {
         let fromEl = document.getElementById(fromId);
         let toEl = document.getElementById(toId);
@@ -1019,14 +1025,12 @@
         let tRect = toEl.getBoundingClientRect();
         
         let chip = document.createElement('div');
-        chip.className = `mbj-chip animated-chip`;
+        chip.className = `animated-chip`;
         chip.style.cssText = `
             --c-bg: ${color}; 
-            position: fixed;
             left: ${fRect.left + (fRect.width/2)}px; 
             top: ${fRect.top + (fRect.height/2)}px;
             margin-left: -22.5px; margin-top: -22.5px;
-            z-index: 99999;
         `;
         
         document.body.appendChild(chip);
@@ -1056,6 +1060,7 @@
         cont.innerHTML = '';
         
         let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null;
+        let activeHandIdx = activeTurnObj ? activeTurnObj.handIdx : 0;
         localSeatId = null;
 
         for(let i=1; i<=5; i++) {
@@ -1073,43 +1078,57 @@
 
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
             
-            // 1. CARDS (Absolute Centered Container)
-            let cardCount = (s && s.hands && s.hands.length > 0) ? s.hands[0].cards.length : 0;
-            // Dynamic width calculation to keep absolute cards perfectly centered
-            let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 65 : 65; 
+            // 1. CARDS (Split hand wrapper)
+            html += `<div class="mbj-hands-row">`;
             
-            html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
-            
-            if (isMySeatTurn && mbjGameState === 'PLAYER_TURN') {
-                html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
-            }
-
             if (s && s.hands && s.hands.length > 0) {
-                let previouslyRendered = renderedCardCount[i] || 0;
-                
-                // Fixed Gold Plaque Score Badge above hand
-                if(s.hands[0].cards.length > 0 && s.hands[0].status !== 'BUST') { 
-                    html += `<div class="hand-score">${s.hands[0].score}</div>`; 
-                }
-
                 s.hands.forEach((hand, hIdx) => {
+                    let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx;
+                    let cardCount = hand.cards.length;
+                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
+                    
+                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px; ${s.hands.length > 1 ? 'transform: scale(0.85); transform-origin: bottom center;' : ''}">`;
+                    
+                    if (isThisHandActive && mbjGameState === 'PLAYER_TURN') {
+                        html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
+                    }
+
+                    if(hand.cards.length > 0 && hand.status !== 'BUST') { 
+                        html += `<div class="hand-score">${hand.score}</div>`; 
+                    }
+
+                    let previouslyRendered = renderedCardCount[i] || 0;
+
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
-                        html += generateCardHTML(c, false, animateThisCard, false, cIdx * 20);
+                        let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
+                        html += generateCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard);
                     });
+                    html += `</div>`;
                 });
-                renderedCardCount[i] = cardCount; 
-            } else { renderedCardCount[i] = 0; }
-            html += `</div>`;
+                renderedCardCount[i] = s.hands[0].cards.length; // Approximate for now
+            } else { 
+                renderedCardCount[i] = 0; 
+                // Empty placeholder to keep height
+                html += `<div class="mbj-hand-container" style="width: 70px;"></div>`;
+            }
+            html += `</div>`; // End hands row
 
-            // 2. ACTION BUTTONS
+            // 2. ACTION BUTTONS (Middle)
             let btnClass = (isMySeatTurn && mbjGameState === 'PLAYER_TURN' && isMe) ? 'show' : '';
-            let canDouble = s && s.hands && s.hands.length > 0 && s.hands[0].cards.length === 2;
+            let activeHand = s && s.hands && s.hands[activeHandIdx] ? s.hands[activeHandIdx] : null;
+            let canDouble = activeHand && activeHand.cards.length === 2;
+            let canSplit = activeHand && activeHand.cards.length === 2 && (activeHand.cards[0].bjVal === activeHand.cards[1].bjVal);
+
             html += `<div class="mbj-action-row ${btnClass}">
                         <button class="mbj-action-btn hit" onclick="socket.emit('mbjAction', {type:'hit'})"><i class="fas fa-plus"></i></button>
                         <button class="mbj-action-btn stand" onclick="socket.emit('mbjAction', {type:'stand'})"><i class="fas fa-hand-paper"></i></button>
-                        <button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})" ${canDouble ? '' : 'disabled'}>x2</button>
-                     </div>`;
+                        <button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})" ${canDouble ? '' : 'disabled'}>x2</button>`;
+            
+            if (canSplit) {
+                html += `<button class="mbj-action-btn split" onclick="socket.emit('mbjAction', {type:'split'})"><i class="fas fa-arrows-alt-h"></i></button>`;
+            }
+            html += `</div>`;
 
             // 3. CIRCLE, SVG TIMER, & CHIPS
             html += `<div class="mbj-circle-container" id="circle-${i}">`;
@@ -1126,10 +1145,9 @@
                 let displayBet = totalSeatBet;
                 if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && totalSeatBet === 0) displayBet = localPendingBet;
                 
-                // Premium Centered Chip
+                // 3D Stacking Chips!
                 if (displayBet > 0) { 
-                    let cBg = displayBet >= 10000 ? '#00e676' : displayBet >= 1000 ? '#ff3366' : displayBet >= 100 ? '#00a2ff' : '#444';
-                    html += `<div class="mbj-chip ${totalSeatBet===0?'ghost':''}" id="chip-stack-${i}" style="--c-bg:${cBg};">${displayBet}</div>`; 
+                    html += `<div id="chip-stack-${i}" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">${getChipStackHTML(displayBet, totalSeatBet === 0)}</div>`;
                 }
             } else {
                 html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
@@ -1223,8 +1241,7 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                // Set container width dynamically based on card count
-                dHand.style.width = '85px'; 
+                dHand.style.width = '90px'; // 2 cards width
                 dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
                 dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
                 setTimeout(() => { 
@@ -1260,6 +1277,8 @@
             renderMBJSeats(data.seats); 
             
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
+            let dealerArea = document.getElementById('dealer-area');
+
             if(dHand) {
                 dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false, 0);
                 dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
@@ -1268,14 +1287,14 @@
                 const drawRemaining = async () => {
                     await delay(800);
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.style.width = `${(i * 20) + 65}px`;
+                        dHand.style.width = `${(i * 20) + 70}px`;
                         dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false, i * 20); 
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
                         await delay(800); 
                     }
                     dBadge.innerText = data.dealerScore;
                     
-                    await delay(800);
+                    await delay(1000);
                     let myNet = 0;
                     
                     // ============================================
@@ -1287,13 +1306,11 @@
                         
                         if (seat && res) {
                             if (res.status === 'LOSS') {
-                                // Animate chip flying from Player up to Dealer
                                 animateChipSequence(`circle-${i}`, 'dealer-area', '#444', false);
                                 let cEl = document.getElementById(`chip-stack-${i}`);
-                                if(cEl) cEl.style.opacity = '0'; // Hide the original
+                                if(cEl) cEl.style.opacity = '0'; 
                             } 
                             else if (res.status === 'WIN') {
-                                // Animate chip flying from Dealer down to Player
                                 animateChipSequence('dealer-area', `circle-${i}`, '#00e676', true);
                                 setTimeout(() => {
                                     document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; 
@@ -1305,23 +1322,20 @@
                                 }, 600);
                             }
                             
-                            // Calculate local banner total
                             if (seat.username === myUsername) {
-                                let tb = seat.hands.reduce((sum, h)=>sum+h.bet, 0);
-                                myNet = res.win - (tb - res.push);
+                                myNet = res.net;
                             }
                             
-                            // Wait 800ms before doing the next player's animation
                             await delay(800);
                         }
                     }
 
                     await delay(500);
                     
-                    // CENTERED NOTIFICATION
-                    if (myNet > 0) showBoardAlert(`WON +${myNet} TC`, 'success');
-                    else if (myNet < 0) showBoardAlert(`LOST ${Math.abs(myNet)} TC`, 'error');
-                    else if (myNet === 0 && data.results && data.results[localSeatId] && data.results[localSeatId].push > 0) showBoardAlert(`PUSH`, 'success');
+                    // GLOBAL NOTIFICATION
+                    if (myNet > 0) showGlobalAlert(`WON +${myNet} TC`, 'success');
+                    else if (myNet < 0) showGlobalAlert(`LOST ${Math.abs(myNet)} TC`, 'error');
+                    else if (myNet === 0 && data.results && data.results[localSeatId] && data.results[localSeatId].push > 0) showGlobalAlert(`PUSH`, 'success');
                 }; 
                 drawRemaining();
             }
