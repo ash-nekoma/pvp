@@ -7,82 +7,50 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
         /* ================= BASE STYLES & LAYOUT ================= */
         :root { 
-            --ps-bg: #000814; 
-            --ps-glow: #00a2ff; 
-            --glass-bg: rgba(0, 10, 25, 0.75); 
-            --glass-border: rgba(255, 255, 255, 0.15); 
-            --danger: #ff3366; 
-            --success: #00e676; 
-            --credits: #ffb400; 
+            --ps-bg: #000814; --ps-glow: #00a2ff; 
+            --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15); 
+            --danger: #ff3366; --success: #00e676; --credits: #ffb400; 
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; user-select: none; }
         
-        body { 
-            background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
-            color: white; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; margin: 0; padding: 0; 
-        }
+        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); color: white; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; margin: 0; padding: 0; }
         
         input, textarea { user-select: auto; }
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
 
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
 
-        .topbar { 
-            flex: 0 0 75px; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid rgba(255,255,255,0.15); 
-            display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; 
-        }
+        .topbar { flex: 0 0 75px; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; }
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer; }
         
         .main-wrapper { flex: 1; position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .view-container { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
         /* ================= AUTHENTICATION UI ================= */
-        .auth-card {
-            background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 15px; padding: 40px; width: 350px; display: flex; flex-direction: column; gap: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8); text-align: center;
-        }
+        .auth-card { background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); border-radius: 15px; padding: 40px; width: 350px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.8); text-align: center; }
         .auth-card h2 { color: white; font-weight: 900; letter-spacing: 2px; font-size: 1.8rem; margin-bottom: 10px; }
-        .auth-input {
-            background: #111; border: 1px solid rgba(255,255,255,0.2); color: white;
-            padding: 15px; border-radius: 8px; font-family: 'Outfit'; font-size: 1rem; text-align: center;
-        }
+        .auth-input { background: #111; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 15px; border-radius: 8px; font-family: 'Outfit'; font-size: 1rem; text-align: center; }
         .auth-input:focus { border-color: var(--ps-glow); box-shadow: 0 0 10px rgba(0, 162, 255, 0.3); }
-        .auth-btn {
-            background: var(--ps-glow); color: black; border: none; padding: 15px;
-            border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 1.1rem; margin-top: 10px;
-        }
+        .auth-btn { background: var(--ps-glow); color: black; border: none; padding: 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 1.1rem; margin-top: 10px; }
         .auth-btn:hover { background: white; transform: translateY(-2px); }
 
-        .btn-play { 
-            background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.15); 
-            padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; 
-        }
+        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.15); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
 
-        .btn-back-fixed { 
-            position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); 
-            border: 1px solid rgba(255,255,255,0.15); color: white; padding: 10px 20px; border-radius: 8px; 
-            font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; 
-        }
+        .btn-back-fixed { position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .btn-back-fixed:hover { background: white; color: black; }
 
         /* ================= DOCKED LIVE CHAT ================= */
-        .chat-widget {
-            position: fixed; bottom: 20px; right: 20px; width: 280px; height: 380px; 
-            background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 15px;
-            display: flex; flex-direction: column; z-index: 10000; box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; transform-origin: bottom right;
-        }
+        .chat-widget { position: fixed; bottom: 20px; right: 20px; width: 280px; height: 380px; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 15px; display: flex; flex-direction: column; z-index: 10000; box-shadow: 0 15px 30px rgba(0,0,0,0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; transform-origin: bottom right; }
         .chat-widget.minimized { transform: scale(0.2) translate(120px, 120px); opacity: 0.8; cursor: pointer; }
         .chat-header { padding: 12px; background: rgba(0, 162, 255, 0.1); border-bottom: 1px solid var(--glass-border); font-weight: 900; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; color: var(--ps-glow); border-radius: 15px 15px 0 0; cursor: pointer; }
         .chat-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem; }
@@ -97,12 +65,7 @@
         .chat-input-area button:hover { transform: scale(1.1); }
 
         /* ================= CENTERED SCREEN ALERTS ================= */
-        .global-screen-alert {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-            border: 2px solid var(--ps-glow); border-radius: 15px; padding: 30px 60px; font-size: 2.5rem; font-weight: 900;
-            text-transform: uppercase; color: white; text-shadow: 0 5px 15px rgba(0,0,0,1); z-index: 99999; display: none; opacity: 0;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3); text-align: center;
-        }
+        .global-screen-alert { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); border: 2px solid var(--ps-glow); border-radius: 15px; padding: 30px 60px; font-size: 2.5rem; font-weight: 900; text-transform: uppercase; color: white; text-shadow: 0 5px 15px rgba(0,0,0,1); z-index: 99999; display: none; opacity: 0; box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3); text-align: center; }
         .global-screen-alert.show { display: flex; flex-direction: column; align-items: center; animation: popupAlert 3s forwards; }
         .global-screen-alert.success { border-color: var(--success); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3); color: var(--success); }
         .global-screen-alert.error { border-color: var(--danger); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3); color: var(--danger); }
@@ -110,22 +73,28 @@
 
         /* ================= LOBBY GAME CARDS ================= */
         .lobby-modes-container { display: flex; gap: 40px; }
-        .game-card { 
-            width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; 
-            padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
-        }
+        .game-card { width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
 
+        /* ================= HORSE DERBY UI ================= */
+        .derby-board { width: 1000px; height: 550px; background: #1a1a1a; border-radius: 20px; position: relative; border: 15px solid #333; box-shadow: 0 30px 60px rgba(0,0,0,0.9); display: flex; flex-direction: column; overflow: hidden; }
+        .derby-track-container { flex: 1; display: flex; flex-direction: column; background: #222; position: relative; border-bottom: 2px solid white; }
+        .derby-lane { flex: 1; border-bottom: 2px dashed rgba(255,255,255,0.2); position: relative; display: flex; align-items: center; }
+        .finish-line { position: absolute; right: 50px; top: 0; bottom: 0; width: 10px; background: repeating-linear-gradient(to bottom, #fff, #fff 10px, #000 10px, #000 20px); z-index: 5; }
+        .derby-horse { position: absolute; left: 0; font-size: 2.5rem; transition: left 0.1s linear; z-index: 10; text-shadow: 0 5px 10px rgba(0,0,0,0.8); }
+        
+        .derby-bet-panel { padding: 20px; background: #111; display: flex; justify-content: center; gap: 15px; }
+        .derby-horse-btn { flex: 1; padding: 15px; border-radius: 10px; border: 2px solid; background: rgba(0,0,0,0.5); color: white; cursor: pointer; text-align: center; transition: 0.2s; }
+        .derby-horse-btn:hover, .derby-horse-btn.selected { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+        .derby-horse-name { font-weight: 900; font-size: 1.2rem; text-transform: uppercase; }
+        .derby-horse-odds { color: var(--success); font-weight: 800; font-size: 0.9rem; }
+        
+        .derby-hud { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 2rem; font-weight: 900; color: white; text-shadow: 0 2px 10px black; z-index: 20; background: rgba(0,0,0,0.7); padding: 5px 20px; border-radius: 10px; border: 1px solid var(--ps-glow); }
 
         /* ================= VIP BLACKJACK UI ================= */
         .game-board-wrapper { display: flex; flex-direction: column; align-items: center; }
 
-        .mbj-board { 
-            width: 1000px; height: 700px; background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
-            border-radius: 20px; position: relative; border: 15px solid #3e2723; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 5px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(0,0,0,0.8); overflow: hidden; 
-        }
+        .mbj-board { width: 1000px; height: 700px; background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); border-radius: 20px; position: relative; border: 15px solid #3e2723; box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 5px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(0,0,0,0.8); overflow: hidden; }
         .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(212, 175, 55, 0.4); border-radius: 10px; pointer-events: none; z-index: 1; }
         
         .mbj-logo { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.3; mix-blend-mode: overlay; pointer-events: none; width: 100%; z-index: 2; }
@@ -133,21 +102,11 @@
         .mbj-logo p { font-weight: 900; font-size: 1rem; letter-spacing: 4px; color: #000; margin-bottom: 5px;}
         .mbj-logo .limits { font-weight: 900; font-size: 0.8rem; letter-spacing: 2px; color: #000; }
 
-        .mbj-balance-hud {
-            position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); 
-            padding: 8px 20px; border-radius: 12px; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column;
-        }
+        .mbj-balance-hud { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); padding: 8px 20px; border-radius: 12px; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
 
-        .dealer-timer-text {
-            color: white; font-size: 4rem; font-family: 'Rajdhani', monospace; font-weight: 900; 
-            text-shadow: 0 5px 15px black, 0 0 20px rgba(255, 180, 0, 0.5); margin-bottom: 10px; display: none; line-height: 1;
-        }
+        .dealer-timer-text { color: white; font-size: 4rem; font-family: 'Rajdhani', monospace; font-weight: 900; text-shadow: 0 5px 15px black, 0 0 20px rgba(255, 180, 0, 0.5); margin-bottom: 10px; display: none; line-height: 1; }
 
-        .mbj-shoe { 
-            position: absolute; top: 40px; right: 40px; width: 70px; height: 100px; border-radius: 6px;
-            background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); 
-            box-shadow: -1px 1px 0 #fff, -2px 2px 0 #333, -3px 3px 0 #fff, -4px 4px 0 #333, -5px 5px 0 #fff, -6px 6px 0 #333, -7px 7px 0 #fff, -8px 8px 0 #333, -12px 12px 15px rgba(0,0,0,0.8); z-index: 5; 
-        }
+        .mbj-shoe { position: absolute; top: 40px; right: 40px; width: 70px; height: 100px; border-radius: 6px; background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); box-shadow: -1px 1px 0 #fff, -2px 2px 0 #333, -3px 3px 0 #fff, -4px 4px 0 #333, -5px 5px 0 #fff, -6px 6px 0 #333, -7px 7px 0 #fff, -8px 8px 0 #333, -12px 12px 15px rgba(0,0,0,0.8); z-index: 5; }
 
         .mbj-dealer-area { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 20; }
 
@@ -159,56 +118,32 @@
 
         .mbj-hand-container { position: relative; pointer-events: none; display: flex; justify-content: center; align-items: flex-end; height: 100px; margin-bottom: 0px; perspective: 1000px; }
         
-        .mbj-card { 
-            width: 70px; height: 100px; background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); border-radius: 6px; box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
-            position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; font-weight: 900; z-index: 2;
-        }
+        .mbj-card { width: 70px; height: 100px; background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); border-radius: 6px; box-shadow: -4px 4px 10px rgba(0,0,0,0.6); position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; font-weight: 900; z-index: 2; }
         
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
         .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; transform: rotate(180deg); }
         .card-red { color: #cc0000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
         
-        /* STRICT DOUBLE DOWN FIX: Static class retains transform, animation handles entry */
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
 
-        .score-badge {
-            position: absolute; top: 50%; transform: translateY(-50%); left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; 
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif;
-        }
+        .score-badge { position: absolute; top: 50%; transform: translateY(-50%); left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif; }
         .score-badge span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; line-height: 0; text-align: center; width: 100%; }
         .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
         .score-inactive { background: linear-gradient(to bottom, #555, #333); color: white; }
         
-        .status-pill {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 5px 15px; border-radius: 20px; color: white; 
-            font-weight: 900; font-size: 0.9rem; z-index: 60; box-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap; letter-spacing: 1px;
-        }
+        .status-pill { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 5px 15px; border-radius: 20px; color: white; font-weight: 900; font-size: 0.9rem; z-index: 60; box-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap; letter-spacing: 1px; }
         .pill-bj { background: linear-gradient(to bottom, #00b359, #008040); border: 2px solid #00e676; }
         .pill-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); border: 2px solid #ff3366; }
 
         .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        
-        /* NEW DEDICATED DOUBLE DOWN ANIMATION (Directly creates the horizontal drop) */
-        .anim-fly-in-doubled { animation: flyInDoubled 0.3s ease-out forwards; }
-        @keyframes flyInDoubled { 
-            0% { opacity: 0; transform: translate(30px, -150px) rotate(90deg) scale(0.8); } 
-            100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } 
-        }
-
         .anim-reveal { animation: revealCard 0.4s ease-out forwards; }
         @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
 
-        .mbj-action-row { 
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; 
-            display: flex; justify-content: center; gap: 10px; height: 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
-        }
+        .mbj-action-row { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; height: 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100; }
         .mbj-action-row.show { opacity: 1; pointer-events: auto; }
-        .mbj-action-btn { 
-            width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); border: 2px solid #777; color: white; 
-            font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); 
-        }
+        .mbj-action-btn { width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); border: 2px solid #777; color: white; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); }
         .mbj-action-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0px 0 #111, 0 2px 4px rgba(0,0,0,0.5); }
         .mbj-action-btn.hit { background: linear-gradient(to bottom, #00e676, #008040); border-color: #00e676; } 
         .mbj-action-btn.stand { background: linear-gradient(to bottom, #ff3366, #9b0022); border-color: #ff3366; } 
@@ -217,61 +152,36 @@
 
         .mbj-circle-container { position: relative; width: 75px; height: 55px; display: flex; justify-content: center; align-items: center; margin-top: 5px; }
 
-        .mbj-seat-circle { 
-            width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; 
-        }
+        .mbj-seat-circle { width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; }
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 2px solid transparent; background: transparent; cursor: default; }
 
-        .bet-pill {
-            background: black; color: white; border: 1px solid #333; border-radius: 12px; font-size: 0.75rem; font-weight: 900; 
-            padding: 2px 10px; margin-top: 2px; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.8); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
-        }
+        .bet-pill { background: black; color: white; border: 1px solid #333; border-radius: 12px; font-size: 0.75rem; font-weight: 900; padding: 2px 10px; margin-top: 2px; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.8); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
 
         .player-timer-track { width: 90%; height: 6px; background: rgba(0,0,0,0.6); border-radius: 3px; margin-top: 5px; overflow: hidden; display: none; box-shadow: inset 0 1px 3px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); }
         .player-timer-fill { height: 100%; background: var(--success); width: 100%; transition: width 1s linear; }
         .active-turn .player-timer-track { display: block; }
         
         .chip-stack-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 45px; z-index: 10; }
-        .mbj-chip-3d { 
-            position: absolute; left: 0; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; 
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 3px 5px rgba(0,0,0,0.8); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg);
-        }
+        .mbj-chip-3d { position: absolute; left: 0; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 3px 5px rgba(0,0,0,0.8); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg); }
         .mbj-chip-3d.ghost { opacity: 0.5; filter: grayscale(80%); }
 
         .mbj-seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative; margin-top: 5px; }
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
-        .animated-chip {
-            position: fixed; z-index: 99999; pointer-events: none; transition: left 0.4s linear, top 0.4s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.4s linear, opacity 0.2s ease-in 0.2s;
-            width: 45px; height: 45px; border-radius: 50%; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); 
-            background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg);
-        }
+        .animated-chip { position: fixed; z-index: 99999; pointer-events: none; transition: left 0.4s linear, top 0.4s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.4s linear, opacity 0.2s ease-in 0.2s; width: 45px; height: 45px; border-radius: 50%; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg); }
 
-        .payout-flare { 
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.5rem; font-weight: 900; text-shadow: 0 2px 5px black; 
-            animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap;
-        }
+        .payout-flare { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.5rem; font-weight: 900; text-shadow: 0 2px 5px black; animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap; }
         @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -20px); } 80% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -60px); } }
 
-        .chip-rack-container { 
-            width: 1000px; margin-top: 15px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.15); justify-content: space-between; align-items: center; z-index: 99; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9); transition: 0.3s; position: relative;
-        }
+        .chip-rack-container { width: 1000px; margin-top: 15px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); justify-content: space-between; align-items: center; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transition: 0.3s; position: relative; }
         .chip-rack-locked { opacity: 0.5; pointer-events: none; }
 
-        .rack-error-tooltip {
-            position: absolute; top: -45px; background: var(--danger); color: white; font-weight: 900; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; pointer-events: none;
-        }
+        .rack-error-tooltip { position: absolute; top: -45px; background: var(--danger); color: white; font-weight: 900; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
         .rack-error-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 8px; border-style: solid; border-color: var(--danger) transparent transparent transparent; }
         .rack-error-tooltip.show { opacity: 1; }
         
-        .rack-chip { 
-            width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%);
-            border: 3px solid var(--c-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 0 5px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; color: black; cursor: pointer; transition: 0.2s; 
-        }
+        .rack-chip { width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 3px solid var(--c-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 0 5px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; color: black; cursor: pointer; transition: 0.2s; }
         .rack-chip:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 15px rgba(255,255,255,0.3); }
         
         .rack-btn { padding: 10px 20px; border-radius: 8px; font-weight: 900; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; transition: 0.2s; text-transform: uppercase; }
@@ -320,7 +230,7 @@
                 </div>
             </div>
             <div class="game-card" onclick="openGame('derby')">
-                <i class="fas fa-horse-head" style="font-size:4rem;"></i>
+                <i class="fas fa-horse-head" style="font-size:4rem; color: #ffcc00;"></i>
                 <div>
                     <div style="font-size: 1.5rem; font-weight:900;">HORSE DERBY</div>
                     <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Virtual Racing</div>
@@ -330,8 +240,34 @@
       </div>
 
       <div id="view-derby" class="view-container hidden">
-          <h1 style="font-size: 3rem; font-weight: 900; color: var(--ps-glow);">HORSE DERBY</h1>
-          <p style="font-size: 1.2rem;">Virtual Racing Engine Loading...</p>
+          <div class="derby-board">
+              <div class="derby-hud" id="derby-status-text">BETTING: 20s</div>
+              
+              <div class="derby-track-container" id="derby-track">
+                  <div class="finish-line"></div>
+                  </div>
+              
+              <div class="derby-bet-panel" id="derby-horses-panel">
+                  </div>
+          </div>
+          
+          <div class="chip-rack-container" id="derby-chip-rack" style="margin-top: 15px;">
+              <div id="derby-rack-alert" class="rack-error-tooltip">SELECT A HORSE</div>
+              <div style="flex: 1; display: flex; justify-content: flex-start;">
+                  <button class="rack-btn rack-btn-clear" onclick="clearDerbyBet()"><i class="fas fa-times"></i> CLEAR</button>
+              </div>
+              <div style="flex: 2; display: flex; justify-content: center; gap: 15px;">
+                  <div class="rack-chip chip-10" style="--c-bg:#444;" onclick="addDerbyBet(10)">10</div>
+                  <div class="rack-chip chip-100" style="--c-bg:#00a2ff;" onclick="addDerbyBet(100)">100</div>
+                  <div class="rack-chip chip-1k" style="--c-bg:#ff3366;" onclick="addDerbyBet(1000)">1K</div>
+                  <div class="rack-chip chip-10k" style="--c-bg:#00e676; color:black;" onclick="addDerbyBet(10000)">10K</div>
+                  <div class="rack-chip chip-50k" style="--c-bg:#ffcc00; color:black;" onclick="addDerbyBet(50000)">50K</div>
+              </div>
+              <div style="flex: 1; display: flex; justify-content: flex-end; gap: 10px;">
+                  <input type="number" id="derby-custom-bet" class="custom-input" placeholder="Amount" min="0">
+                  <button class="rack-btn rack-btn-confirm" onclick="confirmDerbyBet()">BET <i class="fas fa-check"></i></button>
+              </div>
+          </div>
       </div>
 
       <div id="view-mbj" class="view-container hidden">
@@ -405,6 +341,7 @@
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
+    // CORE MATH FUNCTION 
     function getBJScore(hand) {
         let score = 0, aces = 0;
         for (let card of hand) { 
@@ -468,11 +405,13 @@
 
     function updateBalance(amt) {
         myCredits = amt;
-        document.getElementById('bj-bal').innerText = amt.toLocaleString() + ' TC';
+        let b = document.getElementById('bj-bal');
+        if(b) b.innerText = amt.toLocaleString() + ' TC';
     }
 
-    function showRackAlert(msg) {
-        let r = document.getElementById('rack-alert');
+    function showRackAlert(msg, id='rack-alert') {
+        let r = document.getElementById(id);
+        if(!r) return;
         r.innerText = msg; r.classList.add('show');
         setTimeout(() => r.classList.remove('show'), 2000);
     }
@@ -533,11 +472,90 @@
         box.innerHTML += html; box.scrollTop = box.scrollHeight;
     });
 
+    // =========================================================================
+    // HORSE DERBY LOGIC
+    // =========================================================================
+    let localDerbyBet = 0;
+    let selectedHorseId = null;
+
+    function renderDerbyState(state) {
+        let track = document.getElementById('derby-track');
+        let panel = document.getElementById('derby-horses-panel');
+        let statusText = document.getElementById('derby-status-text');
+
+        if (state.status === 'BETTING') statusText.innerText = `BETTING: ${state.time}s`;
+        else if (state.status === 'RACING') statusText.innerText = `RACING!`;
+        else statusText.innerText = `FINISHED!`;
+
+        track.innerHTML = '<div class="finish-line"></div>';
+        panel.innerHTML = '';
+
+        state.horses.forEach(h => {
+            track.innerHTML += `
+                <div class="derby-lane">
+                    <i class="fas fa-horse-head derby-horse" style="color: ${h.color}; left: ${h.pos}%"></i>
+                </div>
+            `;
+            
+            let myTotalBet = (state.bets[myUsername] && state.bets[myUsername][h.id]) ? state.bets[myUsername][h.id] : 0;
+            let betInfo = myTotalBet > 0 ? `<div style="margin-top:5px; color:var(--credits); font-weight:900;">${myTotalBet} TC</div>` : '';
+            
+            let btnClass = selectedHorseId === h.id ? 'selected' : '';
+            panel.innerHTML += `
+                <div class="derby-horse-btn ${btnClass}" style="border-color: ${h.color};" onclick="selectHorse(${h.id})">
+                    <div class="derby-horse-name">${h.name}</div>
+                    <div class="derby-horse-odds">${h.odds}x</div>
+                    ${betInfo}
+                </div>
+            `;
+        });
+
+        let rack = document.getElementById('derby-chip-rack');
+        if(state.status === 'BETTING') rack.classList.remove('chip-rack-locked');
+        else rack.classList.add('chip-rack-locked');
+    }
+
+    function selectHorse(id) { selectedHorseId = id; socket.emit('joinRoom', 'derby'); } // Re-renders cleanly
+    function addDerbyBet(amt) {
+        if(!selectedHorseId) return showRackAlert('SELECT HORSE FIRST', 'derby-rack-alert');
+        if(myCredits >= localDerbyBet + amt) { localDerbyBet += amt; document.getElementById('derby-custom-bet').value = localDerbyBet; } 
+        else { showRackAlert('NOT ENOUGH CREDITS', 'derby-rack-alert'); }
+    }
+    function clearDerbyBet() { localDerbyBet = 0; document.getElementById('derby-custom-bet').value = ''; }
+    function confirmDerbyBet() {
+        if(!selectedHorseId) return showRackAlert('SELECT HORSE', 'derby-rack-alert');
+        let customInput = document.getElementById('derby-custom-bet').value;
+        let v = parseInt(customInput);
+        if (!isNaN(v) && v > 0) localDerbyBet = v;
+        if(localDerbyBet < 10) return showRackAlert('MIN BET 10 TC', 'derby-rack-alert');
+        socket.emit('derbyPlaceBet', { horseId: selectedHorseId, amount: localDerbyBet });
+        localDerbyBet = 0; document.getElementById('derby-custom-bet').value = '';
+    }
+
+    socket.on('derbyUpdate', (data) => {
+        if(activeGame !== 'derby') return;
+        if(data.event === 'state' || data.event === 'start_race' || data.event === 'race_progress') {
+            if(data.state) renderDerbyState(data.state);
+            else if(data.horses) {
+                let track = document.getElementById('derby-track');
+                track.innerHTML = '<div class="finish-line"></div>';
+                data.horses.forEach(h => { track.innerHTML += `<div class="derby-lane"><i class="fas fa-horse-head derby-horse" style="color: ${h.color}; left: ${h.pos}%"></i></div>`; });
+            }
+        } else if (data.event === 'timer') {
+            document.getElementById('derby-status-text').innerText = `BETTING: ${data.time}s`;
+        } else if (data.event === 'race_finished') {
+            document.getElementById('derby-status-text').innerText = `${data.winner.name} WINS!`;
+            let myWin = data.results[myUsername];
+            if (myWin > 0) showGlobalAlert(`WON +${myWin} TC`, 'success');
+        }
+    });
+
+    // =========================================================================
+    // BLACKJACK ANIMATIONS & RENDERING
+    // =========================================================================
     function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
-        if(animateIn) {
-            animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in';
-        }
+        if(animateIn) animClass = 'anim-fly-in';
         if(animateReveal) animClass = 'anim-reveal'; 
         let doubleClass = isDoubled ? 'card-doubled' : '';
         
@@ -547,37 +565,6 @@
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
         return `<div class="mbj-card ${colorClass} ${animClass} ${doubleClass}" style="${styleStr}"><div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div><div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div></div>`;
     }
-    
-    function getChipStackHTML(amount, isGhost = false) {
-        let html = ''; let remaining = amount;
-        let chips = [{val: 50000, col: '#ffcc00', text: 'black'}, {val: 10000, col: '#00e676', text: 'black'}, {val: 1000, col: '#ff3366', text: 'white'}, {val: 100, col: '#00a2ff', text: 'white'}, {val: 10, col: '#444', text: 'white'}];
-        let offset = 0; let visualCount = 0;
-        
-        for(let c of chips) {
-            while(remaining >= c.val && visualCount < 6) { 
-                let label = c.val >= 1000 ? (c.val/1000)+'K' : c.val;
-                html += `<div class="mbj-chip-3d ${isGhost ? 'ghost' : ''}" style="--c-bg:${c.col}; color:${c.text}; bottom:${offset}px; z-index:${visualCount};">${label}</div>`;
-                remaining -= c.val; offset += 4; visualCount++;
-            }
-        }
-        return `<div class="chip-stack-wrapper" style="height: ${45 + offset}px;">${html}</div>`;
-    }
-
-    function animateChipSequence(fromId, toId, color) {
-        let fromEl = document.getElementById(fromId); let toEl = document.getElementById(toId);
-        if(!fromEl || !toEl) return;
-        let fRect = fromEl.getBoundingClientRect(); let tRect = toEl.getBoundingClientRect();
-        let chip = document.createElement('div'); chip.className = `animated-chip`;
-        chip.style.cssText = `--c-bg: ${color}; left: ${fRect.left + (fRect.width/2)}px; top: ${fRect.top + (fRect.height/2)}px; margin-left: -22.5px; margin-top: -22.5px;`;
-        document.body.appendChild(chip);
-        
-        void chip.offsetWidth;
-        chip.style.transform = 'scale(1.5)';
-        setTimeout(() => { chip.style.left = `${tRect.left + (tRect.width/2)}px`; chip.style.top = `${tRect.top + (tRect.height/2)}px`; chip.style.transform = 'scale(0.5)'; chip.style.opacity = '0'; }, 50);
-        setTimeout(() => { if(chip.parentNode) chip.remove(); }, 650);
-    }
-
-    let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
     function renderMBJSeats(seats, activeTurnObj = null) {
         currentMBJSeats = seats || currentMBJSeats; 
@@ -594,9 +581,7 @@
             let isMe = s && s.username === myUsername; 
             if (isMe) localSeatId = i;
 
-            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) {
-                continue; 
-            }
+            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { continue; }
 
             let isMySeatTurn = activeSeatNum == i;
             let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
@@ -607,7 +592,6 @@
             let clickAction = canSit ? `socket.emit('mbjTakeSeat', ${i})` : ``; 
 
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
-            
             html += `<div class="mbj-split-col">`;
             
             if (s && s.hands && s.hands.length > 0) {
@@ -645,7 +629,6 @@
                     }
 
                     let previouslyRendered = renderedCardCount[i][hIdx] || 0;
-
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
                         let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
@@ -696,20 +679,15 @@
             html += `</div>`; 
             htmlBuffer += html;
         }
-        
         cont.innerHTML = htmlBuffer;
 
         let rack = document.getElementById('mbj-chip-rack');
         if (mbjGameState === 'BETTING') {
             rack.classList.remove('chip-rack-locked');
             if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
-                // Keep unlocked
-            } else {
-                rack.classList.add('chip-rack-locked');
-            }
+            } else { rack.classList.add('chip-rack-locked'); }
         } else {
-            rack.classList.add('chip-rack-locked');
-            localPendingBet = 0;
+            rack.classList.add('chip-rack-locked'); localPendingBet = 0;
         }
     }
 
@@ -723,14 +701,10 @@
     function confirmLocalBet() {
         let customInput = document.getElementById('custom-bet').value;
         let v = parseInt(customInput);
-        if (!isNaN(v) && v > 0) {
-            localPendingBet += v;
-            document.getElementById('custom-bet').value = '';
-        }
+        if (!isNaN(v) && v > 0) { localPendingBet += v; document.getElementById('custom-bet').value = ''; }
         if(localPendingBet < 10) return showRackAlert('Min Bet 10 TC');
         socket.emit('mbjPlaceBet', localPendingBet);
-        localPendingBet = 0; 
-        renderMBJSeats(); 
+        localPendingBet = 0; renderMBJSeats(); 
     }
 
     socket.on('mbjUpdate', async (data) => {
@@ -741,64 +715,22 @@
             mbjGameState = 'BETTING'; 
             if(data.active) { dTimerText.style.display = 'block'; dTimerText.innerText = data.time; } 
             else { dTimerText.style.display = 'none'; }
-            renderMBJSeats(data.seats); 
+            // REMOVED renderMBJSeats(data.seats) -> This perfectly fixes the flicker/input loss bug!
         } 
         else if (data.event === 'sync_seats') { 
             renderMBJSeats(data.seats, data.activeTurn); 
         } 
         else if (data.event === 'lock_bets') { 
-            mbjGameState = 'DEALING'; 
-            dTimerText.style.display = 'none';
-            renderMBJSeats(data.seats, null);
+            mbjGameState = 'DEALING'; dTimerText.style.display = 'none'; renderMBJSeats(data.seats, null);
         } 
         else if (data.event === 'deal') {
-            mbjGameState = 'DEALING';
-            let targetSeats = JSON.parse(JSON.stringify(data.seats));
-            for (let i = 1; i <= 5; i++) {
-                if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) {
-                    currentMBJSeats[i].hands[0].cards = [];
-                    currentMBJSeats[i].hands[0].score = 0;
-                    currentMBJSeats[i].hands[0].status = 'WAITING';
-                }
-            }
-            
-            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
-            renderMBJSeats(currentMBJSeats, null); 
-            
+            renderMBJSeats(data.seats, null); 
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
-                dHand.innerHTML = ''; 
-                dHand.style.width = '70px'; 
-                
-                const dealSequence = async () => {
-                    let activeKeys = Object.keys(targetSeats).filter(k => targetSeats[k] !== null);
-                    
-                    for (let k of activeKeys) {
-                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]);
-                        currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards);
-                        renderMBJSeats(currentMBJSeats, null);
-                        await delay(300);
-                    }
-                    
-                    let html = `<div class="score-badge score-inactive" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
-                    html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
-                    dHand.innerHTML = html; 
-                    await delay(300);
-                    
-                    for (let k of activeKeys) {
-                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]);
-                        currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score;
-                        currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status;
-                        renderMBJSeats(currentMBJSeats, null);
-                        await delay(300);
-                    }
-                    
-                    html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
-                    dHand.style.width = '90px'; 
-                    dHand.innerHTML = html; 
-                };
-                
-                dealSequence();
+                let html = `<div class="score-badge score-inactive" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
+                html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
+                html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
+                dHand.style.width = '90px'; dHand.innerHTML = html; 
             } 
         } 
         else if (data.event === 'turn') {
@@ -814,10 +746,7 @@
         else if (data.event === 'turn_timer') { 
             if (data.activeTurn && data.activeTurn.seat) {
                 let bar = document.getElementById(`timer-fill-${data.activeTurn.seat}`);
-                if (bar) {
-                    bar.style.transition = 'width 1s linear';
-                    bar.style.width = ((data.time / 15) * 100) + '%';
-                }
+                if (bar) { bar.style.transition = 'width 1s linear'; bar.style.width = ((data.time / 15) * 100) + '%'; }
             }
         }
         else if (data.event === 'dealer_resolved') {
@@ -855,27 +784,24 @@
                         await delay(300); 
                     }
                     
-                    await delay(400);
+                    await delay(800);
                     let myNet = 0;
                     
                     for(let i = 1; i <= 5; i++) {
-                        let seat = data.seats[i];
-                        let res = data.results && data.results[i];
+                        let seat = data.seats[i]; let res = data.results && data.results[i];
                         if (seat && res) {
                             let chipCont = document.getElementById(`chip-stack-${i}-0`);
                             if (res.status === 'LOSS') {
                                 animateChipSequence(`circle-${i}-0`, 'dealer-area', '#444');
                                 if (chipCont) chipCont.style.opacity = '0'; 
-                            } 
-                            else if (res.status === 'WIN') {
+                            } else if (res.status === 'WIN') {
                                 animateChipSequence('dealer-area', `circle-${i}-0`, '#00e676');
-                                setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; }, 400);
-                            }
-                            else if (res.status === 'PUSH') {
-                                setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; }, 400);
+                                setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; }, 600);
+                            } else if (res.status === 'PUSH') {
+                                setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; }, 600);
                             }
                             if (seat.username === myUsername) myNet = res.net;
-                            await delay(150); 
+                            await delay(400); 
                         }
                     }
 
@@ -888,10 +814,8 @@
             }
         } 
         else if (data.event === 'new_round') {
-            mbjGameState = 'BETTING'; 
-            document.getElementById('mbj-fs-dealer-hand').innerHTML = ''; 
-            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
-            renderMBJSeats(data.seats); 
+            mbjGameState = 'BETTING'; document.getElementById('mbj-fs-dealer-hand').innerHTML = ''; 
+            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; renderMBJSeats(data.seats); 
         }
     });
 
