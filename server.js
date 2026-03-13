@@ -46,6 +46,7 @@ function buildShoe() {
         }
     }
     
+    // Shuffle the deck
     for (let i = shoe.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
@@ -91,6 +92,7 @@ function mbjNextTurn() {
     let seatNum = mbjState.activeTurn.seat;
     let handIdx = mbjState.activeTurn.handIdx;
 
+    // Check if current seat has a split hand to play
     if (seatNum !== null) {
         let seat = mbjState.seats[seatNum];
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') {
@@ -106,12 +108,16 @@ function mbjNextTurn() {
         }
     }
 
+    // Move to next player
     let nextSeatNum = null;
     let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
     
     for (let i = startIdx; i <= 5; i++) {
         let s = mbjState.seats[i];
-        if (s && s.hands.some(h => h.status === 'PLAYING')) { nextSeatNum = i; break; }
+        if (s && s.hands.some(h => h.status === 'PLAYING')) { 
+            nextSeatNum = i; 
+            break; 
+        }
     }
 
     if (nextSeatNum !== null) {
@@ -207,6 +213,7 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
+    // Gives plenty of time for physical coin animations before resetting
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -457,7 +464,6 @@ io.on('connection', (socket) => {
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2) return;
             
-            // Allows splitting identical cards or any two 10-value cards (10, J, Q, K)
             let val1 = hand.cards[0].bjVal;
             let val2 = hand.cards[1].bjVal;
             if (val1 !== val2) return; 
@@ -471,12 +477,10 @@ io.on('connection', (socket) => {
                 let hand2 = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true };
                 hand.isSplitHand = true;
                 
-                // Re-deal one card to Hand 1
                 hand.cards.push(drawCard());
                 hand.score = getBJScore(hand.cards);
                 if (hand.score === 21) hand.status = 'STAND';
                 
-                // Re-deal one card to Hand 2
                 hand2.cards.push(drawCard());
                 hand2.score = getBJScore(hand2.cards);
                 if (hand2.score === 21) hand2.status = 'STAND';
@@ -486,7 +490,6 @@ io.on('connection', (socket) => {
                 mbjState.turnTimer = 15; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 
-                // If the first hand automatically stood (got 21), advance the turn index immediately
                 if(hand.score === 21) mbjNextTurn();
             }
         }
