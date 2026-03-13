@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stick N' Trade | VIP Premium</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
-        /* ================= BASE STYLES ================= */
+        /* ================= BASE STYLES & LAYOUT ================= */
         :root { 
             --ps-bg: #000814; 
             --ps-glow: #00a2ff; 
@@ -62,15 +63,25 @@
             text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); 
             cursor: pointer;
         }
+
+        /* NEW LAYOUT: Flex row allows the game area to sit on the left, 
+           and the chat to sit docked on the right without overlap.
+        */
+        .app-body {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            height: calc(100vh - 75px);
+            overflow: hidden;
+        }
         
-        .main-wrapper { 
+        .game-area { 
             flex: 1; 
             position: relative; 
-            width: 100%; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            overflow: hidden;
         }
         
         .view-container { 
@@ -84,6 +95,89 @@
             height: 100%; 
         }
 
+        /* ================= DOCKED LIVE CHAT ================= */
+        .chat-column {
+            width: 320px;
+            background: rgba(0, 10, 25, 0.85);
+            border-left: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            z-index: 100;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .chat-header {
+            padding: 15px;
+            background: rgba(0, 162, 255, 0.1);
+            border-bottom: 1px solid var(--glass-border);
+            font-weight: 900;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 1px;
+            color: var(--ps-glow);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 0.85rem;
+        }
+
+        .chat-msg-row { display: flex; flex-direction: column; }
+        .chat-meta { font-size: 0.7rem; color: #aaa; margin-bottom: 4px; }
+        .chat-text { 
+            background: rgba(255,255,255,0.05); 
+            padding: 10px 14px; 
+            border-radius: 12px; 
+            line-height: 1.4; 
+            word-wrap: break-word;
+        }
+        .chat-text.me { 
+            background: rgba(0, 162, 255, 0.2); 
+            color: white; 
+            border-bottom-right-radius: 0;
+        }
+        .chat-text.other { 
+            border-bottom-left-radius: 0; 
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-family: 'Outfit';
+        }
+
+        .chat-input-area button {
+            background: var(--ps-glow);
+            color: black;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 900;
+            transition: 0.2s;
+        }
+        .chat-input-area button:hover { transform: scale(1.1); }
+
+        /* ================= GENERAL UI COMPONENTS ================= */
         .btn-play { 
             background: rgba(255,255,255,0.1); 
             color: white; 
@@ -95,12 +189,8 @@
             transition: 0.2s; 
             text-transform: uppercase; 
         }
-        
-        .btn-play:hover:not(:disabled) { 
-            background: white; 
-            color: black; 
-            transform: translateY(-2px); 
-        }
+        .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
+        .btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .input-control { 
             width: 100%; 
@@ -131,11 +221,7 @@
             align-items: center; 
             gap: 10px; 
         }
-        
-        .btn-back-fixed:hover { 
-            background: white; 
-            color: black; 
-        }
+        .btn-back-fixed:hover { background: white; color: black; }
         
         .lobby-modes-container { display: flex; gap: 40px; }
         
@@ -154,98 +240,11 @@
             text-align: center; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
         }
-        
-        .game-card:hover { 
-            transform: translateY(-8px); 
-            border-color: var(--ps-glow); 
-            box-shadow: 0 15px 40px rgba(0,162,255,0.2); 
-        }
+        .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
 
-        /* ================= FLOATING LIVE CHAT ================= */
-        .chat-widget {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 300px;
-            height: 400px;
-            background: rgba(0, 10, 25, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            z-index: 10000;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-origin: bottom right;
-        }
-
-        .chat-widget.minimized {
-            transform: scale(0.2) translate(150px, 150px);
-            opacity: 0.8;
-            cursor: pointer;
-        }
-
-        .chat-header {
-            padding: 15px;
-            background: rgba(0, 162, 255, 0.1);
-            border-bottom: 1px solid var(--glass-border);
-            border-radius: 15px 15px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 900;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 0.85rem;
-        }
-
-        .chat-msg-row { display: flex; flex-direction: column; }
-        .chat-meta { font-size: 0.65rem; color: #aaa; margin-bottom: 2px; }
-        .chat-text { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; line-height: 1.3; }
-        .chat-text.me { background: rgba(0, 162, 255, 0.2); color: white; border-bottom-right-radius: 0;}
-        .chat-text.other { border-bottom-left-radius: 0; }
-
-        .chat-input-area {
-            padding: 10px;
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-family: 'Outfit';
-        }
-
-        .chat-input-area button {
-            background: var(--ps-glow);
-            color: black;
-            border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: 900;
-        }
-
-        /* ================= IN-BOARD ALERTS ================= */
-        .board-center-alert {
-            position: absolute; 
+        /* CENTERED SCREEN ALERTS */
+        .global-screen-alert {
+            position: fixed; 
             top: 50%; 
             left: 50%; 
             transform: translate(-50%, -50%);
@@ -253,33 +252,33 @@
             backdrop-filter: blur(10px);
             border: 2px solid var(--ps-glow); 
             border-radius: 15px;
-            padding: 20px 40px; 
-            font-size: 2rem; 
+            padding: 30px 60px; 
+            font-size: 2.5rem; 
             font-weight: 900;
             text-transform: uppercase; 
             color: white; 
             text-shadow: 0 5px 15px rgba(0,0,0,1);
-            z-index: 9999; 
+            z-index: 99999; 
             display: none; 
             opacity: 0;
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
             text-align: center;
         }
         
-        .board-center-alert.show { 
+        .global-screen-alert.show { 
             display: flex; 
             flex-direction: column;
             align-items: center;
             animation: popupAlert 3s forwards; 
         }
         
-        .board-center-alert.success { 
+        .global-screen-alert.success { 
             border-color: var(--success); 
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3);
             color: var(--success);
         }
         
-        .board-center-alert.error { 
+        .global-screen-alert.error { 
             border-color: var(--danger); 
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3);
             color: var(--danger);
@@ -292,10 +291,12 @@
             100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } 
         }
 
-        /* ================= VIP BLACKJACK ================= */
+        /* ================= VIP BLACKJACK UI ================= */
+        
+        /* Realistic Mahogany & Gold Trim */
         .mbj-board { 
-            width: 1100px; 
-            height: 550px; 
+            width: 1000px; 
+            height: 520px; 
             background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
             border-radius: 20px; 
             position: relative; 
@@ -304,7 +305,6 @@
             overflow: hidden; 
         }
         
-        /* Inner Gold Ring */
         .mbj-table-line { 
             position: absolute; 
             inset: 20px; 
@@ -328,13 +328,14 @@
             z-index: 2;
         }
         
-        .mbj-logo h1 { font-size: 4rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
-        .mbj-logo p { font-weight: 900; font-size: 1rem; letter-spacing: 4px; color: #000; }
+        .mbj-logo h1 { font-size: 3.5rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
+        .mbj-logo p { font-weight: 900; font-size: 0.9rem; letter-spacing: 2px; color: #000; }
 
+        /* Fixed Top Left Balance */
         .mbj-balance-hud {
             position: absolute;
-            top: 25px;
-            left: 25px;
+            top: 20px;
+            left: 20px;
             background: rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.15);
             padding: 8px 20px;
@@ -345,27 +346,11 @@
             flex-direction: column;
         }
 
-        /* Top Center Global Timer */
-        .mbj-timer-hud {
-            position: absolute;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            border: 1px solid var(--ps-glow);
-            padding: 5px 30px;
-            border-radius: 50px;
-            z-index: 20;
-            box-shadow: 0 5px 15px rgba(0,162,255,0.3);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-        }
-
+        /* Top Right Shoe */
         .mbj-shoe { 
             position: absolute; 
-            top: 25px; 
-            right: 25px; 
+            top: 20px; 
+            right: 20px; 
             width: 60px; 
             height: 90px; 
             background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); 
@@ -375,9 +360,10 @@
             z-index: 5; 
         }
 
+        /* Dealer Plaque and Hand */
         .mbj-dealer-area { 
             position: absolute; 
-            top: 90px; 
+            top: 30px; 
             left: 50%; 
             transform: translateX(-50%); 
             display: flex; 
@@ -385,11 +371,24 @@
             align-items: center; 
             z-index: 20; 
         }
+        
+        .dealer-plaque {
+            background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728);
+            color: black;
+            font-weight: 900;
+            font-size: 0.8rem;
+            padding: 4px 15px;
+            border-radius: 4px;
+            border: 1px solid #000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
 
-        /* Rigid Seats Row */
+        /* Flexible row ensures no horizontal overlaps */
         #mbj-seats-row { 
             position: absolute; 
-            bottom: 25px; 
+            bottom: 20px; 
             left: 0; 
             width: 100%; 
             display: flex; 
@@ -399,61 +398,71 @@
             z-index: 10; 
         }
         
+        /* Vertical Flex for the seat stack */
         .mbj-seat-wrapper { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-end; 
-            width: 140px; 
+            width: 130px; 
             pointer-events: auto; 
             position: relative; 
         }
 
-        /* FIXED ABSOLUTE CARD POSITIONING (Prevents cards from shifting left when a new one is dealt) */
+        /* EXACT CARD CENTERING TRICK */
+        /* Flexbox centers the absolute positioned children perfectly */
         .mbj-hand-container { 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end;
             position: relative; 
-            width: 60px; 
-            height: 85px; 
-            margin-bottom: 20px; 
+            margin-bottom: 10px; 
+            min-height: 105px; 
+            width: 100%; 
             pointer-events: none;
         }
         
+        /* Larger, realistic cards */
         .mbj-card { 
-            width: 55px; 
-            height: 80px; 
+            width: 70px; 
+            height: 100px; 
             background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
             border-radius: 6px; 
-            box-shadow: -3px 3px 10px rgba(0,0,0,0.6); 
-            position: absolute; /* Absolute locks it in place */
-            bottom: 0;
-            font-family: 'Outfit', sans-serif; 
+            box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
+            position: relative; 
             color: black; 
             border: 1px solid #ccc; 
+            margin-left: -40px; /* Negative margin overlaps them nicely */
             transform: translateZ(0); 
             font-weight: 900;
+            z-index: 2;
         }
         
-        .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; }
-        .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 0.9rem; transform: rotate(180deg); }
-        .card-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; }
+        .mbj-card:first-child { 
+            margin-left: 0; 
+        } 
+        
+        /* Clean symbols: top left and bottom right only */
+        .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
+        .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; transform: rotate(180deg); }
         .card-red { color: #cc0000; } 
         .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
 
-        /* FIXED PREMIUM GOLD BADGE */
-        .mbj-hand-score { 
+        /* UNIFORM GOLD SCORE BADGES */
+        .hand-score { 
             position: absolute; 
-            top: -25px; 
+            top: -20px; 
             left: 50%; 
             transform: translateX(-50%);
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
-            border-radius: 4px; 
+            border-radius: 50%; 
             font-weight: 900; 
-            font-size: 0.9rem; 
-            width: 30px;
-            height: 20px;
+            font-size: 1rem; 
+            width: 32px;
+            height: 32px;
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -461,18 +470,18 @@
             z-index: 50; 
         }
         
-        .dealer-score-badge { 
+        .dealer-score {
             position: absolute; 
-            top: -10px; 
+            top: 25px; 
             left: -40px; 
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
-            border-radius: 4px; 
+            border-radius: 50%; 
             font-weight: 900; 
             font-size: 1rem; 
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             z-index: 20; 
             display: flex; 
             justify-content: center; 
@@ -492,47 +501,43 @@
             100% { transform: rotateY(0deg); } 
         }
 
-        /* The YOUR TURN Indicator (Chevron) */
+        /* Sleek Glowing Chevron (Your Turn) */
         .turn-chevron {
             position: absolute;
             top: -45px;
             left: 50%;
             transform: translateX(-50%);
             color: var(--success);
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             z-index: 30;
             animation: floatChevron 1s infinite;
-            text-shadow: 0 0 10px var(--success);
+            text-shadow: 0 0 15px var(--success);
         }
         @keyframes floatChevron {
             0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-5px); }
+            50% { transform: translateX(-50%) translateY(-8px); }
         }
 
-        /* 3D Arcade Buttons */
+        /* 3D Physical Action Buttons */
         .mbj-action-row { 
             display: flex; 
-            gap: 10px; 
+            gap: 8px; 
             margin-bottom: 10px; 
-            height: 40px; 
+            height: 35px; 
             opacity: 0; 
             pointer-events: none; 
             transition: opacity 0.3s; 
         }
-        
-        .mbj-action-row.show { 
-            opacity: 1; 
-            pointer-events: auto; 
-        }
+        .mbj-action-row.show { opacity: 1; pointer-events: auto; }
         
         .mbj-action-btn { 
-            width: 40px; 
-            height: 40px; 
+            width: 35px; 
+            height: 35px; 
             border-radius: 50%; 
             background: linear-gradient(to bottom, #555, #222); 
             border: 2px solid #777; 
             color: white; 
-            font-size: 1rem; 
+            font-size: 0.9rem; 
             font-weight: 900; 
             cursor: pointer; 
             display: flex; 
@@ -549,10 +554,10 @@
         
         .mbj-action-btn.hit { background: linear-gradient(to bottom, #00e676, #008040); border-color: #00e676; } 
         .mbj-action-btn.stand { background: linear-gradient(to bottom, #ff3366, #9b0022); border-color: #ff3366; } 
-        .mbj-action-btn.double { background: linear-gradient(to bottom, #ffcc00, #997a00); border-color: #ffcc00; font-size: 0.8rem; color: black;}
+        .mbj-action-btn.double { background: linear-gradient(to bottom, #ffcc00, #997a00); border-color: #ffcc00; font-size: 0.7rem; color: black;}
         .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); transform: none; box-shadow: none; }
 
-        /* Circle and Circular Timer */
+        /* Circular Timer inside Betting Circle */
         .mbj-circle-container { 
             position: relative; 
             width: 75px; 
@@ -563,7 +568,6 @@
             align-items: center;
         }
 
-        /* SVG Circular Timer */
         .circle-timer-svg {
             position: absolute;
             top: 0;
@@ -586,7 +590,7 @@
             fill: none;
             stroke: var(--success);
             stroke-width: 4;
-            stroke-dasharray: 220; /* Approx 2 * PI * r */
+            stroke-dasharray: 220; /* Approx 2 * PI * r (r=35) */
             stroke-dashoffset: 0;
             transition: stroke-dashoffset 1s linear;
         }
@@ -610,19 +614,19 @@
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 2px solid var(--credits); background: transparent; cursor: default; }
         
-        /* PREMIUM CASINO CHIP */
+        /* Premium Casino Chip (Exact Center) */
         .mbj-chip { 
             position: absolute; 
             top: 50%; 
             left: 50%; 
             transform: translate(-50%, -50%); 
-            width: 50px; 
-            height: 50px; 
+            width: 45px; 
+            height: 45px; 
             border-radius: 50%; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            font-size: 0.8rem; 
+            font-size: 0.75rem; 
             font-weight: 900; 
             color: black; 
             box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.9); 
@@ -643,12 +647,19 @@
             text-align: center; 
             position: relative;
         }
-
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
-        /* THE CHIP RACK UI */
+        /* CHIP ANIMATIONS */
+        .animated-chip {
+            position: fixed;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 99999;
+            pointer-events: none;
+        }
+
+        /* THE CHIP RACK UI (Locks when dealing) */
         .chip-rack-container { 
-            width: 1100px;
+            width: 1000px;
             margin-top: 15px;
             display: flex; 
             background: rgba(0,0,0,0.85); 
@@ -664,12 +675,9 @@
             position: relative;
         }
         
-        .chip-rack-locked {
-            opacity: 0.5;
-            pointer-events: none;
-        }
+        .chip-rack-locked { opacity: 0.5; pointer-events: none; }
 
-        /* Tooltip Error attached to Chip Rack */
+        /* Error Tooltip attached to Rack */
         .rack-error-tooltip {
             position: absolute;
             top: -40px;
@@ -690,8 +698,8 @@
         .rack-error-tooltip.show { opacity: 1; }
         
         .rack-chip { 
-            width: 55px; 
-            height: 55px; 
+            width: 50px; 
+            height: 50px; 
             border-radius: 50%; 
             background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%),
                         repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%);
@@ -700,7 +708,7 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            font-size: 0.9rem; 
+            font-size: 0.8rem; 
             font-weight: 900; 
             color: black;
             cursor: pointer; 
@@ -725,7 +733,6 @@
             transition: 0.2s;
             text-transform: uppercase;
         }
-        
         .rack-btn-clear { background: rgba(255,255,255,0.1); color: white; }
         .rack-btn-clear:hover { background: rgba(255,51,102, 0.8); }
         .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
@@ -836,35 +843,18 @@
             to { transform: translateX(-80px); } 
         }
 
-        /* HD Finish Line */
-        .hr-finish-line { 
-            position: absolute; 
-            right: -100px; 
-            top: 20%; 
-            bottom: 0; 
-            width: 25px; 
-            background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), 
-                              linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); 
-            background-size: 10px 10px; 
-            background-position: 0 0, 5px 5px; 
-            background-color: #fff; 
-            z-index: 5; 
-            border-left: 4px solid #FFD700; 
-            box-shadow: -10px 0 20px rgba(0,0,0,0.8);
-        }
-
-        /* Steel Starting Gate */
+        /* Full Height Steel Starting Gate (Covers horses entirely) */
         .hr-starting-gate { 
             position: absolute; 
-            left: 5%; 
+            left: 0; 
             top: 20%; 
             bottom: 0; 
-            width: 30px; 
+            width: 12%; 
             background: repeating-linear-gradient(to bottom, #555 0px, #555 15px, #444 15px, #444 30px); 
             border-right: 5px solid #222; 
             border-left: 2px solid #aaa;
             z-index: 20; 
-            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
             box-shadow: 10px 0 20px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
@@ -876,18 +866,35 @@
             background: #111;
             color: white;
             font-family: 'Rajdhani';
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 900;
-            width: 20px;
-            height: 20px;
+            width: 25px;
+            height: 25px;
             display: flex;
             justify-content: center;
             align-items: center;
             border-radius: 50%;
-            border: 1px solid #777;
+            border: 2px solid #aaa;
+            box-shadow: inset 0 0 5px black;
         }
-        
         .gate-open { transform: translateY(-100%); }
+
+        /* HD Finish Line - Fine Checkerboard and Gold Wire */
+        .hr-finish-line { 
+            position: absolute; 
+            right: -100px; 
+            top: 20%; 
+            bottom: 0; 
+            width: 20px; 
+            background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), 
+                              linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); 
+            background-size: 10px 10px; 
+            background-position: 0 0, 5px 5px; 
+            background-color: #fff; 
+            z-index: 5; 
+            border-left: 4px solid #FFD700; 
+            box-shadow: -10px 0 20px rgba(0,0,0,0.8);
+        }
         
         /* Grid Architecture prevents vertical escapes */
         .hr-lanes-grid { 
@@ -909,7 +916,7 @@
             position: relative; 
         }
         
-        /* Horses start off-screen or behind gate */
+        /* Horses start at 0% (behind gate) */
         .hr-horse-group { 
             position: absolute; 
             left: 0%; 
@@ -920,22 +927,19 @@
             transform: scaleX(-1); 
         }
         
-        .hr-gif { 
-            height: 50px; 
-            pointer-events: none;
-        }
+        .hr-gif { height: 50px; pointer-events: none; }
         
-        /* Exact Filter Adjustments to get Vivid Colors */
+        /* Exact Filter Adjustments */
         .horse-Red .hr-gif { filter: drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Blue .hr-gif { filter: hue-rotate(210deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Green .hr-gif { filter: hue-rotate(100deg) saturate(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Yellow .hr-gif { filter: hue-rotate(60deg) saturate(3) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
+        .horse-Yellow .hr-gif { filter: hue-rotate(60deg) saturate(5) brightness(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Purple .hr-gif { filter: hue-rotate(270deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
         .horse-Orange .hr-gif { filter: hue-rotate(30deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
 
         .winner-glow { 
             filter: drop-shadow(0 0 15px white); 
-            transform: scaleX(-1) scale(1.1) !important; 
+            transform: scaleX(-1) scale(1.2) !important; 
             z-index: 50 !important; 
         }
         .loser-fade { opacity: 0.3; }
@@ -974,38 +978,23 @@
             overflow: hidden;
         }
         
-        /* The specific color band at the top of the button */
+        /* Top color band matches horse hex exactly */
         .hr-bet-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 8px;
-            background: var(--h-bg);
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: var(--h-bg);
         }
 
         .hr-bet-btn:active:not(:disabled) { 
             transform: translateY(4px); 
             box-shadow: 0 0px 0 #000, inset 0 2px 5px rgba(0,0,0,0.5); 
         }
+        .hr-bet-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         
-        .hr-bet-btn:disabled { 
-            opacity: 0.4; 
-            cursor: not-allowed; 
-        }
+        .hr-odds-text { color: var(--success); text-shadow: 0 0 5px var(--success); }
         
-        .hr-odds-text {
-            color: var(--success);
-            text-shadow: 0 0 5px var(--success);
-        }
-        
+        /* Clean Bet Amount Tag */
         .bet-badge {
-            position: absolute;
-            bottom: 5px;
-            font-size: 0.8rem;
-            color: white;
-            background: rgba(0,0,0,0.8);
-            border: 1px solid var(--glass-border);
-            padding: 2px 8px;
-            border-radius: 10px;
+            position: absolute; bottom: 5px; font-size: 0.8rem; color: white;
+            background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;
         }
     </style>
 </head>
@@ -1019,148 +1008,144 @@
       </div>
   </header>
 
-  <div class="main-wrapper">
+  <div class="app-body">
       
-      <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()">
-          <i class="fas fa-arrow-left"></i> LEAVE TABLE
-      </button>
-      
-      <div id="view-casino" class="view-container">
-        <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">SELECT TABLE</h1>
-        <div class="lobby-modes-container">
-            <div class="game-card" onclick="openGame('mbj')">
-                <i class="fas fa-cards" style="font-size:4rem;"></i>
-                <div>
-                    <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Layout</div>
-                </div>
-            </div>
-            <div class="game-card" onclick="openGame('horserace')">
-                <i class="fas fa-horse-head" style="font-size:4rem; color: var(--danger);"></i>
-                <div>
-                    <div style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Smooth Physics Engine</div>
-                </div>
-            </div>
-        </div>
-      </div>
-
-      <div id="view-mbj" class="view-container hidden">
+      <div class="main-wrapper">
           
-          <div class="mbj-board" id="mbj-board-container">
-              
-              <div id="mbj-center-alert" class="board-center-alert"></div>
-
-              <div class="mbj-table-line"></div>
-              
-              <div class="mbj-logo">
-                  <h1>BLACKJACK</h1>
-                  <p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
-              </div>
-
-              <div class="mbj-balance-hud">
-                  <div style="font-size:0.7rem; color:#ccc; font-weight:900;">BALANCE</div>
-                  <div id="bj-bal" style="font-size:1.3rem; font-weight:900; color:var(--credits);">0 TC</div>
-              </div>
-
-              <div class="mbj-timer-hud" id="bj-timer-box">
-                  <div style="color:var(--ps-glow); font-size:0.7rem; font-weight:900; letter-spacing:1px;">PLACE BETS</div>
-                  <div id="bj-timer" style="font-family:'Rajdhani', monospace; font-size:1.8rem; font-weight:900; color:white; line-height:1;">15</div>
-              </div>
-
-              <div class="mbj-shoe"></div>
-
-              <div class="mbj-dealer-area">
-                  <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
-                  <div id="mbj-fs-dealer-hand" style="position:relative; width: 80px; height: 85px;"></div>
-              </div>
-              
-              <div id="mbj-seats-row"></div>
+          <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()">
+              <i class="fas fa-arrow-left"></i> LEAVE TABLE
+          </button>
+          
+          <div id="view-casino" class="view-container">
+            <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">SELECT TABLE</h1>
+            <div class="lobby-modes-container">
+                <div class="game-card" onclick="openGame('mbj')">
+                    <i class="fas fa-cards" style="font-size:4rem;"></i>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Layout</div>
+                    </div>
+                </div>
+                <div class="game-card" onclick="openGame('horserace')">
+                    <i class="fas fa-horse-head" style="font-size:4rem; color: var(--danger);"></i>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
+                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Smooth Physics Engine</div>
+                    </div>
+                </div>
+            </div>
           </div>
 
-          <div class="chip-rack-container" id="mbj-chip-rack">
-              <div id="rack-alert" class="rack-error-tooltip">MIN BET 10 TC</div>
+          <div id="view-mbj" class="view-container hidden">
+              
+              <div class="mbj-board" id="mbj-board-container">
+                  <div class="mbj-table-line"></div>
+                  
+                  <div class="mbj-logo">
+                      <h1>BLACKJACK</h1>
+                      <p>BLACKJACK PAYS 3 TO 2<br>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
+                  </div>
 
-              <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
-              
-              <div class="rack-chip" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
-              <div class="rack-chip" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
-              <div class="rack-chip" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
-              <div class="rack-chip" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
-              <div class="rack-chip" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
-              
-              <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
-              <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
-              
-              <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
+                  <div class="mbj-balance-hud">
+                      <div style="font-size:0.7rem; color:#ccc; font-weight:900;">BALANCE</div>
+                      <div id="bj-bal" style="font-size:1.3rem; font-weight:900; color:var(--credits);">0 TC</div>
+                  </div>
+
+                  <div class="mbj-shoe"></div>
+
+                  <div class="mbj-dealer-area">
+                      <div class="dealer-plaque">DEALER</div>
+                      <div id="mbj-fs-dealer-hand" class="mbj-hand-container">
+                           <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
+                      </div>
+                  </div>
+                  
+                  <div id="mbj-seats-row"></div>
+              </div>
+
+              <div class="chip-rack-container" id="mbj-chip-rack">
+                  <div id="rack-alert" class="rack-error-tooltip">MIN BET 10 TC</div>
+
+                  <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
+                  
+                  <div class="rack-chip" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
+                  <div class="rack-chip" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
+                  <div class="rack-chip" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
+                  <div class="rack-chip" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
+                  <div class="rack-chip" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
+                  
+                  <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
+                  <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
+                  
+                  <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
+              </div>
           </div>
+
+          <div id="view-horserace" class="view-container hidden">
+              <div class="hr-board" id="hr-board-container">
+                  
+                  <div class="hr-top-bar">
+                      <div class="hr-timer-box">
+                          <i class="fas fa-clock"></i>
+                          <span id="hr-timer">15</span>
+                      </div>
+                      <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
+                      <div style="background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.15); padding: 5px 15px; border-radius: 8px; text-align: right;">
+                          <div style="font-family:'Outfit'; font-size:0.7rem; color:gray; font-weight:800;">BALANCE</div>
+                          <div id="hr-my-bal" style="font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:900; color:var(--credits);">0 TC</div>
+                      </div>
+                  </div>
+                  
+                  <div class="hr-track-window" id="hr-environment">
+                      <div class="hr-bg-grass"></div>
+                      <div class="hr-bg-dirt"></div>
+                      
+                      <div class="hr-finish-line" id="hr-finish-line"></div>
+                      
+                      <div class="hr-starting-gate" id="hr-gate">
+                          <div class="gate-stall-num">1</div>
+                          <div class="gate-stall-num">2</div>
+                          <div class="gate-stall-num">3</div>
+                          <div class="gate-stall-num">4</div>
+                          <div class="gate-stall-num">5</div>
+                          <div class="gate-stall-num">6</div>
+                      </div>
+                      
+                      <div class="hr-lanes-grid" id="hr-lanes-container"></div>
+                  </div>
+
+                  <div class="hr-controls-area">
+                      <div style="display:flex; gap:15px; justify-content:center;">
+                          <input type="number" id="hr-bet-input" class="input-control" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';" value="100">
+                      </div>
+                      <div class="hr-bet-grid" id="hr-bet-grid"></div>
+                  </div>
+              </div>
+          </div>
+
       </div>
 
-      <div id="view-horserace" class="view-container hidden">
-          <div class="hr-board">
-              
-              <div id="hr-center-alert" class="board-center-alert"></div>
-
-              <div class="hr-top-bar">
-                  <div class="hr-timer-box">
-                      <i class="fas fa-clock"></i>
-                      <span id="hr-timer">15</span>
-                  </div>
-                  <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
-                  <div style="background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.15); padding: 5px 15px; border-radius: 8px; text-align: right;">
-                      <div style="font-family:'Outfit'; font-size:0.7rem; color:gray; font-weight:800;">BALANCE</div>
-                      <div id="hr-my-bal" style="font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:900; color:var(--credits);">0 TC</div>
-                  </div>
+      <div class="chat-column" id="chat-column">
+          <div class="chat-header">
+              <i class="fas fa-comments"></i> LIVE CHAT
+          </div>
+          <div class="chat-messages" id="chat-messages">
+              <div class="chat-msg-row" style="align-items: center; opacity: 0.5;">
+                  <span style="font-size:0.7rem; margin-top:10px;">Welcome to VIP Premium.</span>
               </div>
-              
-              <div class="hr-track-window" id="hr-environment">
-                  <div class="hr-hills"></div>
-                  <div class="hr-fence"></div>
-                  <div class="hr-bg-grass"></div>
-                  <div class="hr-bg-dirt"></div>
-                  
-                  <div class="hr-finish-line" id="hr-finish-line"></div>
-                  <div class="hr-starting-gate" id="hr-gate">
-                      <div class="gate-stall-num">1</div>
-                      <div class="gate-stall-num">2</div>
-                      <div class="gate-stall-num">3</div>
-                      <div class="gate-stall-num">4</div>
-                      <div class="gate-stall-num">5</div>
-                      <div class="gate-stall-num">6</div>
-                  </div>
-                  
-                  <div class="hr-lanes-grid" id="hr-lanes-container"></div>
-              </div>
-
-              <div class="hr-controls-area">
-                  <div style="display:flex; gap:15px; justify-content:center;">
-                      <input type="number" id="hr-bet-input" class="input-control" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';" value="100">
-                  </div>
-                  <div class="hr-bet-grid" id="hr-bet-grid"></div>
-              </div>
+          </div>
+          <div class="chat-input-area">
+              <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKey(event)">
+              <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
           </div>
       </div>
 
   </div>
   
-  <div class="chat-widget minimized" id="chat-widget" onclick="toggleChat(event)">
-      <div class="chat-header">
-          <span><i class="fas fa-comments"></i> LIVE CHAT</span>
-          <i class="fas fa-chevron-down" id="chat-toggle-icon"></i>
-      </div>
-      <div class="chat-messages" id="chat-messages">
-          <div class="chat-msg-row" style="align-items: center; opacity: 0.5;">
-              <span>Welcome to VIP Premium.</span>
-          </div>
-      </div>
-      <div class="chat-input-area" onclick="event.stopPropagation()">
-          <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKey(event)">
-          <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
-      </div>
-  </div>
+  <div id="global-alert" class="global-screen-alert"></div> 
+  <div id="flash-msg" class="local-flash"></div> 
 
   <script>
-    // Math logic ensures no blank screen crashes
     function getBJScore(hand) {
         let score = 0, aces = 0;
         for (let card of hand) { 
@@ -1212,12 +1197,11 @@
         setTimeout(() => r.classList.remove('show'), 2000);
     }
     
-    function showBoardAlert(game, msg, type='success') {
-        let f = document.getElementById(game === 'mbj' ? 'mbj-center-alert' : 'hr-center-alert');
-        if(!f) return;
+    function showGlobalAlert(msg, type='success') {
+        let f = document.getElementById('global-alert');
         f.innerText = msg;
-        f.className = `board-center-alert show ${type}`;
-        setTimeout(() => f.className = 'board-center-alert', 3000);
+        f.className = `global-screen-alert show ${type}`;
+        setTimeout(() => f.className = 'global-screen-alert', 3000);
     }
 
     function switchView(viewId) { 
@@ -1233,7 +1217,10 @@
             document.getElementById('mbj-chip-rack').style.display='none'; 
         }
         if(activeGame === 'horserace' && document.getElementById('hr-ticker').innerText === "AND THEY'RE OFF!") { 
-            showBoardAlert('horserace', "Wait for race to finish!", "error"); 
+            let f = document.getElementById('flash-msg');
+            f.innerText = "Wait for race to finish!";
+            f.className = 'local-flash show error';
+            setTimeout(() => f.className = 'local-flash', 2500);
             return; 
         }
         if(activeGame) socket.emit('leaveRoom', activeGame);
@@ -1259,22 +1246,6 @@
     // =========================================================================
     // LIVE CHAT WIDGET
     // =========================================================================
-    let chatOpen = false;
-    function toggleChat(e) {
-        if(e.target.closest('.chat-input-area') || e.target.closest('.chat-messages')) return;
-        let w = document.getElementById('chat-widget');
-        let i = document.getElementById('chat-toggle-icon');
-        chatOpen = !chatOpen;
-        if(chatOpen) {
-            w.classList.remove('minimized');
-            i.className = 'fas fa-chevron-down';
-            document.getElementById('chat-input').focus();
-        } else {
-            w.classList.add('minimized');
-            i.className = 'fas fa-chevron-up';
-        }
-    }
-
     function handleChatKey(e) {
         if(e.key === 'Enter') sendChat();
     }
@@ -1303,28 +1274,56 @@
     });
 
     // =========================================================================
-    // VIP BLACKJACK RENDERING
+    // VIP BLACKJACK RENDERING & CHIP ANIMATIONS
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0) {
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, isDealer = false) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
         if(animateFlip) animClass = 'anim-flip';
         
-        // Use absolute positioning with left offset to prevent shifting
-        let styleStr = `position: absolute; left: ${leftOffset}px;`;
+        // Flexbox will center cards naturally if we use negative left margin. 
+        // We do NOT use absolute positioning here so it scales cleanly.
         
-        if(isHidden) return `<div class="mbj-card card-back ${animClass}" style="${styleStr}"></div>`;
+        if(isHidden) return `<div class="mbj-card card-back ${animClass}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
-        return `<div class="mbj-card ${colorClass} ${animClass}" style="${styleStr}">
+        return `<div class="mbj-card ${colorClass} ${animClass}">
                     <div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
-                    <div class="card-center">${cleanSuit}</div>
                     <div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
                 </div>`;
     }
     
+    // Animate a chip from Point A to Point B
+    function animateChip(fromElem, toElem, colorClass, delayMs) {
+        setTimeout(() => {
+            if(!fromElem || !toElem) return;
+            let fRect = fromElem.getBoundingClientRect();
+            let tRect = toElem.getBoundingClientRect();
+            
+            let chip = document.createElement('div');
+            chip.className = `mbj-chip animated-chip`;
+            chip.style.cssText = `
+                --c-bg: ${colorClass}; 
+                left: ${fRect.left + (fRect.width/2)}px; 
+                top: ${fRect.top + (fRect.height/2)}px;
+                margin-left: -22px; margin-top: -22px;
+            `;
+            document.body.appendChild(chip);
+            
+            // Force reflow
+            void chip.offsetWidth;
+            
+            chip.style.left = `${tRect.left + (tRect.width/2)}px`;
+            chip.style.top = `${tRect.top + (tRect.height/2)}px`;
+            chip.style.opacity = '0';
+            chip.style.transform = 'scale(0.5)';
+            
+            setTimeout(() => { if(chip.parentNode) chip.remove(); }, 600);
+        }, delayMs);
+    }
+
     function renderMBJSeats(seats, activeTurnObj = null) {
         currentMBJSeats = seats || currentMBJSeats; 
         let cont = document.getElementById('mbj-seats-row'); 
@@ -1349,7 +1348,7 @@
 
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
             
-            // 1. CARDS (Top - Absolute container to prevent shifting)
+            // 1. CARDS (Flex Centered)
             html += `<div class="mbj-hand-container">`;
             
             if (isMySeatTurn && mbjGameState === 'PLAYER_TURN') {
@@ -1360,17 +1359,15 @@
                 let currentHandCount = s.hands[0].cards.length;
                 let previouslyRendered = renderedCardCount[i] || 0;
                 
-                // Fixed Gold Plaque Score Badge above cards
+                // Fixed Gold Plaque
                 if(s.hands[0].cards.length > 0 && s.hands[0].status !== 'BUST') { 
-                    html += `<div class="mbj-hand-score">${s.hands[0].score}</div>`; 
+                    html += `<div class="hand-score">${s.hands[0].score}</div>`; 
                 }
-                
+
                 s.hands.forEach((hand, hIdx) => {
-                    // Start absolute positioning from the left edge of container
-                    let baseLeft = 0; 
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
-                        html += generateCardHTML(c, false, animateThisCard, false, baseLeft + (cIdx * 20));
+                        html += generateCardHTML(c, false, animateThisCard, false, false);
                     });
                 });
                 renderedCardCount[i] = currentHandCount; 
@@ -1387,7 +1384,7 @@
                      </div>`;
 
             // 3. CIRCLE, SVG TIMER, & CHIPS (Bottom)
-            html += `<div class="mbj-circle-container">`;
+            html += `<div class="mbj-circle-container" id="circle-${i}">`;
             
             // The SVG Ring Timer
             html += `<svg class="circle-timer-svg" viewBox="0 0 100 100">
@@ -1404,7 +1401,7 @@
                 // Premium Centered Chip
                 if (displayBet > 0) { 
                     let cBg = displayBet >= 10000 ? '#00e676' : displayBet >= 1000 ? '#ff3366' : displayBet >= 100 ? '#00a2ff' : '#444';
-                    html += `<div class="mbj-chip ${totalSeatBet===0?'ghost':''}" style="--c-bg:${cBg};">${displayBet}</div>`; 
+                    html += `<div class="mbj-chip ${totalSeatBet===0?'ghost':''}" id="chip-${i}" style="--c-bg:${cBg};">${displayBet}</div>`; 
                 }
             } else {
                 html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
@@ -1470,19 +1467,10 @@
     socket.on('mbjUpdate', async (data) => {
         if(activeGame !== 'mbj') return;
         let dBadge = document.getElementById('mbj-d-score-val');
-        let tVal = document.getElementById('bj-timer');
-        let tBox = document.getElementById('bj-timer-box');
-
+        
         if(data.event === 'timer') {
             mbjGameState = 'BETTING'; 
             dBadge.style.display = 'none';
-            
-            if(data.active) {
-                tBox.style.display = 'flex';
-                tVal.innerText = data.time; 
-            } else {
-                tBox.style.display = 'none';
-            }
             renderMBJSeats(data.seats); 
         } 
         else if (data.event === 'sync_seats') { 
@@ -1490,7 +1478,6 @@
         } 
         else if (data.event === 'lock_bets') { 
             mbjGameState = 'DEALING'; 
-            tVal.innerText = '--'; 
             renderMBJSeats(data.seats, null);
         } 
         else if (data.event === 'deal') {
@@ -1498,9 +1485,8 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                // Left offset to prevent shifting
-                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, true); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, true); 
                 setTimeout(() => { 
                     dBadge.style.display = 'flex'; 
                     dBadge.innerText = data.dealerHand[0].bjVal; 
@@ -1509,7 +1495,6 @@
         } 
         else if (data.event === 'turn') {
             mbjGameState = 'PLAYER_TURN'; 
-            tVal.innerText = data.time || '--'; 
             renderMBJSeats(data.seats, data.activeTurn);
             
             // Sync SVG Timer
@@ -1522,7 +1507,6 @@
             }
         } 
         else if (data.event === 'turn_timer') { 
-            tVal.innerText = data.time; 
             if (mbjState && mbjState.activeTurn && mbjState.activeTurn.seat) {
                 let svgPath = document.getElementById(`svg-timer-${mbjState.activeTurn.seat}`);
                 if (svgPath) {
@@ -1533,43 +1517,72 @@
         }
         else if (data.event === 'dealer_resolved') {
             mbjGameState = 'RESOLVING'; 
-            tBox.style.display = 'none';
             renderMBJSeats(data.seats); 
             
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
+            let dealerArea = document.querySelector('.dealer-plaque');
+
             if(dHand) {
-                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false, 0);
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
+                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false, true);
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, true); 
                 dBadge.innerText = getBJScore(data.dealerHand.slice(0,2));
                 
                 const drawRemaining = async () => {
                     await delay(800);
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false, i * 20); 
+                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false, true); 
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
                         await delay(800); 
                     }
                     dBadge.innerText = data.dealerScore;
+                    
+                    // The Physical Payout Animations
+                    await delay(1000);
                     let myNet = 0;
                     
-                    // Payout Animations
+                    // 1. Collect Losses
                     for(let i=1; i<=5; i++) {
                         let seat = data.seats[i];
                         if (seat && data.results && data.results[i]) {
-                            let tw = data.results[i].win;
-                            if (tw > 0) { 
-                                document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${tw}</div>`; 
-                            }
-                            if (seat.username === myUsername) {
-                                let tb = seat.hands.reduce((sum, h)=>sum+h.bet, 0);
-                                myNet = tw - (tb - data.results[i].push);
+                            if (data.results[i].status === 'LOSS') {
+                                let cEl = document.getElementById(`chip-${i}`);
+                                if(cEl) animateChip(cEl, dealerArea, '#444', 0);
+                                if(cEl) cEl.style.opacity = '0'; // Hide the original
                             }
                         }
                     }
-                    // CENTERED NOTIFICATION INSIDE BOARD
-                    if (myNet > 0) showBoardAlert('mbj', `WON +${myNet} TC`, 'success');
-                    else if (myNet < 0) showBoardAlert('mbj', `LOST ${Math.abs(myNet)} TC`, 'error');
-                    else if (myNet === 0 && data.results && data.results[localSeatId] && data.results[localSeatId].push > 0) showBoardAlert('mbj', `PUSH`, 'success');
+                    
+                    await delay(1500); // Wait for collection
+                    
+                    // 2. Pay Winners
+                    for(let i=1; i<=5; i++) {
+                        let seat = data.seats[i];
+                        if (seat && data.results && data.results[i]) {
+                            let res = data.results[i];
+                            if (res.status === 'WIN') {
+                                let cEl = document.getElementById(`circle-${i}`);
+                                animateChip(dealerArea, cEl, '#00e676', 0);
+                                animateChip(dealerArea, cEl, '#00e676', 200);
+                                
+                                setTimeout(() => {
+                                    document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; 
+                                }, 800);
+                            }
+                            
+                            // Calculate local net for banner
+                            if (seat.username === myUsername) {
+                                let tb = seat.hands.reduce((sum, h)=>sum+h.bet, 0);
+                                myNet = res.win - (tb - res.push);
+                            }
+                        }
+                    }
+
+                    await delay(1000);
+                    
+                    // CENTERED NOTIFICATION
+                    if (myNet > 0) showGlobalAlert(`WON +${myNet} TC`, 'success');
+                    else if (myNet < 0) showGlobalAlert(`LOST ${Math.abs(myNet)} TC`, 'error');
+                    else if (myNet === 0 && data.results && data.results[localSeatId] && data.results[localSeatId].push > 0) showGlobalAlert(`PUSH`, 'success');
                 }; 
                 drawRemaining();
             }
@@ -1586,7 +1599,7 @@
     // =========================================================================
     // RETRO HORSE DERBY LOGIC
     // =========================================================================
-    const btnColors = {'Red':'#ff3366', 'Blue':'#00a2ff', 'Green':'#00e676', 'Yellow':'#ffcc00', 'Purple':'#b366ff', 'Orange':'#ff8800'};
+    const btnColors = {'Red':'#ff3366', 'Blue':'#4363d8', 'Green':'#3cb44b', 'Yellow':'#ffe119', 'Purple':'#911eb4', 'Orange':'#f58231'};
     
     function setupDerbyUI() {
         let container = document.getElementById('hr-lanes-container');
@@ -1594,7 +1607,7 @@
         
         let trackHTML = ''; 
         ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach((c) => {
-            // Start left behind the gate
+            // Start at 0% (behind the closed gate)
             trackHTML += `
             <div class="hr-lane">
                 <div id="horse-${c}" class="hr-horse-group horse-${c}" style="left: 0%;">
@@ -1666,7 +1679,6 @@
         if(activeGame !== 'horserace') return;
         const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
         
-        // Start hidden behind the steel gate
         let currentPos = { Red: -5, Blue: -5, Green: -5, Yellow: -5, Purple: -5, Orange: -5 };
         let targetPos = { Red: -5, Blue: -5, Green: -5, Yellow: -5, Purple: -5, Orange: -5 };
 
@@ -1688,6 +1700,7 @@
         });
 
         let nextTargetUpdate = startTime + 500;
+        let lineCrossed = false;
 
         hrRaceInterval = setInterval(() => {
             let now = Date.now(); let elapsed = now - startTime; let timeRemaining = duration - elapsed;
@@ -1704,18 +1717,22 @@
                         fLineEl.style.transition = 'right 3s linear'; 
                         fLineEl.style.right = '10%'; 
                     }
-                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 85 : 50 + (Math.random() * 20); });
+                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 90 : 40 + (Math.random() * 20); });
                 }
             } 
 
             if(elapsed >= duration) {
-                // TRUE ENDING: Line crossed, background slowly grinds to a halt
+                // TRUE ENDING: Winner hits 90%, background slowly grinds to a halt
+                if (!lineCrossed) {
+                    lineCrossed = true;
+                    document.getElementById('hr-environment').className = 'hr-track-window track-slowing'; 
+                }
+                
                 clearInterval(hrRaceInterval);
-                document.getElementById('hr-environment').className = 'hr-track-window track-slowing'; 
                 horses.forEach(h => {
                     let el = document.getElementById('horse-' + h);
                     if(el) { 
-                        el.style.left = (h === data.winner ? 85 : Math.min(currentPos[h], 75)) + '%'; 
+                        el.style.left = (h === data.winner ? 90 : Math.min(currentPos[h], 75)) + '%'; 
                     }
                 });
                 return;
@@ -1747,10 +1764,10 @@
             }
         });
 
-        // CENTERED NOTIFICATION INSIDE BOARD
+        // GLOBAL ALERTS FOR RACE
         let myPayout = data.payouts ? (data.payouts[myUsername] || 0) : 0;
-        if (myPayout > 0) showBoardAlert('horserace', `WON +${myPayout} TC`, 'success');
-        else showBoardAlert('horserace', `RACE FINISHED`, 'error');
+        if (myPayout > 0) showGlobalAlert(`WON +${myPayout} TC`, 'success');
+        else showGlobalAlert(`RACE FINISHED`, 'error');
     });
 
     socket.on('hrNewRound', (data) => {
