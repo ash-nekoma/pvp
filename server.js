@@ -46,7 +46,7 @@ function buildShoe() {
         }
     }
     
-    // Shuffle
+    // Shuffle the shoe
     for (let i = shoe.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
@@ -123,6 +123,7 @@ setInterval(() => {
 
                 io.emit('hrRaceStart', { winner: winner, duration: 15000 }); 
 
+                // Race finishes
                 setTimeout(async () => {
                     let payouts = {};
                     hrState.bets.forEach(b => {
@@ -145,7 +146,7 @@ setInterval(() => {
                     });
                 }, 15500); 
 
-                // Reset Derby
+                // Reset Round
                 setTimeout(() => {
                     generateHorseOdds(); 
                     hrState.time = 15; 
@@ -241,7 +242,11 @@ async function mbjResolveDealer() {
             let totalWin = 0; let totalPush = 0; 
             
             seat.hands.forEach(h => {
-                if (h.status === 'BUST') return; 
+                if (h.status === 'BUST') {
+                    // Bust counts as immediate loss (payout 0)
+                    return; 
+                }
+                
                 let pScore = h.score;
                 let payout = 0, isPush = false, refundAmount = 0;
                 let playerNatural = isNaturalBlackjack(h.cards) && !h.isSplitHand;
@@ -264,7 +269,8 @@ async function mbjResolveDealer() {
                 else totalWin += (payout + refundAmount);
             });
 
-            seatResults[i] = { win: totalWin, push: totalPush };
+            seatResults[i] = { win: totalWin, push: totalPush, status: (totalWin > 0 ? 'WIN' : (totalPush > 0 ? 'PUSH' : 'LOSS')) };
+            
             let user = mockUsers[seat.username];
             if(user) {
                 user.credits += formatTC(totalWin + totalPush);
@@ -283,7 +289,7 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
-    // Increased timeout to allow for chip collection/payout animations
+    // Increased to 12 seconds to allow full chip routing animations to play out
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -394,7 +400,7 @@ io.on('connection', (socket) => {
         socket.emit('loginSuccess', { username: user.username, credits: user.credits });
     });
 
-    // Chat System
+    // Dedicated Live Chat Channel
     socket.on('sendChatMessage', (msg) => {
         if(socket.user) {
             let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -515,7 +521,6 @@ io.on('connection', (socket) => {
             
             mbjState.turnTimer = 15; // Reset timer on Hit
             
-            // Auto-Stand on 21 or Bust
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
@@ -543,7 +548,7 @@ io.on('connection', (socket) => {
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 
-                mbjState.turnTimer = 15; // Reset timer
+                mbjState.turnTimer = 15; // Reset timer on Double
                 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
