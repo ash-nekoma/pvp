@@ -67,18 +67,18 @@
             cursor: pointer;
         }
         
-        /* Fills remaining screen space perfectly */
+        /* Direct flex child of body. Cannot collapse to 0 height. */
         .main-wrapper { 
             flex: 1; 
             position: relative; 
             width: 100%; 
+            height: 100%;
             display: flex; 
             justify-content: center; 
             align-items: center; 
             overflow: hidden;
         }
         
-        /* Keeps games perfectly in the middle of the screen */
         .view-container { 
             position: absolute; 
             inset: 0; 
@@ -113,18 +113,6 @@
             cursor: not-allowed; 
         }
         
-        .input-control { 
-            width: 100%; 
-            padding: 12px 15px; 
-            background: rgba(0,0,0,0.5); 
-            border: 1px solid rgba(255,255,255,0.15); 
-            color: white; 
-            border-radius: 8px; 
-            font-size: 1rem; 
-            font-weight: 600; 
-            text-align: center; 
-        }
-
         .btn-back-fixed { 
             position: absolute; 
             top: 20px; 
@@ -172,13 +160,13 @@
             box-shadow: 0 15px 40px rgba(0,162,255,0.2); 
         }
 
-        /* ================= DOCKED LIVE CHAT (FLOATING & SMALL) ================= */
+        /* ================= FLOATING LIVE CHAT (Fixed Position) ================= */
         .chat-widget {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 300px;
-            height: 400px;
+            bottom: 30px;
+            right: 30px;
+            width: 320px;
+            height: 450px;
             background: rgba(0, 10, 25, 0.85);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
@@ -209,25 +197,27 @@
             color: var(--ps-glow);
             border-radius: 15px 15px 0 0;
             cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .chat-messages {
             flex: 1;
-            padding: 10px;
+            padding: 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            font-size: 0.8rem;
+            gap: 12px;
+            font-size: 0.85rem;
         }
 
         .chat-msg-row { display: flex; flex-direction: column; }
-        .chat-meta { font-size: 0.65rem; color: #aaa; margin-bottom: 2px; }
+        .chat-meta { font-size: 0.7rem; color: #aaa; margin-bottom: 4px; }
         .chat-text { 
             background: rgba(255,255,255,0.05); 
-            padding: 8px 12px; 
-            border-radius: 10px; 
-            line-height: 1.3; 
+            padding: 10px 14px; 
+            border-radius: 12px; 
+            line-height: 1.4; 
             word-wrap: break-word;
         }
         .chat-text.me { 
@@ -240,10 +230,10 @@
         }
 
         .chat-input-area {
-            padding: 10px;
+            padding: 15px;
             border-top: 1px solid var(--glass-border);
             display: flex;
-            gap: 8px;
+            gap: 10px;
             background: rgba(0,0,0,0.5);
             border-radius: 0 0 15px 15px;
         }
@@ -253,18 +243,17 @@
             background: #111;
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            padding: 8px 12px;
-            border-radius: 15px;
+            padding: 10px 15px;
+            border-radius: 20px;
             font-family: 'Outfit';
-            font-size: 0.8rem;
         }
 
         .chat-input-area button {
             background: var(--ps-glow);
             color: black;
             border: none;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
             font-weight: 900;
@@ -275,9 +264,9 @@
             transform: scale(1.1); 
         }
 
-        /* ================= CENTERED SCREEN ALERTS ================= */
-        .global-screen-alert {
-            position: fixed; 
+        /* ================= CENTERED BOARD ALERTS ================= */
+        .board-center-alert {
+            position: absolute; 
             top: 50%; 
             left: 50%; 
             transform: translate(-50%, -50%);
@@ -291,27 +280,27 @@
             text-transform: uppercase; 
             color: white; 
             text-shadow: 0 5px 15px rgba(0,0,0,1);
-            z-index: 99999; 
+            z-index: 9999; 
             display: none; 
             opacity: 0;
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
             text-align: center;
         }
         
-        .global-screen-alert.show { 
+        .board-center-alert.show { 
             display: flex; 
             flex-direction: column;
             align-items: center;
             animation: popupAlert 3s forwards; 
         }
         
-        .global-screen-alert.success { 
+        .board-center-alert.success { 
             border-color: var(--success); 
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3);
             color: var(--success);
         }
         
-        .global-screen-alert.error { 
+        .board-center-alert.error { 
             border-color: var(--danger); 
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3);
             color: var(--danger);
@@ -335,7 +324,7 @@
         /* Thick Mahogany Wood Rim & Green Casino Felt */
         .mbj-board { 
             width: 1100px; 
-            height: 520px; 
+            height: 550px; 
             background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
             border-radius: 20px; 
             position: relative; 
@@ -368,15 +357,15 @@
             z-index: 2;
         }
         
-        .mbj-logo h1 { font-size: 3.5rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
-        .mbj-logo p { font-weight: 900; font-size: 0.9rem; letter-spacing: 2px; color: #000; margin-bottom: 5px;}
-        .mbj-logo .limits { font-weight: 900; font-size: 0.75rem; letter-spacing: 1px; color: #000; }
+        .mbj-logo h1 { font-size: 4rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
+        .mbj-logo p { font-weight: 900; font-size: 1rem; letter-spacing: 4px; color: #000; margin-bottom: 5px;}
+        .mbj-logo .limits { font-weight: 900; font-size: 0.8rem; letter-spacing: 2px; color: #000; }
 
         /* Fixed Top Left Balance */
         .mbj-balance-hud {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 25px;
+            left: 25px;
             background: rgba(0,0,0,0.6);
             border: 1px solid rgba(255,255,255,0.15);
             padding: 8px 20px;
@@ -422,8 +411,8 @@
         /* Top Right Shoe */
         .mbj-shoe { 
             position: absolute; 
-            top: 20px; 
-            right: 20px; 
+            top: 25px; 
+            right: 25px; 
             width: 60px; 
             height: 90px; 
             background: repeating-linear-gradient(45deg, #111, #111 10px, #222 10px, #222 20px); 
@@ -436,7 +425,7 @@
         /* RED H1 DEALER TITLE */
         .mbj-dealer-area { 
             position: absolute; 
-            top: 20px; 
+            top: 25px; 
             left: 50%; 
             transform: translateX(-50%); 
             display: flex; 
@@ -447,9 +436,9 @@
         
         .dealer-title {
             color: #ff3366;
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             text-transform: uppercase;
-            letter-spacing: 5px;
+            letter-spacing: 8px;
             font-weight: 900;
             text-shadow: 0 4px 10px rgba(0,0,0,0.9), 0 0 15px rgba(255, 51, 102, 0.5);
             margin-bottom: 20px;
@@ -458,7 +447,7 @@
         /* Flexible row ensures no horizontal overlaps */
         #mbj-seats-row { 
             position: absolute; 
-            bottom: 20px; 
+            bottom: 25px; 
             left: 0; 
             width: 100%; 
             display: flex; 
@@ -474,7 +463,7 @@
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-end; 
-            width: 140px; 
+            width: 150px; 
             pointer-events: auto; 
             position: relative; 
         }
@@ -487,13 +476,12 @@
             width: 100%;
         }
 
-        /* FLEXBOX CARD CENTERING (Fixes the moving card bug cleanly) */
+        /* FIXED ABSOLUTE CARD POSITIONING */
+        /* Fixed width prevents cards from shifting horizontally */
         .mbj-hand-container { 
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
             position: relative; 
-            height: 100px; 
+            height: 100px;
+            width: 90px; /* Fixed width */
             margin-bottom: 10px; 
             pointer-events: none;
         }
@@ -505,18 +493,14 @@
             background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
             border-radius: 6px; 
             box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
-            position: relative; /* Normal document flow */
-            margin-left: -40px; /* Negative margin stacks them */
+            position: absolute; 
+            bottom: 0;
             font-family: 'Outfit', sans-serif; 
             color: black; 
             border: 1px solid #ccc; 
             transform: translateZ(0); 
             font-weight: 900;
             z-index: 2;
-        }
-        
-        .mbj-card:first-child {
-            margin-left: 0;
         }
         
         /* Clean symbols: top left and bottom right only */
@@ -533,19 +517,19 @@
         }
 
         /* UNIFORM GOLD SCORE BADGES */
+        /* Absolute positioned OUTSIDE the card box so it never overlaps */
         .hand-score { 
             position: absolute; 
             top: -25px; 
-            left: 50%; 
-            transform: translateX(-50%);
+            left: -15px; 
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
             border-radius: 50%; 
             font-weight: 900; 
             font-size: 1rem; 
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -556,15 +540,15 @@
         .dealer-score-badge { 
             position: absolute; 
             top: -15px; 
-            left: -45px; 
+            left: -40px; 
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
             border-radius: 50%; 
             font-weight: 900; 
             font-size: 1rem; 
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             z-index: 20; 
             display: flex; 
             justify-content: center; 
@@ -587,18 +571,17 @@
         /* Sleek Glowing Chevron (Your Turn) */
         .turn-chevron {
             position: absolute;
-            top: -45px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: -55px;
+            left: 20px;
             color: var(--success);
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             z-index: 30;
             animation: floatChevron 1s infinite;
             text-shadow: 0 0 15px var(--success);
         }
         @keyframes floatChevron {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-8px); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         /* 3D Arcade Buttons */
@@ -748,7 +731,7 @@
             position: fixed;
             z-index: 99999;
             pointer-events: none;
-            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth arc trajectory */
+            transition: left 0.6s linear, top 0.6s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.6s linear, opacity 0.2s ease-in 0.4s;
             width: 45px; 
             height: 45px; 
             border-radius: 50%; 
@@ -757,6 +740,28 @@
             background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%),
                         repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%);
             border: 2px solid var(--c-bg);
+        }
+
+        /* Payout flare floating text */
+        .payout-flare { 
+            position: absolute; 
+            bottom: 100%; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            color: #00e676; 
+            font-size: 1.5rem; 
+            font-weight: 900; 
+            text-shadow: 0 2px 5px black; 
+            animation: floatUp 2s forwards; 
+            z-index: 500; 
+            pointer-events: none; 
+            white-space: nowrap;
+        }
+        @keyframes floatUp { 
+            0% { opacity: 0; transform: translate(-50%, 0); } 
+            20% { opacity: 1; transform: translate(-50%, -20px); } 
+            80% { opacity: 1; transform: translate(-50%, -40px); } 
+            100% { opacity: 0; transform: translate(-50%, -60px); } 
         }
 
         /* THE CHIP RACK UI (Matches table width exactly) */
@@ -863,105 +868,101 @@
       </div>
   </header>
 
-  <div class="app-body">
+  <div class="main-wrapper">
       
-      <div class="main-wrapper">
-          
-          <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()">
-              <i class="fas fa-arrow-left"></i> LEAVE TABLE
-          </button>
-          
-          <div id="view-casino" class="view-container">
-            <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">SELECT TABLE</h1>
-            <div class="lobby-modes-container">
-                <div class="game-card" onclick="openGame('mbj')">
-                    <i class="fas fa-cards" style="font-size:4rem;"></i>
-                    <div>
-                        <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Layout</div>
-                    </div>
+      <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()">
+          <i class="fas fa-arrow-left"></i> LEAVE TABLE
+      </button>
+      
+      <div id="view-casino" class="view-container">
+        <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">SELECT TABLE</h1>
+        <div class="lobby-modes-container">
+            <div class="game-card" onclick="openGame('mbj')">
+                <i class="fas fa-cards" style="font-size:4rem;"></i>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Table Dynamics</div>
                 </div>
             </div>
-          </div>
+        </div>
+      </div>
 
-          <div id="view-mbj" class="view-container hidden">
-              
-              <div class="game-board-wrapper">
-                  <div class="mbj-board" id="mbj-board-container">
+      <div id="view-mbj" class="view-container hidden">
+          
+          <div class="game-board-wrapper">
+              <div class="mbj-board" id="mbj-board-container">
 
-                      <div class="mbj-global-timer" id="bj-global-timer">
-                          <h2>PLACE BETS</h2>
-                          <div class="time-val" id="bj-timer-val">15</div>
-                      </div>
-
-                      <div class="mbj-table-line"></div>
-                      
-                      <div class="mbj-logo">
-                          <h1>BLACKJACK</h1>
-                          <p>PAYS 3 TO 2</p>
-                          <p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
-                          <div class="limits">MIN 10 TC | MAX 50,000 TC</div>
-                      </div>
-
-                      <div class="mbj-balance-hud">
-                          <div style="font-size:0.7rem; color:#ccc; font-weight:900;">BALANCE</div>
-                          <div id="bj-bal" style="font-size:1.3rem; font-weight:900; color:var(--credits);">0 TC</div>
-                      </div>
-
-                      <div class="mbj-shoe"></div>
-
-                      <div class="mbj-dealer-area" id="dealer-area">
-                          <h1 class="dealer-title">DEALER</h1>
-                          <div id="mbj-fs-dealer-hand" class="mbj-hand-container" style="width: 70px;">
-                               <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
-                          </div>
-                      </div>
-                      
-                      <div id="mbj-seats-row"></div>
+                  <div class="mbj-global-timer" id="bj-global-timer">
+                      <h2>PLACE BETS</h2>
+                      <div class="time-val" id="bj-timer-val">15</div>
                   </div>
 
-                  <div class="chip-rack-container" id="mbj-chip-rack">
-                      <div id="rack-alert" class="rack-error-tooltip">MIN BET 10 TC</div>
-
-                      <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
-                      
-                      <div class="rack-chip" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
-                      <div class="rack-chip" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
-                      <div class="rack-chip" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
-                      <div class="rack-chip" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
-                      <div class="rack-chip" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
-                      
-                      <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
-                      <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
-                      
-                      <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
+                  <div class="mbj-table-line"></div>
+                  
+                  <div class="mbj-logo">
+                      <h1>BLACKJACK</h1>
+                      <p>PAYS 3 TO 2</p>
+                      <p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
+                      <div class="limits">MIN 10 TC | MAX 50,000 TC</div>
                   </div>
+
+                  <div class="mbj-balance-hud">
+                      <div style="font-size:0.7rem; color:#ccc; font-weight:900;">BALANCE</div>
+                      <div id="bj-bal" style="font-size:1.3rem; font-weight:900; color:var(--credits);">0 TC</div>
+                  </div>
+
+                  <div class="mbj-shoe"></div>
+
+                  <div class="mbj-dealer-area" id="dealer-area">
+                      <h1 class="dealer-title">DEALER</h1>
+                      
+                      <div id="mbj-fs-dealer-hand" class="mbj-hand-container" style="width: 80px;">
+                           <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
+                      </div>
+                  </div>
+                  
+                  <div id="mbj-seats-row"></div>
+              </div>
+
+              <div class="chip-rack-container" id="mbj-chip-rack">
+                  <div id="rack-alert" class="rack-error-tooltip">MIN BET 10 TC</div>
+
+                  <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
+                  
+                  <div class="rack-chip chip-10" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
+                  <div class="rack-chip chip-100" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
+                  <div class="rack-chip chip-1k" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
+                  <div class="rack-chip chip-10k" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
+                  <div class="rack-chip chip-50k" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
+                  
+                  <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
+                  <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
+                  
+                  <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
               </div>
           </div>
       </div>
-
-      <div class="chat-widget minimized" id="chat-widget" onclick="toggleChat(event)">
-          <div class="chat-header">
-              <span><i class="fas fa-comments"></i> LIVE CHAT</span>
-              <i class="fas fa-chevron-up" id="chat-toggle-icon"></i>
-          </div>
-          <div class="chat-messages" id="chat-messages">
-              <div class="chat-msg-row" style="align-items: center; opacity: 0.5;">
-                  <span style="font-size:0.7rem; margin-top:10px;">Welcome to VIP Premium.</span>
-              </div>
-          </div>
-          <div class="chat-input-area" onclick="event.stopPropagation()">
-              <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKey(event)">
-              <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
-          </div>
-      </div>
-
   </div>
-  
+
+  <div class="chat-widget minimized" id="chat-widget" onclick="toggleChat(event)">
+      <div class="chat-header">
+          <span><i class="fas fa-comments"></i> LIVE CHAT</span>
+          <i class="fas fa-chevron-up" id="chat-toggle-icon"></i>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+          <div class="chat-msg-row" style="align-items: center; opacity: 0.5;">
+              <span style="font-size:0.7rem; margin-top:10px;">Welcome to VIP Premium.</span>
+          </div>
+      </div>
+      <div class="chat-input-area" onclick="event.stopPropagation()">
+          <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKey(event)">
+          <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+  </div>
+
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
-    // Required mathematical functions for client-side scoring to prevent crashes
     function getBJScore(hand) {
         let score = 0, aces = 0;
         for (let card of hand) { 
@@ -1108,16 +1109,19 @@
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, isDoubled = false) {
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
         if(animateFlip) animClass = 'anim-flip';
         if(isDoubled) animClass += ' card-doubled';
         
-        if(isHidden) return `<div class="mbj-card card-back ${animClass}"></div>`;
+        // Absolute positioning prevents shifting of previous cards
+        let styleStr = `left: ${leftOffset}px;`;
+        
+        if(isHidden) return `<div class="mbj-card card-back ${animClass}" style="${styleStr}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
-        return `<div class="mbj-card ${colorClass} ${animClass}">
+        return `<div class="mbj-card ${colorClass} ${animClass}" style="${styleStr}">
                     <div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
                     <div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
                 </div>`;
@@ -1153,7 +1157,7 @@
     }
 
     // The Mario Coin / Physical Payout Animation
-    function animateChipSequence(fromId, toId, color, isWin) {
+    function animateChipSequence(fromId, toId, color) {
         let fromEl = document.getElementById(fromId);
         let toEl = document.getElementById(toId);
         if(!fromEl || !toEl) return;
@@ -1225,7 +1229,8 @@
                     // Scale down slightly if player has split hands to fit the seat wrapper
                     let scaleTransform = s.hands.length > 1 ? 'transform: scale(0.85); transform-origin: bottom center;' : '';
                     
-                    html += `<div class="mbj-hand-container" style="${scaleTransform}">`;
+                    // Fixed width container based on 80px + offset
+                    html += `<div class="mbj-hand-container" style="width: 80px; ${scaleTransform}">`;
                     
                     if (isThisHandActive && mbjGameState === 'PLAYER_TURN') {
                         html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
@@ -1240,7 +1245,8 @@
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
                         let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
-                        html += generateCardHTML(c, false, animateThisCard, false, isDoubledCard);
+                        // Start cards at 0, offset each by 20px
+                        html += generateCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard);
                     });
                     html += `</div>`;
                 });
@@ -1248,7 +1254,7 @@
             } else { 
                 renderedCardCount[i] = 0; 
                 // Empty placeholder to keep height
-                html += `<div class="mbj-hand-container"></div>`;
+                html += `<div class="mbj-hand-container" style="width: 80px;"></div>`;
             }
             html += `</div>`; // End hands row
 
@@ -1379,8 +1385,8 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false); 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
                 setTimeout(() => { 
                     dBadge.style.display = 'flex'; 
                     dBadge.innerText = data.dealerHand[0].bjVal; 
@@ -1414,17 +1420,16 @@
             renderMBJSeats(data.seats); 
             
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
-            let dealerArea = document.getElementById('dealer-area');
-
+            
             if(dHand) {
-                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false);
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true); 
+                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false, 0);
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
                 dBadge.innerText = getBJScore(data.dealerHand.slice(0,2));
                 
                 const drawRemaining = async () => {
                     await delay(800);
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false); 
+                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false, i * 20); 
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
                         await delay(800); 
                     }
@@ -1443,13 +1448,13 @@
                         if (seat && res) {
                             if (res.status === 'LOSS') {
                                 // Animate chip flying from Player up to Dealer
-                                animateChipSequence(`circle-${i}`, 'dealer-area', '#444', false);
+                                animateChipSequence(`circle-${i}`, 'dealer-area', '#444');
                                 let cEl = document.getElementById(`chip-stack-${i}`);
-                                if(cEl) cEl.style.opacity = '0'; // Hide the original
+                                if(cEl) cEl.style.opacity = '0'; 
                             } 
                             else if (res.status === 'WIN') {
                                 // Animate chip flying from Dealer down to Player
-                                animateChipSequence('dealer-area', `circle-${i}`, '#00e676', true);
+                                animateChipSequence('dealer-area', `circle-${i}`, '#00e676');
                                 setTimeout(() => {
                                     document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; 
                                 }, 600);
@@ -1460,7 +1465,6 @@
                                 }, 600);
                             }
                             
-                            // Calculate local banner total
                             if (seat.username === myUsername) {
                                 myNet = res.net;
                             }
