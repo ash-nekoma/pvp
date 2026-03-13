@@ -21,16 +21,14 @@ let mockUsers = {};
 let connectedUsers = {};
 
 // =========================================================================
-// 6-DECK SHOE LOGIC (BLACKJACK)
+// SHARED UTILITIES & SHOE LOGIC
 // =========================================================================
-let shoe = [];
-
-function buildShoe() {
-    shoe = [];
+function buildShoe(decks = 6) {
+    let shoe = [];
     const vs = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
     const ss = ['♠','♣','♥','♦'];
     
-    for(let d = 0; d < 6; d++) {
+    for(let d = 0; d < decks; d++) {
         for(let s of ss) {
             for(let v of vs) {
                 let bj = isNaN(parseInt(v)) ? (v === 'A' ? 11 : 10) : parseInt(v);
@@ -43,10 +41,20 @@ function buildShoe() {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
     }
+    return shoe;
 }
-buildShoe();
 
-function drawCard() { if(shoe.length < 52) buildShoe(); return shoe.pop(); }
+let globalShoe = buildShoe(6);
+
+function drawCard(isSolo = false, soloShoe = null) { 
+    if (isSolo && soloShoe) {
+        if(soloShoe.length < 15) soloShoe.push(...buildShoe(1));
+        return soloShoe.pop();
+    } else {
+        if(globalShoe.length < 52) globalShoe = buildShoe(6); 
+        return globalShoe.pop(); 
+    }
+}
 
 function getBJScore(hand) {
     let score = 0, aces = 0;
@@ -58,7 +66,7 @@ function getBJScore(hand) {
 function isNaturalBlackjack(handCards) { return (handCards.length === 2 && getBJScore(handCards) === 21); }
 
 // =========================================================================
-// VIP BLACKJACK ENGINE
+// 1. VIP MULTIPLAYER BLACKJACK ENGINE
 // =========================================================================
 let mbjState = {
     status: 'BETTING', time: 15, turnTimer: 0, activeTurn: { seat: null, handIdx: 0 }, 
@@ -168,7 +176,6 @@ setInterval(() => {
         
         if (hasBets) {
             mbjState.time--;
-            // Sends ONLY timer updates to stop DOM flickering
             io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true });
         } else {
             mbjState.time = 15; 
@@ -225,7 +232,7 @@ setInterval(() => {
 }, 1000);
 
 // =========================================================================
-// HORSE DERBY ENGINE
+// 2. HORSE DERBY ENGINE
 // =========================================================================
 const HORSES = [
     { id: 1, name: "Thunder", color: "#ff3366", pos: 0, odds: 2 },
@@ -251,7 +258,7 @@ function runDerbyRace() {
         let raceFinished = false; let winner = null;
 
         derbyState.horses.forEach(h => {
-            let speed = Math.random() * 2 + (10 / h.odds); // Fast movement, odds weighted
+            let speed = Math.random() * 2 + (10 / h.odds); 
             h.pos += speed;
             if (h.pos >= 100) { h.pos = 100; if(!raceFinished) { raceFinished = true; winner = h; } }
         });
@@ -288,8 +295,27 @@ setInterval(() => {
     }
 }, 1000);
 
+
 // =========================================================================
-// SOCKET CONNECTION
+// 3. SOLO PLAY ENGINE (Isolated instances per user)
+// =========================================================================
+let soloGames = {}; // Keyed by username
+
+function initSoloGame(username) {
+    soloGames[username] = {
+        status: 'BETTING',
+        bet: 0,
+        playerHand: [],
+        dealerHand: [],
+        shoe: buildShoe(4), // 4 decks for solo
+        doubled: false
+    };
+    return soloGames[username];
+}
+
+
+// =========================================================================
+// SOCKET CONNECTION & ROUTES
 // =========================================================================
 io.on('connection', (socket) => {
     socket.on('login', (data) => {
@@ -318,12 +344,16 @@ io.on('connection', (socket) => {
             if (mbjState.status === 'PLAYER_TURN') socket.emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
         } else if (room === 'derby') {
             socket.emit('derbyUpdate', { event: 'state', state: derbyState });
+        } else if (room === 'solo') {
+            if (!socket.user) return;
+            if (!soloGames[socket.user.username]) initSoloGame(socket.user.username);
+            socket.emit('soloUpdate', { event: 'sync', state: soloGames[socket.user.username] });
         }
     });
 
     socket.on('leaveRoom', (room) => { socket.leave(room); });
 
-    // --- BLACKJACK LOGIC ---
+    // --- VIP MULTIPLAYER BLACKJACK ROUTES ---
     socket.on('mbjTakeSeat', (seatNum) => {
         if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
         for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].username === socket.user.username) return; }
@@ -376,10 +406,12 @@ io.on('connection', (socket) => {
         if (actionData.type === 'hit') {
             if (hand.isSplitAce) return; 
             hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards); mbjState.turnTimer = 15; 
+            
+            // 1.2s PACING PAUSE RESTORED
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                setTimeout(() => mbjNextTurn(), 400); 
+                setTimeout(() => mbjNextTurn(), 1200); 
             } else { 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
@@ -395,7 +427,7 @@ io.on('connection', (socket) => {
                 hand.doubledAmount = hand.bet; hand.bet *= 2; hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; mbjState.turnTimer = 15; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                setTimeout(() => mbjNextTurn(), 400);
+                setTimeout(() => mbjNextTurn(), 1200);
             }
         }
         else if (actionData.type === 'split') {
@@ -414,12 +446,12 @@ io.on('connection', (socket) => {
 
                 seat.hands.push(hand2); mbjState.turnTimer = 15; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                if(hand.score === 21) setTimeout(() => mbjNextTurn(), 400);
+                if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200);
             }
         }
     });
 
-    // --- DERBY LOGIC ---
+    // --- DERBY ROUTES ---
     socket.on('derbyPlaceBet', (data) => {
         if (derbyState.status !== 'BETTING' || !socket.user) return;
         let u = mockUsers[socket.user.username];
@@ -453,4 +485,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Premium VIP Casino Server Running`));
+server.listen(PORT, () => console.log(`🚀 Premium Master Casino Server Running`));
