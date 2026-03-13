@@ -35,8 +35,6 @@ function buildShoe() {
             for(let v of vs) {
                 let bj = isNaN(parseInt(v)) ? (v === 'A' ? 11 : 10) : parseInt(v);
                 let colorClass = (s === '♥' || s === '♦') ? `card-red` : `card-black`;
-                
-                // Note: Center HTML removed for cleaner premium look
                 shoe.push({ 
                     val: v, 
                     suit: s, 
@@ -48,7 +46,7 @@ function buildShoe() {
         }
     }
     
-    // Shuffle the deck
+    // Shuffle the shoe
     for (let i = shoe.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
@@ -94,7 +92,7 @@ function mbjNextTurn() {
     let seatNum = mbjState.activeTurn.seat;
     let handIdx = mbjState.activeTurn.handIdx;
 
-    // Check if current seat has another hand (Split scenarios)
+    // Check if the current seat has split hands remaining
     if (seatNum !== null) {
         let seat = mbjState.seats[seatNum];
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') {
@@ -110,7 +108,7 @@ function mbjNextTurn() {
         }
     }
 
-    // Move to next player
+    // Move to the next player's seat
     let nextSeatNum = null;
     let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
     
@@ -147,6 +145,7 @@ async function mbjResolveDealer() {
         }
     }
 
+    // Dealer rules: Draw to 16, Stand on 17
     let dScore = getBJScore(mbjState.dealer.hand);
     if (playersAlive) {
         while (dScore < 17) {
@@ -180,7 +179,7 @@ async function mbjResolveDealer() {
                         payout = 0; 
                     }
                 } else if (playerNatural) {
-                    payout = h.bet * 2.5; 
+                    payout = h.bet * 2.5; // Pays 3 to 2 (Returns initial bet + 1.5x)
                 } else if (dScore > 21 || pScore > dScore) {
                     payout = h.bet * 2;
                 } else if (pScore === dScore) {
@@ -191,9 +190,12 @@ async function mbjResolveDealer() {
                 else totalWin += (payout + refundAmount);
             });
 
-            // Assign status string for the sequential animations
-            let statusStr = totalWin > 0 ? 'WIN' : (totalPush > 0 ? 'PUSH' : 'LOSS');
-            seatResults[i] = { win: totalWin, push: totalPush, status: statusStr };
+            // Assign status for Mario Coin Animations
+            let totalBet = seat.hands.reduce((sum, h) => sum + h.bet, 0);
+            let netResult = totalWin - (totalBet - totalPush);
+            let statusStr = netResult > 0 ? 'WIN' : (netResult < 0 ? 'LOSS' : 'PUSH');
+            
+            seatResults[i] = { win: totalWin, push: totalPush, status: statusStr, net: netResult };
             
             let user = mockUsers[seat.username];
             if(user) {
@@ -213,7 +215,7 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
-    // Increased timeout heavily to allow the step-by-step Mario Coin chip animations
+    // Give 12 seconds for the physical chip animations to run before clearing the board
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -229,9 +231,10 @@ async function mbjResolveDealer() {
         mbjState.status = 'BETTING';
         
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 13000); 
+    }, 12000); 
 }
 
+// MAIN ENGINE INTERVAL
 setInterval(() => {
     if (mbjState.status === 'BETTING') {
         let hasBets = Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0);
@@ -244,6 +247,7 @@ setInterval(() => {
             io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false, seats: mbjState.seats });
         }
         
+        // Timer hits 0, Lock Bets and Deal
         if (mbjState.time <= 0 && hasBets) {
             for (let i = 1; i <= 5; i++) {
                 if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) {
@@ -264,9 +268,9 @@ setInterval(() => {
                     mbjState.seats[k].hands[0].cards = [c1, c2];
                     mbjState.seats[k].hands[0].isSplitHand = false;
                     mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet;
-                    
                     let score = getBJScore([c1, c2]);
                     mbjState.seats[k].hands[0].score = score;
+                    // Auto-Flag Blackjacks
                     mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
                 });
 
@@ -298,6 +302,7 @@ setInterval(() => {
         mbjState.turnTimer--;
         io.to('mbj').emit('mbjUpdate', { event: 'turn_timer', time: mbjState.turnTimer });
         
+        // Ghost Player Protection
         if (mbjState.turnTimer <= 0) {
             let seat = mbjState.seats[mbjState.activeTurn.seat];
             if(seat && seat.hands[mbjState.activeTurn.handIdx]) {
@@ -324,7 +329,6 @@ io.on('connection', (socket) => {
         socket.emit('loginSuccess', { username: user.username, credits: user.credits });
     });
 
-    // Chat System
     socket.on('sendChatMessage', (msg) => {
         if(socket.user) {
             let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -426,21 +430,16 @@ io.on('connection', (socket) => {
         let hand = seat.hands[handIdx];
 
         if (actionData.type === 'hit') {
-            if (hand.isSplitAce) return; 
-            
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
             
-            // TIMER RESET ON HIT
-            mbjState.turnTimer = 15; 
+            mbjState.turnTimer = 15; // Reset timer
             
-            // Auto-stand if 21 or Bust
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
                 mbjNextTurn(); 
-            } 
-            else { 
+            } else { 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
         } 
@@ -462,11 +461,45 @@ io.on('connection', (socket) => {
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 
-                // TIMER RESET ON DOUBLE
-                mbjState.turnTimer = 15; 
+                mbjState.turnTimer = 15; // Reset timer
                 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
+            }
+        }
+        else if (actionData.type === 'split') {
+            if (hand.cards.length !== 2) return;
+            
+            let val1 = hand.cards[0].bjVal;
+            let val2 = hand.cards[1].bjVal;
+            if (val1 !== val2) return; 
+            
+            let user = mockUsers[socket.user.username];
+            if (user && user.credits >= hand.bet) {
+                user.credits -= hand.bet;
+                socket.emit('balanceUpdateData', { credits: user.credits });
+                
+                let splitCard = hand.cards.pop();
+                let hand2 = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true };
+                hand.isSplitHand = true;
+                
+                // Deal to hand 1
+                hand.cards.push(drawCard());
+                hand.score = getBJScore(hand.cards);
+                if (hand.score === 21) hand.status = 'STAND';
+                
+                // Deal to hand 2
+                hand2.cards.push(drawCard());
+                hand2.score = getBJScore(hand2.cards);
+                if (hand2.score === 21) hand2.status = 'STAND';
+
+                seat.hands.push(hand2);
+                
+                mbjState.turnTimer = 15; // Reset timer
+                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
+                
+                // If both got 21, skip turn
+                if(hand.score === 21) mbjNextTurn();
             }
         }
     });
