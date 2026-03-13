@@ -210,6 +210,7 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
+    // DELAY SLAHSED TO 4 SECONDS FOR FAST RESET
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -225,7 +226,7 @@ async function mbjResolveDealer() {
         mbjState.status = 'BETTING';
         
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 12000); 
+    }, 4000); 
 }
 
 setInterval(() => {
@@ -267,7 +268,7 @@ setInterval(() => {
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
                 
-                let animTime = ((activeSeats.length * 2) + 2) * 400 + 1000; 
+                let animTime = ((activeSeats.length * 2) + 2) * 300 + 500; 
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
@@ -313,13 +314,6 @@ io.on('connection', (socket) => {
         socket.user = user; 
         connectedUsers[user.username] = socket.id;
         socket.emit('loginSuccess', { username: user.username, credits: user.credits });
-    });
-
-    socket.on('sendChatMessage', (msg) => {
-        if(socket.user) {
-            let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            io.emit('receiveChatMessage', { username: socket.user.username, message: msg, time: time });
-        }
     });
 
     socket.on('joinRoom', (room) => { 
@@ -450,7 +444,7 @@ io.on('connection', (socket) => {
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2) return;
             
-            // MAX 1 SPLIT PER PLAYER RULE
+            // MAX 1 SPLIT STRICT RULE
             if (seat.hands.length >= 2) return; 
             
             let val1 = hand.cards[0].bjVal;
