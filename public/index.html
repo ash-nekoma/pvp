@@ -49,17 +49,9 @@
 
         /* ================= AUTHENTICATION UI ================= */
         .auth-card {
-            background: rgba(0, 10, 25, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 15px;
-            padding: 40px;
-            width: 350px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-            text-align: center;
+            background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 15px; padding: 40px; width: 350px; display: flex; flex-direction: column; gap: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8); text-align: center;
         }
         .auth-card h2 { color: white; font-weight: 900; letter-spacing: 2px; font-size: 1.8rem; margin-bottom: 10px; }
         .auth-input {
@@ -386,7 +378,7 @@
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
-    // RESTORED MATH FUNCTION PREVENTS CRASH
+    // RESTORED MATH FUNCTION
     function getBJScore(hand) {
         let score = 0, aces = 0;
         for (let card of hand) { 
@@ -422,7 +414,6 @@
     let localSeatId = null;
     let renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; 
 
-    // INIT AUTH VIEW
     window.onload = () => { switchView('auth'); };
 
     function handleAuthKey(e) { if(e.key === 'Enter') attemptAuth(); }
@@ -731,14 +722,59 @@
             renderMBJSeats(data.seats, null);
         } 
         else if (data.event === 'deal') {
-            renderMBJSeats(data.seats, null); 
+            mbjGameState = 'DEALING';
+            let targetSeats = JSON.parse(JSON.stringify(data.seats));
+            
+            for (let i = 1; i <= 5; i++) {
+                if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) {
+                    currentMBJSeats[i].hands[0].cards = [];
+                    currentMBJSeats[i].hands[0].score = 0;
+                    currentMBJSeats[i].hands[0].status = 'WAITING';
+                }
+            }
+            
+            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
+            renderMBJSeats(currentMBJSeats, null); 
+            
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
-                let html = `<div class="score-badge score-inactive" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
-                html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
-                html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
-                dHand.style.width = '90px'; 
-                dHand.innerHTML = html; 
+                dHand.innerHTML = ''; 
+                dHand.style.width = '70px'; 
+                
+                // TRUE ROUND ROBIN DEALING ANIMATION
+                const dealSequence = async () => {
+                    let activeKeys = Object.keys(targetSeats).filter(k => targetSeats[k] !== null);
+                    
+                    // 1st Card loop
+                    for (let k of activeKeys) {
+                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]);
+                        currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards);
+                        renderMBJSeats(currentMBJSeats, null);
+                        await delay(300);
+                    }
+                    
+                    // Dealer 1st card
+                    let html = `<div class="score-badge score-inactive" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
+                    html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
+                    dHand.innerHTML = html; 
+                    await delay(300);
+                    
+                    // 2nd Card loop
+                    for (let k of activeKeys) {
+                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]);
+                        currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score;
+                        currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status;
+                        renderMBJSeats(currentMBJSeats, null);
+                        await delay(300);
+                    }
+                    
+                    // Dealer Hole card
+                    html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
+                    dHand.style.width = '90px'; 
+                    dHand.innerHTML = html; 
+                };
+                
+                dealSequence();
             } 
         } 
         else if (data.event === 'turn') {
@@ -774,7 +810,7 @@
                 else htmlStr += `<div class="score-badge score-inactive" id="d-score-badge"><span>${initialDScore}</span></div>`;
 
                 htmlStr += generateCardHTML(data.dealerHand[0], false, false, false, 0);
-                htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
+                htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); // Flip Trigger
                 
                 dHand.innerHTML = htmlStr;
                 
