@@ -33,15 +33,9 @@
         .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
 
-        /* Remove Number Input Spinners */
         input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield; 
-        }
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
 
         .topbar { 
             flex: 0 0 75px; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid rgba(255,255,255,0.15); 
@@ -53,6 +47,33 @@
         .main-wrapper { flex: 1; position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .view-container { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
+        /* ================= AUTHENTICATION UI ================= */
+        .auth-card {
+            background: rgba(0, 10, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 40px;
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+            text-align: center;
+        }
+        .auth-card h2 { color: white; font-weight: 900; letter-spacing: 2px; font-size: 1.8rem; margin-bottom: 10px; }
+        .auth-input {
+            background: #111; border: 1px solid rgba(255,255,255,0.2); color: white;
+            padding: 15px; border-radius: 8px; font-family: 'Outfit'; font-size: 1rem; text-align: center;
+        }
+        .auth-input:focus { border-color: var(--ps-glow); box-shadow: 0 0 10px rgba(0, 162, 255, 0.3); }
+        .auth-btn {
+            background: var(--ps-glow); color: black; border: none; padding: 15px;
+            border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 1.1rem; margin-top: 10px;
+        }
+        .auth-btn:hover { background: white; transform: translateY(-2px); }
+
+        /* ================= BUTTONS ================= */
         .btn-play { 
             background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.15); 
             padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; 
@@ -99,18 +120,13 @@
         .global-screen-alert.error { border-color: var(--danger); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3); color: var(--danger); }
         @keyframes popupAlert { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } }
 
-        /* ================= VIP BLACKJACK UI (Spacious Dimensions) ================= */
+        /* ================= VIP BLACKJACK UI ================= */
         .game-board-wrapper { display: flex; flex-direction: column; align-items: center; }
 
         .mbj-board { 
-            width: 1000px; 
-            height: 700px; 
-            background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
-            border-radius: 20px; 
-            position: relative; 
-            border: 15px solid #3e2723; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 5px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(0,0,0,0.8);
-            overflow: hidden; 
+            width: 1000px; height: 700px; background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
+            border-radius: 20px; position: relative; border: 15px solid #3e2723; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 5px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(0,0,0,0.8); overflow: hidden; 
         }
         .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(212, 175, 55, 0.4); border-radius: 10px; pointer-events: none; z-index: 1; }
         
@@ -124,30 +140,23 @@
             padding: 8px 20px; border-radius: 12px; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column;
         }
 
-        /* DEALER TEXT TIMER (Glowing Center Number) */
         .dealer-timer-text {
             color: white; font-size: 4rem; font-family: 'Rajdhani', monospace; font-weight: 900; 
             text-shadow: 0 5px 15px black, 0 0 20px rgba(255, 180, 0, 0.5); margin-bottom: 10px; display: none; line-height: 1;
         }
 
         .mbj-shoe { 
-            position: absolute; top: 40px; right: 40px; 
-            width: 70px; height: 100px; border-radius: 6px;
-            background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); 
-            border: 2px solid rgba(255,255,255,0.8); 
-            box-shadow: -1px 1px 0 #fff, -2px 2px 0 #333, -3px 3px 0 #fff, -4px 4px 0 #333, -5px 5px 0 #fff, -6px 6px 0 #333, -7px 7px 0 #fff, -8px 8px 0 #333, -12px 12px 15px rgba(0,0,0,0.8);
-            z-index: 5; 
+            position: absolute; top: 40px; right: 40px; width: 70px; height: 100px; border-radius: 6px;
+            background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); 
+            box-shadow: -1px 1px 0 #fff, -2px 2px 0 #333, -3px 3px 0 #fff, -4px 4px 0 #333, -5px 5px 0 #fff, -6px 6px 0 #333, -7px 7px 0 #fff, -8px 8px 0 #333, -12px 12px 15px rgba(0,0,0,0.8); z-index: 5; 
         }
 
         .mbj-dealer-area { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 20; }
 
         #mbj-seats-row { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: center; align-items: flex-end; padding: 0 20px; gap: 40px; z-index: 10; }
-        
         .mbj-seat-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 160px; pointer-events: auto; position: relative; }
 
-        /* VERTICAL SPLIT COLUMN (No scaling, stacked) */
         .mbj-split-col { display: flex; flex-direction: column-reverse; gap: 15px; align-items: center; width: 100%; position: relative; }
-        
         .mbj-hand-column { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; }
 
         .mbj-hand-container { position: relative; pointer-events: none; display: flex; justify-content: center; align-items: flex-end; height: 100px; margin-bottom: 0px; perspective: 1000px; }
@@ -162,18 +171,13 @@
         .card-red { color: #cc0000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
         
-        /* EXACT DOUBLE DOWN GEOMETRY (Flush Bottom Edge) */
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
 
-        /* STRICT PERFECT CIRCLE BADGES (Absolute Centered Text) */
         .score-badge {
             position: absolute; top: 50%; transform: translateY(-50%); left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; 
             box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif;
         }
-        .score-badge span { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            font-weight: 900; line-height: 0; text-align: center; width: 100%;
-        }
+        .score-badge span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; line-height: 0; text-align: center; width: 100%; }
         .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
         .score-inactive { background: linear-gradient(to bottom, #555, #333); color: white; }
         
@@ -186,17 +190,14 @@
 
         .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        
         .anim-reveal { animation: revealCard 0.4s ease-out forwards; }
         @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
 
-        /* ACTION BUTTONS */
         .mbj-action-row { 
             position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; 
             display: flex; justify-content: center; gap: 10px; height: 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
         }
         .mbj-action-row.show { opacity: 1; pointer-events: auto; }
-        
         .mbj-action-btn { 
             width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); border: 2px solid #777; color: white; 
             font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); 
@@ -221,10 +222,7 @@
             padding: 2px 10px; margin-top: 2px; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.8); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
         }
 
-        .player-timer-track {
-            width: 90%; height: 6px; background: rgba(0,0,0,0.6); border-radius: 3px; margin-top: 5px; overflow: hidden; 
-            display: none; box-shadow: inset 0 1px 3px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1);
-        }
+        .player-timer-track { width: 90%; height: 6px; background: rgba(0,0,0,0.6); border-radius: 3px; margin-top: 5px; overflow: hidden; display: none; box-shadow: inset 0 1px 3px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); }
         .player-timer-fill { height: 100%; background: var(--success); width: 100%; transition: width 1s linear; }
         .active-turn .player-timer-track { display: block; }
         
@@ -238,7 +236,6 @@
         .mbj-seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative; margin-top: 5px; }
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
-        /* THE MARIO COIN CHIP ANIMATION CLASS */
         .animated-chip {
             position: fixed; z-index: 99999; pointer-events: none; transition: left 0.4s linear, top 0.4s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.4s linear, opacity 0.2s ease-in 0.2s;
             width: 45px; height: 45px; border-radius: 50%; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); 
@@ -251,7 +248,6 @@
         }
         @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -20px); } 80% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -60px); } }
 
-        /* BALANCED CHIP RACK UI */
         .chip-rack-container { 
             width: 1000px; margin-top: 15px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; 
             border: 1px solid rgba(255,255,255,0.15); justify-content: space-between; align-items: center; z-index: 99; 
@@ -277,13 +273,15 @@
         .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
         .rack-btn-confirm:hover { background: white; }
         .custom-input { width: 100px; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: #111; color: white; font-weight: 900; text-align: center; }
+        
+        .user-hud { display: none; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
   <header class="topbar">
       <div class="brand-title" onclick="switchView('casino')">STICK N' TRADE</div>
-      <div style="font-weight: 800; font-size: 1.1rem;">
+      <div class="user-hud" id="user-hud">
           <i class="fas fa-user-circle" style="color:var(--ps-glow)"></i> 
           <span id="player-name-display">Loading...</span>
       </div>
@@ -293,8 +291,18 @@
       <button class="btn-back-fixed hidden" id="global-back-btn" onclick="backToHub()">
           <i class="fas fa-arrow-left"></i> LEAVE TABLE
       </button>
+
+      <div id="view-auth" class="view-container">
+          <div class="auth-card">
+              <h2>JOIN CASINO</h2>
+              <input type="text" id="auth-user" class="auth-input" placeholder="Username" onkeypress="handleAuthKey(event)">
+              <input type="password" id="auth-pass" class="auth-input" placeholder="Password" onkeypress="handleAuthKey(event)">
+              <button class="auth-btn" onclick="attemptAuth()">LOGIN / SIGNUP</button>
+              <div id="auth-err" style="color: var(--danger); font-weight: 900; font-size: 0.9rem; display: none;"></div>
+          </div>
+      </div>
       
-      <div id="view-casino" class="view-container">
+      <div id="view-casino" class="view-container hidden">
         <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">SELECT TABLE</h1>
         <div class="lobby-modes-container">
             <div class="game-card" onclick="openGame('mbj')">
@@ -359,10 +367,26 @@
       </div>
   </div>
 
+  <div class="chat-widget minimized" id="chat-widget" style="display:none;" onclick="toggleChat(event)">
+      <div class="chat-header">
+          <span><i class="fas fa-comments"></i> LIVE CHAT</span>
+          <i class="fas fa-chevron-up" id="chat-toggle-icon"></i>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+          <div class="chat-msg-row" style="align-items: center; opacity: 0.5;">
+              <span style="font-size:0.7rem; margin-top:10px;">Welcome to VIP Premium.</span>
+          </div>
+      </div>
+      <div class="chat-input-area" onclick="event.stopPropagation()">
+          <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKey(event)">
+          <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+  </div>
+
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
-    // CORE MATH FUNCTION (RESTORED TO PREVENT THE FATAL CRASH)
+    // RESTORED MATH FUNCTION PREVENTS CRASH
     function getBJScore(hand) {
         let score = 0, aces = 0;
         for (let card of hand) { 
@@ -376,7 +400,6 @@
         return score;
     }
 
-    // EXACT SIZING FOR PERFECT BADGE CIRCLES
     function getDisplayScore(handCards) {
         let score = 0, aces = 0;
         for (let c of handCards) {
@@ -399,8 +422,31 @@
     let localSeatId = null;
     let renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; 
 
-    window.onload = () => { socket.emit('login', { username: 'VIP_Tester', password: '123' }); };
-    socket.on('loginSuccess', (data) => { myUsername = data.username; updateBalance(data.credits); document.getElementById('player-name-display').innerText = myUsername; switchView('casino'); });
+    // INIT AUTH VIEW
+    window.onload = () => { switchView('auth'); };
+
+    function handleAuthKey(e) { if(e.key === 'Enter') attemptAuth(); }
+    
+    function attemptAuth() {
+        let u = document.getElementById('auth-user').value.trim();
+        let p = document.getElementById('auth-pass').value.trim();
+        document.getElementById('auth-err').style.display = 'none';
+        if(u && p) socket.emit('login', {username: u, password: p});
+    }
+
+    socket.on('loginError', (msg) => {
+        let err = document.getElementById('auth-err');
+        err.innerText = msg; err.style.display = 'block';
+    });
+
+    socket.on('loginSuccess', (data) => { 
+        myUsername = data.username; 
+        updateBalance(data.credits); 
+        document.getElementById('player-name-display').innerText = myUsername; 
+        document.getElementById('user-hud').style.display = 'flex';
+        switchView('casino'); 
+    });
+    
     socket.on('balanceUpdateData', (data) => { updateBalance(data.credits); });
 
     function updateBalance(amt) {
@@ -424,7 +470,11 @@
         document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden')); 
         let v = document.getElementById('view-' + viewId); 
         if (v) v.classList.remove('hidden'); 
-        document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino');
+        
+        document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino' || viewId === 'auth');
+        
+        let chat = document.getElementById('chat-widget');
+        if (viewId === 'casino' || viewId === 'auth') chat.style.display = 'none'; else chat.style.display = 'flex';
     }
 
     function backToHub() {
@@ -443,6 +493,26 @@
     }
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
+
+    let chatOpen = false;
+    function toggleChat(e) {
+        if(e.target.closest('.chat-input-area') || e.target.closest('.chat-messages')) return;
+        let w = document.getElementById('chat-widget'); let i = document.getElementById('chat-toggle-icon'); chatOpen = !chatOpen;
+        if(chatOpen) { w.classList.remove('minimized'); i.className = 'fas fa-chevron-down'; document.getElementById('chat-input').focus(); } 
+        else { w.classList.add('minimized'); i.className = 'fas fa-chevron-up'; }
+    }
+
+    function handleChatKey(e) { if(e.key === 'Enter') sendChat(); }
+    function sendChat() {
+        let input = document.getElementById('chat-input'); let msg = input.value.trim();
+        if(msg.length > 0) { socket.emit('sendChatMessage', msg); input.value = ''; }
+    }
+
+    socket.on('receiveChatMessage', (data) => {
+        let box = document.getElementById('chat-messages'); let isMe = data.username === myUsername;
+        let html = `<div class="chat-msg-row" style="align-items: ${isMe ? 'flex-end' : 'flex-start'};"><div class="chat-meta">${isMe ? 'You' : data.username} • ${data.time}</div><div class="chat-text ${isMe ? 'me' : 'other'}">${data.message}</div></div>`;
+        box.innerHTML += html; box.scrollTop = box.scrollHeight;
+    });
 
     function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
@@ -612,7 +682,7 @@
         if (mbjGameState === 'BETTING') {
             rack.classList.remove('chip-rack-locked');
             if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
-                // Keep unlocked
+                // Keep unlocked for betting
             } else {
                 rack.classList.add('chip-rack-locked');
             }
@@ -629,7 +699,6 @@
     
     function clearLocalBet() { localPendingBet = 0; renderMBJSeats(); }
     
-    // FIX: Automates the custom bet reading when clicking BET
     function confirmLocalBet() {
         let customInput = document.getElementById('custom-bet').value;
         let v = parseInt(customInput);
@@ -640,7 +709,7 @@
         if(localPendingBet < 10) return showRackAlert('Min Bet 10 TC');
         socket.emit('mbjPlaceBet', localPendingBet);
         localPendingBet = 0; 
-        renderMBJSeats(); // Reset visually
+        renderMBJSeats(); 
     }
 
     socket.on('mbjUpdate', async (data) => {
@@ -675,8 +744,6 @@
         else if (data.event === 'turn') {
             mbjGameState = 'PLAYER_TURN'; 
             renderMBJSeats(data.seats, data.activeTurn);
-            
-            // Timeout guarantees the CSS catches the width change and animates smoothly
             setTimeout(() => {
                 if (data.activeTurn && data.activeTurn.seat) {
                     let bar = document.getElementById(`timer-fill-${data.activeTurn.seat}`);
@@ -687,7 +754,10 @@
         else if (data.event === 'turn_timer') { 
             if (data.activeTurn && data.activeTurn.seat) {
                 let bar = document.getElementById(`timer-fill-${data.activeTurn.seat}`);
-                if (bar) bar.style.width = ((data.time / 15) * 100) + '%';
+                if (bar) {
+                    bar.style.transition = 'width 1s linear';
+                    bar.style.width = ((data.time / 15) * 100) + '%';
+                }
             }
         }
         else if (data.event === 'dealer_resolved') {
@@ -696,7 +766,6 @@
             
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
             if(dHand) {
-                // GETBJSCORE IS NOW ACCESSIBLE. ANIMATIONS WILL RUN.
                 let initialDScore = getBJScore(data.dealerHand.slice(0,2));
                 let isBlackjack = (initialDScore === 21 && data.dealerHand.length === 2);
                 
