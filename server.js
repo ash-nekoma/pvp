@@ -211,7 +211,6 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
-    // Physical Mario Coin Timeout
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -419,9 +418,10 @@ io.on('connection', (socket) => {
         let hand = seat.hands[handIdx];
 
         if (actionData.type === 'hit') {
+            if (hand.isSplitAce) return; 
+            
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
-            
             mbjState.turnTimer = 15; 
             
             if (hand.score >= 21) { 
