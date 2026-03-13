@@ -22,25 +22,11 @@
             --credits: #ffb400; 
         }
         
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Outfit', sans-serif; 
-            outline: none; 
-            user-select: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; user-select: none; }
         
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
-            color: white; 
-            height: 100vh; 
-            width: 100vw; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            margin: 0;
-            padding: 0;
+            color: white; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; margin: 0; padding: 0; 
         }
         
         input, textarea { user-select: auto; }
@@ -48,158 +34,68 @@
         ::-webkit-scrollbar { display: none; }
 
         .topbar { 
-            flex: 0 0 75px; 
-            background: rgba(0, 5, 15, 0.95); 
-            border-bottom: 1px solid rgba(255,255,255,0.15); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 25px; 
-            z-index: 1000; 
+            flex: 0 0 75px; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid rgba(255,255,255,0.15); 
+            display: flex; align-items: center; justify-content: space-between; padding: 0 25px; z-index: 1000; 
         }
         
         .brand-title { font-weight: 900; letter-spacing: 2px; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); cursor: pointer; }
         
-        .main-wrapper { 
-            flex: 1; 
-            position: relative; 
-            width: 100%; 
-            height: 100%;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            overflow: hidden;
-        }
-        
-        .view-container { 
-            position: absolute; 
-            inset: 0; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            width: 100%; 
-            height: 100%; 
-        }
+        .main-wrapper { flex: 1; position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .view-container { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
         .btn-play { 
-            background: rgba(255,255,255,0.1); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.15); 
-            padding: 12px 15px; 
-            border-radius: 8px; 
-            font-weight: 900; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            text-transform: uppercase; 
+            background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.15); 
+            padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; 
         }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
         .btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-back-fixed { 
-            position: absolute; 
-            top: 20px; 
-            left: 25px; 
-            z-index: 1000; 
-            background: rgba(0,0,0,0.8); 
-            border: 1px solid rgba(255,255,255,0.15); 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
+            position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); 
+            border: 1px solid rgba(255,255,255,0.15); color: white; padding: 10px 20px; border-radius: 8px; 
+            font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; 
         }
         .btn-back-fixed:hover { background: white; color: black; }
 
         /* ================= DOCKED LIVE CHAT ================= */
         .chat-widget {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 280px; 
-            height: 380px; 
-            background: rgba(0, 10, 25, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            z-index: 10000;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-            transform-origin: bottom right;
+            position: fixed; bottom: 20px; right: 20px; width: 280px; height: 380px; 
+            background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 15px;
+            display: flex; flex-direction: column; z-index: 10000; box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; transform-origin: bottom right;
         }
-
-        .chat-widget.minimized {
-            transform: scale(0.2) translate(120px, 120px);
-            opacity: 0.8;
-            cursor: pointer;
-        }
-
-        .chat-header {
-            padding: 12px;
-            background: rgba(0, 162, 255, 0.1);
-            border-bottom: 1px solid var(--glass-border);
-            font-weight: 900;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--ps-glow);
-            border-radius: 15px 15px 0 0;
-            cursor: pointer;
-        }
-
-        .chat-messages {
-            flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem;
-        }
-
+        .chat-widget.minimized { transform: scale(0.2) translate(120px, 120px); opacity: 0.8; cursor: pointer; }
+        .chat-header { padding: 12px; background: rgba(0, 162, 255, 0.1); border-bottom: 1px solid var(--glass-border); font-weight: 900; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; color: var(--ps-glow); border-radius: 15px 15px 0 0; cursor: pointer; }
+        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem; }
         .chat-msg-row { display: flex; flex-direction: column; }
         .chat-meta { font-size: 0.65rem; color: #aaa; margin-bottom: 2px; }
         .chat-text { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 10px; line-height: 1.3; word-wrap: break-word; }
         .chat-text.me { background: rgba(0, 162, 255, 0.2); color: white; border-bottom-right-radius: 0; }
         .chat-text.other { border-bottom-left-radius: 0; }
-
-        .chat-input-area {
-            padding: 10px; border-top: 1px solid var(--glass-border); display: flex; gap: 8px; background: rgba(0,0,0,0.5); border-radius: 0 0 15px 15px;
-        }
-
+        .chat-input-area { padding: 10px; border-top: 1px solid var(--glass-border); display: flex; gap: 8px; background: rgba(0,0,0,0.5); border-radius: 0 0 15px 15px; }
         .chat-input-area input { flex: 1; background: #111; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 15px; font-family: 'Outfit'; font-size: 0.8rem; }
         .chat-input-area button { background: var(--ps-glow); color: black; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-weight: 900; transition: 0.2s; }
         .chat-input-area button:hover { transform: scale(1.1); }
 
         /* ================= CENTERED SCREEN ALERTS ================= */
         .global-screen-alert {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-            border: 2px solid var(--ps-glow); border-radius: 15px;
-            padding: 30px 60px; font-size: 2.5rem; font-weight: 900;
-            text-transform: uppercase; color: white; text-shadow: 0 5px 15px rgba(0,0,0,1);
-            z-index: 99999; display: none; opacity: 0;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
-            text-align: center;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            border: 2px solid var(--ps-glow); border-radius: 15px; padding: 30px 60px; font-size: 2.5rem; font-weight: 900;
+            text-transform: uppercase; color: white; text-shadow: 0 5px 15px rgba(0,0,0,1); z-index: 99999; display: none; opacity: 0;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3); text-align: center;
         }
         .global-screen-alert.show { display: flex; flex-direction: column; align-items: center; animation: popupAlert 3s forwards; }
         .global-screen-alert.success { border-color: var(--success); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3); color: var(--success); }
         .global-screen-alert.error { border-color: var(--danger); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3); color: var(--danger); }
-        
-        @keyframes popupAlert { 
-            0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 
-            10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
-            90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
-            100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } 
-        }
+        @keyframes popupAlert { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } }
 
-        /* ================= VIP BLACKJACK UI ================= */
+        /* ================= VIP BLACKJACK UI (Spacious Dimensions) ================= */
         .game-board-wrapper { display: flex; flex-direction: column; align-items: center; }
 
+        /* Spacious Table (More square-ish, massive playable space) */
         .mbj-board { 
-            width: 1100px; 
-            height: 520px; 
+            width: 1000px; 
+            height: 700px; 
             background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); 
             border-radius: 20px; 
             position: relative; 
@@ -209,66 +105,64 @@
         }
         .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(212, 175, 55, 0.4); border-radius: 10px; pointer-events: none; z-index: 1; }
         
-        .mbj-logo { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.3; mix-blend-mode: overlay; pointer-events: none; width: 100%; z-index: 2; }
+        .mbj-logo { position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.3; mix-blend-mode: overlay; pointer-events: none; width: 100%; z-index: 2; }
         .mbj-logo h1 { font-size: 3.5rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
         .mbj-logo p { font-weight: 900; font-size: 1rem; letter-spacing: 4px; color: #000; margin-bottom: 5px;}
         .mbj-logo .limits { font-weight: 900; font-size: 0.8rem; letter-spacing: 2px; color: #000; }
 
         .mbj-balance-hud {
-            position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.15); padding: 8px 20px; border-radius: 12px;
-            z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+            position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); 
+            padding: 8px 20px; border-radius: 12px; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column;
         }
 
         .mbj-global-timer {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-            border: 2px solid var(--ps-glow); padding: 30px 60px; border-radius: 20px;
-            z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
-            text-align: center; display: none; 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            border: 2px solid var(--ps-glow); padding: 30px 60px; border-radius: 20px; z-index: 100; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3); text-align: center; display: none; 
         }
         .mbj-global-timer h2 { color: var(--ps-glow); font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 10px; }
         .mbj-global-timer .time-val { color: white; font-family: 'Rajdhani', monospace; font-size: 4rem; font-weight: 900; line-height: 1; }
 
-        /* 3D SHOE */
+        /* REALISTIC 3D SHOE (Matches exactly with 70x100 cards) */
         .mbj-shoe { 
-            position: absolute; top: 20px; right: 20px; width: 70px; height: 100px; 
-            background: repeating-linear-gradient(45deg, #001f4d, #001f4d 5px, #000a1f 5px, #000a1f 10px); 
-            border: 1px solid rgba(255,255,255,0.5); border-radius: 4px;
-            box-shadow: -1px 1px 0 #ddd, -2px 2px 0 #aaa, -3px 3px 0 #ddd, -4px 4px 0 #aaa, 
-                        -5px 5px 0 #ddd, -6px 6px 0 #aaa, -7px 7px 0 #ddd, -8px 8px 0 #aaa, 
-                        -12px 12px 15px rgba(0,0,0,0.8);
+            position: absolute; top: 40px; right: 40px; 
+            width: 70px; height: 100px; border-radius: 6px;
+            background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); 
+            border: 2px solid rgba(255,255,255,0.8); 
+            /* Multi-layered shadow builds physical thickness */
+            box-shadow: 
+                -1px 1px 0 #fff, -2px 2px 0 #333, 
+                -3px 3px 0 #fff, -4px 4px 0 #333, 
+                -5px 5px 0 #fff, -6px 6px 0 #333, 
+                -7px 7px 0 #fff, -8px 8px 0 #333, 
+                -12px 12px 15px rgba(0,0,0,0.8);
             z-index: 5; 
         }
 
         .mbj-dealer-area { 
-            position: absolute; top: 30px; left: 50%; transform: translateX(-50%); 
-            display: flex; flex-direction: column; align-items: center; z-index: 20; 
+            position: absolute; top: 60px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 20; 
         }
 
+        /* SEATS WRAPPER (Dynamic Space Evenly - Centers when players are hidden) */
         #mbj-seats-row { 
-            position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; 
-            justify-content: space-evenly; align-items: flex-end; padding: 0 20px; z-index: 10; 
+            position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: space-evenly; align-items: flex-end; padding: 0 20px; z-index: 10; 
         }
         
         .mbj-seat-wrapper { 
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end; 
-            width: 160px; pointer-events: auto; position: relative; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 160px; pointer-events: auto; position: relative; 
         }
 
         .mbj-hands-row { display: flex; justify-content: center; gap: 15px; width: 100%; position: relative; }
         .mbj-hand-column { display: flex; flex-direction: column; align-items: center; position: relative; }
 
+        /* HORIZONTAL CARD STACKING */
         .mbj-hand-container { 
-            position: relative; pointer-events: none; display: flex;
-            justify-content: center; align-items: flex-end; height: 100px; margin-bottom: 0px; 
-            perspective: 1000px;
+            position: relative; pointer-events: none; display: flex; justify-content: center; align-items: flex-end; height: 100px; margin-bottom: 0px; perspective: 1000px;
         }
         
         .mbj-card { 
-            width: 70px; height: 100px; background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
-            border-radius: 6px; box-shadow: -4px 4px 10px rgba(0,0,0,0.6); position: absolute; 
-            bottom: 0; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; font-weight: 900; z-index: 2;
+            width: 70px; height: 100px; background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); border-radius: 6px; box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
+            position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; font-weight: 900; z-index: 2;
         }
         
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
@@ -276,149 +170,109 @@
         .card-red { color: #cc0000; } .card-black { color: #000; }
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); }
         
+        /* CORRECT DOUBLE DOWN ROTATION (Bottom-Left Pivot to stay perfectly level) */
         .card-doubled { transform-origin: bottom left; transform: rotate(90deg) translate(0, -70px); z-index: 10; }
 
-        /* EXACT PERFECT CENTERED BADGES */
+        /* STRICT PERFECT CIRCLE BADGES (Centered Text inside) */
         .score-badge {
-            position: absolute; top: 50%; transform: translateY(-50%); left: -17px; 
-            width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; 
-            display: flex; justify-content: center; align-items: center; 
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; 
-            font-family: 'Rajdhani', sans-serif; /* Cleaner vertical rendering */
+            position: absolute; top: 50%; transform: translateY(-50%); left: -17px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; 
+            display: flex; justify-content: center; align-items: center; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif;
         }
         .score-badge span {
-            position: relative;
-            top: 1px; /* Corrects standard font ascender gaps for perfect optical center */
-            font-weight: 900; 
-            line-height: 1;
-            text-align: center;
+            position: relative; top: 1px; font-weight: 900; line-height: 1; text-align: center;
         }
-        
         .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
         .score-inactive { background: linear-gradient(to bottom, #555, #333); color: white; }
         
+        /* BUST AND BLACKJACK CENTER OVERLAYS */
         .status-pill {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            padding: 5px 15px; border-radius: 20px; color: white; font-weight: 900; font-size: 0.9rem;
-            z-index: 60; box-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap; letter-spacing: 1px;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 5px 15px; border-radius: 20px; color: white; 
+            font-weight: 900; font-size: 0.9rem; z-index: 60; box-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap; letter-spacing: 1px;
         }
         .pill-bj { background: linear-gradient(to bottom, #00b359, #008040); border: 2px solid #00e676; }
         .pill-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); border: 2px solid #ff3366; }
 
+        /* SMOOTH DEALER & PLAYER CARD ANIMATIONS */
         .anim-fly-in { animation: flyIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translate(300px, -200px) scale(0.3) rotate(45deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } }
+        
         .anim-flip { animation: flipCard 0.4s ease-in-out forwards; }
         @keyframes flipCard { 0% { transform: rotateY(180deg) scale(1.05); } 100% { transform: rotateY(0deg) scale(1); } }
 
-        /* FLOATING CHEVRON (ABOVE BUTTONS) */
-        .turn-chevron {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-bottom: 55px; /* Sits above buttons */
-            color: var(--success);
-            font-size: 1.5rem;
-            z-index: 30;
-            animation: floatChevron 1s infinite;
-            text-shadow: 0 0 15px var(--success);
-        }
-        @keyframes floatChevron { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-8px); } }
-
         /* PERFECTLY ALIGNED ACTION BUTTONS (HOVERING ABOVE CARDS) */
         .mbj-action-row { 
-            position: absolute;
-            bottom: 100%; 
-            left: 50%;
-            transform: translateX(-50%);
-            margin-bottom: 10px; /* Safely floats above the top of the cards */
-            display: flex; justify-content: center; gap: 10px; height: 40px; 
-            opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; 
+            display: flex; justify-content: center; gap: 10px; height: 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
         }
         .mbj-action-row.show { opacity: 1; pointer-events: auto; }
         
         .mbj-action-btn { 
-            width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); 
-            border: 2px solid #777; color: white; font-size: 0.9rem; font-weight: 900; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; transition: 0.1s; 
-            box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); 
+            width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); border: 2px solid #777; color: white; 
+            font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); 
         }
         .mbj-action-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0px 0 #111, 0 2px 4px rgba(0,0,0,0.5); }
         .mbj-action-btn.hit { background: linear-gradient(to bottom, #00e676, #008040); border-color: #00e676; } 
         .mbj-action-btn.stand { background: linear-gradient(to bottom, #ff3366, #9b0022); border-color: #ff3366; } 
         .mbj-action-btn.double { background: linear-gradient(to bottom, #ffcc00, #997a00); border-color: #ffcc00; font-size: 0.75rem; color: black;}
         .mbj-action-btn.split { background: linear-gradient(to bottom, #00a2ff, #005080); border-color: #00a2ff; font-size: 0.75rem; }
-        .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); transform: none; box-shadow: none; }
 
-        .mbj-circle-container { 
-            position: relative; width: 75px; height: 55px; display: flex;
-            justify-content: center; align-items: center; margin-top: 5px;
-        }
+        .mbj-circle-container { position: relative; width: 75px; height: 55px; display: flex; justify-content: center; align-items: center; margin-top: 5px; }
 
         .mbj-seat-circle { 
             width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; cursor: pointer; 
-            transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; 
+            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; 
         }
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 2px solid transparent; background: transparent; cursor: default; }
 
+        /* BLACK BET PILL */
         .bet-pill {
-            background: black; color: white; border: 1px solid #333; border-radius: 12px;
-            font-size: 0.75rem; font-weight: 900; padding: 2px 10px; margin-top: 2px; 
-            z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.8); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
+            background: black; color: white; border: 1px solid #333; border-radius: 12px; font-size: 0.75rem; font-weight: 900; 
+            padding: 2px 10px; margin-top: 2px; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.8); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
         }
 
+        /* LINEAR TIMER BAR */
         .player-timer-track {
-            width: 90%; height: 6px; background: rgba(0,0,0,0.6); border-radius: 3px;
-            margin-top: 5px; overflow: hidden; display: none; box-shadow: inset 0 1px 3px rgba(0,0,0,0.9);
-            border: 1px solid rgba(255,255,255,0.1);
+            width: 90%; height: 6px; background: rgba(0,0,0,0.6); border-radius: 3px; margin-top: 5px; overflow: hidden; 
+            display: none; box-shadow: inset 0 1px 3px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1);
         }
         .player-timer-fill { height: 100%; background: var(--success); width: 100%; transition: width 1s linear; }
         .active-turn .player-timer-track { display: block; }
         
+        /* 3D CHIP STACKS */
         .chip-stack-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 45px; z-index: 10; }
         .mbj-chip-3d { 
-            position: absolute; left: 0; width: 45px; height: 45px; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; 
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 3px 5px rgba(0,0,0,0.8); 
-            background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%),
-                        repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%);
-            border: 2px solid var(--c-bg);
+            position: absolute; left: 0; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; 
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 3px 5px rgba(0,0,0,0.8); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg);
         }
         .mbj-chip-3d.ghost { opacity: 0.5; filter: grayscale(80%); }
 
         .mbj-seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative; margin-top: 5px; }
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
+        /* THE MARIO COIN CHIP ANIMATION CLASS */
         .animated-chip {
-            position: fixed; z-index: 99999; pointer-events: none;
-            transition: left 0.6s linear, top 0.6s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.6s linear, opacity 0.2s ease-in 0.4s;
-            width: 45px; height: 45px; border-radius: 50%; font-weight: 900; 
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); 
-            background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%),
-                        repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%);
-            border: 2px solid var(--c-bg);
+            position: fixed; z-index: 99999; pointer-events: none; transition: left 0.6s linear, top 0.6s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.6s linear, opacity 0.2s ease-in 0.4s;
+            width: 45px; height: 45px; border-radius: 50%; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); 
+            background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg);
         }
 
         .payout-flare { 
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); 
-            color: #00e676; font-size: 1.5rem; font-weight: 900; text-shadow: 0 2px 5px black; 
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.5rem; font-weight: 900; text-shadow: 0 2px 5px black; 
             animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap;
         }
         @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -20px); } 80% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -60px); } }
 
+        /* CHIP RACK UI */
         .chip-rack-container { 
-            width: 1100px; margin-top: 15px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; 
+            width: 1000px; margin-top: 15px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; 
             border: 1px solid rgba(255,255,255,0.15); justify-content: center; gap: 15px; align-items: center; z-index: 99; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.9); transition: 0.3s; position: relative;
         }
         .chip-rack-locked { opacity: 0.5; pointer-events: none; }
 
         .rack-error-tooltip {
-            position: absolute; top: -45px; background: var(--danger); color: white; font-weight: 900;
-            padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            position: absolute; top: -45px; background: var(--danger); color: white; font-weight: 900; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; pointer-events: none;
         }
         .rack-error-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 8px; border-style: solid; border-color: var(--danger) transparent transparent transparent; }
         .rack-error-tooltip.show { opacity: 1; }
@@ -532,7 +386,7 @@
   <div id="global-alert" class="global-screen-alert"></div> 
 
   <script>
-    // Exact sizing dynamically to ensure perfect circle centering
+    // EXACT SIZING FOR PERFECT BADGE CIRCLES (Dynamic font scaling for "10/20")
     function getDisplayScore(handCards) {
         let score = 0, aces = 0;
         for (let c of handCards) {
@@ -627,6 +481,7 @@
         box.innerHTML += html; box.scrollTop = box.scrollHeight;
     });
 
+    // PERFECT HORIZONTAL CARD ALIGNMENT
     function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
@@ -686,6 +541,11 @@
             let isMe = s && s.username === myUsername; 
             if (isMe) localSeatId = i;
 
+            // HIDE EMPTY SEATS DURING ACTIVE ROUNDS
+            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) {
+                continue; 
+            }
+
             let isMySeatTurn = activeSeatNum == i;
             let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
             let activeClass = isMySeatTurn ? 'active-turn' : '';
@@ -707,22 +567,17 @@
                     let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
                     let scaleTransform = s.hands.length > 1 ? 'transform: scale(0.85); transform-origin: bottom center;' : '';
                     
-                    // Column wrapper is relative so absolute buttons float relative to it safely
                     html += `<div class="mbj-hand-column" style="position: relative;">`;
                     
-                    if (isThisHandActive && mbjGameState === 'PLAYER_TURN') {
-                        html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
-                    }
-
-                    // Floating Action Buttons (Positioned purely above the cards)
+                    // FLOATING BUTTONS ABOVE CARDS (Double removed if invalid)
                     let btnClass = (isThisHandActive && mbjGameState === 'PLAYER_TURN' && isMe) ? 'show' : '';
                     let canDouble = hand.cards.length === 2;
                     let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal);
 
                     html += `<div class="mbj-action-row ${btnClass}">
                                 <button class="mbj-action-btn hit" onclick="socket.emit('mbjAction', {type:'hit'})"><i class="fas fa-plus"></i></button>
-                                <button class="mbj-action-btn stand" onclick="socket.emit('mbjAction', {type:'stand'})"><i class="fas fa-hand-paper"></i></button>
-                                <button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})" ${canDouble ? '' : 'disabled'}>x2</button>`;
+                                <button class="mbj-action-btn stand" onclick="socket.emit('mbjAction', {type:'stand'})"><i class="fas fa-hand-paper"></i></button>`;
+                    if (canDouble) html += `<button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})">x2</button>`;
                     if (canSplit) html += `<button class="mbj-action-btn split" onclick="socket.emit('mbjAction', {type:'split'})"><i class="fas fa-arrows-alt-h"></i></button>`;
                     html += `</div>`;
                     
@@ -781,6 +636,7 @@
             }
             html += `</div>`; 
 
+            // TIMER BAR BENEATH NAME
             let nameHTML = s ? s.username : 'EMPTY';
             html += `<div class="mbj-seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${s || mbjGameState==='BETTING' ? 1 : 0.3};" id="seat-name-${i}">${nameHTML}</div>`;
             html += `<div class="player-timer-track"><div class="player-timer-fill" id="timer-fill-${i}"></div></div>`;
@@ -798,7 +654,7 @@
         if (mbjGameState === 'BETTING') {
             rack.classList.remove('chip-rack-locked');
             if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
-                // Keep unlocked for betting
+                // Keep unlocked
             } else {
                 rack.classList.add('chip-rack-locked');
             }
@@ -847,7 +703,7 @@
             renderMBJSeats(data.seats, null); 
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
-                let html = `<div class="score-badge score-inactive" style="display:flex;"><span>${data.dealerHand[0].bjVal}</span></div>`;
+                let html = `<div class="score-badge score-inactive" id="d-score-badge"><span id="d-score-val">${data.dealerHand[0].bjVal}</span></div>`;
                 html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
                 html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
                 dHand.style.width = '90px'; 
@@ -875,32 +731,38 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
             if(dHand) {
                 let initialDScore = getBJScore(data.dealerHand.slice(0,2));
-                let badgeHTML = (initialDScore === 21 && data.dealerHand.length === 2) 
-                                ? `<div class="status-pill pill-bj">BLACKJACK</div>` 
-                                : `<div class="score-badge score-inactive"><span>${initialDScore}</span></div>`;
+                let isBlackjack = (initialDScore === 21 && data.dealerHand.length === 2);
+                
+                let htmlStr = '';
+                if (isBlackjack) htmlStr += `<div class="status-pill pill-bj" id="d-score-badge">BLACKJACK</div>`;
+                else htmlStr += `<div class="score-badge score-inactive" id="d-score-badge"><span id="d-score-val">${initialDScore}</span></div>`;
 
-                let htmlStr = badgeHTML;
                 htmlStr += generateCardHTML(data.dealerHand[0], false, false, false, 0);
-                htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
+                htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); // Hole card FLIPS here
                 
                 dHand.innerHTML = htmlStr;
                 
                 const drawRemaining = async () => {
                     await delay(800);
                     for(let i=2; i<data.dealerHand.length; i++) { 
+                        dHand.style.width = `${(i * 20) + 70}px`;
+                        
                         let currentScore = getBJScore(data.dealerHand.slice(0, i+1));
-                        let currentBadge = currentScore > 21 
-                                         ? `<div class="status-pill pill-bust">${currentScore} BUST</div>` 
-                                         : `<div class="score-badge score-inactive"><span>${currentScore}</span></div>`;
-                                         
-                        let newHtml = currentBadge;
-                        for(let k=0; k<=i; k++) {
-                            let isNewCard = (k === i); 
-                            newHtml += generateCardHTML(data.dealerHand[k], false, isNewCard, false, k * 20); 
+                        
+                        // Cleanly replace badge without destroying card DOM
+                        let badge = document.getElementById('d-score-badge');
+                        if (currentScore > 21) {
+                            if(badge) badge.outerHTML = `<div class="status-pill pill-bust" id="d-score-badge">${currentScore} BUST</div>`;
+                        } else {
+                            if(badge) {
+                                let valSpan = document.getElementById('d-score-val');
+                                if(valSpan) valSpan.innerText = currentScore;
+                            }
                         }
                         
-                        dHand.style.width = `${(i * 20) + 70}px`;
-                        dHand.innerHTML = newHtml; 
+                        // Inject ONLY the new card, so previous cards don't re-animate
+                        dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dealerHand[i], false, true, false, i * 20));
+                        
                         await delay(800); 
                     }
                     
