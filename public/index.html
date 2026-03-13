@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stick N' Trade | VIP Premium</title>
+    <title>Stick N' Trade | Premium VIP Blackjack</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -39,6 +39,8 @@
             overflow: hidden; 
             display: flex; 
             flex-direction: column; 
+            margin: 0;
+            padding: 0;
         }
         
         input, textarea { user-select: auto; }
@@ -64,9 +66,7 @@
             cursor: pointer;
         }
 
-        /* NEW LAYOUT: Flex row allows the game area to sit on the left, 
-           and the chat to sit docked on the right without overlap.
-        */
+        /* NEW LAYOUT: Flex row positions Board and Chat side by side */
         .app-body {
             flex: 1;
             display: flex;
@@ -74,14 +74,9 @@
             width: 100%;
             height: calc(100vh - 75px);
             overflow: hidden;
-        }
-        
-        .game-area { 
-            flex: 1; 
-            position: relative; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
         }
         
         .view-container { 
@@ -96,15 +91,17 @@
         }
 
         /* ================= DOCKED LIVE CHAT ================= */
-        .chat-column {
-            width: 320px;
+        .chat-widget {
+            width: 300px;
+            height: 600px;
             background: rgba(0, 10, 25, 0.85);
-            border-left: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
             display: flex;
             flex-direction: column;
-            height: 100%;
             z-index: 100;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
         }
 
         .chat-header {
@@ -116,6 +113,7 @@
             text-align: center;
             letter-spacing: 1px;
             color: var(--ps-glow);
+            border-radius: 15px 15px 0 0;
         }
 
         .chat-messages {
@@ -152,6 +150,7 @@
             display: flex;
             gap: 10px;
             background: rgba(0,0,0,0.5);
+            border-radius: 0 0 15px 15px;
         }
 
         .chat-input-area input {
@@ -190,38 +189,6 @@
             text-transform: uppercase; 
         }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
-        .btn-play:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .input-control { 
-            width: 100%; 
-            padding: 12px 15px; 
-            background: rgba(0,0,0,0.5); 
-            border: 1px solid rgba(255,255,255,0.15); 
-            color: white; 
-            border-radius: 8px; 
-            font-size: 1rem; 
-            font-weight: 600; 
-            text-align: center; 
-        }
-
-        .btn-back-fixed { 
-            position: absolute; 
-            top: 20px; 
-            left: 25px; 
-            z-index: 1000; 
-            background: rgba(0,0,0,0.8); 
-            border: 1px solid rgba(255,255,255,0.15); 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        .btn-back-fixed:hover { background: white; color: black; }
         
         .lobby-modes-container { display: flex; gap: 40px; }
         
@@ -242,9 +209,9 @@
         }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
 
-        /* CENTERED SCREEN ALERTS */
-        .global-screen-alert {
-            position: fixed; 
+        /* CENTERED BOARD ALERTS */
+        .board-center-alert {
+            position: absolute; 
             top: 50%; 
             left: 50%; 
             transform: translate(-50%, -50%);
@@ -258,27 +225,27 @@
             text-transform: uppercase; 
             color: white; 
             text-shadow: 0 5px 15px rgba(0,0,0,1);
-            z-index: 99999; 
+            z-index: 9999; 
             display: none; 
             opacity: 0;
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
             text-align: center;
         }
         
-        .global-screen-alert.show { 
+        .board-center-alert.show { 
             display: flex; 
             flex-direction: column;
             align-items: center;
             animation: popupAlert 3s forwards; 
         }
         
-        .global-screen-alert.success { 
+        .board-center-alert.success { 
             border-color: var(--success); 
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3);
             color: var(--success);
         }
         
-        .global-screen-alert.error { 
+        .board-center-alert.error { 
             border-color: var(--danger); 
             box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3);
             color: var(--danger);
@@ -293,7 +260,13 @@
 
         /* ================= VIP BLACKJACK UI ================= */
         
-        /* Realistic Mahogany & Gold Trim */
+        .game-board-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Thick Mahogany Wood Rim & Green Casino Felt */
         .mbj-board { 
             width: 1000px; 
             height: 520px; 
@@ -305,6 +278,7 @@
             overflow: hidden; 
         }
         
+        /* Inner Gold Ring */
         .mbj-table-line { 
             position: absolute; 
             inset: 20px; 
@@ -317,7 +291,7 @@
         /* Embossed Felt Typography */
         .mbj-logo { 
             position: absolute; 
-            top: 45%; 
+            top: 40%; 
             left: 50%; 
             transform: translate(-50%, -50%); 
             text-align: center; 
@@ -346,6 +320,37 @@
             flex-direction: column;
         }
 
+        /* GIANT CENTER GLOBAL TIMER */
+        .mbj-global-timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            border: 2px solid var(--ps-glow);
+            padding: 30px 60px;
+            border-radius: 20px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3);
+            text-align: center;
+            display: none; /* Only visible when betting */
+        }
+
+        .mbj-global-timer h2 {
+            color: var(--ps-glow);
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .mbj-global-timer .time-val {
+            color: white;
+            font-family: 'Rajdhani', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
         /* Top Right Shoe */
         .mbj-shoe { 
             position: absolute; 
@@ -360,10 +365,10 @@
             z-index: 5; 
         }
 
-        /* Dealer Plaque and Hand */
+        /* RED H1 DEALER TITLE */
         .mbj-dealer-area { 
             position: absolute; 
-            top: 30px; 
+            top: 20px; 
             left: 50%; 
             transform: translateX(-50%); 
             display: flex; 
@@ -372,17 +377,14 @@
             z-index: 20; 
         }
         
-        .dealer-plaque {
-            background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728);
-            color: black;
+        .dealer-title {
+            color: #ff3366;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
             font-weight: 900;
-            font-size: 0.8rem;
-            padding: 4px 15px;
-            border-radius: 4px;
-            border: 1px solid #000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-            margin-bottom: 15px;
-            letter-spacing: 2px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.9), 0 0 15px rgba(255, 51, 102, 0.5);
+            margin-bottom: 20px;
         }
 
         /* Flexible row ensures no horizontal overlaps */
@@ -409,38 +411,33 @@
             position: relative; 
         }
 
-        /* EXACT CARD CENTERING TRICK */
-        /* Flexbox centers the absolute positioned children perfectly */
+        /* FIXED ABSOLUTE CARD POSITIONING */
+        /* Dynamic width applied via Javascript to center the absolute children perfectly */
         .mbj-hand-container { 
-            display: flex; 
-            justify-content: center; 
-            align-items: flex-end;
             position: relative; 
+            height: 95px; 
             margin-bottom: 10px; 
-            min-height: 105px; 
-            width: 100%; 
             pointer-events: none;
+            display: flex;
+            justify-content: center;
         }
         
         /* Larger, realistic cards */
         .mbj-card { 
-            width: 70px; 
-            height: 100px; 
+            width: 65px; 
+            height: 95px; 
             background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); 
             border-radius: 6px; 
             box-shadow: -4px 4px 10px rgba(0,0,0,0.6); 
-            position: relative; 
+            position: absolute; 
+            bottom: 0;
+            font-family: 'Outfit', sans-serif; 
             color: black; 
             border: 1px solid #ccc; 
-            margin-left: -40px; /* Negative margin overlaps them nicely */
             transform: translateZ(0); 
             font-weight: 900;
             z-index: 2;
         }
-        
-        .mbj-card:first-child { 
-            margin-left: 0; 
-        } 
         
         /* Clean symbols: top left and bottom right only */
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
@@ -452,17 +449,17 @@
         /* UNIFORM GOLD SCORE BADGES */
         .hand-score { 
             position: absolute; 
-            top: -20px; 
+            top: -25px; 
             left: 50%; 
             transform: translateX(-50%);
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
-            border-radius: 50%; 
+            border-radius: 4px; 
             font-weight: 900; 
-            font-size: 1rem; 
-            width: 32px;
-            height: 32px;
+            font-size: 0.9rem; 
+            width: 30px;
+            height: 25px;
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -470,18 +467,18 @@
             z-index: 50; 
         }
         
-        .dealer-score {
+        .dealer-score-badge { 
             position: absolute; 
             top: 25px; 
             left: -40px; 
             background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7);
             color: black; 
             border: 1px solid #000; 
-            border-radius: 50%; 
+            border-radius: 4px; 
             font-weight: 900; 
-            font-size: 1rem; 
-            width: 32px;
-            height: 32px;
+            font-size: 0.9rem; 
+            width: 30px;
+            height: 25px;
             z-index: 20; 
             display: flex; 
             justify-content: center; 
@@ -508,7 +505,7 @@
             left: 50%;
             transform: translateX(-50%);
             color: var(--success);
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             z-index: 30;
             animation: floatChevron 1s infinite;
             text-shadow: 0 0 15px var(--success);
@@ -518,26 +515,30 @@
             50% { transform: translateX(-50%) translateY(-8px); }
         }
 
-        /* 3D Physical Action Buttons */
+        /* 3D Arcade Buttons */
         .mbj-action-row { 
             display: flex; 
-            gap: 8px; 
+            gap: 10px; 
             margin-bottom: 10px; 
-            height: 35px; 
+            height: 40px; 
             opacity: 0; 
             pointer-events: none; 
             transition: opacity 0.3s; 
         }
-        .mbj-action-row.show { opacity: 1; pointer-events: auto; }
+        
+        .mbj-action-row.show { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
         
         .mbj-action-btn { 
-            width: 35px; 
-            height: 35px; 
+            width: 40px; 
+            height: 40px; 
             border-radius: 50%; 
             background: linear-gradient(to bottom, #555, #222); 
             border: 2px solid #777; 
             color: white; 
-            font-size: 0.9rem; 
+            font-size: 1rem; 
             font-weight: 900; 
             cursor: pointer; 
             display: flex; 
@@ -554,7 +555,7 @@
         
         .mbj-action-btn.hit { background: linear-gradient(to bottom, #00e676, #008040); border-color: #00e676; } 
         .mbj-action-btn.stand { background: linear-gradient(to bottom, #ff3366, #9b0022); border-color: #ff3366; } 
-        .mbj-action-btn.double { background: linear-gradient(to bottom, #ffcc00, #997a00); border-color: #ffcc00; font-size: 0.7rem; color: black;}
+        .mbj-action-btn.double { background: linear-gradient(to bottom, #ffcc00, #997a00); border-color: #ffcc00; font-size: 0.8rem; color: black;}
         .mbj-action-btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(100%); transform: none; box-shadow: none; }
 
         /* Circular Timer inside Betting Circle */
@@ -568,6 +569,7 @@
             align-items: center;
         }
 
+        /* SVG Circular Timer perfectly mapped to 45px radius (Circumference 282.7) */
         .circle-timer-svg {
             position: absolute;
             top: 0;
@@ -590,7 +592,7 @@
             fill: none;
             stroke: var(--success);
             stroke-width: 4;
-            stroke-dasharray: 220; /* Approx 2 * PI * r (r=35) */
+            stroke-dasharray: 282.7; 
             stroke-dashoffset: 0;
             transition: stroke-dashoffset 1s linear;
         }
@@ -614,7 +616,7 @@
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle.occupied { border: 2px solid var(--credits); background: transparent; cursor: default; }
         
-        /* Premium Casino Chip (Exact Center) */
+        /* PREMIUM PAULSON CHIP (Dead Center) */
         .mbj-chip { 
             position: absolute; 
             top: 50%; 
@@ -647,17 +649,18 @@
             text-align: center; 
             position: relative;
         }
+
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
-        /* CHIP ANIMATIONS */
+        /* THE MARIO COIN CHIP ANIMATION CLASS */
         .animated-chip {
             position: fixed;
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 99999;
             pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth arc trajectory */
         }
 
-        /* THE CHIP RACK UI (Locks when dealing) */
+        /* THE CHIP RACK UI (Matches table width exactly) */
         .chip-rack-container { 
             width: 1000px;
             margin-top: 15px;
@@ -669,18 +672,21 @@
             justify-content: center;
             gap: 15px; 
             align-items: center; 
-            z-index: 9999; 
+            z-index: 99; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.9); 
             transition: 0.3s;
             position: relative;
         }
         
-        .chip-rack-locked { opacity: 0.5; pointer-events: none; }
+        .chip-rack-locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
 
         /* Error Tooltip attached to Rack */
         .rack-error-tooltip {
             position: absolute;
-            top: -40px;
+            top: -45px;
             background: var(--danger);
             color: white;
             font-weight: 900;
@@ -733,6 +739,7 @@
             transition: 0.2s;
             text-transform: uppercase;
         }
+        
         .rack-btn-clear { background: rgba(255,255,255,0.1); color: white; }
         .rack-btn-clear:hover { background: rgba(255,51,102, 0.8); }
         .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
@@ -747,254 +754,6 @@
             color: white;
             font-weight: 900;
             text-align: center;
-        }
-
-        /* ================= RETRO HORSE DERBY ================= */
-        .hr-board { 
-            width: 900px; 
-            height: 600px; 
-            background: #0a0a0a; 
-            border: 4px solid #333; 
-            border-radius: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 20px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
-            position: relative;
-        }
-        
-        .hr-top-bar { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px; 
-        }
-        
-        .hr-ticker { 
-            flex: 1; 
-            text-align: center; 
-            color: var(--credits); 
-            font-family: 'Rajdhani', sans-serif; 
-            font-size: 1.5rem; 
-            font-weight: 900; 
-            text-shadow: 0 0 10px var(--credits); 
-            padding: 10px; 
-            background: #111; 
-            border: 2px solid #333; 
-            border-radius: 8px; 
-            margin: 0 20px; 
-            text-transform: uppercase;
-        }
-        
-        /* Inline Clock and Timer */
-        .hr-timer-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0,0,0,0.8);
-            border: 1px solid rgba(255,255,255,0.15);
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: white;
-        }
-        
-        #hr-timer { 
-            font-variant-numeric: tabular-nums; 
-            display: inline-block; 
-            width: 30px; 
-            text-align: center;
-        }
-
-        .hr-track-window { 
-            flex: 1; 
-            border: 4px solid #222; 
-            position: relative; 
-            overflow: hidden; 
-            border-radius: 8px; 
-            background: #87CEEB; 
-            display: flex; 
-            flex-direction: column;
-        }
-        
-        .hr-bg-grass { 
-            height: 20%; 
-            width: 100%; 
-            background: #2a8f3d; 
-            border-bottom: 4px solid white; 
-            z-index: 1; 
-            position: relative;
-        }
-        
-        .hr-bg-dirt { 
-            height: 80%; 
-            width: 200%; 
-            background: repeating-linear-gradient(90deg, #4a3026 0px, #4a3026 40px, #3d251d 40px, #3d251d 80px); 
-            z-index: 2; 
-            position: relative;
-        }
-        
-        .track-moving .hr-bg-dirt { animation: scrollTrack 0.3s linear infinite; }
-        .track-slowing .hr-bg-dirt { animation: scrollTrack 2s ease-out forwards; }
-        @keyframes scrollTrack { 
-            from { transform: translateX(0); } 
-            to { transform: translateX(-80px); } 
-        }
-
-        /* Full Height Steel Starting Gate (Covers horses entirely) */
-        .hr-starting-gate { 
-            position: absolute; 
-            left: 0; 
-            top: 20%; 
-            bottom: 0; 
-            width: 12%; 
-            background: repeating-linear-gradient(to bottom, #555 0px, #555 15px, #444 15px, #444 30px); 
-            border-right: 5px solid #222; 
-            border-left: 2px solid #aaa;
-            z-index: 20; 
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: 10px 0 20px rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-evenly;
-            align-items: center;
-        }
-        
-        .gate-stall-num {
-            background: #111;
-            color: white;
-            font-family: 'Rajdhani';
-            font-size: 0.9rem;
-            font-weight: 900;
-            width: 25px;
-            height: 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            border: 2px solid #aaa;
-            box-shadow: inset 0 0 5px black;
-        }
-        .gate-open { transform: translateY(-100%); }
-
-        /* HD Finish Line - Fine Checkerboard and Gold Wire */
-        .hr-finish-line { 
-            position: absolute; 
-            right: -100px; 
-            top: 20%; 
-            bottom: 0; 
-            width: 20px; 
-            background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), 
-                              linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); 
-            background-size: 10px 10px; 
-            background-position: 0 0, 5px 5px; 
-            background-color: #fff; 
-            z-index: 5; 
-            border-left: 4px solid #FFD700; 
-            box-shadow: -10px 0 20px rgba(0,0,0,0.8);
-        }
-        
-        /* Grid Architecture prevents vertical escapes */
-        .hr-lanes-grid { 
-            position: absolute; 
-            top: 20%; 
-            bottom: 0; 
-            width: 100%; 
-            display: grid; 
-            grid-template-rows: repeat(6, 1fr); 
-            z-index: 10; 
-        }
-        
-        .hr-lane { 
-            width: 100%; 
-            height: 100%; 
-            border-bottom: 2px dashed rgba(255,255,255,0.15); 
-            display: flex; 
-            align-items: center; 
-            position: relative; 
-        }
-        
-        /* Horses start at 0% (behind gate) */
-        .hr-horse-group { 
-            position: absolute; 
-            left: 0%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 15; 
-            transform: scaleX(-1); 
-        }
-        
-        .hr-gif { height: 50px; pointer-events: none; }
-        
-        /* Exact Filter Adjustments */
-        .horse-Red .hr-gif { filter: drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Blue .hr-gif { filter: hue-rotate(210deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Green .hr-gif { filter: hue-rotate(100deg) saturate(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Yellow .hr-gif { filter: hue-rotate(60deg) saturate(5) brightness(1.5) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Purple .hr-gif { filter: hue-rotate(270deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-        .horse-Orange .hr-gif { filter: hue-rotate(30deg) saturate(2) drop-shadow(5px 5px 2px rgba(0,0,0,0.5)); }
-
-        .winner-glow { 
-            filter: drop-shadow(0 0 15px white); 
-            transform: scaleX(-1) scale(1.2) !important; 
-            z-index: 50 !important; 
-        }
-        .loser-fade { opacity: 0.3; }
-
-        .hr-controls-area { 
-            margin-top: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        
-        .hr-bet-grid { 
-            display: grid; 
-            grid-template-columns: repeat(6, 1fr); 
-            gap: 10px; 
-        }
-        
-        /* Premium Arcade Betting Buttons */
-        .hr-bet-btn { 
-            background: linear-gradient(to bottom, #333, #111); 
-            border: 2px solid #555; 
-            color: white; 
-            height: 80px;
-            padding: 10px 5px; 
-            font-family: 'Rajdhani', sans-serif; 
-            font-weight: 900; 
-            font-size: 1.1rem; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: 0.1s; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            position: relative; 
-            box-shadow: 0 4px 0 #000, inset 0 2px 5px rgba(255,255,255,0.2);
-            overflow: hidden;
-        }
-        
-        /* Top color band matches horse hex exactly */
-        .hr-bet-btn::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: var(--h-bg);
-        }
-
-        .hr-bet-btn:active:not(:disabled) { 
-            transform: translateY(4px); 
-            box-shadow: 0 0px 0 #000, inset 0 2px 5px rgba(0,0,0,0.5); 
-        }
-        .hr-bet-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        
-        .hr-odds-text { color: var(--success); text-shadow: 0 0 5px var(--success); }
-        
-        /* Clean Bet Amount Tag */
-        .bet-badge {
-            position: absolute; bottom: 5px; font-size: 0.8rem; color: white;
-            background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;
         }
     </style>
 </head>
@@ -1026,106 +785,66 @@
                         <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Premium Layout</div>
                     </div>
                 </div>
-                <div class="game-card" onclick="openGame('horserace')">
-                    <i class="fas fa-horse-head" style="font-size:4rem; color: var(--danger);"></i>
-                    <div>
-                        <div style="font-size: 1.5rem; font-weight:900;">RETRO DERBY</div>
-                        <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Smooth Physics Engine</div>
-                    </div>
-                </div>
             </div>
           </div>
 
           <div id="view-mbj" class="view-container hidden">
               
-              <div class="mbj-board" id="mbj-board-container">
-                  <div class="mbj-table-line"></div>
-                  
-                  <div class="mbj-logo">
-                      <h1>BLACKJACK</h1>
-                      <p>BLACKJACK PAYS 3 TO 2<br>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
-                  </div>
-
-                  <div class="mbj-balance-hud">
-                      <div style="font-size:0.7rem; color:#ccc; font-weight:900;">BALANCE</div>
-                      <div id="bj-bal" style="font-size:1.3rem; font-weight:900; color:var(--credits);">0 TC</div>
-                  </div>
-
-                  <div class="mbj-shoe"></div>
-
-                  <div class="mbj-dealer-area">
-                      <div class="dealer-plaque">DEALER</div>
-                      <div id="mbj-fs-dealer-hand" class="mbj-hand-container">
-                           <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
-                      </div>
-                  </div>
-                  
-                  <div id="mbj-seats-row"></div>
-              </div>
-
-              <div class="chip-rack-container" id="mbj-chip-rack">
-                  <div id="rack-alert" class="rack-error-tooltip">MIN BET 10 TC</div>
-
-                  <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
-                  
-                  <div class="rack-chip" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
-                  <div class="rack-chip" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
-                  <div class="rack-chip" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
-                  <div class="rack-chip" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
-                  <div class="rack-chip" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
-                  
-                  <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
-                  <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
-                  
-                  <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
-              </div>
-          </div>
-
-          <div id="view-horserace" class="view-container hidden">
-              <div class="hr-board" id="hr-board-container">
-                  
-                  <div class="hr-top-bar">
-                      <div class="hr-timer-box">
-                          <i class="fas fa-clock"></i>
-                          <span id="hr-timer">15</span>
-                      </div>
-                      <div class="hr-ticker" id="hr-ticker">WAITING FOR NEXT RACE...</div>
-                      <div style="background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.15); padding: 5px 15px; border-radius: 8px; text-align: right;">
-                          <div style="font-family:'Outfit'; font-size:0.7rem; color:gray; font-weight:800;">BALANCE</div>
-                          <div id="hr-my-bal" style="font-family:'Rajdhani', sans-serif; font-size:1.2rem; font-weight:900; color:var(--credits);">0 TC</div>
-                      </div>
-                  </div>
-                  
-                  <div class="hr-track-window" id="hr-environment">
-                      <div class="hr-bg-grass"></div>
-                      <div class="hr-bg-dirt"></div>
+              <div class="game-board-wrapper">
+                  <div class="mbj-board" id="mbj-board-container">
                       
-                      <div class="hr-finish-line" id="hr-finish-line"></div>
+                      <div id="mbj-center-alert" class="board-center-alert"></div>
+
+                      <div class="mbj-global-timer" id="bj-global-timer">
+                          <h2>PLACE BETS</h2>
+                          <div class="time-val" id="bj-timer-val">15</div>
+                      </div>
+
+                      <div class="mbj-table-line"></div>
                       
-                      <div class="hr-starting-gate" id="hr-gate">
-                          <div class="gate-stall-num">1</div>
-                          <div class="gate-stall-num">2</div>
-                          <div class="gate-stall-num">3</div>
-                          <div class="gate-stall-num">4</div>
-                          <div class="gate-stall-num">5</div>
-                          <div class="gate-stall-num">6</div>
+                      <div class="mbj-logo">
+                          <h1>BLACKJACK</h1>
+                          <p>PAYS 3 TO 2</p>
+                      </div>
+
+                      <div class="mbj-balance-hud">
+                          <div style="font-size:0.7rem; color:#ccc; font-weight:900;">BALANCE</div>
+                          <div id="bj-bal" style="font-size:1.3rem; font-weight:900; color:var(--credits);">0 TC</div>
+                      </div>
+
+                      <div class="mbj-shoe"></div>
+
+                      <div class="mbj-dealer-area" id="dealer-area">
+                          <h1 class="dealer-title">DEALER</h1>
+                          <div id="mbj-fs-dealer-hand" class="mbj-hand-container" style="width: 70px;">
+                               <div class="dealer-score-badge" id="mbj-d-score-val" style="display:none;">0</div>
+                          </div>
                       </div>
                       
-                      <div class="hr-lanes-grid" id="hr-lanes-container"></div>
+                      <div id="mbj-seats-row"></div>
                   </div>
 
-                  <div class="hr-controls-area">
-                      <div style="display:flex; gap:15px; justify-content:center;">
-                          <input type="number" id="hr-bet-input" class="input-control" placeholder="BET AMOUNT (TC)" style="max-width:300px; font-size:1.2rem; height:50px; font-family:'Outfit';" value="100">
-                      </div>
-                      <div class="hr-bet-grid" id="hr-bet-grid"></div>
+                  <div class="chip-rack-container" id="mbj-chip-rack">
+                      <div id="rack-alert" class="rack-error-tooltip">MIN BET 10 TC</div>
+
+                      <button class="rack-btn rack-btn-clear" onclick="clearLocalBet()"><i class="fas fa-times"></i></button>
+                      
+                      <div class="rack-chip chip-10" style="--c-bg:#444;" onclick="addLocalBet(10)">10</div>
+                      <div class="rack-chip chip-100" style="--c-bg:#00a2ff;" onclick="addLocalBet(100)">100</div>
+                      <div class="rack-chip chip-1k" style="--c-bg:#ff3366;" onclick="addLocalBet(1000)">1K</div>
+                      <div class="rack-chip chip-10k" style="--c-bg:#00e676; color:black;" onclick="addLocalBet(10000)">10K</div>
+                      <div class="rack-chip chip-50k" style="--c-bg:#ffcc00; color:black;" onclick="addLocalBet(50000)">50K</div>
+                      
+                      <input type="number" id="custom-bet" class="custom-input" placeholder="Amount">
+                      <button class="rack-btn" style="background:#00a2ff; color:white;" onclick="addCustomBet()"><i class="fas fa-plus"></i></button>
+                      
+                      <button class="rack-btn rack-btn-confirm" onclick="confirmLocalBet()">BET <i class="fas fa-check"></i></button>
                   </div>
               </div>
           </div>
-
       </div>
 
-      <div class="chat-column" id="chat-column">
+      <div class="chat-widget" id="chat-widget" style="display: none;">
           <div class="chat-header">
               <i class="fas fa-comments"></i> LIVE CHAT
           </div>
@@ -1142,10 +861,8 @@
 
   </div>
   
-  <div id="global-alert" class="global-screen-alert"></div> 
-  <div id="flash-msg" class="local-flash"></div> 
-
   <script>
+    // Required mathematical functions for client-side scoring to prevent crashes
     function getBJScore(hand) {
         let score = 0, aces = 0;
         for (let card of hand) { 
@@ -1163,11 +880,9 @@
     let myUsername = '', myCredits = 0;
     let activeGame = null;
     let mbjGameState = 'BETTING';
-    let hrState = { time: 15, status: 'BETTING', currentOdds: {} };
     let localPendingBet = 0;
     let localSeatId = null;
     let renderedCardCount = {}; 
-    let myHRBets = {};
 
     window.onload = () => { 
         socket.emit('login', { username: 'VIP_Tester', password: '123' }); 
@@ -1187,7 +902,6 @@
     function updateBalance(amt) {
         myCredits = amt;
         document.getElementById('bj-bal').innerText = amt.toLocaleString() + ' TC';
-        document.getElementById('hr-my-bal').innerText = amt.toLocaleString() + ' TC';
     }
 
     function showRackAlert(msg) {
@@ -1197,31 +911,34 @@
         setTimeout(() => r.classList.remove('show'), 2000);
     }
     
-    function showGlobalAlert(msg, type='success') {
-        let f = document.getElementById('global-alert');
+    function showBoardAlert(msg, type='success') {
+        let f = document.getElementById('mbj-center-alert');
+        if(!f) return;
         f.innerText = msg;
-        f.className = `global-screen-alert show ${type}`;
-        setTimeout(() => f.className = 'global-screen-alert', 3000);
+        f.className = `board-center-alert show ${type}`;
+        setTimeout(() => f.className = 'board-center-alert', 3000);
     }
 
     function switchView(viewId) { 
         document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden')); 
         let v = document.getElementById('view-' + viewId); 
         if (v) v.classList.remove('hidden'); 
+        
         document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino');
+        
+        // Show chat only when in game
+        let chat = document.getElementById('chat-widget');
+        if (viewId === 'casino') {
+            chat.style.display = 'none';
+        } else {
+            chat.style.display = 'flex';
+        }
     }
 
     function backToHub() {
         if(activeGame === 'mbj') { 
             socket.emit('mbjLeaveSeat'); 
             document.getElementById('mbj-chip-rack').style.display='none'; 
-        }
-        if(activeGame === 'horserace' && document.getElementById('hr-ticker').innerText === "AND THEY'RE OFF!") { 
-            let f = document.getElementById('flash-msg');
-            f.innerText = "Wait for race to finish!";
-            f.className = 'local-flash show error';
-            setTimeout(() => f.className = 'local-flash', 2500);
-            return; 
         }
         if(activeGame) socket.emit('leaveRoom', activeGame);
         activeGame = null;
@@ -1235,9 +952,6 @@
             renderedCardCount = {};
             renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
             switchView('mbj');
-        } else if (id === 'horserace') {
-            setupDerbyUI();
-            switchView('horserace');
         }
     }
 
@@ -1274,54 +988,65 @@
     });
 
     // =========================================================================
-    // VIP BLACKJACK RENDERING & CHIP ANIMATIONS
+    // VIP BLACKJACK RENDERING & ANIMATIONS
     // =========================================================================
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, isDealer = false) {
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateFlip = false, leftOffset = 0) {
         let animClass = '';
         if(animateIn) animClass = 'anim-fly-in';
         if(animateFlip) animClass = 'anim-flip';
         
-        // Flexbox will center cards naturally if we use negative left margin. 
-        // We do NOT use absolute positioning here so it scales cleanly.
+        // Absolute positioning prevents flexbox shift.
+        let styleStr = `left: ${leftOffset}px;`;
         
-        if(isHidden) return `<div class="mbj-card card-back ${animClass}"></div>`;
+        if(isHidden) return `<div class="mbj-card card-back ${animClass}" style="${styleStr}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
-        return `<div class="mbj-card ${colorClass} ${animClass}">
+        return `<div class="mbj-card ${colorClass} ${animClass}" style="${styleStr}">
                     <div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
                     <div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div>
                 </div>`;
     }
     
-    // Animate a chip from Point A to Point B
-    function animateChip(fromElem, toElem, colorClass, delayMs) {
+    // The Mario Coin / Physical Chip Animation
+    function animateChipSequence(fromId, toId, color, isWin) {
+        let fromEl = document.getElementById(fromId);
+        let toEl = document.getElementById(toId);
+        if(!fromEl || !toEl) return;
+        
+        let fRect = fromEl.getBoundingClientRect();
+        let tRect = toEl.getBoundingClientRect();
+        
+        let chip = document.createElement('div');
+        chip.className = `mbj-chip animated-chip`;
+        chip.style.cssText = `
+            --c-bg: ${color}; 
+            position: fixed;
+            left: ${fRect.left + (fRect.width/2)}px; 
+            top: ${fRect.top + (fRect.height/2)}px;
+            margin-left: -22.5px; margin-top: -22.5px;
+            z-index: 99999;
+        `;
+        
+        document.body.appendChild(chip);
+        
+        // Force CSS Reflow
+        void chip.offsetWidth;
+        
+        // Mario Arc Effect
+        chip.style.transform = 'scale(1.5)';
+        
         setTimeout(() => {
-            if(!fromElem || !toElem) return;
-            let fRect = fromElem.getBoundingClientRect();
-            let tRect = toElem.getBoundingClientRect();
-            
-            let chip = document.createElement('div');
-            chip.className = `mbj-chip animated-chip`;
-            chip.style.cssText = `
-                --c-bg: ${colorClass}; 
-                left: ${fRect.left + (fRect.width/2)}px; 
-                top: ${fRect.top + (fRect.height/2)}px;
-                margin-left: -22px; margin-top: -22px;
-            `;
-            document.body.appendChild(chip);
-            
-            // Force reflow
-            void chip.offsetWidth;
-            
             chip.style.left = `${tRect.left + (tRect.width/2)}px`;
             chip.style.top = `${tRect.top + (tRect.height/2)}px`;
-            chip.style.opacity = '0';
             chip.style.transform = 'scale(0.5)';
-            
-            setTimeout(() => { if(chip.parentNode) chip.remove(); }, 600);
-        }, delayMs);
+            chip.style.opacity = '0';
+        }, 50);
+        
+        setTimeout(() => {
+            if(chip.parentNode) chip.remove();
+        }, 650);
     }
 
     function renderMBJSeats(seats, activeTurnObj = null) {
@@ -1348,18 +1073,21 @@
 
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
             
-            // 1. CARDS (Flex Centered)
-            html += `<div class="mbj-hand-container">`;
+            // 1. CARDS (Absolute Centered Container)
+            let cardCount = (s && s.hands && s.hands.length > 0) ? s.hands[0].cards.length : 0;
+            // Dynamic width calculation to keep absolute cards perfectly centered
+            let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 65 : 65; 
+            
+            html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
             
             if (isMySeatTurn && mbjGameState === 'PLAYER_TURN') {
                 html += `<div class="turn-chevron"><i class="fas fa-chevron-down"></i></div>`;
             }
 
             if (s && s.hands && s.hands.length > 0) {
-                let currentHandCount = s.hands[0].cards.length;
                 let previouslyRendered = renderedCardCount[i] || 0;
                 
-                // Fixed Gold Plaque
+                // Fixed Gold Plaque Score Badge above hand
                 if(s.hands[0].cards.length > 0 && s.hands[0].status !== 'BUST') { 
                     html += `<div class="hand-score">${s.hands[0].score}</div>`; 
                 }
@@ -1367,14 +1095,14 @@
                 s.hands.forEach((hand, hIdx) => {
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
-                        html += generateCardHTML(c, false, animateThisCard, false, false);
+                        html += generateCardHTML(c, false, animateThisCard, false, cIdx * 20);
                     });
                 });
-                renderedCardCount[i] = currentHandCount; 
+                renderedCardCount[i] = cardCount; 
             } else { renderedCardCount[i] = 0; }
             html += `</div>`;
 
-            // 2. ACTION BUTTONS (Middle)
+            // 2. ACTION BUTTONS
             let btnClass = (isMySeatTurn && mbjGameState === 'PLAYER_TURN' && isMe) ? 'show' : '';
             let canDouble = s && s.hands && s.hands.length > 0 && s.hands[0].cards.length === 2;
             html += `<div class="mbj-action-row ${btnClass}">
@@ -1383,10 +1111,10 @@
                         <button class="mbj-action-btn double" onclick="socket.emit('mbjAction', {type:'double'})" ${canDouble ? '' : 'disabled'}>x2</button>
                      </div>`;
 
-            // 3. CIRCLE, SVG TIMER, & CHIPS (Bottom)
+            // 3. CIRCLE, SVG TIMER, & CHIPS
             html += `<div class="mbj-circle-container" id="circle-${i}">`;
             
-            // The SVG Ring Timer
+            // The SVG Ring Timer (Circumference 282.7)
             html += `<svg class="circle-timer-svg" viewBox="0 0 100 100">
                         <circle class="circle-timer-bg" cx="50" cy="50" r="45"></circle>
                         <circle class="circle-timer-path" id="svg-timer-${i}" cx="50" cy="50" r="45"></circle>
@@ -1401,7 +1129,7 @@
                 // Premium Centered Chip
                 if (displayBet > 0) { 
                     let cBg = displayBet >= 10000 ? '#00e676' : displayBet >= 1000 ? '#ff3366' : displayBet >= 100 ? '#00a2ff' : '#444';
-                    html += `<div class="mbj-chip ${totalSeatBet===0?'ghost':''}" id="chip-${i}" style="--c-bg:${cBg};">${displayBet}</div>`; 
+                    html += `<div class="mbj-chip ${totalSeatBet===0?'ghost':''}" id="chip-stack-${i}" style="--c-bg:${cBg};">${displayBet}</div>`; 
                 }
             } else {
                 html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
@@ -1467,10 +1195,19 @@
     socket.on('mbjUpdate', async (data) => {
         if(activeGame !== 'mbj') return;
         let dBadge = document.getElementById('mbj-d-score-val');
-        
+        let gTimerBox = document.getElementById('bj-global-timer');
+        let gTimerVal = document.getElementById('bj-timer-val');
+
         if(data.event === 'timer') {
             mbjGameState = 'BETTING'; 
             dBadge.style.display = 'none';
+            
+            if(data.active) {
+                gTimerBox.style.display = 'block';
+                gTimerVal.innerText = data.time; 
+            } else {
+                gTimerBox.style.display = 'none';
+            }
             renderMBJSeats(data.seats); 
         } 
         else if (data.event === 'sync_seats') { 
@@ -1478,6 +1215,7 @@
         } 
         else if (data.event === 'lock_bets') { 
             mbjGameState = 'DEALING'; 
+            gTimerBox.style.display = 'none';
             renderMBJSeats(data.seats, null);
         } 
         else if (data.event === 'deal') {
@@ -1485,8 +1223,10 @@
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, true); 
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, true); 
+                // Set container width dynamically based on card count
+                dHand.style.width = '85px'; 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
                 setTimeout(() => { 
                     dBadge.style.display = 'flex'; 
                     dBadge.innerText = data.dealerHand[0].bjVal; 
@@ -1501,7 +1241,7 @@
             if (data.activeTurn && data.activeTurn.seat) {
                 let svgPath = document.getElementById(`svg-timer-${data.activeTurn.seat}`);
                 if (svgPath) {
-                    let offset = 280 - ((data.time / 15) * 280);
+                    let offset = 282.7 - ((data.time / 15) * 282.7);
                     svgPath.style.strokeDashoffset = offset;
                 }
             }
@@ -1510,7 +1250,7 @@
             if (mbjState && mbjState.activeTurn && mbjState.activeTurn.seat) {
                 let svgPath = document.getElementById(`svg-timer-${mbjState.activeTurn.seat}`);
                 if (svgPath) {
-                    let offset = 280 - ((data.time / 15) * 280);
+                    let offset = 282.7 - ((data.time / 15) * 282.7);
                     svgPath.style.strokeDashoffset = offset;
                 }
             }
@@ -1520,69 +1260,68 @@
             renderMBJSeats(data.seats); 
             
             let dHand = document.getElementById('mbj-fs-dealer-hand'); 
-            let dealerArea = document.querySelector('.dealer-plaque');
-
             if(dHand) {
-                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false, true);
-                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, true); 
+                dHand.innerHTML = generateCardHTML(data.dealerHand[0], false, false, false, 0);
+                dHand.innerHTML += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
                 dBadge.innerText = getBJScore(data.dealerHand.slice(0,2));
                 
                 const drawRemaining = async () => {
                     await delay(800);
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false, true); 
+                        dHand.style.width = `${(i * 20) + 65}px`;
+                        dHand.innerHTML += generateCardHTML(data.dealerHand[i], false, true, false, i * 20); 
                         dBadge.innerText = getBJScore(data.dealerHand.slice(0, i+1));
                         await delay(800); 
                     }
                     dBadge.innerText = data.dealerScore;
                     
-                    // The Physical Payout Animations
-                    await delay(1000);
+                    await delay(800);
                     let myNet = 0;
                     
-                    // 1. Collect Losses
-                    for(let i=1; i<=5; i++) {
+                    // ============================================
+                    // SEQUENTIAL PHYSICAL CHIP PAYOUT ANIMATION
+                    // ============================================
+                    for(let i = 1; i <= 5; i++) {
                         let seat = data.seats[i];
-                        if (seat && data.results && data.results[i]) {
-                            if (data.results[i].status === 'LOSS') {
-                                let cEl = document.getElementById(`chip-${i}`);
-                                if(cEl) animateChip(cEl, dealerArea, '#444', 0);
+                        let res = data.results && data.results[i];
+                        
+                        if (seat && res) {
+                            if (res.status === 'LOSS') {
+                                // Animate chip flying from Player up to Dealer
+                                animateChipSequence(`circle-${i}`, 'dealer-area', '#444', false);
+                                let cEl = document.getElementById(`chip-stack-${i}`);
                                 if(cEl) cEl.style.opacity = '0'; // Hide the original
-                            }
-                        }
-                    }
-                    
-                    await delay(1500); // Wait for collection
-                    
-                    // 2. Pay Winners
-                    for(let i=1; i<=5; i++) {
-                        let seat = data.seats[i];
-                        if (seat && data.results && data.results[i]) {
-                            let res = data.results[i];
-                            if (res.status === 'WIN') {
-                                let cEl = document.getElementById(`circle-${i}`);
-                                animateChip(dealerArea, cEl, '#00e676', 0);
-                                animateChip(dealerArea, cEl, '#00e676', 200);
-                                
+                            } 
+                            else if (res.status === 'WIN') {
+                                // Animate chip flying from Dealer down to Player
+                                animateChipSequence('dealer-area', `circle-${i}`, '#00e676', true);
                                 setTimeout(() => {
                                     document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${res.win}</div>`; 
-                                }, 800);
+                                }, 600);
+                            }
+                            else if (res.status === 'PUSH') {
+                                setTimeout(() => {
+                                    document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; 
+                                }, 600);
                             }
                             
-                            // Calculate local net for banner
+                            // Calculate local banner total
                             if (seat.username === myUsername) {
                                 let tb = seat.hands.reduce((sum, h)=>sum+h.bet, 0);
                                 myNet = res.win - (tb - res.push);
                             }
+                            
+                            // Wait 800ms before doing the next player's animation
+                            await delay(800);
                         }
                     }
 
-                    await delay(1000);
+                    await delay(500);
                     
                     // CENTERED NOTIFICATION
-                    if (myNet > 0) showGlobalAlert(`WON +${myNet} TC`, 'success');
-                    else if (myNet < 0) showGlobalAlert(`LOST ${Math.abs(myNet)} TC`, 'error');
-                    else if (myNet === 0 && data.results && data.results[localSeatId] && data.results[localSeatId].push > 0) showGlobalAlert(`PUSH`, 'success');
+                    if (myNet > 0) showBoardAlert(`WON +${myNet} TC`, 'success');
+                    else if (myNet < 0) showBoardAlert(`LOST ${Math.abs(myNet)} TC`, 'error');
+                    else if (myNet === 0 && data.results && data.results[localSeatId] && data.results[localSeatId].push > 0) showBoardAlert(`PUSH`, 'success');
                 }; 
                 drawRemaining();
             }
@@ -1596,191 +1335,6 @@
         }
     });
 
-    // =========================================================================
-    // RETRO HORSE DERBY LOGIC
-    // =========================================================================
-    const btnColors = {'Red':'#ff3366', 'Blue':'#4363d8', 'Green':'#3cb44b', 'Yellow':'#ffe119', 'Purple':'#911eb4', 'Orange':'#f58231'};
-    
-    function setupDerbyUI() {
-        let container = document.getElementById('hr-lanes-container');
-        if(!container) return;
-        
-        let trackHTML = ''; 
-        ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach((c) => {
-            // Start at 0% (behind the closed gate)
-            trackHTML += `
-            <div class="hr-lane">
-                <div id="horse-${c}" class="hr-horse-group horse-${c}" style="left: 0%;">
-                    <img src="./giphy.gif" class="hr-gif" alt="Horse">
-                </div>
-            </div>`;
-        });
-        container.innerHTML = trackHTML;
-        
-        let bg = document.getElementById('hr-bet-grid');
-        if(bg) {
-            bg.innerHTML = '';
-            ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach((c) => {
-                let oText = hrState.currentOdds && hrState.currentOdds[c] ? hrState.currentOdds[c] + 'x' : '?x';
-                let myB = myHRBets[c] || 0;
-                
-                // Colors exactly match the horse
-                bg.innerHTML += `
-                <button class="hr-bet-btn" style="--h-bg:${btnColors[c]};" onclick="placeHRBet('${c}', this)">
-                    ${c} 
-                    <span style="color: white; text-shadow: 1px 1px 2px black;">${oText}</span>
-                    <span class="bet-badge" id="b-${c}">${myB > 0 ? myB + ' TC' : ''}</span>
-                </button>`;
-            });
-        }
-        let fLineEl = document.getElementById('hr-finish-line');
-        if(fLineEl) fLineEl.style.right = '-100px'; 
-        let gate = document.getElementById('hr-gate');
-        if(gate) gate.classList.remove('gate-open');
-    }
-
-    function placeHRBet(c, btnElement) {
-        if(hrState.status !== 'BETTING') return;
-        let i = document.getElementById('hr-bet-input');
-        let a = parseFloat(i.value);
-        if(isNaN(a) || a < 10) return;
-        
-        btnElement.classList.add('flash-bet');
-        setTimeout(() => btnElement.classList.remove('flash-bet'), 200);
-
-        socket.emit('placeSharedBet', { room: 'horserace', choice: c, amount: a });
-    }
-
-    socket.on('sharedBetConfirmed', (data) => {
-        if(data.room !== 'horserace') return;
-        myHRBets[data.choice] = (myHRBets[data.choice] || 0) + data.amount;
-        let e = document.getElementById('b-' + data.choice);
-        if(e) e.innerText = myHRBets[data.choice] + ' TC';
-    });
-
-    socket.on('hrTimerUpdate', (data) => {
-        hrState.time = data.time;
-        if (data.odds) hrState.currentOdds = data.odds;
-        if(activeGame === 'horserace' && document.getElementById('hr-ticker').innerText !== "AND THEY'RE OFF!") {
-            let s = document.getElementById('hr-timer');
-            if(s) s.innerText = data.time;
-        }
-    });
-
-    socket.on('hrLockBets', () => {
-        if(activeGame !== 'horserace') return;
-        hrState.status = 'RACING';
-        document.getElementById('hr-ticker').innerText = "AND THEY'RE OFF!";
-        document.querySelectorAll('.hr-bet-btn').forEach(b => b.disabled = true);
-    });
-
-    let hrRaceInterval;
-    socket.on('hrRaceStart', (data) => {
-        if(activeGame !== 'horserace') return;
-        const horses = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
-        
-        let currentPos = { Red: -5, Blue: -5, Green: -5, Yellow: -5, Purple: -5, Orange: -5 };
-        let targetPos = { Red: -5, Blue: -5, Green: -5, Yellow: -5, Purple: -5, Orange: -5 };
-
-        let duration = data.duration; let startTime = Date.now();
-        
-        // Gate rockets up, track starts moving
-        let gate = document.getElementById('hr-gate');
-        if(gate) gate.classList.add('gate-open');
-        document.getElementById('hr-environment').className = 'hr-track-window track-moving';
-        
-        let fLineEl = document.getElementById('hr-finish-line');
-        if(fLineEl) { fLineEl.style.transition = 'none'; fLineEl.style.right = '-100px'; }
-        
-        if(hrRaceInterval) clearInterval(hrRaceInterval);
-
-        horses.forEach(h => {
-            let el = document.getElementById('horse-' + h);
-            if (el) { el.classList.remove('loser-fade', 'winner-glow'); }
-        });
-
-        let nextTargetUpdate = startTime + 500;
-        let lineCrossed = false;
-
-        hrRaceInterval = setInterval(() => {
-            let now = Date.now(); let elapsed = now - startTime; let timeRemaining = duration - elapsed;
-
-            if (timeRemaining > 0) {
-                // Jostling smoothly between off-screen left and mid-screen
-                if (now > nextTargetUpdate && timeRemaining > 3000) {
-                    horses.forEach(h => { targetPos[h] = Math.random() * 50 + 10; });
-                    nextTargetUpdate = now + 800 + Math.random() * 1000; 
-                } 
-                // The Sprint to the Finish Line
-                else if (timeRemaining <= 3000 && timeRemaining > 0) {
-                    if (fLineEl && fLineEl.style.right === '-100px') { 
-                        fLineEl.style.transition = 'right 3s linear'; 
-                        fLineEl.style.right = '10%'; 
-                    }
-                    horses.forEach(h => { targetPos[h] = (h === data.winner) ? 90 : 40 + (Math.random() * 20); });
-                }
-            } 
-
-            if(elapsed >= duration) {
-                // TRUE ENDING: Winner hits 90%, background slowly grinds to a halt
-                if (!lineCrossed) {
-                    lineCrossed = true;
-                    document.getElementById('hr-environment').className = 'hr-track-window track-slowing'; 
-                }
-                
-                clearInterval(hrRaceInterval);
-                horses.forEach(h => {
-                    let el = document.getElementById('horse-' + h);
-                    if(el) { 
-                        el.style.left = (h === data.winner ? 90 : Math.min(currentPos[h], 75)) + '%'; 
-                    }
-                });
-                return;
-            }
-
-            horses.forEach(h => {
-                // Gradual acceleration math for smooth running
-                let speed = (timeRemaining <= 3000) ? 0.04 : 0.015; 
-                currentPos[h] += (targetPos[h] - currentPos[h]) * speed;
-                
-                let el = document.getElementById('horse-' + h);
-                if(el) el.style.left = currentPos[h] + '%';
-            });
-        }, 30); 
-    });
-
-    socket.on('hrRaceResults', (data) => {
-        if(activeGame !== 'horserace') return;
-        let w = data.winner;
-        document.getElementById('hr-ticker').innerText = `${w.toUpperCase()} WINS!`;
-        document.getElementById('hr-ticker').style.color = btnColors[w];
-        
-        // Spotlights the winner
-        ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'].forEach(c => {
-            let el = document.getElementById('horse-' + c);
-            if (el) {
-                if (c === w) el.classList.add('winner-glow');
-                else el.classList.add('loser-fade');
-            }
-        });
-
-        // GLOBAL ALERTS FOR RACE
-        let myPayout = data.payouts ? (data.payouts[myUsername] || 0) : 0;
-        if (myPayout > 0) showGlobalAlert(`WON +${myPayout} TC`, 'success');
-        else showGlobalAlert(`RACE FINISHED`, 'error');
-    });
-
-    socket.on('hrNewRound', (data) => {
-        if(activeGame === 'horserace') {
-            hrState.status = 'BETTING'; hrState.time = 15;
-            if (data && data.odds) hrState.currentOdds = data.odds;
-            document.getElementById('hr-ticker').innerText = "WAITING FOR NEXT RACE...";
-            document.getElementById('hr-ticker').style.color = "var(--credits)";
-            myHRBets = {};
-            setupDerbyUI(); 
-            document.querySelectorAll('.hr-bet-btn').forEach(b => b.disabled = false);
-        }
-    });
   </script>
 </body>
 </html>
