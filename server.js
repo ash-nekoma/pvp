@@ -297,7 +297,7 @@ async function mbjResolveDealer() {
         mbjState.status = 'BETTING';
         
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 8000); 
+    }, 10000); 
 }
 
 setInterval(() => {
@@ -499,8 +499,11 @@ io.on('connection', (socket) => {
             
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
-            mbjState.turnTimer = 15; // Reset timer on Hit
             
+            // TIMER RESET ON HIT
+            mbjState.turnTimer = 15; 
+            
+            // AUTO STAND LOGIC
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
@@ -528,7 +531,8 @@ io.on('connection', (socket) => {
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 
-                mbjState.turnTimer = 15; // Reset timer on Double
+                // TIMER RESET ON DOUBLE
+                mbjState.turnTimer = 15; 
                 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
