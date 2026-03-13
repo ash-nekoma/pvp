@@ -449,6 +449,10 @@ io.on('connection', (socket) => {
         }
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2) return;
+            
+            // MAX 1 SPLIT PER PLAYER RULE
+            if (seat.hands.length >= 2) return; 
+            
             let val1 = hand.cards[0].bjVal;
             let val2 = hand.cards[1].bjVal;
             if (val1 !== val2) return; 
