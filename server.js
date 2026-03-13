@@ -59,7 +59,6 @@ function drawCard() {
     return shoe.pop();
 }
 
-// Server-side strict scoring (Always returns best hard score for game logic)
 function getBJScore(hand) {
     let score = 0, aces = 0;
     for (let card of hand) { 
@@ -93,7 +92,6 @@ function mbjNextTurn() {
     let seatNum = mbjState.activeTurn.seat;
     let handIdx = mbjState.activeTurn.handIdx;
 
-    // Check if current seat has a split hand to play
     if (seatNum !== null) {
         let seat = mbjState.seats[seatNum];
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') {
@@ -109,16 +107,12 @@ function mbjNextTurn() {
         }
     }
 
-    // Move to next player
     let nextSeatNum = null;
     let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
     
     for (let i = startIdx; i <= 5; i++) {
         let s = mbjState.seats[i];
-        if (s && s.hands.some(h => h.status === 'PLAYING')) { 
-            nextSeatNum = i; 
-            break; 
-        }
+        if (s && s.hands.some(h => h.status === 'PLAYING')) { nextSeatNum = i; break; }
     }
 
     if (nextSeatNum !== null) {
@@ -214,7 +208,6 @@ async function mbjResolveDealer() {
         results: seatResults 
     });
     
-    // Resolution timeout gives front-end animations time to run
     setTimeout(() => {
         for (let i = 1; i <= 5; i++) {
             if (mbjState.seats[i]) {
@@ -309,7 +302,6 @@ setInterval(() => {
 }, 1000);
 
 io.on('connection', (socket) => {
-
     socket.on('login', (data) => {
         let user = mockUsers[data.username];
         if(!user) {
@@ -402,10 +394,8 @@ io.on('connection', (socket) => {
             if (s.hands.length === 0) {
                 s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false });
             }
-            
             s.hands[0].bet += amt;
             s.hands[0].originalBet += amt;
-            
             socket.emit('balanceUpdateData', { credits: user.credits });
             io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
         }
@@ -423,19 +413,15 @@ io.on('connection', (socket) => {
 
         if (actionData.type === 'hit') {
             if (hand.isSplitAce) return; 
-            
             hand.cards.push(drawCard());
             hand.score = getBJScore(hand.cards);
-            
             mbjState.turnTimer = 15; 
-            
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
                 mbjNextTurn(); 
-            } 
-            else { 
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
+            } else { 
+                io.to('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
         } 
         else if (actionData.type === 'stand') {
@@ -449,23 +435,18 @@ io.on('connection', (socket) => {
             if (user && user.credits >= hand.bet) {
                 user.credits -= hand.bet;
                 socket.emit('balanceUpdateData', { credits: user.credits });
-                
                 hand.doubledAmount = hand.bet; 
                 hand.bet *= 2;
                 hand.cards.push(drawCard());
                 hand.score = getBJScore(hand.cards);
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND';
-                
                 mbjState.turnTimer = 15; 
-                
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 mbjNextTurn();
             }
         }
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2) return;
-            
-            // Allows splitting identical cards or any two 10-value cards
             let val1 = hand.cards[0].bjVal;
             let val2 = hand.cards[1].bjVal;
             if (val1 !== val2) return; 
@@ -474,7 +455,6 @@ io.on('connection', (socket) => {
             if (user && user.credits >= hand.bet) {
                 user.credits -= hand.bet;
                 socket.emit('balanceUpdateData', { credits: user.credits });
-                
                 let splitCard = hand.cards.pop();
                 let hand2 = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true };
                 hand.isSplitHand = true;
@@ -488,18 +468,14 @@ io.on('connection', (socket) => {
                 if (hand2.score === 21) hand2.status = 'STAND';
 
                 seat.hands.push(hand2);
-                
                 mbjState.turnTimer = 15; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                
                 if(hand.score === 21) mbjNextTurn();
             }
         }
     });
 
-    socket.on('disconnect', () => { 
-        delete connectedUsers[socket.user?.username]; 
-    });
+    socket.on('disconnect', () => { delete connectedUsers[socket.user?.username]; });
 });
 
 const PORT = process.env.PORT || 3000;
