@@ -221,11 +221,12 @@ io.on('connection', (socket) => {
 
     socket.on('sendChatMessage', (msg) => {
         if(socket.user) {
-            io.emit('receiveChatMessage', { username: socket.user.username, message: msg });
+            // ONLY BROADCAST TO OTHERS (Eliminates echo delay)
+            socket.broadcast.emit('receiveChatMessage', { username: socket.user.username, message: msg });
         }
     });
 
-    // PUSH TO TALK VOICE RELAY (Discord Style)
+    // PUSH TO TALK VOICE RELAY
     socket.on('voiceStream', (data) => {
         socket.broadcast.emit('voiceStream', data);
     });
@@ -287,7 +288,7 @@ io.on('connection', (socket) => {
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                setTimeout(() => mbjNextTurn(), 1200); // PACING: Give time to see the bust
+                setTimeout(() => mbjNextTurn(), 1200); 
             } else { 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
