@@ -324,13 +324,6 @@ io.on('connection', (socket) => {
     socket.isCashier = false;
     socket.isAuth = false;
 
-    // Room specific voice broadcast
-    socket.on('voiceStream', (data) => {
-        if (socket.currentRoom) {
-            socket.to(socket.currentRoom).emit('voiceStream', data);
-        }
-    });
-
     socket.on('requestBalanceRefresh', async () => {
         if(socket.user) {
             let u = await User.findById(socket.user._id);
@@ -880,146 +873,6 @@ io.on('connection', (socket) => {
         } catch(e) { socket.emit('promoResult', { success: false, msg: 'Server error' }); }
     });
 
-    // --- VIP BLACKJACK SOCKETS ---
-    socket.on('mbjTakeSeat', (seatNum) => {
-        if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
-        for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) return; }
-        mbjState.seats[seatNum] = { userId: socket.user._id, username: socket.user.username, hands: [] };
-        io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
-    });
-
-    socket.on('mbjLeaveSeat', async () => {
-        if (!socket.user) return;
-        for(let i = 1; i <= 5; i++) {
-            let s = mbjState.seats[i];
-            if (s && s.userId.toString() === socket.user._id.toString() && mbjState.status === 'BETTING') {
-                if (s.hands.length > 0 && s.hands[0].bet > 0) {
-                    try {
-                        let u = await User.findById(socket.user._id);
-                        if (u) { 
-                            u.playableCredits = formatTC((u.playableCredits || 0) + s.hands[0].fromPlayable);
-                            u.credits = formatTC((u.credits || 0) + s.hands[0].fromMain);
-                            await u.save(); 
-                            socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
-                        }
-                    } catch(e) {}
-                }
-                mbjState.seats[i] = null;
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(st => st && st.hands.length > 0 && st.hands[0].bet > 0) });
-                break;
-            }
-        }
-    });
-
-    socket.on('mbjPlaceBet', async (amount) => {
-        if (!socket.user || mbjState.status !== 'BETTING') return;
-        let seatNum = null;
-        for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) seatNum = i; }
-        if (!seatNum) return;
-
-        let amt = formatTC(amount);
-        try {
-            let u = await User.findById(socket.user._id);
-            if (!u) return;
-            
-            let deduction = await deductBet(u, amt);
-            if (!deduction.success) {
-                socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' });
-                return;
-            }
-            await u.save();
-            processReferralBetCommission(u, amt);
-
-            let s = mbjState.seats[seatNum];
-            if (s.hands.length === 0) s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false, fromPlayable: 0, fromMain: 0 });
-            
-            s.hands[0].bet += amt;
-            s.hands[0].originalBet += amt;
-            s.hands[0].fromPlayable += deduction.fromPlayable;
-            s.hands[0].fromMain += deduction.fromMain;
-            
-            socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
-            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
-        } catch(e) { console.error("MBJ Bet Error:", e); }
-    });
-
-    socket.on('mbjAction', async (actionData) => {
-        if (!socket.user || mbjState.status !== 'PLAYER_TURN' || mbjState.activeTurn.seat === null) return;
-        let seatNum = mbjState.activeTurn.seat; let handIdx = mbjState.activeTurn.handIdx;
-        let seat = mbjState.seats[seatNum];
-        if (seat.userId.toString() !== socket.user._id.toString()) return; 
-        let hand = seat.hands[handIdx];
-
-        try {
-            if (actionData.type === 'hit') {
-                if (hand.isSplitAce) return; 
-                hand.cards.push(mbjDrawCard()); hand.score = getBJScore(hand.cards); mbjState.turnTimer = 15; 
-                
-                if (hand.score >= 21) { 
-                    hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
-                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                    setTimeout(() => mbjNextTurn(), 1200); 
-                } else { 
-                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                }
-            } 
-            else if (actionData.type === 'stand') {
-                hand.status = 'STAND'; io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); mbjNextTurn();
-            }
-            else if (actionData.type === 'double') {
-                if (hand.cards.length !== 2) return;
-                
-                let u = await User.findById(socket.user._id);
-                if (!u) return;
-                let deduction = await deductBet(u, hand.bet);
-                if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' }); return; }
-                await u.save();
-                processReferralBetCommission(u, hand.bet);
-                
-                hand.fromPlayable += deduction.fromPlayable;
-                hand.fromMain += deduction.fromMain;
-                hand.doubledAmount = hand.bet; 
-                hand.bet *= 2; 
-                hand.cards.push(mbjDrawCard()); 
-                hand.score = getBJScore(hand.cards);
-                hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
-                mbjState.turnTimer = 15; 
-                
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
-                setTimeout(() => mbjNextTurn(), 1200);
-            }
-            else if (actionData.type === 'split') {
-                if (hand.cards.length !== 2 || seat.hands.length >= 2) return; 
-                let val1 = hand.cards[0].bjVal; let val2 = hand.cards[1].bjVal; if (val1 !== val2) return; 
-                
-                let u = await User.findById(socket.user._id);
-                if (!u) return;
-                let deduction = await deductBet(u, hand.bet);
-                if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' }); return; }
-                await u.save();
-                processReferralBetCommission(u, hand.bet);
-
-                let splitCard = hand.cards.pop();
-                let hand2 = { 
-                    bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, 
-                    cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true,
-                    fromPlayable: deduction.fromPlayable, fromMain: deduction.fromMain
-                };
-                hand.isSplitHand = true;
-                
-                hand.cards.push(mbjDrawCard()); hand.score = getBJScore(hand.cards); if (hand.score === 21) hand.status = 'STAND';
-                hand2.cards.push(mbjDrawCard()); hand2.score = getBJScore(hand2.cards); if (hand2.score === 21) hand2.status = 'STAND';
-
-                seat.hands.push(hand2); mbjState.turnTimer = 15; 
-                
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
-                if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200); 
-            }
-        } catch(e) { console.error("MBJ Action Error", e); }
-    });
-
     socket.on('adminAction', async (data) => {
         if (!socket.rooms.has('admin_room')) return; 
         try {
@@ -1197,6 +1050,154 @@ io.on('connection', (socket) => {
         socket.emit('globalResultsData', { game: game, results: globalResults[game] || [], stats: gameStats[game] || { total: 0 } });
     });
 
+    // --- VIP BLACKJACK & PUSH-TO-TALK SOCKETS ---
+    socket.on('voiceStream', (data) => {
+        if (socket.currentRoom) {
+            socket.to(socket.currentRoom).emit('voiceStream', data);
+        } else {
+            socket.broadcast.emit('voiceStream', data);
+        }
+    });
+
+    socket.on('mbjTakeSeat', (seatNum) => {
+        if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
+        for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) return; }
+        mbjState.seats[seatNum] = { userId: socket.user._id, username: socket.user.username, hands: [] };
+        io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
+    });
+
+    socket.on('mbjLeaveSeat', async () => {
+        if (!socket.user) return;
+        for(let i = 1; i <= 5; i++) {
+            let s = mbjState.seats[i];
+            if (s && s.userId.toString() === socket.user._id.toString() && mbjState.status === 'BETTING') {
+                if (s.hands.length > 0 && s.hands[0].bet > 0) {
+                    try {
+                        let u = await User.findById(socket.user._id);
+                        if (u) { 
+                            u.playableCredits = formatTC((u.playableCredits || 0) + s.hands[0].fromPlayable);
+                            u.credits = formatTC((u.credits || 0) + s.hands[0].fromMain);
+                            await u.save(); 
+                            socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
+                        }
+                    } catch(e) {}
+                }
+                mbjState.seats[i] = null;
+                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(st => st && st.hands.length > 0 && st.hands[0].bet > 0) });
+                break;
+            }
+        }
+    });
+
+    socket.on('mbjPlaceBet', async (amount) => {
+        if (!socket.user || mbjState.status !== 'BETTING') return;
+        let seatNum = null;
+        for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) seatNum = i; }
+        if (!seatNum) return;
+
+        let amt = formatTC(amount);
+        try {
+            let u = await User.findById(socket.user._id);
+            if (!u) return;
+            
+            let deduction = await deductBet(u, amt);
+            if (!deduction.success) {
+                socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' });
+                return;
+            }
+            await u.save();
+            processReferralBetCommission(u, amt);
+
+            let s = mbjState.seats[seatNum];
+            if (s.hands.length === 0) s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false, fromPlayable: 0, fromMain: 0 });
+            
+            s.hands[0].bet += amt;
+            s.hands[0].originalBet += amt;
+            s.hands[0].fromPlayable += deduction.fromPlayable;
+            s.hands[0].fromMain += deduction.fromMain;
+            
+            socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
+            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
+        } catch(e) { console.error("MBJ Bet Error:", e); }
+    });
+
+    socket.on('mbjAction', async (actionData) => {
+        if (!socket.user || mbjState.status !== 'PLAYER_TURN' || mbjState.activeTurn.seat === null) return;
+        let seatNum = mbjState.activeTurn.seat; let handIdx = mbjState.activeTurn.handIdx;
+        let seat = mbjState.seats[seatNum];
+        if (seat.userId.toString() !== socket.user._id.toString()) return; 
+        let hand = seat.hands[handIdx];
+
+        try {
+            if (actionData.type === 'hit') {
+                if (hand.isSplitAce) return; 
+                hand.cards.push(mbjDrawCard()); hand.score = getBJScore(hand.cards); mbjState.turnTimer = 15; 
+                
+                if (hand.score >= 21) { 
+                    hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
+                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
+                    setTimeout(() => mbjNextTurn(), 1200); 
+                } else { 
+                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
+                }
+            } 
+            else if (actionData.type === 'stand') {
+                hand.status = 'STAND'; io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); mbjNextTurn();
+            }
+            else if (actionData.type === 'double') {
+                if (hand.cards.length !== 2) return;
+                
+                let u = await User.findById(socket.user._id);
+                if (!u) return;
+                let deduction = await deductBet(u, hand.bet);
+                if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' }); return; }
+                await u.save();
+                processReferralBetCommission(u, hand.bet);
+                
+                hand.fromPlayable += deduction.fromPlayable;
+                hand.fromMain += deduction.fromMain;
+                hand.doubledAmount = hand.bet; 
+                hand.bet *= 2; 
+                hand.cards.push(mbjDrawCard()); 
+                hand.score = getBJScore(hand.cards);
+                hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
+                mbjState.turnTimer = 15; 
+                
+                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
+                socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
+                setTimeout(() => mbjNextTurn(), 1200);
+            }
+            else if (actionData.type === 'split') {
+                if (hand.cards.length !== 2 || seat.hands.length >= 2) return; 
+                let val1 = hand.cards[0].bjVal; let val2 = hand.cards[1].bjVal; if (val1 !== val2) return; 
+                
+                let u = await User.findById(socket.user._id);
+                if (!u) return;
+                let deduction = await deductBet(u, hand.bet);
+                if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' }); return; }
+                await u.save();
+                processReferralBetCommission(u, hand.bet);
+
+                let splitCard = hand.cards.pop();
+                let hand2 = { 
+                    bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, 
+                    cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true,
+                    fromPlayable: deduction.fromPlayable, fromMain: deduction.fromMain
+                };
+                hand.isSplitHand = true;
+                
+                hand.cards.push(mbjDrawCard()); hand.score = getBJScore(hand.cards); if (hand.score === 21) hand.status = 'STAND';
+                hand2.cards.push(mbjDrawCard()); hand2.score = getBJScore(hand2.cards); if (hand2.score === 21) hand2.status = 'STAND';
+
+                seat.hands.push(hand2); mbjState.turnTimer = 15; 
+                
+                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
+                socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
+                if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200); 
+            }
+        } catch(e) { console.error("MBJ Action Error", e); }
+    });
+
     socket.on('disconnect', async () => {
         if (socket.user) { 
             // Handle VIP Blackjack Refund
@@ -1310,7 +1311,7 @@ async function mbjResolveDealer() {
     mbjState.dealer.score = dScore;
     
     let dealerNatural = (mbjState.dealer.hand.length === 2 && getBJScore(mbjState.dealer.hand) === 21);
-    let dealerUpcardVal = mbjState.dealer.hand[0].bjVal;
+    let dealerUpcardVal = mbjState.dealer.hand[0] ? mbjState.dealer.hand[0].bjVal : 0;
 
     let seatResults = {}; 
     for (let i = 1; i <= 5; i++) {
