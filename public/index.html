@@ -403,57 +403,46 @@
         #current-bets-popover { bottom: 100%; top: auto; right: 0; margin-bottom: 15px; width: 300px; z-index: 2500; cursor: default; display: flex; flex-direction: column;}
         .cb-item { display: flex; justify-content: space-between; align-items: center; font-weight: 800; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; white-space: nowrap; }
 
-        /* ================= VIP BLACKJACK ASSETS ================= */
+        /* ================= PTT & VIP BLACKJACK CSS ================= */
+        .ptt-btn { background: #333; color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .ptt-btn:hover { background: #555; }
+        .ptt-btn.recording { background: var(--danger); animation: pulseRecord 1s infinite; color: white; box-shadow: 0 0 15px var(--danger); }
+        @keyframes pulseRecord { 0% { box-shadow: 0 0 0 0 rgba(255,51,102,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,51,102,0); } 100% { box-shadow: 0 0 0 0 rgba(255,51,102,0); } }
+
         .mbj-master-layout { display: flex; flex-direction: row; gap: 30px; justify-content: center; align-items: stretch; max-width: 1500px; width: 100%; padding: 0 40px; height: 780px; }
         .mbj-board { width: 1000px; height: 700px; background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); border-radius: 20px; position: relative; border: 15px solid #3e2723; box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 5px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(0,0,0,0.8); overflow: hidden; flex-shrink: 0;}
         .mbj-table-line { position: absolute; inset: 15px; border: 2px solid rgba(212, 175, 55, 0.4); border-radius: 10px; pointer-events: none; z-index: 1; }
-        
         .mbj-logo { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.3; mix-blend-mode: overlay; pointer-events: none; width: 100%; z-index: 2; }
         .mbj-logo h1 { font-size: 3.5rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
         .mbj-logo p { font-weight: 900; font-size: 1rem; letter-spacing: 4px; color: #000; margin-bottom: 5px;}
         .mbj-logo .limits { font-weight: 900; font-size: 0.8rem; letter-spacing: 2px; color: #000; }
-
         .dealer-timer-text { color: white; font-size: 4rem; font-family: 'Rajdhani', monospace; font-weight: 900; text-shadow: 0 5px 15px black, 0 0 20px rgba(255, 180, 0, 0.5); margin-bottom: 10px; display: none; line-height: 1; }
-
-        .mbj-shoe { position: absolute; top: 40px; right: 40px; width: 70px; height: 100px; border-radius: 6px; background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); box-shadow: -1px 1px 0 #fff, -2px 2px 0 #333, -3px 3px 0 #fff, -4px 4px 0 #333, -5px 5px 0 #fff, -6px 6px 0 #333, -7px 7px 0 #fff, -8px 8px 0 #333, -12px 12px 15px rgba(0,0,0,0.8); z-index: 5; }
-
+        .mbj-shoe { position: absolute; top: 40px; right: 40px; width: 70px; height: 100px; border-radius: 6px; background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); box-shadow: -1px 1px 0 #fff, -12px 12px 15px rgba(0,0,0,0.8); z-index: 5; }
         .mbj-dealer-area { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 20; }
-
         #mbj-seats-row { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: center; align-items: flex-end; padding: 0 20px; gap: 40px; z-index: 10; }
         .mbj-seat-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 160px; pointer-events: auto; position: relative; }
-
         .mbj-split-col { display: flex; flex-direction: column-reverse; gap: 15px; align-items: center; width: 100%; position: relative; }
         .mbj-hand-column { display: flex; flex-direction: column; align-items: center; position: relative; width: 100%; }
-
         .mbj-hand-container { position: relative; pointer-events: none; display: flex; justify-content: center; align-items: flex-end; height: 100px; margin-bottom: 0px; perspective: 1000px; }
-        
         .mbj-card { width: 70px; height: 100px; background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); border-radius: 6px; box-shadow: -4px 4px 10px rgba(0,0,0,0.6); position: absolute; bottom: 0; font-family: 'Outfit', sans-serif; color: black; border: 1px solid #ccc; font-weight: 900; z-index: 2; }
-        
         .card-tl { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; }
         .card-br { position: absolute; bottom: 4px; right: 4px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; font-size: 1rem; transform: rotate(180deg); }
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
-
         .mbj-score-badge { position: absolute; top: 50%; left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif; transform: translateY(-50%); }
         .mbj-score-badge span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; line-height: 0; text-align: center; width: 100%; }
         .mbj-score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
         .mbj-score-inactive { background: linear-gradient(to bottom, #555, #333); color: white; }
-        
         .mbj-status-pill { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 5px 15px; border-radius: 20px; color: white; font-weight: 900; font-size: 0.9rem; z-index: 60; box-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap; letter-spacing: 1px; }
         .mbj-pill-bj { background: linear-gradient(to bottom, #00b359, #008040); border: 2px solid #00e676; }
         .mbj-pill-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); border: 2px solid #ff3366; }
-
         .mbj-delay-badge { opacity: 0; animation: popInBadge 0.2s 0.4s forwards; }
         @keyframes popInBadge { 0% { opacity: 0; transform: translateY(-50%) scale(0.5); } 100% { opacity: 1; transform: translateY(-50%) scale(1); } }
         .mbj-delay-pill { opacity: 0; animation: popInPill 0.2s 0.4s forwards; }
         @keyframes popInPill { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-
         .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
         .anim-fly-in-doubled { animation: flyInDoubled 0.3s ease-out forwards; }
         @keyframes flyInDoubled { 0% { opacity: 0; transform: translate(30px, -150px) rotate(90deg) scale(0.8); } 100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } }
-        .anim-reveal { animation: revealCard 0.3s ease-out forwards; }
-        @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
-
         .mbj-action-row { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; height: 40px; transition: opacity 0.1s; z-index: 100; opacity: 0; pointer-events: none;}
         .mbj-action-row.show { opacity: 1; pointer-events: auto; }
         .mbj-action-btn { width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); border: 2px solid #777; color: white; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); }
@@ -462,115 +451,39 @@
         .mbj-action-btn.stand { background: linear-gradient(to bottom, #ff3366, #9b0022); border-color: #ff3366; } 
         .mbj-action-btn.double { background: linear-gradient(to bottom, #ffcc00, #997a00); border-color: #ffcc00; font-size: 0.75rem; color: black;}
         .mbj-action-btn.split { background: linear-gradient(to bottom, #00a2ff, #005080); border-color: #00a2ff; font-size: 0.75rem; }
-
         .mbj-circle-container { position: relative; width: 75px; height: 55px; display: flex; justify-content: center; align-items: center; margin-top: 5px; }
         .mbj-seat-circle { width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; }
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
         .mbj-seat-circle:active { transform: scale(0.9); }
         .mbj-seat-circle.occupied { border: 2px solid transparent; background: transparent; cursor: default; }
         .mbj-seat-circle.occupied:active { transform: scale(1); }
-
-        .bet-pill { background: black; color: white; border: 1px solid #333; border-radius: 12px; font-size: 0.75rem; font-weight: 900; padding: 2px 10px; margin-top: 2px; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.8); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
-
-        .player-timer-track { width: 90%; height: 6px; background: rgba(0,0,0,0.6); border-radius: 3px; margin-top: 5px; overflow: hidden; display: none; box-shadow: inset 0 1px 3px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); }
-        .player-timer-fill { height: 100%; background: var(--success); width: 100%; transition: width 1s linear; }
-        .active-turn .player-timer-track { display: block; }
-        
-        .chip-stack-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 45px; z-index: 10; }
         .mbj-chip-3d { position: absolute; left: 0; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 3px 5px rgba(0,0,0,0.8); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg); }
         .mbj-chip-3d.ghost { opacity: 0.5; filter: grayscale(80%); }
-
         .mbj-seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative; margin-top: 5px; }
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
-
-        .animated-chip { position: fixed; z-index: 99999; pointer-events: none; transition: left 0.4s linear, top 0.4s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.4s linear, opacity 0.2s ease-in 0.2s; width: 45px; height: 45px; border-radius: 50%; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg); }
-
-        .payout-flare { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.5rem; font-weight: 900; text-shadow: 0 2px 5px black; animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap; }
-        @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -20px); } 80% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -60px); } }
-
         .chip-rack-container { width: 1000px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); justify-content: space-between; align-items: center; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transition: 0.3s; position: relative; margin-top:15px; flex-shrink: 0;}
         .chip-rack-locked { opacity: 0.5; pointer-events: none; }
-        
-        .rack-error-tooltip { position: absolute; top: -45px; background: var(--danger); color: white; font-weight: 900; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-        .rack-error-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 8px; border-style: solid; border-color: var(--danger) transparent transparent transparent; }
-        .rack-error-tooltip.show { opacity: 1; }
-        
         .rack-chip { width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 3px solid var(--c-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 0 5px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; color: black; cursor: pointer; transition: 0.1s; }
         .rack-chip:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 15px rgba(255,255,255,0.3); }
         .rack-chip:active { transform: translateY(0) scale(0.95); box-shadow: 0 2px 5px rgba(255,255,255,0.2); }
-        
         .rack-btn { padding: 10px 20px; border-radius: 8px; font-weight: 900; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; transition: 0.1s; text-transform: uppercase; }
         .rack-btn-clear { background: rgba(255,255,255,0.1); color: white; }
         .rack-btn-clear:hover { background: rgba(255,51,102, 0.8); }
         .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
         .rack-btn-confirm:hover { background: white; }
         .rack-btn:active { transform: scale(0.95); }
-
         .mbj-chat-panel { flex: 1; max-width: 350px; height: 100%; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.8); overflow: hidden; flex-shrink: 0;}
         .mbj-chat-send-btn { background: var(--ps-glow); color: black; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-weight: 900; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; }
         .mbj-chat-send-btn:hover { transform: scale(1.1); background: white; }
         .mbj-chat-send-btn:active { transform: scale(0.9); }
-        
-        .ptt-btn { background: #333; color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
-        .ptt-btn:hover { background: #555; }
-        .ptt-btn.recording { background: var(--danger); animation: pulseRecord 1s infinite; color: white; box-shadow: 0 0 15px var(--danger); }
-        @keyframes pulseRecord { 0% { box-shadow: 0 0 0 0 rgba(255,51,102,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,51,102,0); } 100% { box-shadow: 0 0 0 0 rgba(255,51,102,0); } }
-
-        /* ================= MOBILE UI / MEDIA QUERIES ================= */
-        #chat-floating-btn { display: none; }
-        
         @media (max-width: 1200px) {
-            .casino-grid.solo-grid { grid-template-columns: repeat(2, 260px); }
-            .casino-grid.shared-grid { grid-template-columns: repeat(2, 260px); }
             .mbj-master-layout { flex-direction: column; height: auto; align-items: center;}
             .mbj-chat-panel { width: 100%; max-width: 1000px; height: 400px; margin-top: 20px;}
         }
-
         @media (max-width: 768px) {
-            .desktop-actions { display: none; position: absolute; top: 65px; right: 20px; background: var(--glass-bg); flex-direction: column; padding: 20px; border-radius: 8px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
-            .desktop-actions.show { display: flex; }
-            .mobile-menu-btn { display: flex !important; font-size: 1.5rem; }
-            .brand-title { font-size: 1.2rem; }
-            .brand-sub { font-size: 0.7rem; }
-            
-            /* SWIPE CAROUSEL LOGIC */
-            .lobby-modes-container, .casino-grid.shared-grid, .casino-grid.solo-grid {
-                display: flex; flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; justify-content: flex-start; padding: 0 20px 20px; width: 100vw; gap: 15px;
-            }
-            .mode-card, .game-card { scroll-snap-align: center; }
-
-            /* SHARED TABLE VERTICAL STACK & CHAT OVERLAY */
-            .shared-layout { flex-direction: column; height: calc(100vh - 150px); }
-            .main-panel { height: 60vh; }
-            .chat-panel { position: fixed; bottom: 0; left: 0; width: 100vw; height: 50vh; z-index: 1000; transform: translateY(100%); }
-            .chat-panel.show { transform: translateY(0); }
-            #chat-floating-btn { display: flex; align-items: center; justify-content: center; position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--ps-glow); color: black; font-size: 1.5rem; z-index: 1001; border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); cursor: pointer; }
-            
-            /* Game Board Scaling for Mobile */
-            .blackjack-scores, .dt-arena { flex-direction: column !important; gap: 15px !important; align-items: center;}
-            .card-area { min-height: auto; padding: 10px; width: 100%; min-width: unset; }
-            .play-card { transform: scale(0.85); margin: -5px; } 
-
-            .custom-dropdown { right: -50px; width: 300px; }
-            #history-popover { width: 340px; right: -50px; }
-
-            .modal-content {
-                position: absolute;
-                bottom: 0;
-                width: 100vw;
-                max-width: 100vw;
-                border-radius: 20px 20px 0 0;
-                animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                max-height: 85vh;
-            }
-            @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-            
-            /* MBJ Scaling */
             .mbj-board { width: 100%; transform: scale(0.6); transform-origin: top center; margin-bottom: -250px;}
             .chip-rack-container { width: 100%; transform: scale(0.8); transform-origin: top center;}
         }
-        
-        .rules-text { text-align: left; padding-left: 20px; }
     </style>
 </head>
 <body onclick="document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.add('hidden'));">
@@ -1565,668 +1478,943 @@
             let bHtml = formatBetHistory(id, h.bet); 
             let rHtml = h.result;
 
-           if (id === 'perya') {
-                    rHtml = `<div style="display:flex; justify-content:center; align-items:center; gap:2px; flex-wrap:nowrap;">${colorsToDice(h.result)}</div>`;
-                } else {
-                    let safeR = h.result ? h.result.toString() : '-';
-                    rHtml = `<span style="font-weight:900; color:${getBetColor(safeR.split(' ')[0])}">${safeR}</span>`;
-                }
-                list.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:10px; align-items:center; font-size:0.95rem; text-transform:uppercase; text-align:center; white-space:nowrap;"><div>${rHtml}</div><div>${bHtml}</div><div>${winVal}</div><div>${lossVal}</div></div>`;
-            });
-        }
-
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.dropdown-wrapper')) {
-                document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.add('hidden'));
-            }
-        });
-
-        function renderNotifs() {
-            const list = document.getElementById('notif-list-popover');
-            const badge = document.getElementById('notif-badge-display');
-            const clearBtn = document.getElementById('btn-clear-notifs');
-            list.innerHTML = '';
-            
-            let unreadCount = myNotifications.filter(n => !n.read).length;
-            if(unreadCount > 0) { 
-                badge.style.display = 'flex'; 
-                badge.innerText = unreadCount; 
-                badge.classList.add('pulse');
-            } else { 
-                badge.style.display = 'none'; 
-                badge.classList.remove('pulse');
-            }
-            
-            clearBtn.disabled = unreadCount > 0 || myNotifications.length === 0;
-
-            if(myNotifications.length === 0) {
-                list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;" id="no-notif-msg">No new notifications.</div>`;
-                return;
-            }
-
-            myNotifications.forEach(n => {
-                let cl = n.read ? '' : 'unread';
-                list.innerHTML += `
-                <div class="notif-item ${cl}" id="notif-${n.id}" onclick="markSingleRead(${n.id}, event)">
-                    <div class="notif-item-header">
-                        <span class="notif-item-title">${n.title}</span>
-                        <span class="notif-item-time">${new Date(n.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                    </div>
-                    <div class="notif-item-body">${n.msg}</div>
-                    <button class="notif-item-del" onclick="deleteNotif(${n.id}, event)" ${n.read ? '' : 'style="display:none;"'}><i class="fas fa-times"></i></button>
-                </div>`;
-            });
-        }
-
-        function markSingleRead(id, e) { let n = myNotifications.find(x => x.id === id); if(n && !n.read) { n.read = true; renderNotifs(); } }
-        function deleteNotif(id, e) { e.stopPropagation(); myNotifications = myNotifications.filter(x => x.id !== id); renderNotifs(); }
-        function markAllNotifsRead() { myNotifications.forEach(n => n.read = true); renderNotifs(); }
-        function clearNotifs() { myNotifications = []; renderNotifs(); }
-
-        socket.on('silentNotification', (data) => {
-            myNotifications.unshift({ id: data.id || Date.now(), title: data.title, msg: data.msg, read: false, date: data.date || new Date() });
-            if(myNotifications.length > 50) myNotifications.pop();
-            renderNotifs(); 
-        });
-
-        function playTone(f, t, d, v = 0.1) { 
-          if (audioCtx.state === 'suspended') return; 
-          let o = audioCtx.createOscillator(); let g = audioCtx.createGain(); 
-          o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime); 
-          g.gain.setValueAtTime(v * sfxGainVal, audioCtx.currentTime); 
-          g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d); 
-          o.connect(g); g.connect(audioCtx.destination); 
-          o.start(); o.stop(audioCtx.currentTime + d); 
-        }
-
-        const sfx = { 
-          click: () => {
-              if (audioCtx.state === 'suspended') return;
-              let o = audioCtx.createOscillator(), g = audioCtx.createGain();
-              o.type = 'triangle'; o.frequency.setValueAtTime(600, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
-              g.gain.setValueAtTime(0.15 * sfxGainVal, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
-              o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.03);
-          },
-          tick: () => {
-              if (audioCtx.state === 'suspended') return;
-              let o = audioCtx.createOscillator(), g = audioCtx.createGain();
-              o.type = 'square'; o.frequency.setValueAtTime(1200, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.02);
-              g.gain.setValueAtTime(0.05 * sfxGainVal, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
-              o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.02);
-          },
-          deal: () => playTone(300, 'triangle', 0.1, 0.1), 
-          coin: () => { for(let i=0; i<10; i++) setTimeout(() => playTone(1500 + i * 100, 'square', 0.02, 0.05), i * 30); }, 
-          win: () => { playTone(440, 'sine', 0.1, 0.1); setTimeout(() => playTone(660, 'sine', 0.15, 0.1), 100); setTimeout(() => playTone(880, 'sine', 0.3, 0.1), 250); }, 
-          lose: () => { playTone(200, 'sawtooth', 0.4, 0.1); setTimeout(() => playTone(150, 'sawtooth', 0.6, 0.1), 200); }, 
-          lock: () => { playTone(400, 'square', 0.1, 0.1); setTimeout(() => playTone(300, 'square', 0.1, 0.1), 100); }
-        };
-
-        document.addEventListener('mousedown', (e) => {
-           if(e.target.closest('button, .nav-link, .mode-card, .game-card, .bank-tab, .action-btn, .top-icon-btn, .brand, .wallet-pill')) sfx.click();
-        });
-
-        function switchAuthTab(tab) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            if(tab === 'login') {
-                document.querySelectorAll('.auth-tab')[0].classList.add('active');
-                document.getElementById('auth-form-login').style.display = 'block';
-                document.getElementById('auth-form-register').style.display = 'none';
+            if (id === 'perya') {
+                rHtml = `<div style="display:flex; justify-content:center; align-items:center; gap:2px; flex-wrap:nowrap;">${colorsToDice(h.result)}</div>`;
             } else {
-                document.querySelectorAll('.auth-tab')[1].classList.add('active');
-                document.getElementById('auth-form-login').style.display = 'none';
-                document.getElementById('auth-form-register').style.display = 'block';
+                let safeR = h.result ? h.result.toString() : '-';
+                rHtml = `<span style="font-weight:900; color:${getBetColor(safeR.split(' ')[0])}">${safeR}</span>`;
             }
-            document.getElementById('auth-error-login').innerText = '';
-            document.getElementById('auth-error-register').innerText = '';
-        }
-
-        function toggleInputPwd(inputId, icon) {
-            const input = document.getElementById(inputId);
-            if (input.type === "password") { input.type = "text"; icon.className = "fas fa-eye-slash"; } 
-            else { input.type = "password"; icon.className = "fas fa-eye"; }
-        }
-
-        document.getElementById('login-pass').addEventListener('keypress', function(e) { if (e.key === 'Enter') submitAuth('login'); });
-
-        function submitAuth(mode) {
-            const uId = mode === 'login' ? 'login-user' : 'reg-user';
-            const pId = mode === 'login' ? 'login-pass' : 'reg-pass';
-            const user = document.getElementById(uId).value.trim();
-            const pass = document.getElementById(pId).value;
-            const ref = mode === 'register' ? document.getElementById('reg-ref').value.trim() : null;
-
-            if(!user || !pass) return document.getElementById(mode === 'login' ? 'auth-error-login' : 'auth-error-register').innerText = "Please fill all fields.";
-            
-            if (mode === 'login') {
-                window.tempLoginUser = user;
-                window.tempLoginPass = pass;
-            }
-            
-            socket.emit(mode, { username: user, password: pass, referral: ref });
-        }
-
-        socket.on('authError', (msg) => {
-            document.getElementById('auth-error-login').innerText = msg;
-            document.getElementById('auth-error-register').innerText = msg;
+            list.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:10px; align-items:center; font-size:0.95rem; text-transform:uppercase; text-align:center; white-space:nowrap;"><div>${rHtml}</div><div>${bHtml}</div><div>${winVal}</div><div>${lossVal}</div></div>`;
         });
+    }
 
-        socket.on('registerSuccess', (msg) => {
-            document.getElementById('auth-error-register').className = 'auth-msg auth-success';
-            document.getElementById('auth-error-register').innerText = msg;
-            setTimeout(() => { switchAuthTab('login'); }, 1000);
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown-wrapper')) {
+            document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.add('hidden'));
+        }
+    });
+
+    function renderNotifs() {
+        const list = document.getElementById('notif-list-popover');
+        const badge = document.getElementById('notif-badge-display');
+        const clearBtn = document.getElementById('btn-clear-notifs');
+        list.innerHTML = '';
+        
+        let unreadCount = myNotifications.filter(n => !n.read).length;
+        if(unreadCount > 0) { 
+            badge.style.display = 'flex'; 
+            badge.innerText = unreadCount; 
+            badge.classList.add('pulse');
+        } else { 
+            badge.style.display = 'none'; 
+            badge.classList.remove('pulse');
+        }
+        
+        clearBtn.disabled = unreadCount > 0 || myNotifications.length === 0;
+
+        if(myNotifications.length === 0) {
+            list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;" id="no-notif-msg">No new notifications.</div>`;
+            return;
+        }
+
+        myNotifications.forEach(n => {
+            let cl = n.read ? '' : 'unread';
+            list.innerHTML += `
+            <div class="notif-item ${cl}" id="notif-${n.id}" onclick="markSingleRead(${n.id}, event)">
+                <div class="notif-item-header">
+                    <span class="notif-item-title">${n.title}</span>
+                    <span class="notif-item-time">${new Date(n.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                </div>
+                <div class="notif-item-body">${n.msg}</div>
+                <button class="notif-item-del" onclick="deleteNotif(${n.id}, event)" ${n.read ? '' : 'style="display:none;"'}><i class="fas fa-times"></i></button>
+            </div>`;
         });
+    }
 
-        socket.on('loginSuccess', (data) => {
-            if (window.tempLoginUser && window.tempLoginPass) {
-                localStorage.setItem('snt_user', window.tempLoginUser);
-                localStorage.setItem('snt_pass', window.tempLoginPass);
-            }
+    function markSingleRead(id, e) { let n = myNotifications.find(x => x.id === id); if(n && !n.read) { n.read = true; renderNotifs(); } }
+    function deleteNotif(id, e) { e.stopPropagation(); myNotifications = myNotifications.filter(x => x.id !== id); renderNotifs(); }
+    function markAllNotifsRead() { myNotifications.forEach(n => n.read = true); renderNotifs(); }
+    function clearNotifs() { myNotifications = []; renderNotifs(); }
 
-            myUsername = data.username;
-            myCredits = formatTC(data.credits);
-            myPlayable = formatTC(data.playable || 0);
-            
-            let nameHTML = data.role === 'VIP' ? `<span style="color:var(--playable); text-shadow:0 0 10px var(--playable);"><i class="fas fa-crown" style="margin-right:5px;"></i>${myUsername}</span>` : myUsername;
-            document.getElementById('player-name-display').innerHTML = nameHTML;
-            
-            updateMyBalance({credits: myCredits, playable: myPlayable});
-            
-            if(data.role === 'Admin' || data.role === 'Moderator') { document.querySelector('.admin-btn').classList.remove('hidden'); }
-            setupDailyRewardUI(data.daily);
+    socket.on('silentNotification', (data) => {
+        myNotifications.unshift({ id: data.id || Date.now(), title: data.title, msg: data.msg, read: false, date: data.date || new Date() });
+        if(myNotifications.length > 50) myNotifications.pop();
+        renderNotifs(); 
+    });
 
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            switchView('casino');
-        });
+    function playTone(f, t, d, v = 0.1) { 
+      if (audioCtx.state === 'suspended') return; 
+      let o = audioCtx.createOscillator(); let g = audioCtx.createGain(); 
+      o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime); 
+      g.gain.setValueAtTime(v * sfxGainVal, audioCtx.currentTime); 
+      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d); 
+      o.connect(g); g.connect(audioCtx.destination); 
+      o.start(); o.stop(audioCtx.currentTime + d); 
+    }
 
-        function confirmLogout() {
-            if(confirm("Are you sure you want to log out?")) {
-                localStorage.removeItem('snt_user');
-                localStorage.removeItem('snt_pass');
-                location.reload();
-            }
+    const sfx = { 
+      click: () => {
+          if (audioCtx.state === 'suspended') return;
+          let o = audioCtx.createOscillator(), g = audioCtx.createGain();
+          o.type = 'triangle'; o.frequency.setValueAtTime(600, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
+          g.gain.setValueAtTime(0.15 * sfxGainVal, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+          o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.03);
+      },
+      tick: () => {
+          if (audioCtx.state === 'suspended') return;
+          let o = audioCtx.createOscillator(), g = audioCtx.createGain();
+          o.type = 'square'; o.frequency.setValueAtTime(1200, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.02);
+          g.gain.setValueAtTime(0.05 * sfxGainVal, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
+          o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.02);
+      },
+      deal: () => playTone(300, 'triangle', 0.1, 0.1), 
+      coin: () => { for(let i=0; i<10; i++) setTimeout(() => playTone(1500 + i * 100, 'square', 0.02, 0.05), i * 30); }, 
+      win: () => { playTone(440, 'sine', 0.1, 0.1); setTimeout(() => playTone(660, 'sine', 0.15, 0.1), 100); setTimeout(() => playTone(880, 'sine', 0.3, 0.1), 250); }, 
+      lose: () => { playTone(200, 'sawtooth', 0.4, 0.1); setTimeout(() => playTone(150, 'sawtooth', 0.6, 0.1), 200); }, 
+      lock: () => { playTone(400, 'square', 0.1, 0.1); setTimeout(() => playTone(300, 'square', 0.1, 0.1), 100); }
+    };
+
+    document.addEventListener('mousedown', (e) => {
+       if(e.target.closest('button, .nav-link, .mode-card, .game-card, .bank-tab, .action-btn, .top-icon-btn, .brand, .wallet-pill')) sfx.click();
+    });
+
+    function switchAuthTab(tab) {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        if(tab === 'login') {
+            document.querySelectorAll('.auth-tab')[0].classList.add('active');
+            document.getElementById('auth-form-login').style.display = 'block';
+            document.getElementById('auth-form-register').style.display = 'none';
+        } else {
+            document.querySelectorAll('.auth-tab')[1].classList.add('active');
+            document.getElementById('auth-form-login').style.display = 'none';
+            document.getElementById('auth-form-register').style.display = 'block';
+        }
+        document.getElementById('auth-error-login').innerText = '';
+        document.getElementById('auth-error-register').innerText = '';
+    }
+
+    function toggleInputPwd(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") { input.type = "text"; icon.className = "fas fa-eye-slash"; } 
+        else { input.type = "password"; icon.className = "fas fa-eye"; }
+    }
+
+    document.getElementById('login-pass').addEventListener('keypress', function(e) { if (e.key === 'Enter') submitAuth('login'); });
+
+    function submitAuth(mode) {
+        const uId = mode === 'login' ? 'login-user' : 'reg-user';
+        const pId = mode === 'login' ? 'login-pass' : 'reg-pass';
+        const user = document.getElementById(uId).value.trim();
+        const pass = document.getElementById(pId).value;
+        const ref = mode === 'register' ? document.getElementById('reg-ref').value.trim() : null;
+
+        if(!user || !pass) return document.getElementById(mode === 'login' ? 'auth-error-login' : 'auth-error-register').innerText = "Please fill all fields.";
+        
+        if (mode === 'login') {
+            window.tempLoginUser = user;
+            window.tempLoginPass = pass;
+        }
+        
+        socket.emit(mode, { username: user, password: pass, referral: ref });
+    }
+
+    socket.on('authError', (msg) => {
+        document.getElementById('auth-error-login').innerText = msg;
+        document.getElementById('auth-error-register').innerText = msg;
+    });
+
+    socket.on('registerSuccess', (msg) => {
+        document.getElementById('auth-error-register').className = 'auth-msg auth-success';
+        document.getElementById('auth-error-register').innerText = msg;
+        setTimeout(() => { switchAuthTab('login'); }, 1000);
+    });
+
+    socket.on('loginSuccess', (data) => {
+        if (window.tempLoginUser && window.tempLoginPass) {
+            localStorage.setItem('snt_user', window.tempLoginUser);
+            localStorage.setItem('snt_pass', window.tempLoginPass);
         }
 
-        function triggerWinAnim() { 
-          let p1 = document.getElementById('pill-credits'); 
-          if (p1) { p1.classList.remove('anim-pop'); void p1.offsetWidth; p1.classList.add('anim-pop'); } 
+        myUsername = data.username;
+        myCredits = formatTC(data.credits);
+        myPlayable = formatTC(data.playable || 0);
+        
+        let nameHTML = data.role === 'VIP' ? `<span style="color:var(--playable); text-shadow:0 0 10px var(--playable);"><i class="fas fa-crown" style="margin-right:5px;"></i>${myUsername}</span>` : myUsername;
+        document.getElementById('player-name-display').innerHTML = nameHTML;
+        
+        updateMyBalance({credits: myCredits, playable: myPlayable});
+        
+        if(data.role === 'Admin' || data.role === 'Moderator') { document.querySelector('.admin-btn').classList.remove('hidden'); }
+        setupDailyRewardUI(data.daily);
+
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        switchView('casino');
+    });
+
+    function confirmLogout() {
+        if(confirm("Are you sure you want to log out?")) {
+            localStorage.removeItem('snt_user');
+            localStorage.removeItem('snt_pass');
+            location.reload();
+        }
+    }
+
+    function triggerWinAnim() { 
+      let p1 = document.getElementById('pill-credits'); 
+      if (p1) { p1.classList.remove('anim-pop'); void p1.offsetWidth; p1.classList.add('anim-pop'); } 
+    }
+
+    function triggerBetAnim() {
+        let p1 = document.getElementById('pill-credits');
+        let p2 = document.getElementById('pill-playable');
+        if(p1 && p1.style.display !== 'none') { p1.classList.remove('anim-pop-bet'); void p1.offsetWidth; p1.classList.add('anim-pop-bet'); }
+        if(p2 && p2.style.display !== 'none') { p2.classList.remove('anim-pop-bet'); void p2.offsetWidth; p2.classList.add('anim-pop-bet'); }
+    }
+
+    function updateMyBalance(data, didWin = false) {
+        let tc = formatTC(data.credits);
+        let ptc = formatTC(data.playable || 0);
+        
+        if(didWin && tc > myCredits) { triggerWinAnim(); }
+        myCredits = tc;
+        myPlayable = ptc;
+
+        document.getElementById('nav-credits').innerText = fmtTC(tc); 
+        
+        const pillPlayable = document.getElementById('pill-playable');
+        const navPlayable = document.getElementById('nav-playable');
+        if (myPlayable > 0) { 
+            pillPlayable.style.display = 'flex'; 
+            navPlayable.innerText = fmtTC(ptc); 
+        } else { 
+            pillPlayable.style.display = 'none'; 
+        }
+        
+        document.querySelectorAll('.cashier-balance-display').forEach(el => el.innerText = fmtTC(tc) + ' TC');
+    }
+
+    socket.on('balanceUpdateData', (newBalance) => { updateMyBalance(newBalance, true); });
+
+    function setupDailyRewardUI(dailyData) {
+        const container = document.getElementById('dr-days-container');
+        container.innerHTML = '';
+        const rewards = [100, 250, 500, 750, 1000, 1500, 2000];
+        
+        for(let i=1; i<=7; i++) {
+            let statClass = ''; let boxTitle = `Day ${i}`;
+            if (!dailyData.canClaim && dailyData.day === 1) { statClass = 'claimed'; boxTitle = "CLAIMED"; }
+            else if (i < dailyData.day) { statClass = 'claimed'; boxTitle = "CLAIMED"; } 
+            else if (i === dailyData.day && dailyData.canClaim) { statClass = 'active'; }
+            container.innerHTML += `<div class="dr-day ${statClass}" id="dr-day-${i}"><div class="dr-title">${boxTitle}</div><div class="dr-coin">${rewards[i-1]}<br>Credits</div></div>`;
         }
 
-        function triggerBetAnim() {
-            let p1 = document.getElementById('pill-credits');
-            let p2 = document.getElementById('pill-playable');
-            if(p1 && p1.style.display !== 'none') { p1.classList.remove('anim-pop-bet'); void p1.offsetWidth; p1.classList.add('anim-pop-bet'); }
-            if(p2 && p2.style.display !== 'none') { p2.classList.remove('anim-pop-bet'); void p2.offsetWidth; p2.classList.add('anim-pop-bet'); }
+        let sc = document.getElementById('dr-status-container');
+        if(dailyData.canClaim) { sc.innerHTML = `<button class="btn-play dr-claim-btn" id="btn-claim-reward" onclick="claimDaily()">CLAIM REWARD</button>`; } 
+        else { startDailyTimer(dailyData.nextClaim); }
+    }
+
+    function claimDaily() { socket.emit('claimDaily'); }
+
+    socket.on('dailyClaimed', (data) => {
+        let activeEl = document.querySelector('.dr-day.active');
+        if (activeEl) { activeEl.classList.add('active-claimed'); activeEl.querySelector('.dr-title').innerText = "CLAIMED"; }
+        updateMyBalance(data.newBalance, true);
+        startDailyTimer(data.nextClaim);
+        
+        showLocalFlash('shared', `+${fmtTC(data.amt)} PLAYABLE`, 'success');
+        setTimeout(() => { closeModal('daily-reward-modal'); }, 1500);
+    });
+
+    function startDailyTimer(nextClaimDate) {
+        let sc = document.getElementById('dr-status-container');
+        sc.innerHTML = `<div class="dr-status-text" style="margin-top:10px;">COME BACK TOMORROW</div><div class="dr-timer" id="dr-timer-display" style="margin-top:5px;">--:--:--</div>`;
+        let dest = new Date(nextClaimDate).getTime();
+        if(dailyTimerInterval) clearInterval(dailyTimerInterval);
+        
+        dailyTimerInterval = setInterval(() => {
+            let now = new Date().getTime(); let d = dest - now;
+            if(d <= 0) { clearInterval(dailyTimerInterval); sc.innerHTML = `<button class="btn-play dr-claim-btn" onclick="location.reload()">REFRESH TO CLAIM</button>`; return; }
+            let h = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let m = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
+            let s = Math.floor((d % (1000 * 60)) / 1000);
+            h = (h < 10) ? "0" + h : h; m = (m < 10) ? "0" + m : m; s = (s < 10) ? "0" + s : s;
+            document.getElementById('dr-timer-display').innerText = `${h}:${m}:${s}`;
+        }, 1000);
+    }
+
+    const gameInfoMap = {
+      'd20': { title: "D20", body: "<ul><li>Select multiple bets to increase your coverage.</li><li><strong>High/Low:</strong> Low (1-10) or High (11-20). Pays <strong>1.95x</strong>.</li><li><strong>Odd/Even:</strong> Pays <strong>1.95x</strong>.</li></ul>" },
+      'coinflip': { title: "Coin Flip", body: "<ul><li>Enter your bet and choose <strong>Heads</strong> or <strong>Tails</strong>.</li><li>Winning pays <strong>1.95x</strong> your bet.</li><li>Playable Bonus is used before Main TC.</li></ul>" },
+      'baccarat': { title: "Baccarat", body: "<ul><li>Bet on Player, Banker, or Tie. Closest to <strong>9</strong> wins.</li><li>Player pays <strong>2x</strong>. Banker pays <strong>1.95x</strong>.</li><li>Tie pays <strong>9x</strong>. Player/Banker bets push.</li></ul>" },
+      'blackjack': { title: "Blackjack", body: "<ul><li>Beat the dealer without going over 21.</li><li>Dealer must stand on <strong>17 or higher</strong>.</li><li>Natural Blackjack pays <strong>2.5x</strong>. Standard wins pay <strong>2x</strong>. Ties push.</li></ul>" },
+      'perya': { title: "Color Game", body: "<ul><li>Bet on Red, Blue, Yellow, White, Green, or Pink.</li><li>3 dice are rolled.</li><li>1 Match pays <strong>2x</strong>. 2 Matches pay <strong>3x</strong>. 3 Matches pay <strong>4x</strong>!</li></ul>" },
+      'dt': { title: "Dragon Tiger", body: "<ul><li>Bet on Dragon, Tiger, or Tie. Highest card wins.</li><li>Aces are low (1). Kings are high (13).</li><li>Dragon/Tiger pays <strong>2x</strong>. Tie pays <strong>9x</strong>.</li></ul>" },
+      'sicbo': { title: "Sic Bo", body: "<ul><li>Bet on Small (Sum 4-10) or Big (Sum 11-17).</li><li>Wins pay <strong>2x</strong>.</li><li>Any Triple roll loses all Big/Small bets.</li></ul>" }
+    };
+
+    function logHistory(gid, betStr, resultStr, wonProfit, lostBet, didBet = true) {
+        if(!myGameHistory[gid]) myGameHistory[gid] = [];
+        let cleanRes = resultStr.replace(' WINS!', '').replace(' WINS', '');
+        
+        myGameHistory[gid].unshift({ bet: betStr, result: cleanRes, wonProfit: wonProfit, lostBet: lostBet, didBet: didBet });
+        if(myGameHistory[gid].length > 5) myGameHistory[gid].pop();
+        if(currentHistoryGame === gid && !document.getElementById('history-popover').classList.contains('hidden')) {
+            updateHistoryUI(gid);
         }
+    }
 
-        function updateMyBalance(data, didWin = false) {
-            let tc = formatTC(data.credits);
-            let ptc = formatTC(data.playable || 0);
-            
-            if(didWin && tc > myCredits) { triggerWinAnim(); }
-            myCredits = tc;
-            myPlayable = ptc;
+    socket.on('system_stats_reset', (data) => { 
+        if(currentHistoryGame === data.game) socket.emit('getGlobalResults', data.game); 
+    });
 
-            document.getElementById('nav-credits').innerText = fmtTC(tc); 
-            
-            const pillPlayable = document.getElementById('pill-playable');
-            const navPlayable = document.getElementById('nav-playable');
-            if (myPlayable > 0) { 
-                pillPlayable.style.display = 'flex'; 
-                navPlayable.innerText = fmtTC(ptc); 
-            } else { 
-                pillPlayable.style.display = 'none'; 
-            }
-            
-            document.querySelectorAll('.cashier-balance-display').forEach(el => el.innerText = fmtTC(tc) + ' TC');
+    socket.on('globalResultsData', data => {
+        if (data.game === 'baccarat' || data.game === 'perya' || data.game === 'dt' || data.game === 'sicbo') {
+            globalFallback[data.game] = data.results;
+            if(data.game === currentHistoryGame) document.getElementById('stat-total-rounds').innerText = data.stats.total;
         }
-
-        socket.on('balanceUpdateData', (newBalance) => { updateMyBalance(newBalance, true); });
-
-        function setupDailyRewardUI(dailyData) {
-            const container = document.getElementById('dr-days-container');
-            container.innerHTML = '';
-            const rewards = [100, 250, 500, 750, 1000, 1500, 2000];
-            
-            for(let i=1; i<=7; i++) {
-                let statClass = ''; let boxTitle = `Day ${i}`;
-                if (!dailyData.canClaim && dailyData.day === 1) { statClass = 'claimed'; boxTitle = "CLAIMED"; }
-                else if (i < dailyData.day) { statClass = 'claimed'; boxTitle = "CLAIMED"; } 
-                else if (i === dailyData.day && dailyData.canClaim) { statClass = 'active'; }
-                container.innerHTML += `<div class="dr-day ${statClass}" id="dr-day-${i}"><div class="dr-title">${boxTitle}</div><div class="dr-coin">${rewards[i-1]}<br>Credits</div></div>`;
-            }
-
-            let sc = document.getElementById('dr-status-container');
-            if(dailyData.canClaim) { sc.innerHTML = `<button class="btn-play dr-claim-btn" id="btn-claim-reward" onclick="claimDaily()">CLAIM REWARD</button>`; } 
-            else { startDailyTimer(dailyData.nextClaim); }
-        }
-
-        function claimDaily() { socket.emit('claimDaily'); }
-
-        socket.on('dailyClaimed', (data) => {
-            let activeEl = document.querySelector('.dr-day.active');
-            if (activeEl) { activeEl.classList.add('active-claimed'); activeEl.querySelector('.dr-title').innerText = "CLAIMED"; }
-            updateMyBalance(data.newBalance, true);
-            startDailyTimer(data.nextClaim);
-            
-            showLocalFlash('shared', `+${fmtTC(data.amt)} PLAYABLE`, 'success');
-            setTimeout(() => { closeModal('daily-reward-modal'); }, 1500);
-        });
-
-        function startDailyTimer(nextClaimDate) {
-            let sc = document.getElementById('dr-status-container');
-            sc.innerHTML = `<div class="dr-status-text" style="margin-top:10px;">COME BACK TOMORROW</div><div class="dr-timer" id="dr-timer-display" style="margin-top:5px;">--:--:--</div>`;
-            let dest = new Date(nextClaimDate).getTime();
-            if(dailyTimerInterval) clearInterval(dailyTimerInterval);
-            
-            dailyTimerInterval = setInterval(() => {
-                let now = new Date().getTime(); let d = dest - now;
-                if(d <= 0) { clearInterval(dailyTimerInterval); sc.innerHTML = `<button class="btn-play dr-claim-btn" onclick="location.reload()">REFRESH TO CLAIM</button>`; return; }
-                let h = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                let m = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
-                let s = Math.floor((d % (1000 * 60)) / 1000);
-                h = (h < 10) ? "0" + h : h; m = (m < 10) ? "0" + m : m; s = (s < 10) ? "0" + s : s;
-                document.getElementById('dr-timer-display').innerText = `${h}:${m}:${s}`;
-            }, 1000);
-        }
-
-        const gameInfoMap = {
-          'd20': { title: "D20", body: "<ul><li>Select multiple bets to increase your coverage.</li><li><strong>High/Low:</strong> Low (1-10) or High (11-20). Pays <strong>1.95x</strong>.</li><li><strong>Odd/Even:</strong> Pays <strong>1.95x</strong>.</li></ul>" },
-          'coinflip': { title: "Coin Flip", body: "<ul><li>Enter your bet and choose <strong>Heads</strong> or <strong>Tails</strong>.</li><li>Winning pays <strong>1.95x</strong> your bet.</li><li>Playable Bonus is used before Main TC.</li></ul>" },
-          'baccarat': { title: "Baccarat", body: "<ul><li>Bet on Player, Banker, or Tie. Closest to <strong>9</strong> wins.</li><li>Player pays <strong>2x</strong>. Banker pays <strong>1.95x</strong>.</li><li>Tie pays <strong>9x</strong>. Player/Banker bets push.</li></ul>" },
-          'blackjack': { title: "Blackjack", body: "<ul><li>Beat the dealer without going over 21.</li><li>Dealer must stand on <strong>17 or higher</strong>.</li><li>Natural Blackjack pays <strong>2.5x</strong>. Standard wins pay <strong>2x</strong>. Ties push.</li></ul>" },
-          'perya': { title: "Color Game", body: "<ul><li>Bet on Red, Blue, Yellow, White, Green, or Pink.</li><li>3 dice are rolled.</li><li>1 Match pays <strong>2x</strong>. 2 Matches pay <strong>3x</strong>. 3 Matches pay <strong>4x</strong>!</li></ul>" },
-          'dt': { title: "Dragon Tiger", body: "<ul><li>Bet on Dragon, Tiger, or Tie. Highest card wins.</li><li>Aces are low (1). Kings are high (13).</li><li>Dragon/Tiger pays <strong>2x</strong>. Tie pays <strong>9x</strong>.</li></ul>" },
-          'sicbo': { title: "Sic Bo", body: "<ul><li>Bet on Small (Sum 4-10) or Big (Sum 11-17).</li><li>Wins pay <strong>2x</strong>.</li><li>Any Triple roll loses all Big/Small bets.</li></ul>" }
-        };
-
-        function logHistory(gid, betStr, resultStr, wonProfit, lostBet, didBet = true) {
-            if(!myGameHistory[gid]) myGameHistory[gid] = [];
-            let cleanRes = resultStr.replace(' WINS!', '').replace(' WINS', '');
-            
-            myGameHistory[gid].unshift({ bet: betStr, result: cleanRes, wonProfit: wonProfit, lostBet: lostBet, didBet: didBet });
-            if(myGameHistory[gid].length > 5) myGameHistory[gid].pop();
-            if(currentHistoryGame === gid && !document.getElementById('history-popover').classList.contains('hidden')) {
-                updateHistoryUI(gid);
-            }
-        }
-
-        socket.on('system_stats_reset', (data) => { 
-            if(currentHistoryGame === data.game) socket.emit('getGlobalResults', data.game); 
-        });
-
-        socket.on('globalResultsData', data => {
-            if (data.game === 'baccarat' || data.game === 'perya' || data.game === 'dt' || data.game === 'sicbo') {
-                globalFallback[data.game] = data.results;
-                if(data.game === currentHistoryGame) document.getElementById('stat-total-rounds').innerText = data.stats.total;
-            }
-            
-            if(data.game !== currentHistoryGame) return;
-            
-            let statsHtml = ``;
-            if (data.stats.total > 0) {
-                if (data.game === 'd20' || data.game === 'blackjack') {
-                    let winP = ((data.stats.Win / data.stats.total) * 100).toFixed(1);
-                    let loseP = ((data.stats.Lose / data.stats.total) * 100).toFixed(1);
-                    statsHtml = `<span><span style="color:var(--success); font-weight:800;">WIN: ${winP}%</span></span><span><span style="color:var(--danger); font-weight:800;">LOSE: ${loseP}%</span></span>`;
-                } else if(data.game === 'coinflip') {
-                    let headsP = ((data.stats.Heads / data.stats.total) * 100).toFixed(1);
-                    let tailsP = ((data.stats.Tails / data.stats.total) * 100).toFixed(1);
-                    statsHtml = `<span><span style="color:#ffb400; font-weight:800;">HEADS: ${headsP}%</span></span><span><span style="color:#e2e8f0; font-weight:800;">TAILS: ${tailsP}%</span></span>`;
-                } else {
-                    Object.keys(data.stats).forEach(key => {
-                        if (key !== 'total') {
-                            let perc = ((data.stats[key] / data.stats.total) * 100).toFixed(1);
-                            if (data.game === 'perya') {
-                                statsHtml += `<div style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; margin-right:5px;"><div class="color-die c-${key.toLowerCase()}" style="width:12px; height:12px; border-radius:2px; border:1px solid rgba(255,255,255,0.2);"></div><span style="color:white; font-weight:800; font-size:0.8rem;">${perc}%</span></div>`;
-                            } else {
-                                statsHtml += `<span><span style="color:${getBetColor(key)}; font-weight:800;">${key.toUpperCase()}: ${perc}%</span></span>`;
-                            }
+        
+        if(data.game !== currentHistoryGame) return;
+        
+        let statsHtml = ``;
+        if (data.stats.total > 0) {
+            if (data.game === 'd20' || data.game === 'blackjack') {
+                let winP = ((data.stats.Win / data.stats.total) * 100).toFixed(1);
+                let loseP = ((data.stats.Lose / data.stats.total) * 100).toFixed(1);
+                statsHtml = `<span><span style="color:var(--success); font-weight:800;">WIN: ${winP}%</span></span><span><span style="color:var(--danger); font-weight:800;">LOSE: ${loseP}%</span></span>`;
+            } else if(data.game === 'coinflip') {
+                let headsP = ((data.stats.Heads / data.stats.total) * 100).toFixed(1);
+                let tailsP = ((data.stats.Tails / data.stats.total) * 100).toFixed(1);
+                statsHtml = `<span><span style="color:#ffb400; font-weight:800;">HEADS: ${headsP}%</span></span><span><span style="color:#e2e8f0; font-weight:800;">TAILS: ${tailsP}%</span></span>`;
+            } else {
+                Object.keys(data.stats).forEach(key => {
+                    if (key !== 'total') {
+                        let perc = ((data.stats[key] / data.stats.total) * 100).toFixed(1);
+                        if (data.game === 'perya') {
+                            statsHtml += `<div style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; margin-right:5px;"><div class="color-die c-${key.toLowerCase()}" style="width:12px; height:12px; border-radius:2px; border:1px solid rgba(255,255,255,0.2);"></div><span style="color:white; font-weight:800; font-size:0.8rem;">${perc}%</span></div>`;
+                        } else {
+                            statsHtml += `<span><span style="color:${getBetColor(key)}; font-weight:800;">${key.toUpperCase()}: ${perc}%</span></span>`;
                         }
-                    });
-                }
+                    }
+                });
             }
-            document.getElementById('stat-percentages').innerHTML = statsHtml;
-            updateHistoryUI(data.game);
-        });
-
-        function switchView(viewId) { 
-          if (audioCtx.state === 'suspended') audioCtx.resume(); 
-          document.querySelectorAll('.main-wrapper > .content > .view-container').forEach(d => d.classList.add('hidden')); 
-          let v = document.getElementById('view-' + viewId); 
-          if (v) v.classList.remove('hidden'); 
-          
-          let backBtn = document.getElementById('global-back-btn');
-          if (viewId === 'casino') {
-              openLobbyMode('modes'); 
-          } else {
-              backBtn.classList.remove('hidden');
-              document.getElementById('back-btn-text').innerText = 'LEAVE TABLE';
-          }
         }
+        document.getElementById('stat-percentages').innerHTML = statsHtml;
+        updateHistoryUI(data.game);
+    });
 
-        function openLobbyMode(mode) { 
-          ['modes', 'indiv', 'shared'].forEach(m => {
-            let el = document.getElementById('lobby-' + m);
-            if(el) el.classList.add('hidden');
-          }); 
-          let target = document.getElementById('lobby-' + mode);
-          if(target) target.classList.remove('hidden'); 
-          
-          let backBtn = document.getElementById('global-back-btn');
-          if(mode === 'modes') {
-              document.querySelector('.casino-title').classList.remove('hidden');
-              backBtn.classList.add('hidden');
-          } else { 
-              document.querySelector('.casino-title').classList.add('hidden'); 
-              backBtn.classList.remove('hidden');
-              document.getElementById('back-btn-text').innerText = 'BACK TO MODES';
-          }
+    function switchView(viewId) { 
+      if (audioCtx.state === 'suspended') audioCtx.resume(); 
+      document.querySelectorAll('.main-wrapper > .content > .view-container').forEach(d => d.classList.add('hidden')); 
+      let v = document.getElementById('view-' + viewId); 
+      if (v) v.classList.remove('hidden'); 
+      
+      let backBtn = document.getElementById('global-back-btn');
+      if (viewId === 'casino') {
+          openLobbyMode('modes'); 
+      } else {
+          backBtn.classList.remove('hidden');
+          document.getElementById('back-btn-text').innerText = 'LEAVE TABLE';
+      }
+    }
+
+    function openLobbyMode(mode) { 
+      ['modes', 'indiv', 'shared'].forEach(m => {
+        let el = document.getElementById('lobby-' + m);
+        if(el) el.classList.add('hidden');
+      }); 
+      let target = document.getElementById('lobby-' + mode);
+      if(target) target.classList.remove('hidden'); 
+      
+      let backBtn = document.getElementById('global-back-btn');
+      if(mode === 'modes') {
+          document.querySelector('.casino-title').classList.remove('hidden');
+          backBtn.classList.add('hidden');
+      } else { 
+          document.querySelector('.casino-title').classList.add('hidden'); 
+          backBtn.classList.remove('hidden');
+          document.getElementById('back-btn-text').innerText = 'BACK TO MODES';
+      }
+    }
+    
+    function openGame(id) { 
+      switchView('game-' + id); 
+      let resBox = document.querySelector(`#view-game-${id} .result-box`);
+      if(resBox) { resBox.style.display = 'none'; resBox.classList.remove('show'); resBox.style.opacity = '0'; }
+      
+      if(id === 'd20') {
+          clearInterval(window.d20AnimCycle);
+          document.getElementById('d20-icon').className = 'fas fa-dice-d20 dice-icon';
+          document.getElementById('d20-icon').style.display='block'; document.getElementById('d20-num').style.display='none';
+          document.getElementById('btn-d20').disabled = false;
+          document.getElementById('d20-bet').disabled = false;
+          document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
+      }
+      if(id === 'coinflip') {
+          document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false;
+          document.getElementById('coin-wrapper').classList.remove('tossing');
+      }
+      if(id === 'blackjack') {
+          document.getElementById('bj-p-hand').innerHTML=''; document.getElementById('bj-d-hand').innerHTML='';
+          document.getElementById('bj-p-score').innerText='0'; document.getElementById('bj-d-score').innerText='0';
+          document.getElementById('bj-start-controls').classList.remove('hidden');
+          document.getElementById('bj-action-controls').classList.add('hidden');
+          document.getElementById('btn-bj-deal').disabled = false; bjSt.active = false;
+      }
+    }
+
+    function openSharedGame(id) {
+        window.activeSharedGame = id;
+        socket.emit('joinRoom', id);
+        if (sConf[id] && sConf[id].setupUI) sConf[id].setupUI();
+        document.getElementById('sg-title').innerText = sConf[id].title;
+        document.getElementById('sg-chat').innerHTML = '<div class="chat-msg chat-sys">Connected to server.</div>';
+        switchView('shared-game');
+    }
+
+    function backToHub() {
+        let inCasinoView = !document.getElementById('view-casino').classList.contains('hidden');
+        if (inCasinoView) {
+            openLobbyMode('modes');
+        } else {
+            if (window.activeSharedGame) backToSharedLobby();
+            else backToSoloLobby();
         }
+    }
+    
+    function backToSoloLobby() { switchView('casino'); openLobbyMode('indiv'); }
+
+    // =======================================================
+    // SOLO GAMES LOGIC
+    // =======================================================
+    let activeD20Bets = [];
+    function toggleD20Bet(btn) {
+        if(document.getElementById('btn-d20').disabled) return; sfx.click();
+        let val = btn.dataset.val;
+        let type = btn.dataset.type;
         
-        function openGame(id) { 
-          switchView('game-' + id); 
-          let resBox = document.querySelector(`#view-game-${id} .result-box`);
-          if(resBox) { resBox.style.display = 'none'; resBox.classList.remove('show'); resBox.style.opacity = '0'; }
-          
-          if(id === 'd20') {
-              clearInterval(window.d20AnimCycle);
-              document.getElementById('d20-icon').className = 'fas fa-dice-d20 dice-icon';
-              document.getElementById('d20-icon').style.display='block'; document.getElementById('d20-num').style.display='none';
-              document.getElementById('btn-d20').disabled = false;
-              document.getElementById('d20-bet').disabled = false;
-              document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
-          }
-          if(id === 'coinflip') {
-              document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false;
-              document.getElementById('coin-wrapper').classList.remove('tossing');
-          }
-          if(id === 'blackjack') {
-              document.getElementById('bj-p-hand').innerHTML=''; document.getElementById('bj-d-hand').innerHTML='';
-              document.getElementById('bj-p-score').innerText='0'; document.getElementById('bj-d-score').innerText='0';
-              document.getElementById('bj-start-controls').classList.remove('hidden');
-              document.getElementById('bj-action-controls').classList.add('hidden');
-              document.getElementById('btn-bj-deal').disabled = false; bjSt.active = false;
-          }
-        }
+        document.querySelectorAll(`.d20-toggle[data-type="${type}"]`).forEach(b => b.classList.remove('has-bet'));
+        activeD20Bets = activeD20Bets.filter(b => b.type !== type);
+        
+        let existingIndex = activeD20Bets.findIndex(b => b.val === val);
+        if(existingIndex === -1) { btn.classList.add('has-bet'); activeD20Bets.push({type, val}); }
+    }
 
-        function openSharedGame(id) {
-            window.activeSharedGame = id;
-            socket.emit('joinRoom', id);
-            if (sConf[id] && sConf[id].setupUI) sConf[id].setupUI();
-            document.getElementById('sg-title').innerText = sConf[id].title;
-            document.getElementById('sg-chat').innerHTML = '<div class="chat-msg chat-sys">Connected to server.</div>';
-            switchView('shared-game');
-        }
+    function playD20() {
+        if(activeD20Bets.length === 0) { showLocalFlash('d20', 'SELECT A BET', 'error'); return; }
+        let amt = formatTC(document.getElementById('d20-bet').value);
+        if(isNaN(amt) || amt < 10) { showLocalFlash('d20', 'MIN BET 10 TC', 'error'); return; }
 
-        function backToHub() {
-            let inCasinoView = !document.getElementById('view-casino').classList.contains('hidden');
-            if (inCasinoView) {
-                openLobbyMode('modes');
+        triggerBetAnim(); sfx.click();
+        document.getElementById('btn-d20').disabled = true;
+        document.getElementById('d20-bet').disabled = true;
+        document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = true);
+        
+        let betsToSend = activeD20Bets.map(b => ({ guessValue: b.val, amount: amt }));
+        socket.emit('playSolo', { game: 'd20', bets: betsToSend });
+        mySoloRounds.d20++;
+    }
+
+    socket.on('d20Result', (data) => {
+        let i = document.getElementById('d20-icon'); let n = document.getElementById('d20-num');
+        i.style.display = 'none'; n.style.display = 'block';
+        
+        let count = 0; sfx.coin();
+        window.d20AnimCycle = setInterval(() => { n.innerText = crypto.randomInt ? crypto.randomInt(1,21) : Math.floor(Math.random()*20)+1; count++; if(count > 15) { clearInterval(window.d20AnimCycle); finalizeD20(data); } }, 50);
+    });
+
+    function finalizeD20(data) {
+        let n = document.getElementById('d20-num');
+        n.innerText = data.roll;
+        
+        let betStrs = activeD20Bets.map(b => b.val.toUpperCase());
+        
+        let msg = document.getElementById('d20-msg');
+        msg.classList.remove('win', 'lose', 'push');
+        if (data.payout > 0) { msg.classList.add('win'); msg.innerHTML = `<div class="res-title">WON</div><div class="res-payout">+${fmtTC(data.payout)}</div>`; sfx.win(); } 
+        else { msg.classList.add('lose'); msg.innerHTML = `<div class="res-title">LOST</div>`; sfx.lose(); }
+        msg.classList.add('show');
+        
+        logHistory('d20', betStrs.join(', '), data.resStr, data.payout, data.bet);
+        
+        setTimeout(() => {
+            msg.classList.remove('show');
+            document.getElementById('btn-d20').disabled = false;
+            document.getElementById('d20-bet').disabled = false;
+            document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
+            updateMyBalance(data.newBalance, data.payout > 0);
+        }, 3000);
+    }
+
+    function playCoin(choice) {
+        let amt = formatTC(document.getElementById('coin-bet').value);
+        if(isNaN(amt) || amt < 10) { showLocalFlash('coinflip', 'MIN BET 10 TC', 'error'); return; }
+        triggerBetAnim(); sfx.click();
+        document.getElementById('btn-heads').disabled = true; document.getElementById('btn-tails').disabled = true;
+        window.currentCoinChoice = choice;
+        socket.emit('playSolo', { game: 'coinflip', choice: choice, bet: amt });
+        mySoloRounds.coinflip++;
+    }
+
+    socket.on('coinResult', (data) => {
+        let coin = document.getElementById('coin-wrapper'); sfx.coin();
+        coin.classList.remove('tossing'); void coin.offsetWidth; coin.classList.add('tossing');
+        
+        setTimeout(() => {
+            document.getElementById('coin-obj').style.transform = data.result === 'Heads' ? 'rotateY(0deg)' : 'rotateY(180deg)';
+        }, 1000);
+
+        setTimeout(() => {
+            let msg = document.getElementById('coin-msg');
+            msg.classList.remove('win', 'lose', 'push');
+            if (data.payout > 0) { msg.classList.add('win'); msg.innerHTML = `<div class="res-title">WON</div><div class="res-payout">+${fmtTC(data.payout)}</div>`; sfx.win(); } 
+            else { msg.classList.add('lose'); msg.innerHTML = `<div class="res-title">LOST</div>`; sfx.lose(); }
+            msg.classList.add('show');
+
+            logHistory('coinflip', window.currentCoinChoice, data.resStr, data.payout, data.bet);
+            
+            setTimeout(() => {
+                msg.classList.remove('show');
+                document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false;
+                updateMyBalance(data.newBalance, data.payout > 0);
+            }, 2500);
+        }, 2200);
+    });
+
+    let bjSt = { active: false };
+    function startBlackjack() {
+        if(bjSt.active) return;
+        let amt = formatTC(document.getElementById('bj-bet').value);
+        if(isNaN(amt) || amt < 10) { showLocalFlash('blackjack', 'MIN BET 10 TC', 'error'); return; }
+        triggerBetAnim(); sfx.click();
+        document.getElementById('btn-bj-deal').disabled = true; bjSt.active = true;
+        
+        document.getElementById('bj-p-hand').innerHTML = ''; document.getElementById('bj-d-hand').innerHTML = '';
+        document.getElementById('bj-p-score').innerText = '0'; document.getElementById('bj-d-score').innerText = '0';
+        
+        socket.emit('playSolo', { game: 'blackjack', action: 'start', bet: amt });
+        mySoloRounds.blackjack++;
+    }
+
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false) {
+        let animClass = '';
+        if(animateIn) animClass = 'anim-deal';
+        if(animateReveal) animClass = 'anim-flip'; 
+        if(isHidden) return `<div class="play-card card-back ${animClass}">?</div>`;
+        let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
+        let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : '';
+        return `<div class="play-card ${colorClass} ${animClass}"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`;
+    }
+
+    async function renderBJHands(data) {
+        let pHand = document.getElementById('bj-p-hand'); let dHand = document.getElementById('bj-d-hand');
+        
+        if (data.event === 'deal') {
+            sfx.deal();
+            pHand.innerHTML = generateCardHTML(data.pHand[0], false, true); await delay(300); sfx.deal();
+            dHand.innerHTML = generateCardHTML(data.dHand[0], false, true); await delay(300); sfx.deal();
+            pHand.innerHTML += generateCardHTML(data.pHand[1], false, true); await delay(300); sfx.deal();
+            dHand.innerHTML += generateCardHTML(data.dHand[1], true, true); await delay(400);
+
+            document.getElementById('bj-p-score').innerText = getBJScore(data.pHand);
+            document.getElementById('bj-d-score').innerText = data.dHand[0].bjVal;
+            
+            if (!data.naturalBJ) {
+                document.getElementById('bj-start-controls').classList.add('hidden');
+                document.getElementById('bj-action-controls').classList.remove('hidden');
             } else {
-                if (window.activeSharedGame) backToSharedLobby();
-                else backToSoloLobby();
+                finalizeBJ(data);
             }
+        } 
+        else if (data.event === 'hit') {
+            sfx.deal();
+            let c = data.pHand[data.pHand.length - 1];
+            pHand.innerHTML += generateCardHTML(c, false, true);
+            document.getElementById('bj-p-score').innerText = getBJScore(data.pHand);
+        }
+        else if (data.event === 'resolved') {
+            document.getElementById('bj-action-controls').classList.add('hidden');
+            
+            dHand.innerHTML = generateCardHTML(data.dHand[0], false, false) + generateCardHTML(data.dHand[1], false, false, true);
+            document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, 2));
+            await delay(600);
+
+            for (let i = 2; i < data.dHand.length; i++) {
+                sfx.deal();
+                dHand.innerHTML += generateCardHTML(data.dHand[i], false, true);
+                document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, i+1));
+                await delay(600);
+            }
+            
+            finalizeBJ(data);
+        }
+    }
+
+    socket.on('bjUpdate', (data) => { renderBJHands(data); });
+
+    function finalizeBJ(data) {
+        let msg = document.getElementById('bj-msg');
+        msg.classList.remove('win', 'lose', 'push');
+        
+        let displayPayout = '';
+        if (data.payout > 0) { 
+            if (data.msg === 'Push') { msg.classList.add('push'); displayPayout = `PUSH`; sfx.win(); }
+            else { msg.classList.add('win'); displayPayout = `+${fmtTC(data.payout)}`; sfx.win(); }
+        } else { 
+            msg.classList.add('lose'); displayPayout = `LOST`; sfx.lose(); 
         }
         
-        function backToSoloLobby() { switchView('casino'); openLobbyMode('indiv'); }
-        function backToSharedLobby() { 
-            if (window.activeSharedGame === 'mbj') {
-                if (localSeatId && currentMBJSeats[localSeatId] && currentMBJSeats[localSeatId].hands.length > 0 && currentMBJSeats[localSeatId].hands[0].bet > 0 && mbjGameState === 'BETTING') {
-                    showLocalFlash('mbj', "Wait for round to finish.", "error"); return;
-                }
-                sitUp();
-                document.getElementById('view-game-mbj').classList.add('hidden');
-                socket.emit('leaveRoom', 'mbj');
-                window.activeSharedGame = null;
-                switchView('casino');
-                openLobbyMode('shared');
-                return;
-            }
+        msg.innerHTML = `<div class="res-title">${data.msg.toUpperCase()}</div><div class="res-payout">${displayPayout}</div>`;
+        msg.classList.add('show');
+        
+        logHistory('blackjack', '-', data.resStr, data.payout, data.bet);
+        
+        setTimeout(() => {
+            msg.classList.remove('show');
+            document.getElementById('btn-bj-deal').disabled = false;
+            bjSt.active = false;
+            document.getElementById('bj-start-controls').classList.remove('hidden');
+            updateMyBalance(data.newBalance, data.payout > data.bet);
+        }, 3000);
+    }
 
-            if (window.activeSharedGame && mySBets && Object.values(mySBets).reduce((a,b)=>a+b,0) > 0 && sState.status === 'BETTING') {
-                showLocalFlash('shared', "Wait for round to finish.", "error"); return;
+    function hitBlackjack() { sfx.click(); socket.emit('playSolo', { game: 'blackjack', action: 'hit' }); }
+    function standBlackjack() { sfx.click(); socket.emit('playSolo', { game: 'blackjack', action: 'stand' }); }
+
+    // =======================================================
+    // SHARED TABLES LOGIC
+    // =======================================================
+    const sConf = {
+        'dt': {
+            title: 'DRAGON TIGER',
+            setupUI: () => {
+                document.getElementById('sg-display').innerHTML = `
+                    <div class="dt-arena">
+                        <div class="dt-side"><div class="dt-label lbl-dragon">DRAGON</div><div id="sg-dt-dragon" style="perspective:1000px;"></div><div id="sg-dt-d-val" style="font-size:2rem; font-weight:900; color:white; opacity:0; transition:0.3s;">0</div></div>
+                        <div style="font-size:2.5rem; font-weight:900; color:var(--text-muted); opacity:0.5;">VS</div>
+                        <div class="dt-side"><div class="dt-label lbl-tiger">TIGER</div><div id="sg-dt-tiger" style="perspective:1000px;"></div><div id="sg-dt-t-val" style="font-size:2rem; font-weight:900; color:white; opacity:0; transition:0.3s;">0</div></div>
+                    </div>`;
+                document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
+                document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
+                document.getElementById('sg-controls-container').innerHTML = `
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:10px;">
+                        <button class="btn-rules undo-btn" onclick="undoSharedBet('dt')" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
+                        <div class="input-group" style="width:150px; margin:0;"><input type="number" id="sg-bet" class="input-control bet-input" placeholder="Amount (TC)"></div>
+                        <div class="dropdown-wrapper" style="position:relative;">
+                            <button class="btn-rules undo-btn" onclick="toggleCurrentBets(event)" title="Current Bets"><i class="fas fa-coins"></i></button>
+                            <div id="current-bets-popover" class="custom-dropdown hidden" onclick="event.stopPropagation()">
+                                <div style="padding: 10px 15px; border-bottom: 1px solid var(--glass-border); font-weight: 900; color: white;">YOUR BETS THIS ROUND</div>
+                                <div id="cb-list" class="custom-scroll" style="max-height: 200px; overflow-y: auto; padding: 10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bet-grid">
+                        <button class="bet-btn sg-tile" data-choice="Dragon" style="--tile-color: var(--danger);" onclick="placeSharedBet('Dragon')">DRAGON<div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Tie" style="--tile-color: var(--success);" onclick="placeSharedBet('Tie')">TIE<div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Tiger" style="--tile-color: var(--credits);" onclick="placeSharedBet('Tiger')">TIGER<div class="tile-bet-badge">0</div></button>
+                    </div>`;
             }
-            document.getElementById('view-shared-game').classList.add('hidden'); 
-            socket.emit('leaveRoom', window.activeSharedGame);
-            window.activeSharedGame = null; 
-            switchView('casino'); 
-            openLobbyMode('shared'); 
+        },
+        'sicbo': {
+            title: 'SIC BO',
+            setupUI: () => {
+                document.getElementById('sg-display').innerHTML = `
+                    <div class="sicbo-dice" id="sg-sicbo-dice">
+                        <i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i>
+                    </div><div id="sg-sicbo-sum" style="font-size:3rem; font-weight:900; color:white; opacity:0; transition:0.3s; margin-top:10px;">0</div>`;
+                document.getElementById('sg-controls-container').innerHTML = `
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:10px;">
+                        <button class="btn-rules undo-btn" onclick="undoSharedBet('sicbo')" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
+                        <div class="input-group" style="width:150px; margin:0;"><input type="number" id="sg-bet" class="input-control bet-input" placeholder="Amount (TC)"></div>
+                        <div class="dropdown-wrapper" style="position:relative;">
+                            <button class="btn-rules undo-btn" onclick="toggleCurrentBets(event)" title="Current Bets"><i class="fas fa-coins"></i></button>
+                            <div id="current-bets-popover" class="custom-dropdown hidden" onclick="event.stopPropagation()">
+                                <div style="padding: 10px 15px; border-bottom: 1px solid var(--glass-border); font-weight: 900; color: white;">YOUR BETS THIS ROUND</div>
+                                <div id="cb-list" class="custom-scroll" style="max-height: 200px; overflow-y: auto; padding: 10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bet-grid">
+                        <button class="bet-btn sg-tile" data-choice="Small" style="--tile-color: var(--ps-glow);" onclick="placeSharedBet('Small')">SMALL (4-10)<div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Big" style="--tile-color: var(--danger);" onclick="placeSharedBet('Big')">BIG (11-17)<div class="tile-bet-badge">0</div></button>
+                    </div>`;
+            }
+        },
+        'perya': {
+            title: 'COLOR GAME',
+            setupUI: () => {
+                document.getElementById('sg-display').innerHTML = `
+                    <div class="color-dice-container" id="sg-perya-dice">
+                        <div class="color-die c-grey"><i class="fas fa-question"></i></div>
+                        <div class="color-die c-grey"><i class="fas fa-question"></i></div>
+                        <div class="color-die c-grey"><i class="fas fa-question"></i></div>
+                    </div>`;
+                document.getElementById('sg-controls-container').innerHTML = `
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:10px;">
+                        <button class="btn-rules undo-btn" onclick="undoSharedBet('perya')" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
+                        <div class="input-group" style="width:150px; margin:0;"><input type="number" id="sg-bet" class="input-control bet-input" placeholder="Amount (TC)"></div>
+                        <div class="dropdown-wrapper" style="position:relative;">
+                            <button class="btn-rules undo-btn" onclick="toggleCurrentBets(event)" title="Current Bets"><i class="fas fa-coins"></i></button>
+                            <div id="current-bets-popover" class="custom-dropdown hidden" onclick="event.stopPropagation()">
+                                <div style="padding: 10px 15px; border-bottom: 1px solid var(--glass-border); font-weight: 900; color: white;">YOUR BETS THIS ROUND</div>
+                                <div id="cb-list" class="custom-scroll" style="max-height: 200px; overflow-y: auto; padding: 10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bet-grid perya-grid">
+                        <button class="bet-btn sg-tile" data-choice="Yellow" style="--tile-color: #ffcc00;" onclick="placeSharedBet('Yellow')"><div class="color-die c-yellow" style="width:30px; height:30px;"></div><div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="White" style="--tile-color: #fff;" onclick="placeSharedBet('White')"><div class="color-die c-white" style="width:30px; height:30px;"></div><div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Pink" style="--tile-color: #ff66b2;" onclick="placeSharedBet('Pink')"><div class="color-die c-pink" style="width:30px; height:30px;"></div><div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Blue" style="--tile-color: #00a2ff;" onclick="placeSharedBet('Blue')"><div class="color-die c-blue" style="width:30px; height:30px;"></div><div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Red" style="--tile-color: #ff3366;" onclick="placeSharedBet('Red')"><div class="color-die c-red" style="width:30px; height:30px;"></div><div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Green" style="--tile-color: #00e676;" onclick="placeSharedBet('Green')"><div class="color-die c-green" style="width:30px; height:30px;"></div><div class="tile-bet-badge">0</div></button>
+                    </div>`;
+            }
+        },
+        'baccarat': {
+            title: 'BACCARAT',
+            setupUI: () => {
+                document.getElementById('sg-display').innerHTML = `
+                    <div class="blackjack-scores" style="gap:20px;">
+                        <div class="card-area" style="min-width: 180px;"><div class="bj-title">Player</div><div class="bj-score" id="sg-bac-p-score">0</div><div class="card-hand" id="sg-bac-p-hand"></div></div>
+                        <div class="card-area" style="min-width: 180px;"><div class="bj-title">Banker</div><div class="bj-score" id="sg-bac-b-score">0</div><div class="card-hand" id="sg-bac-b-hand"></div></div>
+                    </div>`;
+                document.getElementById('sg-bac-p-hand').innerHTML = `<div class="play-card card-back">?</div><div class="play-card card-back">?</div>`;
+                document.getElementById('sg-bac-b-hand').innerHTML = `<div class="play-card card-back">?</div><div class="play-card card-back">?</div>`;
+                document.getElementById('sg-controls-container').innerHTML = `
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:10px;">
+                        <button class="btn-rules undo-btn" onclick="undoSharedBet('baccarat')" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
+                        <div class="input-group" style="width:150px; margin:0;"><input type="number" id="sg-bet" class="input-control bet-input" placeholder="Amount (TC)"></div>
+                        <div class="dropdown-wrapper" style="position:relative;">
+                            <button class="btn-rules undo-btn" onclick="toggleCurrentBets(event)" title="Current Bets"><i class="fas fa-coins"></i></button>
+                            <div id="current-bets-popover" class="custom-dropdown hidden" onclick="event.stopPropagation()">
+                                <div style="padding: 10px 15px; border-bottom: 1px solid var(--glass-border); font-weight: 900; color: white;">YOUR BETS THIS ROUND</div>
+                                <div id="cb-list" class="custom-scroll" style="max-height: 200px; overflow-y: auto; padding: 10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bet-grid">
+                        <button class="bet-btn sg-tile" data-choice="Player" style="--tile-color: var(--ps-glow);" onclick="placeSharedBet('Player')">PLAYER<div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Tie" style="--tile-color: var(--success);" onclick="placeSharedBet('Tie')">TIE<div class="tile-bet-badge">0</div></button>
+                        <button class="bet-btn sg-tile" data-choice="Banker" style="--tile-color: var(--danger);" onclick="placeSharedBet('Banker')">BANKER<div class="tile-bet-badge">0</div></button>
+                    </div>`;
+            }
         }
-        function backToCasino() { switchView('casino'); }
+    };
 
-        // Global Error Handler for Solo Games
-        socket.on('localGameError', (data) => { 
-            showLocalFlash(data.game, data.msg, "error"); 
-            socket.emit('requestBalanceRefresh');
-            
-            if (data.game === 'd20') {
-                clearInterval(window.d20AnimCycle);
-                document.getElementById('d20-icon').className = 'fas fa-dice-d20 dice-icon';
-                document.getElementById('btn-d20').disabled = false;
-                document.getElementById('d20-bet').disabled = false;
-                document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
-            } else if (data.game === 'coinflip') {
-                document.getElementById('coin-wrapper').classList.remove('tossing');
-                document.getElementById('btn-heads').disabled = false; 
-                document.getElementById('btn-tails').disabled = false;
-            } else if (data.game === 'blackjack') {
-                bjSt.active = false; 
-                document.getElementById('btn-bj-deal').disabled = false; 
-                document.getElementById('bj-start-controls').classList.remove('hidden');
-            } else if (data.game === 'mbj') {
-                localPendingBet = 0;
-                renderMBJSeats();
-            }
+    const dIconMap = ['dice-one', 'dice-two', 'dice-three', 'dice-four', 'dice-five', 'dice-six'];
+    
+    function fetchActivePlayers(e) {
+        if(e) e.stopPropagation();
+        sfx.click();
+        if(window.activeSharedGame) socket.emit('getRoomPlayers', window.activeSharedGame);
+        toggleCustomDropdown('ap-popover', null);
+    }
+    
+    socket.on('roomPlayersList', (players) => {
+        let list = document.getElementById('ap-list-container');
+        if(!list) return;
+        list.innerHTML = '';
+        if(players.length === 0) { list.innerHTML = `<div style="text-align:center; color:var(--text-muted);">No players found.</div>`; return; }
+        players.forEach(p => {
+            let color = p === myUsername ? 'var(--ps-glow)' : 'white';
+            list.innerHTML += `<div style="padding: 8px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); margin-bottom: 5px; font-weight: 800; color: ${color};"><i class="fas fa-user" style="margin-right:8px; color:var(--text-muted);"></i> ${p}</div>`;
         });
+    });
 
-        socket.on('playerCount', (counts) => {
-            document.querySelectorAll('.active-players .ap-count').forEach((el, index) => {
-                const keys = ['mbj', 'baccarat', 'perya', 'dt', 'sicbo'];
-                if(counts[keys[index]]!==undefined) el.innerText = counts[keys[index]];
+    socket.on('timerUpdate', (t) => {
+        let el = document.getElementById('sg-timer'); if(!el) return;
+        el.innerText = t; sState.time = t;
+        let box = document.getElementById('sg-timer-box');
+        if (t <= 5 && t > 0) { box.classList.add('closing'); sfx.tick(); } else { box.classList.remove('closing'); }
+        if (t === 0) { sState.status = 'RESOLVING'; sfx.lock(); }
+    });
+
+    socket.on('lockBets', () => {
+        document.querySelectorAll('.sg-tile').forEach(btn => { btn.disabled = true; });
+        let ov = document.getElementById('sg-overlay'); if(ov) ov.classList.remove('show');
+    });
+
+    function placeSharedBet(choice) {
+        if (sState.status !== 'BETTING') return;
+        let amt = formatTC(document.getElementById('sg-bet').value);
+        if(isNaN(amt) || amt < 10) { showLocalFlash('shared', 'MIN BET 10 TC', 'error'); return; }
+        triggerBetAnim(); sfx.click();
+        socket.emit('placeSharedBet', { room: window.activeSharedGame, choice: choice, amount: amt });
+    }
+
+    function undoSharedBet(room) {
+        if (sState.status !== 'BETTING') return;
+        if (mySBetsStack.length === 0) { showLocalFlash('shared', 'NO BETS TO UNDO', 'error'); return; }
+        sfx.click();
+        socket.emit('undoSharedBet', { room });
+    }
+
+    socket.on('undoSuccess', (data) => {
+        if(mySBets[data.choice]) {
+            mySBets[data.choice] -= data.amount;
+            if(mySBets[data.choice] <= 0) delete mySBets[data.choice];
+        }
+        mySBetsStack.pop();
+        
+        let btn = document.querySelector(`.sg-tile[data-choice="${data.choice}"]`);
+        if(btn) {
+            let badge = btn.querySelector('.tile-bet-badge');
+            if(mySBets[data.choice]) {
+                badge.innerText = fmtTC(mySBets[data.choice]);
+            } else {
+                badge.style.display = 'none';
+                btn.classList.remove('has-bet');
+            }
+        }
+        updateCurrentBetsPopover();
+        showLocalFlash('shared', 'BET UNDONE', 'success');
+    });
+
+    socket.on('sharedBetConfirmed', (data) => {
+        if(!mySBets[data.choice]) mySBets[data.choice] = 0;
+        mySBets[data.choice] += data.amount;
+        mySBetsStack.push(data.choice); 
+
+        let btn = document.querySelector(`.sg-tile[data-choice="${data.choice}"]`);
+        if(btn) {
+            btn.classList.add('has-bet');
+            let badge = btn.querySelector('.tile-bet-badge');
+            badge.innerText = fmtTC(mySBets[data.choice]);
+            badge.style.display = 'block';
+        }
+        updateCurrentBetsPopover();
+        updateMyBalance(data.newBalance);
+    });
+
+    socket.on('newRound', () => {
+        sState.status = 'BETTING'; mySBets = {}; mySBetsStack = [];
+        document.querySelectorAll('.sg-tile').forEach(btn => { 
+            btn.disabled = false; btn.classList.remove('has-bet'); 
+            let badge = btn.querySelector('.tile-bet-badge');
+            if(badge) badge.style.display = 'none';
+        });
+        updateCurrentBetsPopover();
+        
+        let ov = document.getElementById('sg-overlay'); if(ov) ov.classList.remove('show');
+        
+        if (window.activeSharedGame === 'baccarat') {
+            document.getElementById('sg-bac-p-hand').innerHTML = `<div class="play-card card-back">?</div><div class="play-card card-back">?</div>`;
+            document.getElementById('sg-bac-b-hand').innerHTML = `<div class="play-card card-back">?</div><div class="play-card card-back">?</div>`;
+            document.getElementById('sg-bac-p-score').innerText = '0'; document.getElementById('sg-bac-b-score').innerText = '0';
+        } else if (window.activeSharedGame === 'perya') {
+            document.getElementById('sg-perya-dice').innerHTML = `<div class="color-die c-grey"><i class="fas fa-question"></i></div><div class="color-die c-grey"><i class="fas fa-question"></i></div><div class="color-die c-grey"><i class="fas fa-question"></i></div>`;
+        } else if (window.activeSharedGame === 'dt') {
+            document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
+            document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
+            document.getElementById('sg-dt-d-val').style.opacity = '0'; document.getElementById('sg-dt-t-val').style.opacity = '0';
+        } else if (window.activeSharedGame === 'sicbo') {
+            document.getElementById('sg-sicbo-dice').innerHTML = `<i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i>`;
+            document.getElementById('sg-sicbo-sum').style.opacity = '0';
+        }
+    });
+
+    socket.on('sharedResults', async (data) => {
+        if (data.room !== window.activeSharedGame) return;
+        let ov = document.getElementById('sg-overlay'); let rT = document.getElementById('sg-res-title'); let rP = document.getElementById('sg-res-payout');
+        ov.classList.remove('win', 'lose', 'push');
+        
+        let totalBet = Object.values(mySBets).reduce((a,b)=>a+b, 0);
+        let myWin = 0; let net = 0; let statClass = ''; let displayStr = '';
+
+        if (data.room === 'dt') {
+            document.getElementById('sg-dt-dragon').innerHTML = generateCardHTML(data.dCard, false, false, true); sfx.deal();
+            document.getElementById('sg-dt-tiger').innerHTML = generateCardHTML(data.tCard, false, false, true); sfx.deal();
+            setTimeout(() => {
+                document.getElementById('sg-dt-d-val').innerText = data.dCard.dtVal; document.getElementById('sg-dt-d-val').style.opacity = '1';
+                document.getElementById('sg-dt-t-val').innerText = data.tCard.dtVal; document.getElementById('sg-dt-t-val').style.opacity = '1';
+            }, 500);
+
+            if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; else if(mySBets['Dragon'] || mySBets['Tiger']) myWin = (mySBets['Dragon']||0) + (mySBets['Tiger']||0); } 
+            else { if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2; }
+        } 
+        else if (data.room === 'sicbo') {
+            let dc = document.getElementById('sg-sicbo-dice'); dc.innerHTML = '';
+            for(let i=0; i<3; i++) { dc.innerHTML += `<i class="fas fa-${dIconMap[data.roll[i]-1]} s-die anim-deal"></i>`; sfx.tick(); await delay(200); }
+            document.getElementById('sg-sicbo-sum').innerText = data.sum; document.getElementById('sg-sicbo-sum').style.opacity = '1';
+
+            if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2;
+        } 
+        else if (data.room === 'perya') {
+            let dc = document.getElementById('sg-perya-dice'); dc.innerHTML = '';
+            for(let i=0; i<3; i++) { dc.innerHTML += `<div class="color-die c-${data.roll[i].toLowerCase()} anim-deal"></div>`; sfx.tick(); await delay(200); }
+            
+            Object.keys(mySBets).forEach(choice => {
+                let matches = data.roll.filter(c => c === choice).length;
+                if(matches > 0) myWin += mySBets[choice] + (mySBets[choice] * matches);
             });
-            const sgCount = document.getElementById('sg-active-players');
-            if(sgCount && window.activeSharedGame && window.activeSharedGame !== 'mbj') sgCount.innerText = counts[window.activeSharedGame] || 0;
-        });
+        }
+        else if (data.room === 'baccarat') {
+            let pHand = document.getElementById('sg-bac-p-hand'); let bHand = document.getElementById('sg-bac-b-hand');
+            
+            pHand.innerHTML = generateCardHTML(data.pCards[0], false, false, true); sfx.deal(); await delay(300);
+            bHand.innerHTML = generateCardHTML(data.bCards[0], false, false, true); sfx.deal(); await delay(300);
+            pHand.innerHTML += generateCardHTML(data.pCards[1], false, false, true); sfx.deal(); await delay(300);
+            bHand.innerHTML += generateCardHTML(data.bCards[1], false, false, true); sfx.deal(); await delay(500);
 
-        // --- CASHIER ACTIONS ---
-        function openCashier() {
-          if (audioCtx.state === 'suspended') audioCtx.resume();
-          sfx.click();
-          document.querySelectorAll('.cashier-balance-display').forEach(el => el.innerText = fmtTC(myCredits) + ' TC');
-          switchSupportCenterTab('deposit', document.querySelectorAll('#cashier-tabs-nav .bank-tab')[0]);
-          openModal('support-center-modal');
+            if (data.p3Drawn) { pHand.innerHTML += generateCardHTML(data.pCards[2], false, true); sfx.deal(); await delay(500); }
+            if (data.b3Drawn) { bHand.innerHTML += generateCardHTML(data.bCards[2], false, true); sfx.deal(); await delay(500); }
+
+            document.getElementById('sg-bac-p-score').innerText = data.pScore;
+            document.getElementById('sg-bac-b-score').innerText = data.bScore;
+
+            if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; else if(mySBets['Player'] || mySBets['Banker']) myWin = (mySBets['Player']||0) + (mySBets['Banker']||0); } 
+            else if (data.winner === 'Player') { if (mySBets['Player']) myWin = mySBets['Player'] * 2; } 
+            else if (data.winner === 'Banker') { if (mySBets['Banker']) myWin = mySBets['Banker'] * 1.95; }
         }
 
-        function switchSupportCenterTab(tab, el) {
-          if(el) {
-              document.querySelectorAll('#cashier-tabs-nav .bank-tab').forEach(b => b.classList.remove('active'));
-              el.classList.add('active');
-          }
-          
-          if (tab === 'ledger') {
-              document.getElementById('cashier-tabs-nav').style.display = 'none';
-              document.getElementById('btn-view-ledger').style.display = 'none';
-              document.getElementById('cashier-balance-header').style.display = 'none';
-          } else {
-              document.getElementById('cashier-tabs-nav').style.display = 'flex';
-              document.getElementById('btn-view-ledger').style.display = 'block';
-              document.getElementById('cashier-balance-header').style.display = 'block';
-          }
+        net = formatTC(myWin - totalBet);
+        let myBetStrs = Object.keys(mySBets).length > 0 ? Object.keys(mySBets).join(', ') : '-';
+        
+        logHistory(data.room, myBetStrs, data.resStr, myWin, totalBet, totalBet > 0);
 
-          ['deposit','withdraw','requests','ledger'].forEach(t => {
-            let scTab = document.getElementById('sc-tab-' + t);
-            if(scTab) {
-                scTab.classList.toggle('active', t === tab);
-                scTab.classList.toggle('hidden', t !== tab);
+        if (totalBet > 0) {
+            rP.style.display = 'block';
+            if (net > 0) { statClass = 'win'; displayStr = `+${fmtTC(net)}`; sfx.win(); } 
+            else if (net < 0) { statClass = 'lose'; displayStr = `LOST`; sfx.lose(); } 
+            else { statClass = 'push'; displayStr = `PUSH`; sfx.win(); }
+            
+            ov.classList.add(statClass);
+            rT.innerText = data.resStr;
+            rP.innerText = displayStr;
+            ov.classList.add('show');
+            setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1000);
+        } else {
+            showLocalFlash('shared', data.resStr, 'success');
+        }
+    });
+
+    // OVERRIDING BASE backToSharedLobby() TO SUPPORT MBJ
+    function backToSharedLobby() { 
+        if (window.activeSharedGame === 'mbj') {
+            if (localSeatId && currentMBJSeats[localSeatId] && currentMBJSeats[localSeatId].hands.length > 0 && currentMBJSeats[localSeatId].hands[0].bet > 0 && mbjGameState === 'BETTING') {
+                showLocalFlash('mbj', "Wait for round to finish.", "error"); return;
             }
-          });
-          if(tab === 'requests') socket.emit('getTransactions');
-          if(tab === 'ledger') socket.emit('getWalletLogs');
+            sitUp();
+            document.getElementById('view-game-mbj').classList.add('hidden');
+            socket.emit('leaveRoom', 'mbj');
+            window.activeSharedGame = null;
+            switchView('casino');
+            openLobbyMode('shared');
+            return;
         }
 
-        function copyDiscord(el) {
-            navigator.clipboard.writeText('@sr.ashley').then(() => {
-                let ogHtml = el.innerHTML;
-                el.innerHTML = '✓ COPIED TO CLIPBOARD';
-                el.style.color = 'var(--success)';
-                setTimeout(() => {
-                    el.innerHTML = ogHtml;
-                    el.style.color = 'var(--text-muted)';
-                }, 2000);
-            });
+        if (window.activeSharedGame && mySBets && Object.values(mySBets).reduce((a,b)=>a+b,0) > 0 && sState.status === 'BETTING') {
+            showLocalFlash('shared', "Wait for round to finish.", "error"); return;
         }
-
-        function submitDeposit() {
-            const amt = document.getElementById('dep-amount').value;
-            const snt = document.getElementById('dep-snt').value.trim();
-            const discord = document.getElementById('dep-discord').value.trim();
-            const msgBox = document.getElementById('deposit-msg');
-            
-            if(!amt || !snt || !discord) { 
-                msgBox.innerHTML = '<span style="color:var(--danger)">Please fill all fields.</span>';
-                return; 
-            }
-            
-            if(parseFloat(amt) < 1000) { 
-                msgBox.innerHTML = '<span style="color:var(--danger)">Minimum deposit is 1,000 TC.</span>';
-                return; 
-            }
-            
-            if(parseFloat(amt) > 100000) {
-                msgBox.innerHTML = '<span style="color:var(--danger)">Maximum deposit is 100,000 TC.</span>';
-                return;
-            }
-
-            let combinedRef = `SNT: ${snt} | Discord: ${discord}`; 
-            socket.emit('submitTransaction', { type: 'Deposit', amount: parseFloat(amt), ref: combinedRef });
-            
-            msgBox.innerHTML = '<span style="color:var(--success)"><i class="fas fa-check-circle"></i> Deposit Request Submitted!</span>';
-
-            document.getElementById('dep-amount').value = ''; 
-            document.getElementById('dep-snt').value = '';
-            document.getElementById('dep-discord').value = '';
-            
-            setTimeout(() => { msgBox.innerHTML = ''; }, 3500);
-        }
-
-        function submitWithdrawal() {
-            const amt = parseFloat(document.getElementById('wit-amount').value);
-            const snt = document.getElementById('wit-snt').value.trim();
-            const discord = document.getElementById('wit-discord').value.trim();
-            const msgBox = document.getElementById('withdraw-msg');
-
-            if(!amt || !snt || !discord) { 
-                msgBox.innerHTML = '<span style="color:var(--danger)">Please fill all fields.</span>';
-                return; 
-            }
-            if(amt < 10000) { 
-                msgBox.innerHTML = '<span style="color:var(--danger)">Minimum withdrawal is 10,000 TC.</span>';
-                return; 
-            }
-
-            if(amt > 100000) { 
-                msgBox.innerHTML = '<span style="color:var(--danger)">Maximum withdrawal is 100,000 TC.</span>';
-                return; 
-            }
-
-            if(amt > myCredits) { 
-                msgBox.innerHTML = '<span style="color:var(--danger)">Insufficient Withdrawable TC.</span>';
-                return; 
-            }
-            
-            let combinedRef = `SNT: ${snt} | Discord: ${discord}`;
-            socket.emit('submitTransaction', { type: 'Withdrawal', amount: amt, ref: combinedRef });
-            
-            msgBox.innerHTML = '<span style="color:var(--success)"><i class="fas fa-check-circle"></i> Withdrawal Request Submitted!</span>';
-
-            document.getElementById('wit-amount').value = ''; 
-            document.getElementById('wit-snt').value = '';
-            document.getElementById('wit-discord').value = '';
-            
-            setTimeout(() => { msgBox.innerHTML = ''; }, 3500);
-        }
-
-        socket.on('transactionsData', (txs) => {
-            const container = document.getElementById('bank-logs-container'); container.innerHTML = '';
-            if(txs.length === 0) return container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">No requests found.</div>';
-            txs.forEach(t => {
-                let statClass = t.status === 'Approved' ? 'approved' : (t.status === 'Rejected' ? 'rejected' : 'pending');
-                let color = t.type === 'Deposit' ? 'var(--success)' : 'var(--danger)'; let sign = t.type === 'Deposit' ? '+' : '-';
-                container.innerHTML += `<div class="ticket-log-item"><div class="ticket-log-header"><span class="ticket-log-id">${t._id.substring(0,8)}... - ${new Date(t.date).toLocaleDateString()}</span><span class="ticket-log-status ${statClass}">${t.status}</span></div><div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:900; font-size:1.1rem; text-transform:uppercase;">${t.type}</div><div style="color:${color}; font-weight:900; font-size:1.2rem;">${sign}${fmtTC(t.amount)} TC</div></div></div>`;
-            });
-        });
-
-        function clearLedger() {
-            if(confirm("Are you sure you want to clear your ledger history?")) {
-                socket.emit('clearWalletLogs');
-            }
-        }
-
-        socket.on('walletLogsData', (data) => {
-            const container = document.getElementById('ledger-logs-container'); container.innerHTML = '';
-            
-            const pHud = document.getElementById('ledger-daily-profit');
-            if(pHud) {
-                let pColor = data.dailyProfit > 0 ? 'var(--success)' : (data.dailyProfit < 0 ? 'var(--danger)' : 'white');
-                let pSign = data.dailyProfit > 0 ? '+' : '';
-                pHud.innerHTML = `<span style="color:${pColor}">${pSign}${fmtTC(data.dailyProfit)} TC</span>`;
-            }
-
-            if(data.logs.length === 0) return container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px; grid-column: span 4;">No ledger history found.</div>';
-            
-            data.logs.forEach(l => {
-                let color = l.amount > 0 ? 'var(--success)' : (l.amount < 0 ? 'var(--danger)' : 'white'); 
-                let sign = l.amount > 0 ? '+' : '';
-                container.innerHTML += `
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); align-items:center; text-align:center; font-size:0.9rem; white-space:nowrap;">
-                    <div style="color:white; font-weight:900; text-transform:uppercase;">${l.action}</div>
-                    <div style="color:${color}; font-weight:900;">${sign}${fmtTC(l.amount)}</div>
-                    <div style="color:var(--text-muted); font-weight:600; text-transform:uppercase;">${l.details}</div>
-                    <div style="color:var(--text-muted); font-weight:600; font-size:0.8rem;">${new Date(l.date).toLocaleDateString([], {month:'short', day:'numeric'})}</div>
-                </div>`;
-            });
-        });
-
-        function submitPromo() {
-            const code = document.getElementById('promo-code').value.trim(); 
-            if(!code) {
-                document.getElementById('promo-response').innerHTML = '<span style="color:var(--danger)">Enter a code</span>';
-                return;
-            }
-            socket.emit('redeemPromo', code);
-        }
-
-        socket.on('promoResult', (res) => {
-            let respDiv = document.getElementById('promo-response');
-            if(res.success) { 
-                respDiv.innerHTML = `<span style="color:var(--success)">Valid: +${fmtTC(res.amt)} ${res.type === 'playable' ? 'P TC' : 'TC'}</span>`;
-                document.getElementById('promo-code').value = ''; 
-                socket.emit('requestBalanceRefresh');
-            } else { 
-                respDiv.innerHTML = `<span style="color:var(--danger)">${res.msg}</span>`; 
-            }
-        });
-
-        socket.on('maintenanceToggle', (isMain) => {
-            if(isMain && myUsername !== 'admin') {
-                document.body.innerHTML = `<div id="maintenance-overlay" style="height:100vh;width:100vw;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#00050d;color:white;text-align:center;padding:20px;"><i class="fas fa-tools" style="font-size:5rem;color:var(--danger);margin-bottom:20px;animation:pulseRed 2s infinite;"></i><h1 style="font-weight:900;font-size:2.5rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">System Maintenance</h1><p style="color:var(--text-muted);font-size:1.1rem;max-width:400px;line-height:1.5;">The casino vault is currently closed for upgrades and routine security checks. Please check our Discord for updates.</p></div>`;
-            } else if (!isMain && document.getElementById('maintenance-overlay')) {
-                location.reload();
-            }
-        });
-
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
-            if(e.keyCode === 123) return false; 
-            if(e.ctrlKey && e.shiftKey && e.keyCode === 'I'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.shiftKey && e.keyCode === 'C'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.shiftKey && e.keyCode === 'J'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) return false; 
-        };
-
-      </script>
-    </body>
-    </html>
+        document.getElementById('view-shared-game').classList.add('hidden'); 
+        socket.emit('leaveRoom', window.activeSharedGame);
+        window.activeSharedGame = null; 
+        switchView('casino'); 
+        openLobbyMode('shared'); 
+    }
+  </script>
+</body>
+</html>
