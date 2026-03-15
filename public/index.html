@@ -2506,6 +2506,380 @@
         switchView('casino'); 
         openLobbyMode('shared'); 
     }
+      // =======================================================
+    // VIP BLACKJACK LOGIC & UI INTEGRATION (THE MISSING CODE)
+    // =======================================================
+    let mbjGameState = 'BETTING';
+    let localPendingBet = 0;
+    let localSeatId = null;
+    let renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
+    let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
+
+    function openMBJ() {
+        window.activeSharedGame = 'mbj';
+        socket.emit('joinRoom', 'mbj');
+        renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
+        renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
+        document.getElementById('mbj-chat-messages').innerHTML = '<div class="chat-line chat-sys">Welcome to VIP Premium.</div>';
+        switchView('game-mbj');
+    }
+
+    function getMBJDisplayScore(handCards) {
+        let score = 0, aces = 0;
+        for (let c of handCards) {
+            score += c.bjVal; 
+            if (c.raw === 'A') aces++;
+        }
+        while (score > 21 && aces > 0) { score -= 10; aces--; }
+        if (aces > 0 && score < 21) {
+            return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`;
+        }
+        return `<span style="font-size:1.05rem;">${score}</span>`;
+    }
+
+    function generateMBJCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
+        let animClass = '';
+        if(animateIn) { animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in'; }
+        if(animateReveal) animClass = 'anim-reveal'; 
+        let doubleClass = isDoubled ? 'card-doubled' : '';
+        let styleStr = `left: ${leftOffset}px;`;
+        if(isHidden) return `<div class="mbj-card card-back ${animClass} ${doubleClass}" style="${styleStr}"></div>`;
+        let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
+        let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
+        return `<div class="mbj-card ${colorClass} ${animClass} ${doubleClass}" style="${styleStr}"><div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div><div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div></div>`;
+    }
+
+    function getMBJChipStackHTML(amount, isGhost = false) {
+        let html = ''; let remaining = amount;
+        let chips = [{val: 50000, col: '#ffcc00', text: 'black'}, {val: 10000, col: '#00e676', text: 'black'}, {val: 1000, col: '#ff3366', text: 'white'}, {val: 100, col: '#00a2ff', text: 'white'}, {val: 10, col: '#444', text: 'white'}];
+        let offset = 0; let visualCount = 0;
+        for(let c of chips) {
+            while(remaining >= c.val && visualCount < 6) { 
+                let label = c.val >= 1000 ? (c.val/1000)+'K' : c.val;
+                html += `<div class="mbj-chip-3d ${isGhost ? 'ghost' : ''}" style="--c-bg:${c.col}; color:${c.text}; bottom:${offset}px; z-index:${visualCount};">${label}</div>`;
+                remaining -= c.val; offset += 4; visualCount++;
+            }
+        }
+        return `<div class="chip-stack-wrapper" style="height: ${45 + offset}px;">${html}</div>`;
+    }
+
+    function animateMBJChipSequence(fromId, toId, color) {
+        let fromEl = document.getElementById(fromId); let toEl = document.getElementById(toId);
+        if(!fromEl || !toEl) return;
+        let fRect = fromEl.getBoundingClientRect(); let tRect = toEl.getBoundingClientRect();
+        let chip = document.createElement('div'); chip.className = `animated-chip`;
+        chip.style.cssText = `--c-bg: ${color}; left: ${fRect.left + (fRect.width/2)}px; top: ${fRect.top + (fRect.height/2)}px; margin-left: -22.5px; margin-top: -22.5px;`;
+        document.body.appendChild(chip);
+        void chip.offsetWidth;
+        chip.style.transform = 'scale(1.5)';
+        setTimeout(() => { chip.style.left = `${tRect.left + (tRect.width/2)}px`; chip.style.top = `${tRect.top + (tRect.height/2)}px`; chip.style.transform = 'scale(0.5)'; chip.style.opacity = '0'; }, 30);
+        setTimeout(() => { if(chip.parentNode) chip.remove(); }, 500);
+    }
+
+    function sendMBJAction(type) {
+        document.querySelectorAll('.mbj-action-row').forEach(el => {
+            el.classList.remove('show'); el.style.display = 'none'; 
+        });
+        socket.emit('mbjAction', { type: type });
+    }
+
+    function sitDown(seatNum) {
+        socket.emit('mbjTakeSeat', seatNum);
+        currentMBJSeats[seatNum] = { username: myUsername, hands: [] };
+        renderMBJSeats();
+    }
+    
+    function sitUp() {
+        socket.emit('mbjLeaveSeat');
+        if(localSeatId) currentMBJSeats[localSeatId] = null;
+        localSeatId = null;
+        renderMBJSeats();
+    }
+
+    function renderMBJSeats(seats, activeTurnObj = null) {
+        currentMBJSeats = seats || currentMBJSeats; 
+        let cont = document.getElementById('mbj-seats-row'); 
+        if(!cont) return; 
+        
+        let htmlBuffer = '';
+        let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null;
+        let activeHandIdx = activeTurnObj ? activeTurnObj.handIdx : 0;
+        localSeatId = null;
+
+        for(let i=1; i<=5; i++) {
+            let s = currentMBJSeats[i]; 
+            let isMe = s && s.username === myUsername; 
+            if (isMe) localSeatId = i;
+
+            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { continue; }
+
+            let isMySeatTurn = activeSeatNum == i;
+            let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
+            let activeClass = isMySeatTurn ? 'active-turn' : '';
+            let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
+            
+            let canSit = !s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername);
+            let clickAction = canSit ? `sitDown(${i})` : ``; 
+
+            let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
+            html += `<div class="mbj-split-col">`;
+            
+            if (s && s.hands && s.hands.length > 0) {
+                if (!renderedCardCount[i]) renderedCardCount[i] = [];
+                s.hands.forEach((hand, hIdx) => {
+                    let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx;
+                    let cardCount = hand.cards.length;
+                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
+                    
+                    html += `<div class="mbj-hand-column">`;
+                    let btnClass = (isThisHandActive && mbjGameState === 'PLAYER_TURN' && isMe) ? 'show' : '';
+                    let canDouble = hand.cards.length === 2;
+                    let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1;
+
+                    html += `<div class="mbj-action-row ${btnClass}" style="${btnClass ? '' : 'display:none;'}">
+                                <button class="mbj-action-btn hit" onclick="sendMBJAction('hit')"><i class="fas fa-plus"></i></button>
+                                <button class="mbj-action-btn stand" onclick="sendMBJAction('stand')"><i class="fas fa-hand-paper"></i></button>`;
+                    if (canDouble) html += `<button class="mbj-action-btn double" onclick="sendMBJAction('double')">x2</button>`;
+                    if (canSplit) html += `<button class="mbj-action-btn split" onclick="sendMBJAction('split')"><i class="fas fa-arrows-alt-h"></i></button>`;
+                    html += `</div>`;
+                    
+                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
+                    let previouslyRendered = renderedCardCount[i][hIdx] || 0;
+                    let isNewCard = cardCount > previouslyRendered;
+                    let delayClassBadge = isNewCard ? 'mbj-delay-badge' : '';
+                    let delayClassPill = isNewCard ? 'mbj-delay-pill' : '';
+
+                    if(hand.cards.length > 0 && hand.status !== 'BUST') { 
+                        if(hand.status === 'BLACKJACK') {
+                            html += `<div class="mbj-status-pill mbj-pill-bj ${delayClassPill}">BLACKJACK</div>`;
+                        } else {
+                            let badgeClass = isThisHandActive ? 'mbj-score-active' : 'mbj-score-inactive';
+                            html += `<div class="mbj-score-badge ${badgeClass} ${delayClassBadge}">${getMBJDisplayScore(hand.cards)}</div>`; 
+                        }
+                    } else if (hand.status === 'BUST') {
+                        html += `<div class="mbj-status-pill mbj-pill-bust ${delayClassPill}">${hand.score} BUST</div>`;
+                    }
+
+                    hand.cards.forEach((c, cIdx) => { 
+                        let animateThisCard = cIdx >= previouslyRendered;
+                        let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
+                        html += generateMBJCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard);
+                    });
+                    html += `</div>`; 
+                    
+                    let displayBet = hand.bet;
+                    if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && s.hands.length === 1 && s.hands[0].bet === 0) displayBet = localPendingBet;
+                    
+                    html += `<div class="mbj-circle-container" id="mbj-circle-${i}-${hIdx}">`;
+                    html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
+                    if (displayBet > 0) { 
+                        html += `<div id="mbj-chip-stack-${i}-${hIdx}" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">${getMBJChipStackHTML(displayBet, hand.bet === 0)}</div>`;
+                    } else if (hIdx === 0) {
+                        html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
+                    }
+                    html += `</div></div>`; 
+
+                    if (displayBet > 0) html += `<div class="bet-pill">${fmtTC(displayBet)} TC</div>`;
+                    html += `</div>`; 
+                });
+                renderedCardCount[i] = s.hands.map(h => h.cards.length);
+            } else { 
+                renderedCardCount[i] = []; 
+                html += `<div class="mbj-hand-column" style="position: relative;">`;
+                html += `<div class="mbj-hand-container" style="width: 70px;"></div>`;
+                html += `<div class="mbj-circle-container" id="mbj-circle-${i}-0">`;
+                html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
+                if (localPendingBet > 0 && isMe && mbjGameState === 'BETTING') {
+                    html += `<div id="mbj-chip-stack-${i}-0" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">${getMBJChipStackHTML(localPendingBet, true)}</div>`;
+                } else {
+                    html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
+                }
+                html += `</div></div>`;
+                if (localPendingBet > 0 && isMe && mbjGameState === 'BETTING') html += `<div class="bet-pill">${fmtTC(localPendingBet)} TC</div>`;
+                html += `</div>`; 
+            }
+            html += `</div>`; 
+
+            let nameHTML = s ? s.username : 'EMPTY';
+            html += `<div class="mbj-seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${s || mbjGameState==='BETTING' ? 1 : 0.3};" id="mbj-seat-name-${i}">${nameHTML}</div>`;
+            html += `<div class="player-timer-track"><div class="player-timer-fill" id="mbj-timer-fill-${i}"></div></div>`;
+
+            if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
+                html += `<div style="margin-top:5px;"><button class="btn-play" onclick="sitUp();" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`;
+            }
+            html += `</div>`; 
+            htmlBuffer += html;
+        }
+        
+        cont.innerHTML = htmlBuffer;
+
+        let rack = document.getElementById('mbj-chip-rack');
+        if (mbjGameState === 'BETTING') {
+            rack.classList.remove('chip-rack-locked');
+            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
+            } else { rack.classList.add('chip-rack-locked'); }
+        } else {
+            rack.classList.add('chip-rack-locked');
+            localPendingBet = 0;
+        }
+    }
+
+    function mbjAddLocalBet(amt) { localPendingBet += amt; renderMBJSeats(); sfx.click(); }
+    function mbjClearLocalBet() { localPendingBet = 0; renderMBJSeats(); sfx.click(); }
+    
+    function mbjConfirmLocalBet() {
+        sfx.click();
+        let customInput = document.getElementById('mbj-custom-bet').value;
+        let v = parseInt(customInput);
+        if (!isNaN(v) && v > 0) { localPendingBet += v; document.getElementById('mbj-custom-bet').value = ''; }
+        if(localPendingBet < 10) return showLocalFlash('mbj', 'Min Bet 10 TC');
+
+        if (localSeatId && currentMBJSeats[localSeatId]) {
+            let s = currentMBJSeats[localSeatId];
+            if (!s.hands) s.hands = [];
+            if (s.hands.length === 0) { s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false }); }
+            s.hands[0].bet += localPendingBet;
+        }
+
+        socket.emit('mbjPlaceBet', localPendingBet);
+        localPendingBet = 0; 
+        renderMBJSeats(); 
+    }
+
+    socket.on('mbjUpdate', async (data) => {
+        if(window.activeSharedGame !== 'mbj') return;
+        let dTimerText = document.getElementById('mbj-dealer-timer-text');
+
+        if(data.event === 'timer') {
+            mbjGameState = 'BETTING'; 
+            if(data.active) { dTimerText.style.display = 'block'; dTimerText.innerText = data.time; } 
+            else { dTimerText.style.display = 'none'; }
+        } 
+        else if (data.event === 'sync_seats') { renderMBJSeats(data.seats, data.activeTurn); } 
+        else if (data.event === 'lock_bets') { mbjGameState = 'DEALING'; dTimerText.style.display = 'none'; renderMBJSeats(data.seats, null); } 
+        else if (data.event === 'deal') {
+            mbjGameState = 'DEALING';
+            let targetSeats = JSON.parse(JSON.stringify(data.seats));
+            for (let i = 1; i <= 5; i++) {
+                if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) {
+                    currentMBJSeats[i].hands[0].cards = []; currentMBJSeats[i].hands[0].score = 0; currentMBJSeats[i].hands[0].status = 'WAITING';
+                }
+            }
+            
+            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
+            renderMBJSeats(currentMBJSeats, null); 
+            
+            let dHand = document.getElementById('mbj-fs-dealer-hand');
+            if(dHand) { 
+                dHand.innerHTML = ''; dHand.style.width = '70px'; 
+                const dealSequence = async () => {
+                    let activeKeys = Object.keys(targetSeats).filter(k => targetSeats[k] !== null);
+                    for (let k of activeKeys) {
+                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]);
+                        currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards);
+                        renderMBJSeats(currentMBJSeats, null); sfx.deal(); await delay(400);
+                    }
+                    
+                    let html = `<div class="mbj-score-badge mbj-score-inactive mbj-delay-badge" id="mbj-d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
+                    html += generateMBJCardHTML(data.dealerHand[0], false, true, false, 0); 
+                    dHand.innerHTML = html; sfx.deal(); await delay(400);
+                    
+                    for (let k of activeKeys) {
+                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]);
+                        currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score;
+                        currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status;
+                        renderMBJSeats(currentMBJSeats, null); sfx.deal(); await delay(400);
+                    }
+                    html += generateMBJCardHTML(data.dealerHand[1], true, true, false, 20); 
+                    dHand.style.width = '90px'; dHand.innerHTML = html; sfx.deal();
+                };
+                dealSequence();
+            } 
+        } 
+        else if (data.event === 'turn') {
+            mbjGameState = 'PLAYER_TURN'; renderMBJSeats(data.seats, data.activeTurn);
+            setTimeout(() => {
+                if (data.activeTurn && data.activeTurn.seat) {
+                    let bar = document.getElementById(`mbj-timer-fill-${data.activeTurn.seat}`);
+                    if (bar) bar.style.width = ((data.time / 15) * 100) + '%';
+                }
+            }, 10);
+        } 
+        else if (data.event === 'turn_timer') { 
+            if (data.activeTurn && data.activeTurn.seat) {
+                let bar = document.getElementById(`mbj-timer-fill-${data.activeTurn.seat}`);
+                if (bar) { bar.style.transition = 'width 1s linear'; bar.style.width = ((data.time / 15) * 100) + '%'; }
+            }
+        }
+        else if (data.event === 'dealer_resolved') {
+            mbjGameState = 'RESOLVING'; renderMBJSeats(data.seats); 
+            let dHand = document.getElementById('mbj-fs-dealer-hand'); 
+            if(dHand) {
+                let initialDScore = getBJScore(data.dealerHand.slice(0,2));
+                let isBlackjack = (initialDScore === 21 && data.dealerHand.length === 2);
+                let htmlStr = '';
+                if (isBlackjack) htmlStr += `<div class="mbj-status-pill mbj-pill-bj mbj-delay-pill" id="mbj-d-score-badge">BLACKJACK</div>`;
+                else htmlStr += `<div class="mbj-score-badge mbj-score-inactive mbj-delay-badge" id="mbj-d-score-badge"><span>${initialDScore}</span></div>`;
+
+                htmlStr += generateMBJCardHTML(data.dealerHand[0], false, false, false, 0);
+                htmlStr += generateMBJCardHTML(data.dealerHand[1], false, false, true, 20); 
+                dHand.innerHTML = htmlStr;
+                
+                const drawRemaining = async () => {
+                    await delay(800); 
+                    for(let i=2; i<data.dealerHand.length; i++) { 
+                        dHand.style.width = `${(i * 20) + 70}px`;
+                        let currentScore = getBJScore(data.dealerHand.slice(0, i+1));
+                        let badge = document.getElementById('mbj-d-score-badge');
+                        if (currentScore > 21) {
+                            if(badge) badge.outerHTML = `<div class="mbj-status-pill mbj-pill-bust mbj-delay-pill" id="mbj-d-score-badge">${currentScore} BUST</div>`;
+                        } else {
+                            if(badge) badge.innerHTML = `<span>${currentScore}</span>`;
+                        }
+                        dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[i], false, true, false, i * 20));
+                        sfx.deal(); await delay(800); 
+                    }
+                    await delay(600);
+                    
+                    for(let i = 1; i <= 5; i++) {
+                        let seat = data.seats[i]; let res = data.results && data.results[i];
+                        if (seat && res) {
+                            let chipCont = document.getElementById(`mbj-chip-stack-${i}-0`);
+                            if (res.status === 'LOSS') {
+                                animateMBJChipSequence(`mbj-circle-${i}-0`, 'mbj-dealer-area', '#444');
+                                if (chipCont) chipCont.style.opacity = '0'; sfx.lose();
+                            } else if (res.status === 'WIN') {
+                                animateMBJChipSequence('mbj-dealer-area', `mbj-circle-${i}-0`, '#00e676');
+                                setTimeout(() => { document.getElementById(`mbj-seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${fmtTC(res.win)}</div>`; }, 400);
+                                sfx.win();
+                            } else if (res.status === 'PUSH') {
+                                setTimeout(() => { document.getElementById(`mbj-seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; }, 400);
+                                sfx.win();
+                            }
+                            await delay(300); 
+                        }
+                    }
+                    setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1000);
+                }; 
+                drawRemaining();
+            }
+        } 
+        else if (data.event === 'new_round') {
+            mbjGameState = 'BETTING'; document.getElementById('mbj-fs-dealer-hand').innerHTML = ''; 
+            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; renderMBJSeats(data.seats); 
+        }
+    });
+
+    function sendMBJChat() {
+        let input = document.getElementById('mbj-chat-input'); let msg = input.value.trim();
+        if(msg.length > 0) { 
+            let box = document.getElementById('mbj-chat-messages');
+            box.innerHTML += `<div class="chat-line"><span class="c-name">You:</span> <span class="c-msg">${msg}</span></div>`;
+            box.scrollTop = box.scrollHeight;
+            socket.emit('sendChat', { msg: msg }); 
+            input.value = ''; 
+        }
+    }
   </script>
 </body>
 </html>
