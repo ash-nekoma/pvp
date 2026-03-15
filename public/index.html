@@ -41,13 +41,6 @@
         .btn-back-fixed { position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .btn-back-fixed:hover { background: white; color: black; }
 
-        /* ================= CENTERED SCREEN ALERTS ================= */
-        .global-screen-alert { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); border: 2px solid var(--ps-glow); border-radius: 15px; padding: 30px 60px; font-size: 2.5rem; font-weight: 900; text-transform: uppercase; color: white; text-shadow: 0 5px 15px rgba(0,0,0,1); z-index: 99999; display: none; opacity: 0; box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,162,255,0.3); text-align: center; }
-        .global-screen-alert.show { display: flex; flex-direction: column; align-items: center; animation: popupAlert 3s forwards; }
-        .global-screen-alert.success { border-color: var(--success); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,230,118,0.3); color: var(--success); }
-        .global-screen-alert.error { border-color: var(--danger); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,51,102,0.3); color: var(--danger); }
-        @keyframes popupAlert { 0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); } 10% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -60%) scale(1.1); } }
-
         /* ================= LOBBY GAME CARDS ================= */
         .lobby-modes-container { display: flex; gap: 40px; }
         .game-card { width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
@@ -62,7 +55,7 @@
         .chat-header { padding: 15px; background: rgba(0, 162, 255, 0.1); border-bottom: 1px solid var(--glass-border); font-weight: 900; font-size: 1rem; color: var(--ps-glow); text-align: center; letter-spacing: 1px; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; }
         .chat-msg-row { display: flex; flex-direction: column; }
-        .chat-meta { font-size: 0.7rem; color: #aaa; margin-bottom: 4px; }
+        .chat-meta { font-size: 0.7rem; color: #aaa; margin-bottom: 4px; font-weight: 800;}
         .chat-text { background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; line-height: 1.4; word-wrap: break-word; font-weight: 500;}
         .chat-text.me { background: rgba(0, 162, 255, 0.2); color: white; border-bottom-right-radius: 0; }
         .chat-text.other { border-bottom-left-radius: 0; }
@@ -70,6 +63,7 @@
         .chat-input-area input { flex: 1; background: #111; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 15px; border-radius: 20px; font-family: 'Outfit'; font-size: 0.9rem; }
         .chat-send-btn { background: var(--ps-glow); color: black; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-weight: 900; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; }
         .chat-send-btn:hover { transform: scale(1.1); background: white; }
+        .chat-send-btn:active { transform: scale(0.9); }
         
         .ptt-btn { background: #333; color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .ptt-btn:hover { background: #555; }
@@ -130,7 +124,7 @@
         .anim-reveal { animation: revealCard 0.3s ease-out forwards; }
         @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
 
-        .mbj-action-row { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; height: 40px; opacity: 0; pointer-events: none; transition: opacity 0.1s; z-index: 100; }
+        .mbj-action-row { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; height: 40px; transition: opacity 0.1s; z-index: 100; opacity: 0; pointer-events: none;}
         .mbj-action-row.show { opacity: 1; pointer-events: auto; }
         .mbj-action-btn { width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); border: 2px solid #777; color: white; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); }
         .mbj-action-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0px 0 #111, 0 2px 4px rgba(0,0,0,0.5); }
@@ -143,7 +137,9 @@
 
         .mbj-seat-circle { width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; }
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); }
+        .mbj-seat-circle:active { transform: scale(0.9); }
         .mbj-seat-circle.occupied { border: 2px solid transparent; background: transparent; cursor: default; }
+        .mbj-seat-circle.occupied:active { transform: scale(1); }
 
         .bet-pill { background: black; color: white; border: 1px solid #333; border-radius: 12px; font-size: 0.75rem; font-weight: 900; padding: 2px 10px; margin-top: 2px; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.8); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
 
@@ -170,14 +166,16 @@
         .rack-error-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 8px; border-style: solid; border-color: var(--danger) transparent transparent transparent; }
         .rack-error-tooltip.show { opacity: 1; }
         
-        .rack-chip { width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 3px solid var(--c-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 0 5px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; color: black; cursor: pointer; transition: 0.2s; }
+        .rack-chip { width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 3px solid var(--c-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 0 5px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; color: black; cursor: pointer; transition: 0.1s; }
         .rack-chip:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 15px rgba(255,255,255,0.3); }
+        .rack-chip:active { transform: translateY(0) scale(0.95); box-shadow: 0 2px 5px rgba(255,255,255,0.2); }
         
-        .rack-btn { padding: 10px 20px; border-radius: 8px; font-weight: 900; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; transition: 0.2s; text-transform: uppercase; }
+        .rack-btn { padding: 10px 20px; border-radius: 8px; font-weight: 900; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; transition: 0.1s; text-transform: uppercase; }
         .rack-btn-clear { background: rgba(255,255,255,0.1); color: white; }
         .rack-btn-clear:hover { background: rgba(255,51,102, 0.8); }
         .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
         .rack-btn-confirm:hover { background: white; }
+        .rack-btn:active { transform: scale(0.95); }
         .custom-input { width: 100px; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: #111; color: white; font-weight: 900; text-align: center; }
         
         .user-hud { display: none; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; }
@@ -270,8 +268,6 @@
       </div>
   </div>
 
-  <div id="global-alert" class="global-screen-alert"></div> 
-
   <script>
     function getBJScore(hand) {
         let score = 0, aces = 0;
@@ -320,23 +316,16 @@
         r.innerText = msg; r.classList.add('show');
         setTimeout(() => r.classList.remove('show'), 2000);
     }
-    
-    function showGlobalAlert(msg, type='success') {
-        let f = document.getElementById('global-alert');
-        f.innerText = msg; f.className = `global-screen-alert show ${type}`;
-        setTimeout(() => f.className = 'global-screen-alert', 3000);
-    }
 
     function switchView(viewId) { 
         document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden')); 
         let v = document.getElementById('view-' + viewId); 
         if (v) v.classList.remove('hidden'); 
-        
         document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino');
     }
 
     function backToHub() {
-        if(activeGame === 'mbj') { socket.emit('mbjLeaveSeat'); }
+        if(activeGame === 'mbj') sitUp(); 
         if(activeGame) socket.emit('leaveRoom', activeGame);
         activeGame = null; switchView('casino');
     }
@@ -353,18 +342,26 @@
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // TEXT CHAT
+    // OPTIMISTIC TEXT CHAT (Zero Delay)
     // =========================================================================
     function handleChatKey(e) { if(e.key === 'Enter') sendChat(); }
     function sendChat() {
         let input = document.getElementById('chat-input'); let msg = input.value.trim();
-        if(msg.length > 0) { socket.emit('sendChatMessage', msg); input.value = ''; }
+        if(msg.length > 0) { 
+            // Append instantly locally
+            let box = document.getElementById('chat-messages');
+            box.innerHTML += `<div class="chat-msg-row" style="align-items: flex-end;"><div class="chat-meta">You</div><div class="chat-text me">${msg}</div></div>`;
+            box.scrollTop = box.scrollHeight;
+            // Send to server
+            socket.emit('sendChatMessage', msg); 
+            input.value = ''; 
+        }
     }
 
     socket.on('receiveChatMessage', (data) => {
-        let box = document.getElementById('chat-messages'); let isMe = data.username === myUsername;
-        let html = `<div class="chat-msg-row" style="align-items: ${isMe ? 'flex-end' : 'flex-start'};"><div class="chat-meta">${isMe ? 'You' : data.username}</div><div class="chat-text ${isMe ? 'me' : 'other'}">${data.message}</div></div>`;
-        box.innerHTML += html; box.scrollTop = box.scrollHeight;
+        let box = document.getElementById('chat-messages');
+        box.innerHTML += `<div class="chat-msg-row" style="align-items: flex-start;"><div class="chat-meta">${data.username}</div><div class="chat-text other">${data.message}</div></div>`;
+        box.scrollTop = box.scrollHeight;
     });
 
     // =========================================================================
@@ -377,6 +374,7 @@
     let isRecording = false;
 
     async function startPTT() {
+        document.getElementById('ptt-btn').classList.add('recording'); // Instant UI response
         if (!pttContext) pttContext = new (window.AudioContext || window.webkitAudioContext)();
         if (pttContext.state === 'suspended') await pttContext.resume();
         
@@ -403,12 +401,12 @@
                     socket.emit('voiceStream', { audio: int16Array.buffer, sr: pttContext.sampleRate, user: myUsername });
                 };
             } catch (err) {
-                console.error("Microphone access denied or error:", err);
+                console.error("Microphone error:", err);
+                document.getElementById('ptt-btn').classList.remove('recording');
                 return;
             }
         }
         isRecording = true;
-        document.getElementById('ptt-btn').classList.add('recording');
     }
 
     function stopPTT() {
@@ -420,7 +418,6 @@
     let playContext = null;
     let nextPlayTime = 0;
     socket.on('voiceStream', (data) => {
-        if (data.user === myUsername) return; 
         if (!playContext) playContext = new (window.AudioContext || window.webkitAudioContext)();
         
         let int16Array = new Int16Array(data.audio);
@@ -488,9 +485,27 @@
         setTimeout(() => { if(chip.parentNode) chip.remove(); }, 500);
     }
 
+    // IMMEDATE UI BUTTON HANDLER: Kills input lag instantly
     function sendMBJAction(type) {
-        document.querySelectorAll('.mbj-action-row.show').forEach(el => el.classList.remove('show'));
+        document.querySelectorAll('.mbj-action-row').forEach(el => {
+            el.classList.remove('show');
+            el.style.display = 'none'; // Instant visual removal
+        });
         socket.emit('mbjAction', { type: type });
+    }
+
+    // OPTIMISTIC SIT/LEAVE 
+    function sitDown(seatNum) {
+        socket.emit('mbjTakeSeat', seatNum);
+        currentMBJSeats[seatNum] = { username: myUsername, hands: [] };
+        renderMBJSeats();
+    }
+    
+    function sitUp() {
+        socket.emit('mbjLeaveSeat');
+        if(localSeatId) currentMBJSeats[localSeatId] = null;
+        localSeatId = null;
+        renderMBJSeats();
     }
 
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
@@ -520,7 +535,7 @@
             let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
             
             let canSit = !s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername);
-            let clickAction = canSit ? `socket.emit('mbjTakeSeat', ${i})` : ``; 
+            let clickAction = canSit ? `sitDown(${i})` : ``; 
 
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
             
@@ -540,7 +555,7 @@
                     let canDouble = hand.cards.length === 2;
                     let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1;
 
-                    html += `<div class="mbj-action-row ${btnClass}">
+                    html += `<div class="mbj-action-row ${btnClass}" style="${btnClass ? '' : 'display:none;'}">
                                 <button class="mbj-action-btn hit" onclick="sendMBJAction('hit')"><i class="fas fa-plus"></i></button>
                                 <button class="mbj-action-btn stand" onclick="sendMBJAction('stand')"><i class="fas fa-hand-paper"></i></button>`;
                     if (canDouble) html += `<button class="mbj-action-btn double" onclick="sendMBJAction('double')">x2</button>`;
@@ -610,7 +625,7 @@
             html += `<div class="player-timer-track"><div class="player-timer-fill" id="timer-fill-${i}"></div></div>`;
 
             if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
-                html += `<div style="margin-top:5px;"><button class="btn-play" onclick="socket.emit('mbjLeaveSeat');" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`;
+                html += `<div style="margin-top:5px;"><button class="btn-play" onclick="sitUp();" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`;
             }
             html += `</div>`; 
             htmlBuffer += html;
@@ -633,6 +648,7 @@
     
     function clearLocalBet() { localPendingBet = 0; renderMBJSeats(); }
     
+    // OPTIMISTIC BET SUBMISSION
     function confirmLocalBet() {
         let customInput = document.getElementById('custom-bet').value;
         let v = parseInt(customInput);
@@ -694,7 +710,7 @@
                         currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]);
                         currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards);
                         renderMBJSeats(currentMBJSeats, null);
-                        await delay(400); // SLOWED DOWN DISTRIBUTION
+                        await delay(400);
                     }
                     
                     let html = `<div class="score-badge score-inactive delay-badge" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
@@ -770,7 +786,6 @@
                     }
                     
                     await delay(600);
-                    let myNet = 0;
                     
                     for(let i = 1; i <= 5; i++) {
                         let seat = data.seats[i]; let res = data.results && data.results[i];
@@ -785,15 +800,11 @@
                             } else if (res.status === 'PUSH') {
                                 setTimeout(() => { document.getElementById(`seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; }, 400);
                             }
-                            if (seat.username === myUsername) myNet = res.net;
                             await delay(300); 
                         }
                     }
 
-                    await delay(300);
-                    if (myNet > 0) showGlobalAlert(`WON +${myNet} TC`, 'success');
-                    else if (myNet < 0) showGlobalAlert(`LOST ${Math.abs(myNet)} TC`, 'error');
-                    else if (myNet === 0 && data.results && data.results[localSeatId] && data.results[localSeatId].push > 0) showGlobalAlert(`PUSH`, 'success');
+                    // FLASH ALERT COMPLETELY REMOVED HERE
                 }; 
                 drawRemaining();
             }
