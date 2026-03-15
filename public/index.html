@@ -219,7 +219,6 @@
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes popBalance { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); } 100% { transform: scale(1); } } .anim-pop { animation: popBalance 0.6s ease-out; }
         @keyframes popBet { 0% { transform: scale(1); } 50% { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.5); } 100% { transform: scale(1); } } .anim-pop-bet { animation: popBet 0.3s ease-out; }
-        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } 100% { transform: rotate(0deg); } } .anim-shake { animation: shake 0.3s infinite; }
         
         .shake-anim { animation: shakeIt 0.1s infinite; }
         @keyframes shakeIt { 0% { transform: rotate(0deg) translate(0,0); } 25% { transform: rotate(5deg) translate(3px,-3px); } 50% { transform: rotate(0deg) translate(0,0); } 75% { transform: rotate(-5deg) translate(-3px,3px); } 100% { transform: rotate(0deg) translate(0,0); } }
@@ -293,7 +292,7 @@
         .game-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; perspective: 1000px; padding: 20px; overflow: hidden;}
         
         /* Fixed clipping for tile glow */
-        .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px 25px 40px 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto; border-radius: 0 0 12px 12px;} 
+        .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px 25px 35px 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto; border-radius: 0 0 12px 12px;} 
         .controls-full { display: flex; gap: 15px; justify-content: center; width: 100%; }
 
         /* SHARED LAYOUT WIDTH FIX */
@@ -436,7 +435,6 @@
         .dt-card { width: 120px !important; height: 170px !important; } 
         .dt-card .val { font-size: 3rem; } .dt-card .suit { font-size: 3.5rem; }
         
-        /* SIC BO DOME CSS */
         .sicbo-dice { display: flex; justify-content: center; gap: 30px; font-size: 6rem; margin-bottom: 10px; align-items: center; } 
         .s-die { color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8); z-index: 1;}
 
@@ -483,6 +481,16 @@
         @keyframes popInBadge { 0% { opacity: 0; transform: translateY(-50%) scale(0.5); } 100% { opacity: 1; transform: translateY(-50%) scale(1); } }
         .mbj-delay-pill { opacity: 0; animation: popInPill 0.2s 0.4s forwards; }
         @keyframes popInPill { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+        
+        .anim-fly-in { animation: flyInFromShoe 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform-origin: center; }
+        @keyframes flyInFromShoe { 0% { opacity: 0; transform: translate(300px, -300px) scale(0.2) rotate(180deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); } }
+        
+        .anim-fly-in-doubled { animation: flyInDoubledFromShoe 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform-origin: center; }
+        @keyframes flyInDoubledFromShoe { 0% { opacity: 0; transform: translate(300px, -300px) scale(0.2) rotate(180deg); } 100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } }
+        
+        .anim-reveal { animation: revealCard 0.3s ease-out forwards; }
+        @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
+
         .mbj-action-row { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; height: 40px; transition: opacity 0.1s; z-index: 100; opacity: 0; pointer-events: none;}
         .mbj-action-row.show { opacity: 1; pointer-events: auto; }
         .mbj-action-btn { width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); border: 2px solid #777; color: white; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); }
@@ -497,8 +505,12 @@
         .mbj-seat-circle:active { transform: scale(0.9); }
         .mbj-seat-circle.occupied { border: 2px solid transparent; background: transparent; cursor: default; }
         .mbj-seat-circle.occupied:active { transform: scale(1); }
-        .mbj-chip-3d { position: absolute; left: 0; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 3px 5px rgba(0,0,0,0.8); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg); }
+        
+        .chip-stack-wrapper { position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%); width: 45px; z-index: 10; display: flex; flex-direction: column-reverse; align-items: center; pointer-events: none;}
+        .mbj-chip-3d { position: relative; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 3px 5px rgba(0,0,0,0.8); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg); margin-top: -35px; }
+        .mbj-chip-3d:last-child { margin-top: 0; }
         .mbj-chip-3d.ghost { opacity: 0.5; filter: grayscale(80%); }
+        
         .mbj-seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative; margin-top: 5px; }
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
         .chip-rack-container { width: 1000px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); justify-content: space-between; align-items: center; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transition: 0.3s; position: relative; margin-top:15px; flex-shrink: 0;}
@@ -509,11 +521,14 @@
         .rack-btn { padding: 10px 20px; border-radius: 8px; font-weight: 900; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; transition: 0.1s; text-transform: uppercase; }
         .rack-btn-clear { background: rgba(255,255,255,0.1); color: white; }
         .rack-btn-clear:hover { background: rgba(255,51,102, 0.8); }
-        .rack-btn-confirm { background: var(--success); color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
-        .rack-btn-confirm:hover { background: white; }
         .rack-btn:active { transform: scale(0.95); }
         
-        .mbj-chat-panel { flex: 1; max-width: 350px; height: 100%; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.8); overflow: hidden; flex-shrink: 0;}
+        .mbj-custom-bet-wrap { display: flex; align-items: center; background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); border-radius: 8px; overflow: hidden; height: 50px; }
+        .mbj-custom-bet-wrap input { background: transparent; border: none; color: white; padding: 0 15px; font-weight: 900; font-size: 1.1rem; width: 120px; text-align: center; outline: none; }
+        .mbj-custom-bet-wrap button { background: var(--success); color: black; border: none; padding: 0 20px; font-weight: 900; font-size: 1rem; cursor: pointer; height: 100%; transition: 0.2s; text-transform: uppercase; }
+        .mbj-custom-bet-wrap button:hover { background: white; }
+
+        .mbj-chat-panel { flex: 1; max-width: 350px; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.8); overflow: hidden; flex-shrink: 0;}
         .mbj-chat-send-btn { background: var(--ps-glow); color: black; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-weight: 900; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; }
         .mbj-chat-send-btn:hover { transform: scale(1.1); background: white; }
         .mbj-chat-send-btn:active { transform: scale(0.9); }
@@ -995,6 +1010,7 @@
                     <div class="glass-header">
                         <div>LIVE CHAT</div>
                         <div style="display:flex; align-items:center; gap:10px; font-size: 0.95rem; font-weight:800;">
+                            
                             <div class="dropdown-wrapper">
                                 <div style="display:flex; align-items:center; gap:6px; color:var(--success); cursor: pointer;" onclick="fetchActivePlayers(event)">
                                     <i class="fas fa-users"></i> <span id="sg-active-players">0</span>
@@ -1043,9 +1059,8 @@
                     </div>
 
                     <div class="chip-rack-container" id="mbj-chip-rack">
-                        <div id="mbj-rack-alert" class="rack-error-tooltip">MIN BET 10 TC</div>
                         <div style="flex: 1; display: flex; justify-content: flex-start;">
-                            <button class="rack-btn rack-btn-clear" onclick="mbjClearLocalBet()"><i class="fas fa-times"></i> CLEAR</button>
+                            <button class="rack-btn rack-btn-clear" style="height: 50px; font-size: 1rem;" onclick="mbjClearLocalBet()"><i class="fas fa-times"></i> CLEAR</button>
                         </div>
                         <div style="flex: 2; display: flex; justify-content: center; gap: 15px;">
                             <div class="rack-chip chip-10" style="--c-bg:#444;" onclick="mbjAddLocalBet(10)">10</div>
@@ -1054,9 +1069,11 @@
                             <div class="rack-chip chip-10k" style="--c-bg:#00e676; color:black;" onclick="mbjAddLocalBet(10000)">10K</div>
                             <div class="rack-chip chip-50k" style="--c-bg:#ffcc00; color:black;" onclick="mbjAddLocalBet(50000)">50K</div>
                         </div>
-                        <div style="flex: 1; display: flex; justify-content: flex-end; gap: 10px;">
-                            <input type="number" id="mbj-custom-bet" class="custom-input" placeholder="Amount" min="0">
-                            <button class="rack-btn rack-btn-confirm" onclick="mbjConfirmLocalBet()">BET <i class="fas fa-check"></i></button>
+                        <div style="flex: 1; display: flex; justify-content: flex-end;">
+                            <div class="mbj-custom-bet-wrap">
+                                <input type="number" id="mbj-custom-bet" placeholder="Custom" min="10">
+                                <button onclick="mbjConfirmLocalBet()">BET <i class="fas fa-check" style="margin-left:5px;"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1069,12 +1086,12 @@
                             <button class="btn-rules" onclick="toggleRules('blackjack', event)" title="How to Play" style="width:30px; height:30px; font-size:1rem;"><i class="fas fa-info-circle"></i></button>
                         </div>
                     </div>
-                    <div class="chat-messages custom-scroll" id="mbj-chat-messages">
+                    <div class="chat-body custom-scroll" id="mbj-chat">
                         <div class="chat-line chat-sys">Welcome to VIP Premium.</div>
                     </div>
                     <div class="chat-input-area" style="padding:15px; border-top:1px solid var(--glass-border); display:flex; gap:8px; align-items:center;">
-                        <input type="text" id="mbj-chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter') sendMBJChat();">
-                        <button class="mbj-chat-send-btn" onclick="sendMBJChat()"><i class="fas fa-paper-plane"></i></button>
+                        <input type="text" id="mbj-chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter') sendChat(true);">
+                        <button class="mbj-chat-send-btn" onclick="sendChat(true)"><i class="fas fa-paper-plane"></i></button>
                         <button class="ptt-btn" id="ptt-btn-mbj" onmousedown="startPTT('ptt-btn-mbj')" onmouseup="stopPTT('ptt-btn-mbj')" onmouseleave="stopPTT('ptt-btn-mbj')" ontouchstart="startPTT('ptt-btn-mbj')" ontouchend="stopPTT('ptt-btn-mbj')" ontouchcancel="stopPTT('ptt-btn-mbj')"><i class="fas fa-microphone"></i></button>
                     </div>
                 </div>
@@ -1115,6 +1132,17 @@
                 <li style="margin-bottom: 10px;">Any winnings earned using Playable Credits are paid directly into your Main TC Balance.</li>
                 <li>Playable Credits <strong>cannot</strong> be withdrawn in the Cashier.</li>
             </ul>
+        </div>
+    </div>
+  </div>
+
+  <div id="admin-confirm-modal" class="modal-overlay hidden" style="display: none;" onclick="if(event.target===this) closeModal('admin-confirm-modal')">
+    <div class="modal-content" style="width: 400px; text-align: center;">
+        <h3 style="color: var(--danger); border-bottom: none; margin-bottom: 10px;">SYSTEM OVERRIDE</h3>
+        <p style="color: var(--text-muted); margin-bottom: 25px; font-weight: 600;">Leave the casino and enter the Admin Control Panel?</p>
+        <div style="display: flex; gap: 15px;">
+            <button class="btn-play" style="flex: 1; background: rgba(255,255,255,0.1); border-color: transparent;" onclick="closeModal('admin-confirm-modal')">CANCEL</button>
+            <button class="btn-play" style="flex: 1; background: rgba(0, 162, 255, 0.2); border-color: var(--ps-glow); color: var(--ps-glow);" onclick="window.location.href='/admin.html'">PROCEED</button>
         </div>
     </div>
   </div>
@@ -1268,7 +1296,8 @@
     });
 
     socket.on('globalChatMessage', (data) => {
-        let cb = document.getElementById('sg-chat'); 
+        let cbId = window.activeSharedGame === 'mbj' ? 'mbj-chat' : 'sg-chat';
+        let cb = document.getElementById(cbId); 
         if (cb && window.activeSharedGame) { 
             cb.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys">${data.text}</div>`);
             cb.scrollTop = cb.scrollHeight;
@@ -2017,6 +2046,7 @@
         return `<div class="play-card ${colorClass} ${animClass} ${extraClass}"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`;
     }
 
+    let bjSt = { active: false };
     function startBlackjack() {
         if(bjSt.active) return;
         let amt = formatTC(document.getElementById('bj-bet').value);
@@ -2273,15 +2303,34 @@
         }
     });
 
+    let isBettingTimeout = false;
     function placeSharedBet(choice) {
         if (sState.status !== 'BETTING') return;
+        if (isBettingTimeout) return;
+        
         let amt = formatTC(document.getElementById('sg-bet').value);
         if(isNaN(amt) || amt < 10) { showLocalFlash('shared', 'MIN BET 10 TC', 'error'); return; }
+        
+        let currentTileBet = mySBets[choice] || 0;
+        if (currentTileBet + amt > 50000) { showLocalFlash('shared', "Max 50K TC Per Tile", "error"); return; }
+        
+        if (amt > (myCredits + myPlayable)) { showLocalFlash('shared', "Insufficient TC", "error"); return; }
+        
+        isBettingTimeout = true;
+        setTimeout(() => { isBettingTimeout = false; }, 250);
+
         triggerBetAnim(); sfx.click();
         
+        // Optimistic Balance
+        if(myPlayable >= amt) { myPlayable -= amt; } 
+        else { let rem = amt - myPlayable; myPlayable = 0; myCredits -= rem; }
+        updateMyBalance({credits: myCredits, playable: myPlayable});
+        
+        // Optimistic UI Updates instantly
         if(!mySBets[choice]) mySBets[choice] = 0;
         mySBets[choice] += amt;
-        mySBetsStack.push(choice);
+        mySBetsStack.push({choice: choice, amount: amt});
+        
         let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`);
         if(btn) {
             btn.classList.add('has-bet');
@@ -2289,6 +2338,10 @@
             badge.innerText = fmtTC(mySBets[choice]);
             badge.style.display = 'block';
         }
+        
+        let tot = Object.values(mySBets).reduce((sum, val) => sum + val, 0);
+        let mb = document.getElementById('sg-my-bet'); 
+        if (mb) { mb.innerHTML = `${fmtTC(tot)} TC`; }
         updateCurrentBetsPopover();
 
         socket.emit('placeSharedBet', { room: window.activeSharedGame, choice: choice, amount: amt });
@@ -2298,31 +2351,38 @@
         if (sState.status !== 'BETTING') return;
         if (mySBetsStack.length === 0) { showLocalFlash('shared', 'NO BETS TO UNDO', 'error'); return; }
         sfx.click();
-        socket.emit('undoSharedBet', { room });
+        socket.emit('undoSharedBet', { room: window.activeSharedGame });
     }
 
     socket.on('undoSuccess', (data) => {
+        mySBetsStack.pop();
         if(mySBets[data.choice]) {
             mySBets[data.choice] -= data.amount;
-            if(mySBets[data.choice] <= 0) delete mySBets[data.choice];
-        }
-        mySBetsStack.pop();
-        
-        let btn = document.querySelector(`.sg-tile[data-choice="${data.choice}"]`);
-        if(btn) {
-            let badge = btn.querySelector('.tile-bet-badge');
-            if(mySBets[data.choice]) {
-                badge.innerText = fmtTC(mySBets[data.choice]);
-            } else {
-                badge.style.display = 'none';
-                btn.classList.remove('has-bet');
+            
+            let btn = document.querySelector(`.sg-tile[data-choice="${data.choice}"]`);
+            if(btn) {
+                let badge = btn.querySelector('.tile-bet-badge');
+                if (mySBets[data.choice] > 0) {
+                    badge.innerText = fmtTC(mySBets[data.choice]);
+                } else {
+                    delete mySBets[data.choice];
+                    badge.style.display = 'none';
+                    btn.classList.remove('has-bet');
+                }
             }
         }
+        let tot = Object.values(mySBets).reduce((sum, val) => sum + val, 0);
+        let mb = document.getElementById('sg-my-bet');
+        if(mb) mb.innerHTML = `${fmtTC(tot)} TC`;
+        
         updateCurrentBetsPopover();
+        updateMyBalance(data.newBalance);
         showLocalFlash('shared', 'BET UNDONE', 'success');
+        sfx.tick();
     });
 
     socket.on('sharedBetConfirmed', (data) => {
+        // Handled optimistically, just sync exact balance
         updateMyBalance(data.newBalance);
     });
 
@@ -2333,6 +2393,9 @@
             let badge = btn.querySelector('.tile-bet-badge');
             if(badge) badge.style.display = 'none';
         });
+        
+        let mb = document.getElementById('sg-my-bet'); 
+        if (mb) { mb.innerHTML = `0 TC`; }
         updateCurrentBetsPopover();
         
         let ov = document.getElementById('sg-overlay'); if(ov) ov.classList.remove('show');
@@ -2417,7 +2480,7 @@
             }
             
             Object.keys(mySBets).forEach(choice => {
-                let matches = data.roll.filter(c => c === choice).length;
+       let matches = data.roll.filter(c => c === choice).length;
                 if(matches > 0) myWin += mySBets[choice] + (mySBets[choice] * matches);
             });
         }
@@ -2474,10 +2537,22 @@
             input.value = ''; 
         }
     }
+
+    function sendMBJChat() {
+        let input = document.getElementById('mbj-chat-input'); let msg = input.value.trim();
+        if(msg.length > 0) { 
+            let box = document.getElementById('mbj-chat-messages');
+            box.innerHTML += `<div class="chat-line"><span class="c-name">You:</span> <span class="c-msg">${msg}</span></div>`;
+            box.scrollTop = box.scrollHeight;
+            socket.emit('sendChat', { msg: msg }); 
+            input.value = ''; 
+        }
+    }
     
     socket.on('chatMessage', (data) => {
-        let box = document.getElementById('sg-chat');
-        if (box && window.activeSharedGame && window.activeSharedGame !== 'mbj') {
+        let boxId = window.activeSharedGame === 'mbj' ? 'mbj-chat-messages' : 'sg-chat';
+        let box = document.getElementById(boxId);
+        if (box && window.activeSharedGame) {
             box.innerHTML += `<div class="chat-line"><span class="c-name">${data.user}:</span> <span class="c-msg">${data.text}</span></div>`;
             box.scrollTop = box.scrollHeight;
         }
@@ -2505,380 +2580,6 @@
         window.activeSharedGame = null; 
         switchView('casino'); 
         openLobbyMode('shared'); 
-    }
-      // =======================================================
-    // VIP BLACKJACK LOGIC & UI INTEGRATION (THE MISSING CODE)
-    // =======================================================
-    let mbjGameState = 'BETTING';
-    let localPendingBet = 0;
-    let localSeatId = null;
-    let renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
-    let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
-
-    function openMBJ() {
-        window.activeSharedGame = 'mbj';
-        socket.emit('joinRoom', 'mbj');
-        renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
-        renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
-        document.getElementById('mbj-chat-messages').innerHTML = '<div class="chat-line chat-sys">Welcome to VIP Premium.</div>';
-        switchView('game-mbj');
-    }
-
-    function getMBJDisplayScore(handCards) {
-        let score = 0, aces = 0;
-        for (let c of handCards) {
-            score += c.bjVal; 
-            if (c.raw === 'A') aces++;
-        }
-        while (score > 21 && aces > 0) { score -= 10; aces--; }
-        if (aces > 0 && score < 21) {
-            return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`;
-        }
-        return `<span style="font-size:1.05rem;">${score}</span>`;
-    }
-
-    function generateMBJCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
-        let animClass = '';
-        if(animateIn) { animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in'; }
-        if(animateReveal) animClass = 'anim-reveal'; 
-        let doubleClass = isDoubled ? 'card-doubled' : '';
-        let styleStr = `left: ${leftOffset}px;`;
-        if(isHidden) return `<div class="mbj-card card-back ${animClass} ${doubleClass}" style="${styleStr}"></div>`;
-        let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
-        let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
-        return `<div class="mbj-card ${colorClass} ${animClass} ${doubleClass}" style="${styleStr}"><div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div><div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div></div>`;
-    }
-
-    function getMBJChipStackHTML(amount, isGhost = false) {
-        let html = ''; let remaining = amount;
-        let chips = [{val: 50000, col: '#ffcc00', text: 'black'}, {val: 10000, col: '#00e676', text: 'black'}, {val: 1000, col: '#ff3366', text: 'white'}, {val: 100, col: '#00a2ff', text: 'white'}, {val: 10, col: '#444', text: 'white'}];
-        let offset = 0; let visualCount = 0;
-        for(let c of chips) {
-            while(remaining >= c.val && visualCount < 6) { 
-                let label = c.val >= 1000 ? (c.val/1000)+'K' : c.val;
-                html += `<div class="mbj-chip-3d ${isGhost ? 'ghost' : ''}" style="--c-bg:${c.col}; color:${c.text}; bottom:${offset}px; z-index:${visualCount};">${label}</div>`;
-                remaining -= c.val; offset += 4; visualCount++;
-            }
-        }
-        return `<div class="chip-stack-wrapper" style="height: ${45 + offset}px;">${html}</div>`;
-    }
-
-    function animateMBJChipSequence(fromId, toId, color) {
-        let fromEl = document.getElementById(fromId); let toEl = document.getElementById(toId);
-        if(!fromEl || !toEl) return;
-        let fRect = fromEl.getBoundingClientRect(); let tRect = toEl.getBoundingClientRect();
-        let chip = document.createElement('div'); chip.className = `animated-chip`;
-        chip.style.cssText = `--c-bg: ${color}; left: ${fRect.left + (fRect.width/2)}px; top: ${fRect.top + (fRect.height/2)}px; margin-left: -22.5px; margin-top: -22.5px;`;
-        document.body.appendChild(chip);
-        void chip.offsetWidth;
-        chip.style.transform = 'scale(1.5)';
-        setTimeout(() => { chip.style.left = `${tRect.left + (tRect.width/2)}px`; chip.style.top = `${tRect.top + (tRect.height/2)}px`; chip.style.transform = 'scale(0.5)'; chip.style.opacity = '0'; }, 30);
-        setTimeout(() => { if(chip.parentNode) chip.remove(); }, 500);
-    }
-
-    function sendMBJAction(type) {
-        document.querySelectorAll('.mbj-action-row').forEach(el => {
-            el.classList.remove('show'); el.style.display = 'none'; 
-        });
-        socket.emit('mbjAction', { type: type });
-    }
-
-    function sitDown(seatNum) {
-        socket.emit('mbjTakeSeat', seatNum);
-        currentMBJSeats[seatNum] = { username: myUsername, hands: [] };
-        renderMBJSeats();
-    }
-    
-    function sitUp() {
-        socket.emit('mbjLeaveSeat');
-        if(localSeatId) currentMBJSeats[localSeatId] = null;
-        localSeatId = null;
-        renderMBJSeats();
-    }
-
-    function renderMBJSeats(seats, activeTurnObj = null) {
-        currentMBJSeats = seats || currentMBJSeats; 
-        let cont = document.getElementById('mbj-seats-row'); 
-        if(!cont) return; 
-        
-        let htmlBuffer = '';
-        let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null;
-        let activeHandIdx = activeTurnObj ? activeTurnObj.handIdx : 0;
-        localSeatId = null;
-
-        for(let i=1; i<=5; i++) {
-            let s = currentMBJSeats[i]; 
-            let isMe = s && s.username === myUsername; 
-            if (isMe) localSeatId = i;
-
-            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { continue; }
-
-            let isMySeatTurn = activeSeatNum == i;
-            let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
-            let activeClass = isMySeatTurn ? 'active-turn' : '';
-            let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
-            
-            let canSit = !s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername);
-            let clickAction = canSit ? `sitDown(${i})` : ``; 
-
-            let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
-            html += `<div class="mbj-split-col">`;
-            
-            if (s && s.hands && s.hands.length > 0) {
-                if (!renderedCardCount[i]) renderedCardCount[i] = [];
-                s.hands.forEach((hand, hIdx) => {
-                    let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx;
-                    let cardCount = hand.cards.length;
-                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
-                    
-                    html += `<div class="mbj-hand-column">`;
-                    let btnClass = (isThisHandActive && mbjGameState === 'PLAYER_TURN' && isMe) ? 'show' : '';
-                    let canDouble = hand.cards.length === 2;
-                    let canSplit = hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1;
-
-                    html += `<div class="mbj-action-row ${btnClass}" style="${btnClass ? '' : 'display:none;'}">
-                                <button class="mbj-action-btn hit" onclick="sendMBJAction('hit')"><i class="fas fa-plus"></i></button>
-                                <button class="mbj-action-btn stand" onclick="sendMBJAction('stand')"><i class="fas fa-hand-paper"></i></button>`;
-                    if (canDouble) html += `<button class="mbj-action-btn double" onclick="sendMBJAction('double')">x2</button>`;
-                    if (canSplit) html += `<button class="mbj-action-btn split" onclick="sendMBJAction('split')"><i class="fas fa-arrows-alt-h"></i></button>`;
-                    html += `</div>`;
-                    
-                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
-                    let previouslyRendered = renderedCardCount[i][hIdx] || 0;
-                    let isNewCard = cardCount > previouslyRendered;
-                    let delayClassBadge = isNewCard ? 'mbj-delay-badge' : '';
-                    let delayClassPill = isNewCard ? 'mbj-delay-pill' : '';
-
-                    if(hand.cards.length > 0 && hand.status !== 'BUST') { 
-                        if(hand.status === 'BLACKJACK') {
-                            html += `<div class="mbj-status-pill mbj-pill-bj ${delayClassPill}">BLACKJACK</div>`;
-                        } else {
-                            let badgeClass = isThisHandActive ? 'mbj-score-active' : 'mbj-score-inactive';
-                            html += `<div class="mbj-score-badge ${badgeClass} ${delayClassBadge}">${getMBJDisplayScore(hand.cards)}</div>`; 
-                        }
-                    } else if (hand.status === 'BUST') {
-                        html += `<div class="mbj-status-pill mbj-pill-bust ${delayClassPill}">${hand.score} BUST</div>`;
-                    }
-
-                    hand.cards.forEach((c, cIdx) => { 
-                        let animateThisCard = cIdx >= previouslyRendered;
-                        let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
-                        html += generateMBJCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard);
-                    });
-                    html += `</div>`; 
-                    
-                    let displayBet = hand.bet;
-                    if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && s.hands.length === 1 && s.hands[0].bet === 0) displayBet = localPendingBet;
-                    
-                    html += `<div class="mbj-circle-container" id="mbj-circle-${i}-${hIdx}">`;
-                    html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
-                    if (displayBet > 0) { 
-                        html += `<div id="mbj-chip-stack-${i}-${hIdx}" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">${getMBJChipStackHTML(displayBet, hand.bet === 0)}</div>`;
-                    } else if (hIdx === 0) {
-                        html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
-                    }
-                    html += `</div></div>`; 
-
-                    if (displayBet > 0) html += `<div class="bet-pill">${fmtTC(displayBet)} TC</div>`;
-                    html += `</div>`; 
-                });
-                renderedCardCount[i] = s.hands.map(h => h.cards.length);
-            } else { 
-                renderedCardCount[i] = []; 
-                html += `<div class="mbj-hand-column" style="position: relative;">`;
-                html += `<div class="mbj-hand-container" style="width: 70px;"></div>`;
-                html += `<div class="mbj-circle-container" id="mbj-circle-${i}-0">`;
-                html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
-                if (localPendingBet > 0 && isMe && mbjGameState === 'BETTING') {
-                    html += `<div id="mbj-chip-stack-${i}-0" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">${getMBJChipStackHTML(localPendingBet, true)}</div>`;
-                } else {
-                    html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
-                }
-                html += `</div></div>`;
-                if (localPendingBet > 0 && isMe && mbjGameState === 'BETTING') html += `<div class="bet-pill">${fmtTC(localPendingBet)} TC</div>`;
-                html += `</div>`; 
-            }
-            html += `</div>`; 
-
-            let nameHTML = s ? s.username : 'EMPTY';
-            html += `<div class="mbj-seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${s || mbjGameState==='BETTING' ? 1 : 0.3};" id="mbj-seat-name-${i}">${nameHTML}</div>`;
-            html += `<div class="player-timer-track"><div class="player-timer-fill" id="mbj-timer-fill-${i}"></div></div>`;
-
-            if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
-                html += `<div style="margin-top:5px;"><button class="btn-play" onclick="sitUp();" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`;
-            }
-            html += `</div>`; 
-            htmlBuffer += html;
-        }
-        
-        cont.innerHTML = htmlBuffer;
-
-        let rack = document.getElementById('mbj-chip-rack');
-        if (mbjGameState === 'BETTING') {
-            rack.classList.remove('chip-rack-locked');
-            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
-            } else { rack.classList.add('chip-rack-locked'); }
-        } else {
-            rack.classList.add('chip-rack-locked');
-            localPendingBet = 0;
-        }
-    }
-
-    function mbjAddLocalBet(amt) { localPendingBet += amt; renderMBJSeats(); sfx.click(); }
-    function mbjClearLocalBet() { localPendingBet = 0; renderMBJSeats(); sfx.click(); }
-    
-    function mbjConfirmLocalBet() {
-        sfx.click();
-        let customInput = document.getElementById('mbj-custom-bet').value;
-        let v = parseInt(customInput);
-        if (!isNaN(v) && v > 0) { localPendingBet += v; document.getElementById('mbj-custom-bet').value = ''; }
-        if(localPendingBet < 10) return showLocalFlash('mbj', 'Min Bet 10 TC');
-
-        if (localSeatId && currentMBJSeats[localSeatId]) {
-            let s = currentMBJSeats[localSeatId];
-            if (!s.hands) s.hands = [];
-            if (s.hands.length === 0) { s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false }); }
-            s.hands[0].bet += localPendingBet;
-        }
-
-        socket.emit('mbjPlaceBet', localPendingBet);
-        localPendingBet = 0; 
-        renderMBJSeats(); 
-    }
-
-    socket.on('mbjUpdate', async (data) => {
-        if(window.activeSharedGame !== 'mbj') return;
-        let dTimerText = document.getElementById('mbj-dealer-timer-text');
-
-        if(data.event === 'timer') {
-            mbjGameState = 'BETTING'; 
-            if(data.active) { dTimerText.style.display = 'block'; dTimerText.innerText = data.time; } 
-            else { dTimerText.style.display = 'none'; }
-        } 
-        else if (data.event === 'sync_seats') { renderMBJSeats(data.seats, data.activeTurn); } 
-        else if (data.event === 'lock_bets') { mbjGameState = 'DEALING'; dTimerText.style.display = 'none'; renderMBJSeats(data.seats, null); } 
-        else if (data.event === 'deal') {
-            mbjGameState = 'DEALING';
-            let targetSeats = JSON.parse(JSON.stringify(data.seats));
-            for (let i = 1; i <= 5; i++) {
-                if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) {
-                    currentMBJSeats[i].hands[0].cards = []; currentMBJSeats[i].hands[0].score = 0; currentMBJSeats[i].hands[0].status = 'WAITING';
-                }
-            }
-            
-            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
-            renderMBJSeats(currentMBJSeats, null); 
-            
-            let dHand = document.getElementById('mbj-fs-dealer-hand');
-            if(dHand) { 
-                dHand.innerHTML = ''; dHand.style.width = '70px'; 
-                const dealSequence = async () => {
-                    let activeKeys = Object.keys(targetSeats).filter(k => targetSeats[k] !== null);
-                    for (let k of activeKeys) {
-                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]);
-                        currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards);
-                        renderMBJSeats(currentMBJSeats, null); sfx.deal(); await delay(400);
-                    }
-                    
-                    let html = `<div class="mbj-score-badge mbj-score-inactive mbj-delay-badge" id="mbj-d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
-                    html += generateMBJCardHTML(data.dealerHand[0], false, true, false, 0); 
-                    dHand.innerHTML = html; sfx.deal(); await delay(400);
-                    
-                    for (let k of activeKeys) {
-                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]);
-                        currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score;
-                        currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status;
-                        renderMBJSeats(currentMBJSeats, null); sfx.deal(); await delay(400);
-                    }
-                    html += generateMBJCardHTML(data.dealerHand[1], true, true, false, 20); 
-                    dHand.style.width = '90px'; dHand.innerHTML = html; sfx.deal();
-                };
-                dealSequence();
-            } 
-        } 
-        else if (data.event === 'turn') {
-            mbjGameState = 'PLAYER_TURN'; renderMBJSeats(data.seats, data.activeTurn);
-            setTimeout(() => {
-                if (data.activeTurn && data.activeTurn.seat) {
-                    let bar = document.getElementById(`mbj-timer-fill-${data.activeTurn.seat}`);
-                    if (bar) bar.style.width = ((data.time / 15) * 100) + '%';
-                }
-            }, 10);
-        } 
-        else if (data.event === 'turn_timer') { 
-            if (data.activeTurn && data.activeTurn.seat) {
-                let bar = document.getElementById(`mbj-timer-fill-${data.activeTurn.seat}`);
-                if (bar) { bar.style.transition = 'width 1s linear'; bar.style.width = ((data.time / 15) * 100) + '%'; }
-            }
-        }
-        else if (data.event === 'dealer_resolved') {
-            mbjGameState = 'RESOLVING'; renderMBJSeats(data.seats); 
-            let dHand = document.getElementById('mbj-fs-dealer-hand'); 
-            if(dHand) {
-                let initialDScore = getBJScore(data.dealerHand.slice(0,2));
-                let isBlackjack = (initialDScore === 21 && data.dealerHand.length === 2);
-                let htmlStr = '';
-                if (isBlackjack) htmlStr += `<div class="mbj-status-pill mbj-pill-bj mbj-delay-pill" id="mbj-d-score-badge">BLACKJACK</div>`;
-                else htmlStr += `<div class="mbj-score-badge mbj-score-inactive mbj-delay-badge" id="mbj-d-score-badge"><span>${initialDScore}</span></div>`;
-
-                htmlStr += generateMBJCardHTML(data.dealerHand[0], false, false, false, 0);
-                htmlStr += generateMBJCardHTML(data.dealerHand[1], false, false, true, 20); 
-                dHand.innerHTML = htmlStr;
-                
-                const drawRemaining = async () => {
-                    await delay(800); 
-                    for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.style.width = `${(i * 20) + 70}px`;
-                        let currentScore = getBJScore(data.dealerHand.slice(0, i+1));
-                        let badge = document.getElementById('mbj-d-score-badge');
-                        if (currentScore > 21) {
-                            if(badge) badge.outerHTML = `<div class="mbj-status-pill mbj-pill-bust mbj-delay-pill" id="mbj-d-score-badge">${currentScore} BUST</div>`;
-                        } else {
-                            if(badge) badge.innerHTML = `<span>${currentScore}</span>`;
-                        }
-                        dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[i], false, true, false, i * 20));
-                        sfx.deal(); await delay(800); 
-                    }
-                    await delay(600);
-                    
-                    for(let i = 1; i <= 5; i++) {
-                        let seat = data.seats[i]; let res = data.results && data.results[i];
-                        if (seat && res) {
-                            let chipCont = document.getElementById(`mbj-chip-stack-${i}-0`);
-                            if (res.status === 'LOSS') {
-                                animateMBJChipSequence(`mbj-circle-${i}-0`, 'mbj-dealer-area', '#444');
-                                if (chipCont) chipCont.style.opacity = '0'; sfx.lose();
-                            } else if (res.status === 'WIN') {
-                                animateMBJChipSequence('mbj-dealer-area', `mbj-circle-${i}-0`, '#00e676');
-                                setTimeout(() => { document.getElementById(`mbj-seat-name-${i}`).innerHTML += `<div class="payout-flare">+ ${fmtTC(res.win)}</div>`; }, 400);
-                                sfx.win();
-                            } else if (res.status === 'PUSH') {
-                                setTimeout(() => { document.getElementById(`mbj-seat-name-${i}`).innerHTML += `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`; }, 400);
-                                sfx.win();
-                            }
-                            await delay(300); 
-                        }
-                    }
-                    setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1000);
-                }; 
-                drawRemaining();
-            }
-        } 
-        else if (data.event === 'new_round') {
-            mbjGameState = 'BETTING'; document.getElementById('mbj-fs-dealer-hand').innerHTML = ''; 
-            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; renderMBJSeats(data.seats); 
-        }
-    });
-
-    function sendMBJChat() {
-        let input = document.getElementById('mbj-chat-input'); let msg = input.value.trim();
-        if(msg.length > 0) { 
-            let box = document.getElementById('mbj-chat-messages');
-            box.innerHTML += `<div class="chat-line"><span class="c-name">You:</span> <span class="c-msg">${msg}</span></div>`;
-            box.scrollTop = box.scrollHeight;
-            socket.emit('sendChat', { msg: msg }); 
-            input.value = ''; 
-        }
     }
   </script>
 </body>
