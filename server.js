@@ -46,14 +46,9 @@ function buildShoe(decks = 6) {
 
 let globalShoe = buildShoe(6);
 
-function drawCard(isSolo = false, soloShoe = null) { 
-    if (isSolo && soloShoe) {
-        if(soloShoe.length < 15) soloShoe.push(...buildShoe(1));
-        return soloShoe.pop();
-    } else {
-        if(globalShoe.length < 52) globalShoe = buildShoe(6); 
-        return globalShoe.pop(); 
-    }
+function drawCard() { 
+    if(globalShoe.length < 52) globalShoe = buildShoe(6); 
+    return globalShoe.pop(); 
 }
 
 function getBJScore(hand) {
@@ -232,89 +227,6 @@ setInterval(() => {
 }, 1000);
 
 // =========================================================================
-// 2. HORSE DERBY ENGINE
-// =========================================================================
-const HORSES = [
-    { id: 1, name: "Thunder", color: "#ff3366", pos: 0, odds: 2 },
-    { id: 2, name: "Lightning", color: "#00a2ff", pos: 0, odds: 3 },
-    { id: 3, name: "Storm", color: "#00e676", pos: 0, odds: 5 },
-    { id: 4, name: "Blizzard", color: "#ffcc00", pos: 0, odds: 10 },
-    { id: 5, name: "Tornado", color: "#a500ff", pos: 0, odds: 15 }
-];
-
-let derbyState = { status: 'BETTING', time: 20, horses: JSON.parse(JSON.stringify(HORSES)), bets: {} };
-
-function resetDerby() {
-    derbyState.status = 'BETTING'; derbyState.time = 20;
-    derbyState.horses = JSON.parse(JSON.stringify(HORSES)); derbyState.bets = {};
-    io.to('derby').emit('derbyUpdate', { event: 'state', state: derbyState });
-}
-
-function runDerbyRace() {
-    derbyState.status = 'RACING';
-    io.to('derby').emit('derbyUpdate', { event: 'start_race', state: derbyState });
-
-    let raceInterval = setInterval(() => {
-        let raceFinished = false; let winner = null;
-
-        derbyState.horses.forEach(h => {
-            let speed = Math.random() * 2 + (10 / h.odds); 
-            h.pos += speed;
-            if (h.pos >= 100) { h.pos = 100; if(!raceFinished) { raceFinished = true; winner = h; } }
-        });
-
-        io.to('derby').emit('derbyUpdate', { event: 'race_progress', horses: derbyState.horses });
-
-        if (raceFinished) {
-            clearInterval(raceInterval);
-            derbyState.status = 'FINISHED';
-            
-            let results = {};
-            for (let user in derbyState.bets) {
-                let uBets = derbyState.bets[user];
-                let won = 0;
-                if (uBets[winner.id]) {
-                    won = uBets[winner.id] * winner.odds;
-                    if(mockUsers[user]) mockUsers[user].credits += won;
-                }
-                results[user] = won;
-                if(connectedUsers[user] && mockUsers[user]) io.to(connectedUsers[user]).emit('balanceUpdateData', { credits: mockUsers[user].credits });
-            }
-
-            io.to('derby').emit('derbyUpdate', { event: 'race_finished', winner: winner, results: results });
-            setTimeout(resetDerby, 8000);
-        }
-    }, 100); 
-}
-
-setInterval(() => {
-    if (derbyState.status === 'BETTING') {
-        derbyState.time--;
-        io.to('derby').emit('derbyUpdate', { event: 'timer', time: derbyState.time });
-        if (derbyState.time <= 0) runDerbyRace();
-    }
-}, 1000);
-
-
-// =========================================================================
-// 3. SOLO PLAY ENGINE (Isolated instances per user)
-// =========================================================================
-let soloGames = {}; // Keyed by username
-
-function initSoloGame(username) {
-    soloGames[username] = {
-        status: 'BETTING',
-        bet: 0,
-        playerHand: [],
-        dealerHand: [],
-        shoe: buildShoe(4), // 4 decks for solo
-        doubled: false
-    };
-    return soloGames[username];
-}
-
-
-// =========================================================================
 // SOCKET CONNECTION & ROUTES
 // =========================================================================
 io.on('connection', (socket) => {
@@ -342,12 +254,6 @@ io.on('connection', (socket) => {
         if (room === 'mbj') {
             socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
             if (mbjState.status === 'PLAYER_TURN') socket.emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
-        } else if (room === 'derby') {
-            socket.emit('derbyUpdate', { event: 'state', state: derbyState });
-        } else if (room === 'solo') {
-            if (!socket.user) return;
-            if (!soloGames[socket.user.username]) initSoloGame(socket.user.username);
-            socket.emit('soloUpdate', { event: 'sync', state: soloGames[socket.user.username] });
         }
     });
 
@@ -448,20 +354,6 @@ io.on('connection', (socket) => {
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200);
             }
-        }
-    });
-
-    // --- DERBY ROUTES ---
-    socket.on('derbyPlaceBet', (data) => {
-        if (derbyState.status !== 'BETTING' || !socket.user) return;
-        let u = mockUsers[socket.user.username];
-        if (u && u.credits >= data.amount) {
-            u.credits -= data.amount;
-            socket.emit('balanceUpdateData', { credits: u.credits });
-            if (!derbyState.bets[u.username]) derbyState.bets[u.username] = {};
-            if (!derbyState.bets[u.username][data.horseId]) derbyState.bets[u.username][data.horseId] = 0;
-            derbyState.bets[u.username][data.horseId] += data.amount;
-            io.to('derby').emit('derbyUpdate', { event: 'state', state: derbyState });
         }
     });
 
