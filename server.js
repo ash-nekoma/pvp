@@ -17,7 +17,6 @@ app.get('/', (req, res) => {
 
 const formatTC = (amount) => Math.round(amount * 10) / 10;
 
-let mockUsers = {};
 let connectedUsers = {};
 
 // =========================================================================
@@ -142,12 +141,6 @@ async function mbjResolveDealer() {
             let statusStr = netResult > 0 ? 'WIN' : (netResult < 0 ? 'LOSS' : 'PUSH');
             
             seatResults[i] = { win: totalWin, push: totalPush, status: statusStr, net: netResult };
-            
-            let user = mockUsers[seat.username];
-            if(user) {
-                user.credits += formatTC(totalWin + totalPush);
-                if(connectedUsers[user.username]) io.to(connectedUsers[user.username]).emit('balanceUpdateData', { credits: user.credits });
-            }
         }
     }
 
@@ -230,16 +223,10 @@ setInterval(() => {
 // SOCKET CONNECTION & ROUTES
 // =========================================================================
 io.on('connection', (socket) => {
-    socket.on('login', (data) => {
-        let user = mockUsers[data.username];
-        if(!user) {
-            user = { username: data.username, password: data.password, credits: 10000 };
-            mockUsers[data.username] = user;
-        } else {
-            if (user.password !== data.password) return socket.emit('loginError', 'Incorrect Password.');
-        }
-        socket.user = user; connectedUsers[user.username] = socket.id;
-        socket.emit('loginSuccess', { username: user.username, credits: user.credits });
+    
+    socket.on('autoJoinTest', (username) => {
+        socket.user = { username: username };
+        connectedUsers[username] = socket.id;
     });
 
     socket.on('sendChatMessage', (msg) => {
@@ -259,7 +246,6 @@ io.on('connection', (socket) => {
 
     socket.on('leaveRoom', (room) => { socket.leave(room); });
 
-    // --- VIP MULTIPLAYER BLACKJACK ROUTES ---
     socket.on('mbjTakeSeat', (seatNum) => {
         if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
         for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].username === socket.user.username) return; }
@@ -272,10 +258,6 @@ io.on('connection', (socket) => {
         for(let i = 1; i <= 5; i++) {
             let s = mbjState.seats[i];
             if (s && s.username === socket.user.username && mbjState.status === 'BETTING') {
-                if (s.hands.length > 0 && s.hands[0].bet > 0) {
-                    let user = mockUsers[socket.user.username];
-                    if (user) { user.credits += s.hands[0].bet; socket.emit('balanceUpdateData', { credits: user.credits }); }
-                }
                 mbjState.seats[i] = null;
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(st => st && st.hands.length > 0 && st.hands[0].bet > 0) });
                 break;
@@ -290,16 +272,12 @@ io.on('connection', (socket) => {
         if (!seatNum) return;
 
         let amt = formatTC(amount);
-        let user = mockUsers[socket.user.username];
+        let s = mbjState.seats[seatNum];
         
-        if(user && user.credits >= amt) {
-            user.credits -= amt;
-            let s = mbjState.seats[seatNum];
-            if (s.hands.length === 0) s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false });
-            s.hands[0].bet += amt; s.hands[0].originalBet += amt;
-            socket.emit('balanceUpdateData', { credits: user.credits });
-            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
-        }
+        // No credit check for testing
+        if (s.hands.length === 0) s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false });
+        s.hands[0].bet += amt; s.hands[0].originalBet += amt;
+        io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
     });
 
     socket.on('mbjAction', (actionData) => {
@@ -313,7 +291,6 @@ io.on('connection', (socket) => {
             if (hand.isSplitAce) return; 
             hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards); mbjState.turnTimer = 15; 
             
-            // 1.2s PACING PAUSE RESTORED
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
@@ -327,33 +304,27 @@ io.on('connection', (socket) => {
         }
         else if (actionData.type === 'double') {
             if (hand.cards.length !== 2) return;
-            let user = mockUsers[socket.user.username];
-            if (user && user.credits >= hand.bet) {
-                user.credits -= hand.bet; socket.emit('balanceUpdateData', { credits: user.credits });
-                hand.doubledAmount = hand.bet; hand.bet *= 2; hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards);
-                hand.status = hand.score > 21 ? 'BUST' : 'STAND'; mbjState.turnTimer = 15; 
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                setTimeout(() => mbjNextTurn(), 1200);
-            }
+            // No credit check for testing
+            hand.doubledAmount = hand.bet; hand.bet *= 2; hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards);
+            hand.status = hand.score > 21 ? 'BUST' : 'STAND'; mbjState.turnTimer = 15; 
+            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
+            setTimeout(() => mbjNextTurn(), 1200);
         }
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2 || seat.hands.length >= 2) return; 
             let val1 = hand.cards[0].bjVal; let val2 = hand.cards[1].bjVal; if (val1 !== val2) return; 
             
-            let user = mockUsers[socket.user.username];
-            if (user && user.credits >= hand.bet) {
-                user.credits -= hand.bet; socket.emit('balanceUpdateData', { credits: user.credits });
-                let splitCard = hand.cards.pop();
-                let hand2 = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true };
-                hand.isSplitHand = true;
-                
-                hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards); if (hand.score === 21) hand.status = 'STAND';
-                hand2.cards.push(drawCard()); hand2.score = getBJScore(hand2.cards); if (hand2.score === 21) hand2.status = 'STAND';
+            // No credit check for testing
+            let splitCard = hand.cards.pop();
+            let hand2 = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true };
+            hand.isSplitHand = true;
+            
+            hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards); if (hand.score === 21) hand.status = 'STAND';
+            hand2.cards.push(drawCard()); hand2.score = getBJScore(hand2.cards); if (hand2.score === 21) hand2.status = 'STAND';
 
-                seat.hands.push(hand2); mbjState.turnTimer = 15; 
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-                if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200);
-            }
+            seat.hands.push(hand2); mbjState.turnTimer = 15; 
+            io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
+            if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200);
         }
     });
 
@@ -362,10 +333,6 @@ io.on('connection', (socket) => {
             for(let i = 1; i <= 5; i++) {
                 let s = mbjState.seats[i];
                 if (s && s.username === socket.user.username && mbjState.status === 'BETTING') {
-                    if (s.hands.length > 0 && s.hands[0].bet > 0) {
-                        let user = mockUsers[socket.user.username];
-                        if (user) { user.credits += s.hands[0].bet; }
-                    }
                     mbjState.seats[i] = null;
                     io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(st => st && st.hands.length > 0 && st.hands[0].bet > 0) });
                     break;
