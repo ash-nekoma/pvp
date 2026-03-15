@@ -324,6 +324,13 @@ io.on('connection', (socket) => {
     socket.isCashier = false;
     socket.isAuth = false;
 
+    // Room specific voice broadcast
+    socket.on('voiceStream', (data) => {
+        if (socket.currentRoom) {
+            socket.to(socket.currentRoom).emit('voiceStream', data);
+        }
+    });
+
     socket.on('requestBalanceRefresh', async () => {
         if(socket.user) {
             let u = await User.findById(socket.user._id);
@@ -372,15 +379,9 @@ io.on('connection', (socket) => {
                 let maxPotentialMultiplier = 1;
 
                 if (data.game === 'd20') {
-                    if (!Array.isArray(data.bets) || data.bets.length === 0) { socket.emit('localGameError', { msg: 'Select at least one bet', game: 'd20' }); return; }
-                    let totalD20Bet = 0;
-                    for (let b of data.bets) {
-                        let a = formatTC(b.amount);
-                        if(isNaN(a) || a < 10) { socket.emit('localGameError', { msg: 'MIN BET IS 10 TC', game: 'd20' }); return; }
-                        totalD20Bet += a;
-                    }
-                    amt = totalD20Bet;
-                    maxPotentialMultiplier = 1.95 * data.bets.length; 
+                    if (isNaN(amt) || amt < 10) { socket.emit('localGameError', { msg: 'MIN BET IS 10 TC', game: data.game }); return; }
+                    maxPotentialMultiplier = 1.95; 
+                    if (data.choice !== 'Odd' && data.choice !== 'Even') { socket.emit('localGameError', { msg: 'INVALID CHOICE', game: 'd20' }); return; }
                 } else {
                     if (isNaN(amt) || amt < 10) { socket.emit('localGameError', { msg: 'MIN BET IS 10 TC', game: data.game }); return; }
                     if (data.game === 'coinflip') maxPotentialMultiplier = 1.95;
@@ -435,17 +436,11 @@ io.on('connection', (socket) => {
                 let roll = crypto.randomInt(1, 21);
                 let wonAny = false;
                 
-                for(let b of data.bets) {
-                    let win = false;
-                    let val = b.guessValue;
-                    if (val === 'high' && roll >= 11) win = true;
-                    if (val === 'low' && roll <= 10) win = true;
-                    if (val === 'even' && roll % 2 === 0) win = true;
-                    if (val === 'odd' && roll % 2 !== 0) win = true;
-                    
-                    if(win) { payout += formatTC(b.amount * 1.95); wonAny = true; }
+                let isEven = roll % 2 === 0;
+                if ((data.choice === 'Even' && isEven) || (data.choice === 'Odd' && !isEven)) {
+                    payout = formatTC(data.bet * 1.95);
+                    wonAny = true;
                 }
-                payout = formatTC(payout);
                 
                 if (payout > 0 && socket.soloBaseline) socket.soloBaseline.active = false;
 
@@ -527,6 +522,62 @@ io.on('connection', (socket) => {
                         
                         setTimeout(() => { gameStats.blackjack.total++; gameStats.blackjack.Lose++; checkResetStats('blackjack'); }, 2500);
                     } else { socket.emit('bjUpdate', { event: 'hit', pHand: socket.bjState.pHand }); }
+                }
+                else if (data.action === 'double') {
+                    if(!socket.bjState || socket.bjState.pHand.length !== 2) return;
+                    
+                    let deduction = await deductBet(user, socket.bjState.bet);
+                    if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'blackjack' }); return; }
+                    await user.save();
+                    processReferralBetCommission(user, socket.bjState.bet);
+
+                    socket.bjState.fromPlayable += deduction.fromPlayable;
+                    socket.bjState.fromMain += deduction.fromMain;
+                    socket.bjState.bet *= 2; 
+
+                    socket.bjState.pHand.push(drawCard());
+                    let pS = getBJScore(socket.bjState.pHand);
+
+                    if (pS > 21) {
+                        await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-socket.bjState.bet), details: `Blackjack` }).save();
+                        socket.emit('bjUpdate', { event: 'resolved', pHand: socket.bjState.pHand, dHand: socket.bjState.dHand, payout: 0, msg: 'Bust!', resStr: 'PLAYER BUSTS!', bet: socket.bjState.bet, newBalance: { credits: user.credits, playable: user.playableCredits } });
+                        socket.bjState = null;
+                        setTimeout(() => { gameStats.blackjack.total++; gameStats.blackjack.Lose++; checkResetStats('blackjack'); }, 2500);
+                    } else {
+                        // Automatically stand
+                        while (getBJScore(socket.bjState.dHand) < 17) { socket.bjState.dHand.push(drawCard()); }
+                        let dS = getBJScore(socket.bjState.dHand);
+                        let msg = '';
+                        
+                        if (dS > 21 || pS > dS) { payout = formatTC(socket.bjState.bet * 2); msg = 'You Win!'; } 
+                        else if (pS === dS) { payout = formatTC(socket.bjState.bet); msg = 'Push'; } 
+                        else { msg = 'Dealer Wins'; }
+                        
+                        if (msg === 'You Win!' || msg === 'Push') {
+                            if (socket.soloBaseline) socket.soloBaseline.active = false;
+                        }
+
+                        if (msg === 'Push') {
+                            user.playableCredits = formatTC(user.playableCredits + socket.bjState.fromPlayable);
+                            user.credits = formatTC(user.credits + socket.bjState.fromMain);
+                        } else { user.credits = formatTC(user.credits + payout); }
+                        await user.save();
+
+                        await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(payout - socket.bjState.bet), details: `Blackjack` }).save();
+                        let resStr = (dS > 21) ? `DEALER BUSTS!` : (msg === 'Push' ? `TIE (${dS} TO ${pS})` : (msg === 'You Win!' ? `PLAYER (${dS} TO ${pS})` : `DEALER (${dS} TO ${pS})`));
+                        
+                        pushAdminData();
+                        socket.emit('bjUpdate', { event: 'resolved', pHand: socket.bjState.pHand, dHand: socket.bjState.dHand, payout, msg, resStr: resStr, bet: socket.bjState.bet, newBalance: { credits: user.credits, playable: user.playableCredits } });
+                        socket.bjState = null;
+
+                        setTimeout(() => { 
+                            gameStats.blackjack.total++;
+                            if (dS > 21 || pS > dS) gameStats.blackjack.Win++;
+                            else if (pS === dS) gameStats.blackjack.Push++;
+                            else gameStats.blackjack.Lose++;
+                            checkResetStats('blackjack'); 
+                        }, 2500);
+                    }
                 }
                 else if (data.action === 'stand') {
                     if(!socket.bjState) return;
@@ -613,7 +664,7 @@ io.on('connection', (socket) => {
         }
 
         if (socket.currentRoom) { 
-            io.to(socket.currentRoom).emit('chatMessage', { user: socket.user.username, text: data.msg, sys: false }); 
+            socket.broadcast.to(socket.currentRoom).emit('chatMessage', { user: socket.user.username, text: data.msg, sys: false }); 
         } 
     });
     
