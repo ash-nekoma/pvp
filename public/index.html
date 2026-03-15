@@ -53,12 +53,12 @@
         .game-card { width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
 
-        /* ================= VIP BLACKJACK LAYOUT ================= */
-        .mbj-master-layout { display: flex; flex-direction: row; gap: 30px; align-items: stretch; justify-content: center; max-width: 1500px; width: 100%; padding: 0 40px; }
-        .game-board-wrapper { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        /* ================= FLUSH MASTER LAYOUT ================= */
+        .mbj-master-layout { display: flex; flex-direction: row; gap: 30px; justify-content: center; align-items: stretch; max-width: 1500px; width: 100%; padding: 0 40px; height: 780px; }
+        .game-board-wrapper { flex: 0 0 1000px; display: flex; flex-direction: column; justify-content: space-between; }
 
         /* ================= DOCKED RIGHT CHAT PANEL ================= */
-        .mbj-chat-panel { width: 350px; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.8); overflow: hidden; }
+        .mbj-chat-panel { flex: 1; max-width: 350px; height: 100%; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.8); overflow: hidden; }
         .chat-header { padding: 15px; background: rgba(0, 162, 255, 0.1); border-bottom: 1px solid var(--glass-border); font-weight: 900; font-size: 1rem; color: var(--ps-glow); text-align: center; letter-spacing: 1px; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; }
         .chat-msg-row { display: flex; flex-direction: column; }
@@ -66,10 +66,15 @@
         .chat-text { background: rgba(255,255,255,0.05); padding: 10px 14px; border-radius: 12px; line-height: 1.4; word-wrap: break-word; font-weight: 500;}
         .chat-text.me { background: rgba(0, 162, 255, 0.2); color: white; border-bottom-right-radius: 0; }
         .chat-text.other { border-bottom-left-radius: 0; }
-        .chat-input-area { padding: 15px; border-top: 1px solid var(--glass-border); display: flex; gap: 10px; background: rgba(0,0,0,0.5); }
+        .chat-input-area { padding: 15px; border-top: 1px solid var(--glass-border); display: flex; gap: 8px; background: rgba(0,0,0,0.5); align-items: center; }
         .chat-input-area input { flex: 1; background: #111; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 15px; border-radius: 20px; font-family: 'Outfit'; font-size: 0.9rem; }
-        .chat-input-area button { background: var(--ps-glow); color: black; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-weight: 900; transition: 0.2s; font-size: 1.1rem; }
-        .chat-input-area button:hover { transform: scale(1.1); background: white; }
+        .chat-send-btn { background: var(--ps-glow); color: black; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-weight: 900; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; }
+        .chat-send-btn:hover { transform: scale(1.1); background: white; }
+        
+        .ptt-btn { background: #333; color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .ptt-btn:hover { background: #555; }
+        .ptt-btn.recording { background: var(--danger); animation: pulseRecord 1s infinite; color: white; box-shadow: 0 0 15px var(--danger); }
+        @keyframes pulseRecord { 0% { box-shadow: 0 0 0 0 rgba(255,51,102,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,51,102,0); } 100% { box-shadow: 0 0 0 0 rgba(255,51,102,0); } }
 
         /* ================= GAME BOARD ================= */
         .mbj-board { width: 1000px; height: 700px; background: radial-gradient(circle at center, #107a3f 0%, #053317 100%); border-radius: 20px; position: relative; border: 15px solid #3e2723; box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 0 5px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(0,0,0,0.8); overflow: hidden; }
@@ -103,7 +108,7 @@
         
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
 
-        .score-badge { position: absolute; top: 50%; transform: translateY(-50%); left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif; }
+        .score-badge { position: absolute; top: 50%; left: -15px; width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; box-shadow: 2px 2px 6px rgba(0,0,0,0.6); z-index: 50; font-family: 'Rajdhani', sans-serif; transform: translateY(-50%); }
         .score-badge span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; line-height: 0; text-align: center; width: 100%; }
         .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7); color: black; }
         .score-inactive { background: linear-gradient(to bottom, #555, #333); color: white; }
@@ -112,11 +117,17 @@
         .pill-bj { background: linear-gradient(to bottom, #00b359, #008040); border: 2px solid #00e676; }
         .pill-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); border: 2px solid #ff3366; }
 
-        .anim-fly-in { animation: flyIn 0.15s ease-out forwards; } /* SPEEDED UP */
+        /* PACING DELAYS FOR BADGES (Waits for card animation) */
+        .delay-badge { opacity: 0; animation: popInBadge 0.2s 0.4s forwards; }
+        @keyframes popInBadge { 0% { opacity: 0; transform: translateY(-50%) scale(0.5); } 100% { opacity: 1; transform: translateY(-50%) scale(1); } }
+        .delay-pill { opacity: 0; animation: popInPill 0.2s 0.4s forwards; }
+        @keyframes popInPill { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+
+        .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
         @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        .anim-fly-in-doubled { animation: flyInDoubled 0.15s ease-out forwards; } /* SPEEDED UP */
+        .anim-fly-in-doubled { animation: flyInDoubled 0.3s ease-out forwards; }
         @keyframes flyInDoubled { 0% { opacity: 0; transform: translate(30px, -150px) rotate(90deg) scale(0.8); } 100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } }
-        .anim-reveal { animation: revealCard 0.2s ease-out forwards; } /* SPEEDED UP */
+        .anim-reveal { animation: revealCard 0.3s ease-out forwards; }
         @keyframes revealCard { 0% { transform: rotateY(90deg) scale(0.9); } 100% { transform: rotateY(0deg) scale(1); } }
 
         .mbj-action-row { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; height: 40px; opacity: 0; pointer-events: none; transition: opacity 0.1s; z-index: 100; }
@@ -147,12 +158,12 @@
         .mbj-seat-name { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative; margin-top: 5px; }
         .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
-        .animated-chip { position: fixed; z-index: 99999; pointer-events: none; transition: left 0.3s linear, top 0.3s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.3s linear, opacity 0.2s ease-in 0.1s; width: 45px; height: 45px; border-radius: 50%; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg); }
+        .animated-chip { position: fixed; z-index: 99999; pointer-events: none; transition: left 0.4s linear, top 0.4s cubic-bezier(0.5, -0.5, 0.5, 1.5), transform 0.4s linear, opacity 0.2s ease-in 0.2s; width: 45px; height: 45px; border-radius: 50%; font-weight: 900; box-shadow: inset 0 0 5px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9); background: radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); border: 2px solid var(--c-bg); }
 
         .payout-flare { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); color: #00e676; font-size: 1.5rem; font-weight: 900; text-shadow: 0 2px 5px black; animation: floatUp 2s forwards; z-index: 500; pointer-events: none; white-space: nowrap; }
         @keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 0); } 20% { opacity: 1; transform: translate(-50%, -20px); } 80% { opacity: 1; transform: translate(-50%, -40px); } 100% { opacity: 0; transform: translate(-50%, -60px); } }
 
-        .chip-rack-container { width: 1000px; margin-top: 15px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); justify-content: space-between; align-items: center; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transition: 0.3s; position: relative; }
+        .chip-rack-container { width: 1000px; display: flex; background: rgba(0,0,0,0.85); padding: 15px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); justify-content: space-between; align-items: center; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transition: 0.3s; position: relative; }
         .chip-rack-locked { opacity: 0.5; pointer-events: none; }
 
         .rack-error-tooltip { position: absolute; top: -45px; background: var(--danger); color: white; font-weight: 900; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
@@ -250,7 +261,8 @@
                   </div>
                   <div class="chat-input-area">
                       <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKey(event)">
-                      <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+                      <button class="chat-send-btn" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+                      <button class="ptt-btn" id="ptt-btn" onmousedown="startPTT()" onmouseup="stopPTT()" onmouseleave="stopPTT()"><i class="fas fa-microphone"></i></button>
                   </div>
               </div>
               
@@ -340,6 +352,9 @@
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
+    // =========================================================================
+    // TEXT CHAT
+    // =========================================================================
     function handleChatKey(e) { if(e.key === 'Enter') sendChat(); }
     function sendChat() {
         let input = document.getElementById('chat-input'); let msg = input.value.trim();
@@ -348,10 +363,89 @@
 
     socket.on('receiveChatMessage', (data) => {
         let box = document.getElementById('chat-messages'); let isMe = data.username === myUsername;
-        let html = `<div class="chat-msg-row" style="align-items: ${isMe ? 'flex-end' : 'flex-start'};"><div class="chat-meta">${isMe ? 'You' : data.username} • ${data.time}</div><div class="chat-text ${isMe ? 'me' : 'other'}">${data.message}</div></div>`;
+        let html = `<div class="chat-msg-row" style="align-items: ${isMe ? 'flex-end' : 'flex-start'};"><div class="chat-meta">${isMe ? 'You' : data.username}</div><div class="chat-text ${isMe ? 'me' : 'other'}">${data.message}</div></div>`;
         box.innerHTML += html; box.scrollTop = box.scrollHeight;
     });
 
+    // =========================================================================
+    // REAL-TIME VOICE CHAT (DISCORD PTT)
+    // =========================================================================
+    let pttContext = null;
+    let pttProcessor = null;
+    let pttStream = null;
+    let pttSource = null;
+    let isRecording = false;
+
+    async function startPTT() {
+        if (!pttContext) pttContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (pttContext.state === 'suspended') await pttContext.resume();
+        
+        if (!pttStream) {
+            try {
+                pttStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+                pttSource = pttContext.createMediaStreamSource(pttStream);
+                pttProcessor = pttContext.createScriptProcessor(4096, 1, 1);
+                
+                pttSource.connect(pttProcessor);
+                let silentGain = pttContext.createGain();
+                silentGain.gain.value = 0; 
+                pttProcessor.connect(silentGain);
+                silentGain.connect(pttContext.destination);
+
+                pttProcessor.onaudioprocess = (e) => {
+                    if (!isRecording) return;
+                    let float32Array = e.inputBuffer.getChannelData(0);
+                    let int16Array = new Int16Array(float32Array.length);
+                    for (let i = 0; i < float32Array.length; i++) {
+                        let s = Math.max(-1, Math.min(1, float32Array[i]));
+                        int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                    }
+                    socket.emit('voiceStream', { audio: int16Array.buffer, sr: pttContext.sampleRate, user: myUsername });
+                };
+            } catch (err) {
+                console.error("Microphone access denied or error:", err);
+                return;
+            }
+        }
+        isRecording = true;
+        document.getElementById('ptt-btn').classList.add('recording');
+    }
+
+    function stopPTT() {
+        isRecording = false;
+        let btn = document.getElementById('ptt-btn');
+        if(btn) btn.classList.remove('recording');
+    }
+
+    let playContext = null;
+    let nextPlayTime = 0;
+    socket.on('voiceStream', (data) => {
+        if (data.user === myUsername) return; 
+        if (!playContext) playContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        let int16Array = new Int16Array(data.audio);
+        let float32Array = new Float32Array(int16Array.length);
+        for (let i = 0; i < int16Array.length; i++) {
+            float32Array[i] = int16Array[i] / (int16Array[i] >= 0 ? 0x7FFF : 0x8000);
+        }
+
+        let audioBuffer = playContext.createBuffer(1, float32Array.length, data.sr);
+        audioBuffer.getChannelData(0).set(float32Array);
+        
+        let source = playContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(playContext.destination);
+        
+        let currentTime = playContext.currentTime;
+        if (nextPlayTime < currentTime) nextPlayTime = currentTime;
+        
+        source.start(nextPlayTime);
+        nextPlayTime += audioBuffer.duration;
+    });
+
+    // =========================================================================
+    // UI & ANIMATIONS
+    // =========================================================================
     function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
         let animClass = '';
         if(animateIn) { animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in'; }
@@ -394,7 +488,6 @@
         setTimeout(() => { if(chip.parentNode) chip.remove(); }, 500);
     }
 
-    // IMMEDATE UI BUTTON HANDLER: Kills input lag
     function sendMBJAction(type) {
         document.querySelectorAll('.mbj-action-row.show').forEach(el => el.classList.remove('show'));
         socket.emit('mbjAction', { type: type });
@@ -456,18 +549,21 @@
                     
                     html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
 
+                    let previouslyRendered = renderedCardCount[i][hIdx] || 0;
+                    let isNewCard = cardCount > previouslyRendered;
+                    let delayClassBadge = isNewCard ? 'delay-badge' : '';
+                    let delayClassPill = isNewCard ? 'delay-pill' : '';
+
                     if(hand.cards.length > 0 && hand.status !== 'BUST') { 
                         if(hand.status === 'BLACKJACK') {
-                            html += `<div class="status-pill pill-bj">BLACKJACK</div>`;
+                            html += `<div class="status-pill pill-bj ${delayClassPill}">BLACKJACK</div>`;
                         } else {
                             let badgeClass = isThisHandActive ? 'score-active' : 'score-inactive';
-                            html += `<div class="score-badge ${badgeClass}">${getDisplayScore(hand.cards)}</div>`; 
+                            html += `<div class="score-badge ${badgeClass} ${delayClassBadge}">${getDisplayScore(hand.cards)}</div>`; 
                         }
                     } else if (hand.status === 'BUST') {
-                        html += `<div class="status-pill pill-bust">${hand.score} BUST</div>`;
+                        html += `<div class="status-pill pill-bust ${delayClassPill}">${hand.score} BUST</div>`;
                     }
-
-                    let previouslyRendered = renderedCardCount[i][hIdx] || 0;
 
                     hand.cards.forEach((c, cIdx) => { 
                         let animateThisCard = cIdx >= previouslyRendered;
@@ -598,20 +694,20 @@
                         currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]);
                         currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards);
                         renderMBJSeats(currentMBJSeats, null);
-                        await delay(200);
+                        await delay(400); // SLOWED DOWN DISTRIBUTION
                     }
                     
-                    let html = `<div class="score-badge score-inactive" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
+                    let html = `<div class="score-badge score-inactive delay-badge" id="d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`;
                     html += generateCardHTML(data.dealerHand[0], false, true, false, 0); 
                     dHand.innerHTML = html; 
-                    await delay(200);
+                    await delay(400);
                     
                     for (let k of activeKeys) {
                         currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]);
                         currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score;
                         currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status;
                         renderMBJSeats(currentMBJSeats, null);
-                        await delay(200);
+                        await delay(400);
                     }
                     
                     html += generateCardHTML(data.dealerHand[1], true, true, false, 20); 
@@ -648,8 +744,8 @@
                 let isBlackjack = (initialDScore === 21 && data.dealerHand.length === 2);
                 
                 let htmlStr = '';
-                if (isBlackjack) htmlStr += `<div class="status-pill pill-bj" id="d-score-badge">BLACKJACK</div>`;
-                else htmlStr += `<div class="score-badge score-inactive" id="d-score-badge"><span>${initialDScore}</span></div>`;
+                if (isBlackjack) htmlStr += `<div class="status-pill pill-bj delay-pill" id="d-score-badge">BLACKJACK</div>`;
+                else htmlStr += `<div class="score-badge score-inactive delay-badge" id="d-score-badge"><span>${initialDScore}</span></div>`;
 
                 htmlStr += generateCardHTML(data.dealerHand[0], false, false, false, 0);
                 htmlStr += generateCardHTML(data.dealerHand[1], false, false, true, 20); 
@@ -657,20 +753,20 @@
                 dHand.innerHTML = htmlStr;
                 
                 const drawRemaining = async () => {
-                    await delay(400); 
+                    await delay(800); 
                     for(let i=2; i<data.dealerHand.length; i++) { 
                         dHand.style.width = `${(i * 20) + 70}px`;
                         let currentScore = getBJScore(data.dealerHand.slice(0, i+1));
                         
                         let badge = document.getElementById('d-score-badge');
                         if (currentScore > 21) {
-                            if(badge) badge.outerHTML = `<div class="status-pill pill-bust" id="d-score-badge">${currentScore} BUST</div>`;
+                            if(badge) badge.outerHTML = `<div class="status-pill pill-bust delay-pill" id="d-score-badge">${currentScore} BUST</div>`;
                         } else {
                             if(badge) badge.innerHTML = `<span>${currentScore}</span>`;
                         }
                         
                         dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dealerHand[i], false, true, false, i * 20));
-                        await delay(250); 
+                        await delay(800); 
                     }
                     
                     await delay(600);
