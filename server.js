@@ -19,14 +19,10 @@ const formatTC = (amount) => Math.round(amount * 10) / 10;
 
 let connectedUsers = {};
 
-// =========================================================================
-// SHARED UTILITIES & SHOE LOGIC
-// =========================================================================
 function buildShoe(decks = 6) {
     let shoe = [];
     const vs = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
     const ss = ['♠','♣','♥','♦'];
-    
     for(let d = 0; d < decks; d++) {
         for(let s of ss) {
             for(let v of vs) {
@@ -59,9 +55,6 @@ function getBJScore(hand) {
 
 function isNaturalBlackjack(handCards) { return (handCards.length === 2 && getBJScore(handCards) === 21); }
 
-// =========================================================================
-// 1. VIP MULTIPLAYER BLACKJACK ENGINE
-// =========================================================================
 let mbjState = {
     status: 'BETTING', time: 15, turnTimer: 0, activeTurn: { seat: null, handIdx: 0 }, 
     dealer: { hand: [], score: 0 }, seats: { 1: null, 2: null, 3: null, 4: null, 5: null } 
@@ -191,7 +184,7 @@ setInterval(() => {
                 });
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
-                let animTime = ((activeSeats.length * 2) + 2) * 300 + 500; 
+                let animTime = ((activeSeats.length * 2) + 2) * 200 + 300; // SPED UP DEALING TIMEOUT
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
@@ -219,9 +212,6 @@ setInterval(() => {
     }
 }, 1000);
 
-// =========================================================================
-// SOCKET CONNECTION & ROUTES
-// =========================================================================
 io.on('connection', (socket) => {
     
     socket.on('autoJoinTest', (username) => {
@@ -274,7 +264,6 @@ io.on('connection', (socket) => {
         let amt = formatTC(amount);
         let s = mbjState.seats[seatNum];
         
-        // No credit check for testing
         if (s.hands.length === 0) s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false });
         s.hands[0].bet += amt; s.hands[0].originalBet += amt;
         io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
@@ -294,7 +283,7 @@ io.on('connection', (socket) => {
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                setTimeout(() => mbjNextTurn(), 1200); 
+                setTimeout(() => mbjNextTurn(), 400); // PACING REDUCED TO 400ms
             } else { 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
@@ -304,17 +293,15 @@ io.on('connection', (socket) => {
         }
         else if (actionData.type === 'double') {
             if (hand.cards.length !== 2) return;
-            // No credit check for testing
             hand.doubledAmount = hand.bet; hand.bet *= 2; hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards);
             hand.status = hand.score > 21 ? 'BUST' : 'STAND'; mbjState.turnTimer = 15; 
             io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-            setTimeout(() => mbjNextTurn(), 1200);
+            setTimeout(() => mbjNextTurn(), 400); // PACING REDUCED TO 400ms
         }
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2 || seat.hands.length >= 2) return; 
             let val1 = hand.cards[0].bjVal; let val2 = hand.cards[1].bjVal; if (val1 !== val2) return; 
             
-            // No credit check for testing
             let splitCard = hand.cards.pop();
             let hand2 = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true };
             hand.isSplitHand = true;
@@ -324,7 +311,7 @@ io.on('connection', (socket) => {
 
             seat.hands.push(hand2); mbjState.turnTimer = 15; 
             io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-            if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200);
+            if(hand.score === 21) setTimeout(() => mbjNextTurn(), 400); // PACING REDUCED TO 400ms
         }
     });
 
