@@ -76,21 +76,6 @@
         .game-card { width: 320px; height: 380px; background: #020813; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; padding: 30px 20px; cursor: pointer; transition: 0.3s; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
         .game-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 40px rgba(0,162,255,0.2); }
 
-        /* ================= HORSE DERBY UI ================= */
-        .derby-board { width: 1000px; height: 550px; background: #1a1a1a; border-radius: 20px; position: relative; border: 15px solid #333; box-shadow: 0 30px 60px rgba(0,0,0,0.9); display: flex; flex-direction: column; overflow: hidden; }
-        .derby-track-container { flex: 1; display: flex; flex-direction: column; background: #222; position: relative; border-bottom: 2px solid white; }
-        .derby-lane { flex: 1; border-bottom: 2px dashed rgba(255,255,255,0.2); position: relative; display: flex; align-items: center; }
-        .finish-line { position: absolute; right: 50px; top: 0; bottom: 0; width: 10px; background: repeating-linear-gradient(to bottom, #fff, #fff 10px, #000 10px, #000 20px); z-index: 5; }
-        .derby-horse { position: absolute; left: 0; font-size: 2.5rem; transition: left 0.1s linear; z-index: 10; text-shadow: 0 5px 10px rgba(0,0,0,0.8); }
-        
-        .derby-bet-panel { padding: 20px; background: #111; display: flex; justify-content: center; gap: 15px; }
-        .derby-horse-btn { flex: 1; padding: 15px; border-radius: 10px; border: 2px solid; background: rgba(0,0,0,0.5); color: white; cursor: pointer; text-align: center; transition: 0.2s; }
-        .derby-horse-btn:hover, .derby-horse-btn.selected { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
-        .derby-horse-name { font-weight: 900; font-size: 1.2rem; text-transform: uppercase; }
-        .derby-horse-odds { color: var(--success); font-weight: 800; font-size: 0.9rem; }
-        
-        .derby-hud { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 2rem; font-weight: 900; color: white; text-shadow: 0 2px 10px black; z-index: 20; background: rgba(0,0,0,0.7); padding: 5px 20px; border-radius: 10px; border: 1px solid var(--ps-glow); }
-
         /* ================= VIP BLACKJACK UI ================= */
         .game-board-wrapper { display: flex; flex-direction: column; align-items: center; }
 
@@ -231,56 +216,7 @@
                     <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Multiplayer Table</div>
                 </div>
             </div>
-            <div class="game-card" onclick="openGame('solo')">
-                <i class="fas fa-user" style="font-size:4rem;"></i>
-                <div>
-                    <div style="font-size: 1.5rem; font-weight:900;">SOLO BLACKJACK</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Private Table</div>
-                </div>
-            </div>
-            <div class="game-card" onclick="openGame('derby')">
-                <i class="fas fa-horse-head" style="font-size:4rem; color: #ffcc00;"></i>
-                <div>
-                    <div style="font-size: 1.5rem; font-weight:900;">HORSE DERBY</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Virtual Racing</div>
-                </div>
-            </div>
         </div>
-      </div>
-
-      <div id="view-derby" class="view-container hidden">
-          <div class="derby-board">
-              <div class="derby-hud" id="derby-status-text">BETTING: 20s</div>
-              
-              <div class="derby-track-container" id="derby-track">
-                  <div class="finish-line"></div>
-              </div>
-              
-              <div class="derby-bet-panel" id="derby-horses-panel"></div>
-          </div>
-          
-          <div class="chip-rack-container" id="derby-chip-rack" style="margin-top: 15px;">
-              <div id="derby-rack-alert" class="rack-error-tooltip">SELECT A HORSE</div>
-              <div style="flex: 1; display: flex; justify-content: flex-start;">
-                  <button class="rack-btn rack-btn-clear" onclick="clearDerbyBet()"><i class="fas fa-times"></i> CLEAR</button>
-              </div>
-              <div style="flex: 2; display: flex; justify-content: center; gap: 15px;">
-                  <div class="rack-chip chip-10" style="--c-bg:#444;" onclick="addDerbyBet(10)">10</div>
-                  <div class="rack-chip chip-100" style="--c-bg:#00a2ff;" onclick="addDerbyBet(100)">100</div>
-                  <div class="rack-chip chip-1k" style="--c-bg:#ff3366;" onclick="addDerbyBet(1000)">1K</div>
-                  <div class="rack-chip chip-10k" style="--c-bg:#00e676; color:black;" onclick="addDerbyBet(10000)">10K</div>
-                  <div class="rack-chip chip-50k" style="--c-bg:#ffcc00; color:black;" onclick="addDerbyBet(50000)">50K</div>
-              </div>
-              <div style="flex: 1; display: flex; justify-content: flex-end; gap: 10px;">
-                  <input type="number" id="derby-custom-bet" class="custom-input" placeholder="Amount" min="0">
-                  <button class="rack-btn rack-btn-confirm" onclick="confirmDerbyBet()">BET <i class="fas fa-check"></i></button>
-              </div>
-          </div>
-      </div>
-
-      <div id="view-solo" class="view-container hidden">
-          <h1 style="font-size: 3rem; font-weight: 900; color: var(--ps-glow);">SOLO BLACKJACK</h1>
-          <p style="font-size: 1.2rem;">Private Table Initializing...</p>
       </div>
 
       <div id="view-mbj" class="view-container hidden">
@@ -458,10 +394,6 @@
             renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
             renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
             switchView('mbj');
-        } else if (id === 'derby') {
-            switchView('derby');
-        } else if (id === 'solo') {
-            switchView('solo');
         }
     }
 
@@ -485,80 +417,6 @@
         let box = document.getElementById('chat-messages'); let isMe = data.username === myUsername;
         let html = `<div class="chat-msg-row" style="align-items: ${isMe ? 'flex-end' : 'flex-start'};"><div class="chat-meta">${isMe ? 'You' : data.username} • ${data.time}</div><div class="chat-text ${isMe ? 'me' : 'other'}">${data.message}</div></div>`;
         box.innerHTML += html; box.scrollTop = box.scrollHeight;
-    });
-
-    // =========================================================================
-    // HORSE DERBY LOGIC
-    // =========================================================================
-    let localDerbyBet = 0;
-    let selectedHorseId = null;
-
-    function renderDerbyState(state) {
-        let track = document.getElementById('derby-track');
-        let panel = document.getElementById('derby-horses-panel');
-        let statusText = document.getElementById('derby-status-text');
-
-        if (state.status === 'BETTING') statusText.innerText = `BETTING: ${state.time}s`;
-        else if (state.status === 'RACING') statusText.innerText = `RACING!`;
-        else statusText.innerText = `FINISHED!`;
-
-        track.innerHTML = '<div class="finish-line"></div>';
-        panel.innerHTML = '';
-
-        state.horses.forEach(h => {
-            track.innerHTML += `<div class="derby-lane"><i class="fas fa-horse-head derby-horse" style="color: ${h.color}; left: ${h.pos}%"></i></div>`;
-            
-            let myTotalBet = (state.bets[myUsername] && state.bets[myUsername][h.id]) ? state.bets[myUsername][h.id] : 0;
-            let betInfo = myTotalBet > 0 ? `<div style="margin-top:5px; color:var(--credits); font-weight:900;">${myTotalBet} TC</div>` : '';
-            
-            let btnClass = selectedHorseId === h.id ? 'selected' : '';
-            panel.innerHTML += `
-                <div class="derby-horse-btn ${btnClass}" style="border-color: ${h.color};" onclick="selectHorse(${h.id})">
-                    <div class="derby-horse-name">${h.name}</div>
-                    <div class="derby-horse-odds">${h.odds}x</div>
-                    ${betInfo}
-                </div>
-            `;
-        });
-
-        let rack = document.getElementById('derby-chip-rack');
-        if(state.status === 'BETTING') rack.classList.remove('chip-rack-locked');
-        else rack.classList.add('chip-rack-locked');
-    }
-
-    function selectHorse(id) { selectedHorseId = id; socket.emit('joinRoom', 'derby'); }
-    function addDerbyBet(amt) {
-        if(!selectedHorseId) return showRackAlert('SELECT HORSE FIRST', 'derby-rack-alert');
-        if(myCredits >= localDerbyBet + amt) { localDerbyBet += amt; document.getElementById('derby-custom-bet').value = localDerbyBet; } 
-        else { showRackAlert('NOT ENOUGH CREDITS', 'derby-rack-alert'); }
-    }
-    function clearDerbyBet() { localDerbyBet = 0; document.getElementById('derby-custom-bet').value = ''; }
-    function confirmDerbyBet() {
-        if(!selectedHorseId) return showRackAlert('SELECT HORSE', 'derby-rack-alert');
-        let customInput = document.getElementById('derby-custom-bet').value;
-        let v = parseInt(customInput);
-        if (!isNaN(v) && v > 0) localDerbyBet = v;
-        if(localDerbyBet < 10) return showRackAlert('MIN BET 10 TC', 'derby-rack-alert');
-        socket.emit('derbyPlaceBet', { horseId: selectedHorseId, amount: localDerbyBet });
-        localDerbyBet = 0; document.getElementById('derby-custom-bet').value = '';
-    }
-
-    socket.on('derbyUpdate', (data) => {
-        if(activeGame !== 'derby') return;
-        if(data.event === 'state' || data.event === 'start_race' || data.event === 'race_progress') {
-            if(data.state) renderDerbyState(data.state);
-            else if(data.horses) {
-                let track = document.getElementById('derby-track');
-                track.innerHTML = '<div class="finish-line"></div>';
-                data.horses.forEach(h => { track.innerHTML += `<div class="derby-lane"><i class="fas fa-horse-head derby-horse" style="color: ${h.color}; left: ${h.pos}%"></i></div>`; });
-            }
-        } else if (data.event === 'timer') {
-            document.getElementById('derby-status-text').innerText = `BETTING: ${data.time}s`;
-        } else if (data.event === 'race_finished') {
-            document.getElementById('derby-status-text').innerText = `${data.winner.name} WINS!`;
-            let myWin = data.results[myUsername];
-            if (myWin > 0) showGlobalAlert(`WON +${myWin} TC`, 'success');
-        }
     });
 
     // =========================================================================
