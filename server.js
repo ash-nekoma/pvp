@@ -148,7 +148,7 @@ async function mbjResolveDealer() {
         }
         mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-    }, 4000); 
+    }, 4500); 
 }
 
 setInterval(() => {
@@ -184,7 +184,7 @@ setInterval(() => {
                 });
 
                 let hiddenDealer = [mbjState.dealer.hand[0], { raw: '?', suitHtml: `<span class="card-black">?</span>`, bjVal: 0 }];
-                let animTime = ((activeSeats.length * 2) + 2) * 200 + 300; // SPED UP DEALING TIMEOUT
+                let animTime = ((activeSeats.length * 2) + 2) * 400 + 400; // SLOWED DOWN DISTRIBUTION PACING
 
                 io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
 
@@ -221,9 +221,13 @@ io.on('connection', (socket) => {
 
     socket.on('sendChatMessage', (msg) => {
         if(socket.user) {
-            let time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            io.emit('receiveChatMessage', { username: socket.user.username, message: msg, time: time });
+            io.emit('receiveChatMessage', { username: socket.user.username, message: msg });
         }
+    });
+
+    // PUSH TO TALK VOICE RELAY (Discord Style)
+    socket.on('voiceStream', (data) => {
+        socket.broadcast.emit('voiceStream', data);
     });
 
     socket.on('joinRoom', (room) => { 
@@ -283,7 +287,7 @@ io.on('connection', (socket) => {
             if (hand.score >= 21) { 
                 hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                setTimeout(() => mbjNextTurn(), 400); // PACING REDUCED TO 400ms
+                setTimeout(() => mbjNextTurn(), 1200); // PACING: Give time to see the bust
             } else { 
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
             }
@@ -296,7 +300,7 @@ io.on('connection', (socket) => {
             hand.doubledAmount = hand.bet; hand.bet *= 2; hand.cards.push(drawCard()); hand.score = getBJScore(hand.cards);
             hand.status = hand.score > 21 ? 'BUST' : 'STAND'; mbjState.turnTimer = 15; 
             io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-            setTimeout(() => mbjNextTurn(), 400); // PACING REDUCED TO 400ms
+            setTimeout(() => mbjNextTurn(), 1200);
         }
         else if (actionData.type === 'split') {
             if (hand.cards.length !== 2 || seat.hands.length >= 2) return; 
@@ -311,7 +315,7 @@ io.on('connection', (socket) => {
 
             seat.hands.push(hand2); mbjState.turnTimer = 15; 
             io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
-            if(hand.score === 21) setTimeout(() => mbjNextTurn(), 400); // PACING REDUCED TO 400ms
+            if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200); 
         }
     });
 
