@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stick N' Trade | Premium Casino</title>
+    <title>Stick N' Trade | Premium Casino Test</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,23 +35,15 @@
         .main-wrapper { flex: 1; position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .view-container { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
 
-        /* ================= AUTHENTICATION UI ================= */
-        .auth-card { background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); border-radius: 15px; padding: 40px; width: 350px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.8); text-align: center; }
-        .auth-card h2 { color: white; font-weight: 900; letter-spacing: 2px; font-size: 1.8rem; margin-bottom: 10px; }
-        .auth-input { background: #111; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 15px; border-radius: 8px; font-family: 'Outfit'; font-size: 1rem; text-align: center; }
-        .auth-input:focus { border-color: var(--ps-glow); box-shadow: 0 0 10px rgba(0, 162, 255, 0.3); }
-        .auth-btn { background: var(--ps-glow); color: black; border: none; padding: 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 1.1rem; margin-top: 10px; }
-        .auth-btn:hover { background: white; transform: translateY(-2px); }
-
         .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.15); padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); }
 
         .btn-back-fixed { position: absolute; top: 20px; left: 25px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .btn-back-fixed:hover { background: white; color: black; }
 
-        /* ================= DOCKED LIVE CHAT ================= */
-        .chat-widget { position: fixed; bottom: 20px; right: 20px; width: 280px; height: 380px; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 15px; display: flex; flex-direction: column; z-index: 10000; box-shadow: 0 15px 30px rgba(0,0,0,0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; transform-origin: bottom right; }
-        .chat-widget.minimized { transform: scale(0.2) translate(120px, 120px); opacity: 0.8; cursor: pointer; }
+        /* ================= DOCKED LIVE CHAT (Moved to Left) ================= */
+        .chat-widget { position: fixed; bottom: 20px; left: 20px; width: 280px; height: 380px; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 15px; display: flex; flex-direction: column; z-index: 10000; box-shadow: 0 15px 30px rgba(0,0,0,0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; transform-origin: bottom left; }
+        .chat-widget.minimized { transform: scale(0.2) translate(-120px, 120px); opacity: 0.8; cursor: pointer; }
         .chat-header { padding: 12px; background: rgba(0, 162, 255, 0.1); border-bottom: 1px solid var(--glass-border); font-weight: 900; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; color: var(--ps-glow); border-radius: 15px 15px 0 0; cursor: pointer; }
         .chat-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem; }
         .chat-msg-row { display: flex; flex-direction: column; }
@@ -86,8 +78,6 @@
         .mbj-logo h1 { font-size: 3.5rem; letter-spacing: 12px; margin-bottom: 5px; color: #000; }
         .mbj-logo p { font-weight: 900; font-size: 1rem; letter-spacing: 4px; color: #000; margin-bottom: 5px;}
         .mbj-logo .limits { font-weight: 900; font-size: 0.8rem; letter-spacing: 2px; color: #000; }
-
-        .mbj-balance-hud { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); padding: 8px 20px; border-radius: 12px; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
 
         .dealer-timer-text { color: white; font-size: 4rem; font-family: 'Rajdhani', monospace; font-weight: 900; text-shadow: 0 5px 15px black, 0 0 20px rgba(255, 180, 0, 0.5); margin-bottom: 10px; display: none; line-height: 1; }
 
@@ -185,7 +175,7 @@
 
   <header class="topbar">
       <div class="brand-title" onclick="switchView('casino')">STICK N' TRADE</div>
-      <div class="user-hud" id="user-hud">
+      <div class="user-hud" id="user-hud" style="display:flex;">
           <i class="fas fa-user-circle" style="color:var(--ps-glow)"></i> 
           <span id="player-name-display">Loading...</span>
       </div>
@@ -196,24 +186,14 @@
           <i class="fas fa-arrow-left"></i> LEAVE TABLE
       </button>
 
-      <div id="view-auth" class="view-container">
-          <div class="auth-card">
-              <h2>JOIN CASINO</h2>
-              <input type="text" id="auth-user" class="auth-input" placeholder="Username" onkeypress="handleAuthKey(event)">
-              <input type="password" id="auth-pass" class="auth-input" placeholder="Password" onkeypress="handleAuthKey(event)">
-              <button class="auth-btn" onclick="attemptAuth()">LOGIN / SIGNUP</button>
-              <div id="auth-err" style="color: var(--danger); font-weight: 900; font-size: 0.9rem; display: none;"></div>
-          </div>
-      </div>
-      
-      <div id="view-casino" class="view-container hidden">
+      <div id="view-casino" class="view-container">
         <h1 style="font-size: 3rem; font-weight: 900; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;">SELECT TABLE</h1>
         <div class="lobby-modes-container">
             <div class="game-card" onclick="openGame('mbj')">
                 <i class="fas fa-cards" style="font-size:4rem;"></i>
                 <div>
                     <div style="font-size: 1.5rem; font-weight:900;">VIP BLACKJACK</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Multiplayer Table</div>
+                    <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">Test Environment</div>
                 </div>
             </div>
         </div>
@@ -230,11 +210,6 @@
                       <p>PAYS 3 TO 2</p>
                       <p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
                       <div class="limits">MIN 10 TC | MAX 50,000 TC</div>
-                  </div>
-
-                  <div class="mbj-balance-hud">
-                      <div style="font-size:0.7rem; color:#ccc; font-weight:900;">BALANCE</div>
-                      <div id="bj-bal" style="font-size:1.3rem; font-weight:900; color:var(--credits);">0 TC</div>
                   </div>
 
                   <div class="mbj-shoe"></div>
@@ -271,7 +246,7 @@
       </div>
   </div>
 
-  <div class="chat-widget minimized" id="chat-widget" style="display:none;" onclick="toggleChat(event)">
+  <div class="chat-widget minimized" id="chat-widget" onclick="toggleChat(event)">
       <div class="chat-header">
           <span><i class="fas fa-comments"></i> LIVE CHAT</span>
           <i class="fas fa-chevron-up" id="chat-toggle-icon"></i>
@@ -319,44 +294,19 @@
     }
 
     const socket = io(); 
-    let myUsername = '', myCredits = 0;
+    let myUsername = 'Tester_' + Math.floor(Math.random() * 1000); // Auto generate tester name
     let activeGame = null;
     let mbjGameState = 'BETTING';
     let localPendingBet = 0;
     let localSeatId = null;
     let renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; 
 
-    window.onload = () => { switchView('auth'); };
-
-    function handleAuthKey(e) { if(e.key === 'Enter') attemptAuth(); }
-    
-    function attemptAuth() {
-        let u = document.getElementById('auth-user').value.trim();
-        let p = document.getElementById('auth-pass').value.trim();
-        document.getElementById('auth-err').style.display = 'none';
-        if(u && p) socket.emit('login', {username: u, password: p});
-    }
-
-    socket.on('loginError', (msg) => {
-        let err = document.getElementById('auth-err');
-        err.innerText = msg; err.style.display = 'block';
-    });
-
-    socket.on('loginSuccess', (data) => { 
-        myUsername = data.username; 
-        updateBalance(data.credits); 
+    // AUTO BYPASS LOGIN
+    window.onload = () => { 
         document.getElementById('player-name-display').innerText = myUsername; 
-        document.getElementById('user-hud').style.display = 'flex';
+        socket.emit('autoJoinTest', myUsername);
         switchView('casino'); 
-    });
-    
-    socket.on('balanceUpdateData', (data) => { updateBalance(data.credits); });
-
-    function updateBalance(amt) {
-        myCredits = amt;
-        let b = document.getElementById('bj-bal');
-        if(b) b.innerText = amt.toLocaleString() + ' TC';
-    }
+    };
 
     function showRackAlert(msg, id='rack-alert') {
         let r = document.getElementById(id);
@@ -376,10 +326,10 @@
         let v = document.getElementById('view-' + viewId); 
         if (v) v.classList.remove('hidden'); 
         
-        document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino' || viewId === 'auth');
+        document.getElementById('global-back-btn').classList.toggle('hidden', viewId === 'casino');
         
         let chat = document.getElementById('chat-widget');
-        if (viewId === 'casino' || viewId === 'auth') chat.style.display = 'none'; else chat.style.display = 'flex';
+        if (viewId === 'casino') chat.style.display = 'none'; else chat.style.display = 'flex';
     }
 
     function backToHub() {
@@ -603,14 +553,14 @@
         }
     }
 
+    // Removed credit limits - Bet away!
     function addLocalBet(amt) {
-        if(myCredits >= localPendingBet + amt) { localPendingBet += amt; renderMBJSeats(); } 
-        else { showRackAlert('Not enough credits'); }
+        localPendingBet += amt; 
+        renderMBJSeats(); 
     }
     
     function clearLocalBet() { localPendingBet = 0; renderMBJSeats(); }
     
-    // OPTIMISTIC UI: Instantly converts pending bets to active local chips to fix ping flickering
     function confirmLocalBet() {
         let customInput = document.getElementById('custom-bet').value;
         let v = parseInt(customInput);
