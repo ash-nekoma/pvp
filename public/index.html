@@ -220,6 +220,9 @@
         @keyframes popBalance { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); } 100% { transform: scale(1); } } .anim-pop { animation: popBalance 0.6s ease-out; }
         @keyframes popBet { 0% { transform: scale(1); } 50% { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.5); } 100% { transform: scale(1); } } .anim-pop-bet { animation: popBet 0.3s ease-out; }
         @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } 100% { transform: rotate(0deg); } } .anim-shake { animation: shake 0.3s infinite; }
+        
+        .shake-anim { animation: shakeIt 0.4s infinite; }
+        @keyframes shakeIt { 0% { transform: rotate(0deg) translate(0,0); } 25% { transform: rotate(5deg) translate(2px,-2px); } 50% { transform: rotate(0deg) translate(0,0); } 75% { transform: rotate(-5deg) translate(-2px,2px); } 100% { transform: rotate(0deg) translate(0,0); } }
 
         /* STRICT CENTERED MAIN WRAPPER */
         .main-wrapper { 
@@ -287,10 +290,9 @@
         .game-box { display: flex; flex-direction: column; width: 100%; max-width: 850px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.6); height: 600px; flex-shrink: 0; position: relative;} 
         .main-panel { display: flex; flex-direction: column; height: 100%; position: relative;}
         
-        .game-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; perspective: 1000px; padding: 20px;}
+        .game-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; perspective: 1000px; padding: 20px; overflow: hidden;}
         
-        /* Fixed clipping for tile glow */
-        .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px 25px 35px 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto; border-radius: 0 0 12px 12px;} 
+        .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto; border-radius: 0 0 12px 12px;} 
         .controls-full { display: flex; gap: 15px; justify-content: center; width: 100%; }
 
         /* SHARED LAYOUT WIDTH FIX */
@@ -298,10 +300,12 @@
         .shared-layout .main-panel { max-width: 850px; width: 100%; flex: 1; }
         
         .chat-panel { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; height: 100%; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .chat-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;}
-        .chat-msg { background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border-left: 3px solid var(--ps-light-blue); animation: popIn 0.2s ease-out; flex-shrink: 0;}
-        .chat-user { font-weight: 900; color: var(--ps-glow); margin-bottom: 5px; text-transform: uppercase; font-size: 0.85rem;}
-        .chat-sys { border-left-color: var(--success); color: var(--success); font-style: italic; font-weight: 600;}
+        .chat-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto;}
+        
+        .chat-line { font-size: 0.95rem; margin-bottom: 5px; line-height: 1.4; word-wrap: break-word; animation: popIn 0.2s ease-out; }
+        .chat-line .c-name { font-weight: 900; color: var(--ps-glow); margin-right: 5px; text-transform: uppercase; }
+        .chat-line .c-msg { color: white; font-weight: 500;}
+        .chat-sys { color: var(--success); font-style: italic; font-weight: 600; padding: 10px; background: rgba(0,230,118,0.1); border-left: 3px solid var(--success); border-radius: 6px; margin-bottom: 5px;}
 
         /* TIMER */
         .timer-box { background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); padding: 0 15px; height: 44px; border-radius: 8px; color: white; font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.5); transition: 0.3s; font-family: 'Rajdhani', monospace;} 
@@ -313,7 +317,13 @@
         .bet-grid.perya-grid { grid-template-columns: repeat(3, 1fr); gap: 10px;}
         .bet-btn { position: relative; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); color: white; padding: 15px 10px; min-height: 50px; border-radius: 8px; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;}
         .bet-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-        .bet-btn.has-bet { border-top: 2px solid var(--tile-color, var(--ps-glow)) !important; border-left: 2px solid var(--tile-color, var(--ps-glow)) !important; border-right: 2px solid var(--tile-color, var(--ps-glow)) !important; box-shadow: inset 0 0 15px rgba(255,255,255,0.1), 0 -5px 20px rgba(0,0,0,0.6); color: #fff !important; text-shadow: 0 0 10px var(--tile-color, var(--ps-glow)); transform: translateY(-3px); }
+        
+        .bet-btn.has-bet { 
+            border: 2px solid var(--tile-color, var(--ps-glow)) !important; 
+            box-shadow: 0 0 20px var(--tile-color, var(--ps-glow)), inset 0 0 15px rgba(255,255,255,0.1) !important; 
+            color: #fff !important; text-shadow: 0 0 10px var(--tile-color, var(--ps-glow)); transform: translateY(-3px); 
+        }
+        
         .bet-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; border-color: var(--glass-border) !important; color: var(--text-muted) !important; text-shadow: none !important;}
         
         .tile-bet-badge { position: absolute; top: -10px; right: -10px; background: var(--credits); color: black; font-size: 0.8rem; font-weight: 900; padding: 4px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.9); pointer-events: none; display: none; z-index: 10;}
@@ -381,10 +391,10 @@
 
         /* GAME ASSETS */
         .blackjack-scores { display: flex; justify-content: center; gap: 40px; width: 100%; align-items: flex-start; } 
-        .card-area { min-width: 250px; width: 250px; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 240px; } 
+        .card-area { min-width: 200px; width: fit-content; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 240px; } 
         .bj-title { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; } 
         .bj-score { font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 15px; line-height: 1; } 
-        .card-hand { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; width: 100%; } 
+        .card-hand { display: flex; gap: 8px; justify-content: center; width: 100%; } 
         .play-card { background: white; color: black; border-radius: 6px; width: 65px; height: 95px; border: 1px solid #ccc; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;} 
         .play-card .val { font-size: 1.6rem; line-height: 1; margin-bottom: 2px; } 
         .play-card .suit { font-size: 1.8rem; line-height: 1; } 
@@ -395,9 +405,6 @@
         .anim-flip { animation: flipCard 0.4s ease-in-out forwards; } 
         @keyframes flipCard { 0% { transform: rotateY(180deg); } 50% { transform: rotateY(90deg); color: transparent; } 51% { color: inherit; background: white; } 100% { transform: rotateY(0deg); background: white; color: black; } }
         
-        .dice-icon { font-size: 7rem; color: var(--text-muted); text-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: 0.1s; line-height: 1; } 
-        #d20-num { font-size: 6rem !important; line-height: 1; text-shadow: 0 10px 30px rgba(0,0,0,0.8); font-weight: 900 !important; }
-        
         /* STRICT 3D COIN FLIP FIX */
         .coin-wrapper { perspective: 1000px; width: 150px; height: 150px; margin: 0 auto; display: flex; justify-content: center; align-items: center; } 
         .coin-inner { width: 100%; height: 100%; transform-style: preserve-3d; position: relative; transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275); } 
@@ -405,7 +412,7 @@
         .coin-heads { background: radial-gradient(circle at 30% 30%, #fde047, #b45309); color: #78350f; border-color: #f59e0b; transform: rotateY(0deg); } 
         .coin-tails { background: radial-gradient(circle at 30% 30%, #e2e8f0, #475569); color: #0f172a; border-color: #94a3b8; transform: rotateY(180deg); } 
         .tossing { animation: toss 2s ease-in-out forwards; } 
-        @keyframes toss { 0% { transform: translateY(0); } 50% { transform: translateY(-100px) scale(1.2); } 100% { transform: translateY(0); } }
+        @keyframes toss { 0% { transform: translateY(0) rotateX(0deg); } 50% { transform: translateY(-150px) scale(1.2) rotateX(720deg); } 100% { transform: translateY(0) rotateX(1440deg); } }
 
         /* PERYA DICE FIX */
         .color-dice-container { display: flex; gap: 30px; justify-content: center; font-size: 6rem; margin-bottom: 20px; } 
@@ -427,13 +434,19 @@
         .dt-card { width: 120px !important; height: 170px !important; } 
         .dt-card .val { font-size: 3rem; } .dt-card .suit { font-size: 3.5rem; }
         
-        .sicbo-dice { display: flex; justify-content: center; gap: 30px; font-size: 6rem; margin-bottom: 10px; min-height: 120px; align-items: center; } 
-        .s-die { color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+        /* SIC BO DOME CSS */
+        .sicbo-dice { display: flex; justify-content: center; gap: 30px; font-size: 6rem; margin-bottom: 10px; align-items: center; } 
+        .s-die { color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8); z-index: 1;}
+        .dome-container { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 10; pointer-events: none; }
+        .dome { width: 300px; height: 180px; background: linear-gradient(to bottom, #111, #000); border-radius: 150px 150px 10px 10px; border: 2px solid #444; box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 10px 20px rgba(255,255,255,0.1); transition: transform 0.5s ease-in-out, opacity 0.5s; transform-origin: bottom center; }
+        .dome.shaking { animation: domeShake 0.1s infinite; }
+        .dome.reveal { transform: translateY(-200px); opacity: 0; }
+        @keyframes domeShake { 0% { transform: translate(0,0) rotate(0deg); } 25% { transform: translate(5px,-5px) rotate(2deg); } 50% { transform: translate(0,0) rotate(0deg); } 75% { transform: translate(-5px,5px) rotate(-2deg); } 100% { transform: translate(0,0) rotate(0deg); } }
 
         /* BUTTON FIXES & POPOVERS */
         #bj-action-controls { display: flex; flex-direction: row !important; gap: 10px; width: 100%; justify-content: center; }
-        .btn-rules.undo-btn { height: 48px; width: 48px; align-self: flex-end; flex-shrink: 0; }
-        #current-bets-popover { bottom: 100%; top: auto; right: 0; margin-bottom: 15px; width: 300px; z-index: 2500; cursor: default; display: flex; flex-direction: column;}
+        .btn-rules.undo-btn { height: 48px; width: 48px; align-self: center; flex-shrink: 0; }
+        #current-bets-popover { bottom: 100%; top: auto; left: 0; margin-bottom: 15px; width: 300px; z-index: 2500; cursor: default; display: flex; flex-direction: column;}
         .cb-item { display: flex; justify-content: space-between; align-items: center; font-weight: 800; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; white-space: nowrap; }
 
         /* ================= PTT & VIP BLACKJACK CSS ================= */
@@ -473,6 +486,10 @@
         @keyframes popInBadge { 0% { opacity: 0; transform: translateY(-50%) scale(0.5); } 100% { opacity: 1; transform: translateY(-50%) scale(1); } }
         .mbj-delay-pill { opacity: 0; animation: popInPill 0.2s 0.4s forwards; }
         @keyframes popInPill { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+        .anim-fly-in { animation: flyIn 0.3s ease-out forwards; }
+        @keyframes flyIn { 0% { opacity: 0; transform: translateY(-150px) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        .anim-fly-in-doubled { animation: flyInDoubled 0.3s ease-out forwards; }
+        @keyframes flyInDoubled { 0% { opacity: 0; transform: translate(30px, -150px) rotate(90deg) scale(0.8); } 100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } }
         .mbj-action-row { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; height: 40px; transition: opacity 0.1s; z-index: 100; opacity: 0; pointer-events: none;}
         .mbj-action-row.show { opacity: 1; pointer-events: auto; }
         .mbj-action-btn { width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(to bottom, #555, #222); border: 2px solid #777; color: white; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 4px 0 #111, 0 6px 8px rgba(0,0,0,0.5); }
@@ -527,7 +544,7 @@
             }
             .mode-card, .game-card { scroll-snap-align: center; }
 
-            /* SHARED TABLE VERTICAL STACK & CHAT OVERLAY */
+            /* SHARED TABLE VERTICAL STACK */
             .shared-layout { flex-direction: column; height: calc(100vh - 150px); }
             .main-panel { height: 60vh; }
             .chat-panel { position: fixed; bottom: 0; left: 0; width: 100vw; height: 50vh; z-index: 1000; transform: translateY(100%); }
@@ -854,19 +871,15 @@
                     </div>
                     <div class="controls-grid" style="display:flex; flex-direction:column; align-items:center; gap:10px; padding: 25px 25px 35px 25px;">
                         
-                        <div id="d20-inputs-container" style="width:100%; max-width:350px;">
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                                <button class="bet-btn d20-toggle" data-type="highlow" data-val="high" style="--tile-color: var(--danger); min-height: 40px; font-size: 1rem;" onclick="toggleD20Bet(this)">HIGH (11-20)</button>
-                                <button class="bet-btn d20-toggle" data-type="highlow" data-val="low" style="--tile-color: var(--ps-glow); min-height: 40px; font-size: 1rem;" onclick="toggleD20Bet(this)">LOW (1-10)</button>
-                                <button class="bet-btn d20-toggle" data-type="oddeven" data-val="odd" style="--tile-color: var(--playable); min-height: 40px; font-size: 1rem;" onclick="toggleD20Bet(this)">ODD</button>
-                                <button class="bet-btn d20-toggle" data-type="oddeven" data-val="even" style="--tile-color: var(--credits); min-height: 40px; font-size: 1rem;" onclick="toggleD20Bet(this)">EVEN</button>
-                            </div>
+                        <div class="input-group" style="margin:0 auto; width:150px;">
+                            <label style="text-align:center">BET AMOUNT</label>
+                            <input type="number" id="d20-bet" class="input-control bet-input" placeholder="10">
                         </div>
-
-                        <div class="input-group" style="margin:10px 0 0 0; width: 100%; max-width:350px;">
-                            <input type="number" id="d20-bet" class="input-control bet-input" placeholder="Bet Per Selection (TC)">
+                        <div style="display:flex; gap:10px; width:100%; justify-content:center; max-width: 300px;">
+                            <button class="btn-play d20-toggle" id="btn-d20-odd" data-type="oddeven" data-val="odd" style="flex:1; --tile-color: var(--playable); background: rgba(255,255,255,0.1); border-color: white;" onclick="toggleD20Bet(this)">Odd</button>
+                            <button class="btn-play d20-toggle" id="btn-d20-even" data-type="oddeven" data-val="even" style="flex:1; --tile-color: var(--credits); background: rgba(255,255,255,0.1); border-color: white;" onclick="toggleD20Bet(this)">Even</button>
                         </div>
-                        <button class="btn-play" id="btn-d20" onclick="playD20()" style="width: 100%; max-width: 350px; background: #ff3366; border: none;">ROLL D20</button>
+                        <button class="btn-play" id="btn-d20" onclick="playD20()" style="width: 100%; max-width: 300px; background: #ff3366; border: none; margin-top: 10px;">ROLL D20</button>
                     </div>
                   </div>
                 </div>
@@ -948,8 +961,9 @@
                     </div>
 
                     <div class="controls-grid hidden" id="bj-action-controls" style="padding: 25px 25px 35px 25px;">
-                        <button class="btn-play" onclick="hitBlackjack()" id="btn-bj-hit" style="flex:1; max-width:150px; background: rgba(0,162,255,0.2); border-color: var(--ps-glow); color: var(--ps-glow); white-space: nowrap;">HIT</button>
-                        <button class="btn-play" onclick="standBlackjack()" id="btn-bj-stand" style="flex:1; max-width:150px; background: rgba(255,51,102,0.2); border-color: var(--danger); color: var(--danger); white-space: nowrap;">STAND</button>
+                        <button class="btn-play" onclick="hitBlackjack()" id="btn-bj-hit" style="flex:1; max-width:120px; background: rgba(0,162,255,0.2); border-color: var(--ps-glow); color: var(--ps-glow); white-space: nowrap;">HIT</button>
+                        <button class="btn-play" onclick="standBlackjack()" id="btn-bj-stand" style="flex:1; max-width:120px; background: rgba(255,51,102,0.2); border-color: var(--danger); color: var(--danger); white-space: nowrap;">STAND</button>
+                        <button class="btn-play hidden" onclick="doubleBlackjack()" id="btn-bj-double" style="flex:1; max-width:120px; background: rgba(255,204,0,0.2); border-color: var(--credits); color: var(--credits); white-space: nowrap;">DOUBLE</button>
                     </div>
                   </div>
                 </div>
@@ -980,8 +994,7 @@
                         <div class="result-overlay-shared" id="sg-overlay"><div class="res-title" id="sg-res-title"></div><div class="res-payout" id="sg-res-payout" style="display:none"></div></div>
                     </div>
 
-                    <div class="controls-grid" id="sg-controls-container">
-                      </div>
+                    <div class="controls-grid" id="sg-controls-container"></div>
                   </div>
                   
                   <div class="glass-panel chat-panel" id="sg-chat-panel">
@@ -1001,10 +1014,10 @@
                         </div>
                     </div>
                     <div class="chat-body custom-scroll" id="sg-chat">
-                        <div class="chat-msg chat-sys">Connected to server.</div>
+                        <div class="chat-line chat-sys">Connected to server.</div>
                     </div>
                     <div class="chat-input-area" style="padding:15px; border-top:1px solid var(--glass-border); flex-shrink: 0; display:flex; gap:8px; align-items:center;">
-                        <input type="text" id="chat-input" class="input-control" style="flex:1;" placeholder="Say something... (/play URL)" onkeypress="if(event.key==='Enter'){sendChat();}">
+                        <input type="text" id="chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter'){sendChat();}">
                         <button class="mbj-chat-send-btn" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
                         <button class="ptt-btn" id="ptt-btn-shared" onmousedown="startPTT('ptt-btn-shared')" onmouseup="stopPTT('ptt-btn-shared')" onmouseleave="stopPTT('ptt-btn-shared')" ontouchstart="startPTT('ptt-btn-shared')" ontouchend="stopPTT('ptt-btn-shared')" ontouchcancel="stopPTT('ptt-btn-shared')"><i class="fas fa-microphone"></i></button>
                     </div>
@@ -1064,12 +1077,10 @@
                         </div>
                     </div>
                     <div class="chat-messages custom-scroll" id="mbj-chat-messages">
-                        <div class="chat-msg-row" style="align-items: center; opacity: 0.5;">
-                            <span style="font-size:0.7rem; margin-top:10px;">Welcome to VIP Premium.</span>
-                        </div>
+                        <div class="chat-line chat-sys">Welcome to VIP Premium.</div>
                     </div>
                     <div class="chat-input-area" style="padding:15px; border-top:1px solid var(--glass-border); display:flex; gap:8px; align-items:center;">
-                        <input type="text" id="mbj-chat-input" class="input-control" style="flex:1;" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMBJChat();">
+                        <input type="text" id="mbj-chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter') sendMBJChat();">
                         <button class="mbj-chat-send-btn" onclick="sendMBJChat()"><i class="fas fa-paper-plane"></i></button>
                         <button class="ptt-btn" id="ptt-btn-mbj" onmousedown="startPTT('ptt-btn-mbj')" onmouseup="stopPTT('ptt-btn-mbj')" onmouseleave="stopPTT('ptt-btn-mbj')" ontouchstart="startPTT('ptt-btn-mbj')" ontouchend="stopPTT('ptt-btn-mbj')" ontouchcancel="stopPTT('ptt-btn-mbj')"><i class="fas fa-microphone"></i></button>
                     </div>
@@ -1266,7 +1277,7 @@
     socket.on('globalChatMessage', (data) => {
         let cb = document.getElementById('sg-chat'); 
         if (cb && window.activeSharedGame) { 
-            cb.insertAdjacentHTML('beforeend', `<div class="chat-msg chat-sys">${data.text}</div>`);
+            cb.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys">${data.text}</div>`);
             cb.scrollTop = cb.scrollHeight;
         }
     });
@@ -1724,7 +1735,7 @@
     }
 
     const gameInfoMap = {
-      'd20': { title: "D20", body: "<ul><li>Select multiple bets to increase your coverage.</li><li><strong>High/Low:</strong> Low (1-10) or High (11-20). Pays <strong>1.95x</strong>.</li><li><strong>Odd/Even:</strong> Pays <strong>1.95x</strong>.</li></ul>" },
+      'd20': { title: "D20", body: "<ul><li>Select your bet to increase your coverage.</li><li><strong>Odd/Even:</strong> Pays <strong>1.95x</strong>.</li></ul>" },
       'coinflip': { title: "Coin Flip", body: "<ul><li>Enter your bet and choose <strong>Heads</strong> or <strong>Tails</strong>.</li><li>Winning pays <strong>1.95x</strong> your bet.</li><li>Playable Bonus is used before Main TC.</li></ul>" },
       'baccarat': { title: "Baccarat", body: "<ul><li>Bet on Player, Banker, or Tie. Closest to <strong>9</strong> wins.</li><li>Player pays <strong>2x</strong>. Banker pays <strong>1.95x</strong>.</li><li>Tie pays <strong>9x</strong>. Player/Banker bets push.</li></ul>" },
       'blackjack': { title: "Blackjack", body: "<ul><li>Beat the dealer without going over 21.</li><li>Dealer must stand on <strong>17 or higher</strong>.</li><li>Natural Blackjack pays <strong>2.5x</strong>. Standard wins pay <strong>2x</strong>. Ties push.</li></ul>" },
@@ -1848,7 +1859,7 @@
         socket.emit('joinRoom', id);
         if (sConf[id] && sConf[id].setupUI) sConf[id].setupUI();
         document.getElementById('sg-title').innerText = sConf[id].title;
-        document.getElementById('sg-chat').innerHTML = '<div class="chat-msg chat-sys">Connected to server.</div>';
+        document.getElementById('sg-chat').innerHTML = '<div class="chat-line chat-sys">Connected to server.</div>';
         switchView('shared-game');
     }
 
@@ -1891,11 +1902,23 @@
         mySoloRounds.d20++;
     }
 
-    socket.on('d20Result', (data) => {
-        let i = document.getElementById('d20-icon'); let n = document.getElementById('d20-num');
-        i.style.display = 'none'; n.style.display = 'block';
+    socket.on('d20Result', async (data) => {
+        let icon = document.getElementById('d20-icon');
+        icon.classList.add('shake-anim'); sfx.tick();
+        await delay(1000); // Wait for shaking animation
+        
+        icon.classList.remove('shake-anim');
+        icon.style.display = 'none';
+        
+        let n = document.getElementById('d20-num');
+        n.style.display = 'block';
         let count = 0; sfx.coin();
-        window.d20AnimCycle = setInterval(() => { n.innerText = crypto.randomInt ? crypto.randomInt(1,21) : Math.floor(Math.random()*20)+1; count++; if(count > 15) { clearInterval(window.d20AnimCycle); finalizeD20(data); } }, 50);
+        
+        window.d20AnimCycle = setInterval(() => { 
+            n.innerText = crypto.randomInt ? crypto.randomInt(1,21) : Math.floor(Math.random()*20)+1; 
+            count++; 
+            if(count > 15) { clearInterval(window.d20AnimCycle); finalizeD20(data); } 
+        }, 50);
     });
 
     function finalizeD20(data) {
@@ -1972,6 +1995,7 @@
         
         document.getElementById('bj-p-hand').innerHTML = ''; document.getElementById('bj-d-hand').innerHTML = '';
         document.getElementById('bj-p-score').innerText = '0'; document.getElementById('bj-d-score').innerText = '0';
+        document.getElementById('btn-bj-double').classList.add('hidden'); // Hide double by default
         
         socket.emit('playSolo', { game: 'blackjack', action: 'start', bet: amt });
         mySoloRounds.blackjack++;
@@ -1993,9 +2017,15 @@
             if (!data.naturalBJ) {
                 document.getElementById('bj-start-controls').classList.add('hidden');
                 document.getElementById('bj-action-controls').classList.remove('hidden');
+                
+                // Show Double button if hand has 2 cards and balance allows
+                if (data.pHand.length === 2) {
+                    document.getElementById('btn-bj-double').classList.remove('hidden');
+                }
             } else { finalizeBJ(data); }
         } 
         else if (data.event === 'hit') {
+            document.getElementById('btn-bj-double').classList.add('hidden'); // Cannot double after hit
             sfx.deal();
             let c = data.pHand[data.pHand.length - 1];
             pHand.innerHTML += generateCardHTML(c, false, true);
@@ -2005,6 +2035,15 @@
             document.getElementById('bj-action-controls').classList.add('hidden');
             dHand.innerHTML = generateCardHTML(data.dHand[0], false, false) + generateCardHTML(data.dHand[1], false, false, true);
             document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, 2));
+            
+            // If they doubled, we need to show the 3rd player card flipping in
+            if (data.pHand.length > pHand.children.length) {
+                sfx.deal();
+                let c = data.pHand[data.pHand.length - 1];
+                pHand.innerHTML += generateCardHTML(c, false, true);
+                document.getElementById('bj-p-score').innerText = getBJScore(data.pHand);
+            }
+            
             await delay(600);
 
             for (let i = 2; i < data.dHand.length; i++) {
@@ -2038,6 +2077,7 @@
 
     function hitBlackjack() { sfx.click(); socket.emit('playSolo', { game: 'blackjack', action: 'hit' }); }
     function standBlackjack() { sfx.click(); socket.emit('playSolo', { game: 'blackjack', action: 'stand' }); }
+    function doubleBlackjack() { sfx.click(); socket.emit('playSolo', { game: 'blackjack', action: 'double' }); }
 
     // =======================================================
     // SHARED TABLES LOGIC
@@ -2055,7 +2095,7 @@
                 document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
                 document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
                 document.getElementById('sg-controls-container').innerHTML = `
-                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:flex-start; width:100%; align-items:center; margin-bottom:15px; gap: 10px;">
                         <button class="btn-rules undo-btn" onclick="undoSharedBet('dt')" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
                         <div class="input-group" style="width:150px; margin:0;"><input type="number" id="sg-bet" class="input-control bet-input" placeholder="Amount (TC)"></div>
                         <div class="dropdown-wrapper" style="position:relative;">
@@ -2077,11 +2117,17 @@
             title: 'SIC BO',
             setupUI: () => {
                 document.getElementById('sg-display').innerHTML = `
-                    <div class="sicbo-dice" id="sg-sicbo-dice">
-                        <i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i>
-                    </div><div id="sg-sicbo-sum" style="font-size:3rem; font-weight:900; color:white; opacity:0; transition:0.3s; margin-top:10px;">0</div>`;
+                    <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; min-height: 180px;">
+                        <div class="sicbo-dice" id="sg-sicbo-dice" style="margin: 0;">
+                            <i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i>
+                        </div>
+                        <div class="dome-container" id="sicbo-dome-container" style="display:none;">
+                            <div class="dome" id="sicbo-dome"></div>
+                        </div>
+                    </div>
+                    <div id="sg-sicbo-sum" style="font-size:3rem; font-weight:900; color:white; opacity:0; transition:0.3s; margin-top:10px;">0</div>`;
                 document.getElementById('sg-controls-container').innerHTML = `
-                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:flex-start; width:100%; align-items:center; margin-bottom:15px; gap: 10px;">
                         <button class="btn-rules undo-btn" onclick="undoSharedBet('sicbo')" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
                         <div class="input-group" style="width:150px; margin:0;"><input type="number" id="sg-bet" class="input-control bet-input" placeholder="Amount (TC)"></div>
                         <div class="dropdown-wrapper" style="position:relative;">
@@ -2092,9 +2138,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bet-grid">
-                        <button class="bet-btn sg-tile" data-choice="Small" style="--tile-color: var(--ps-glow);" onclick="placeSharedBet('Small')">SMALL (4-10)<div class="tile-bet-badge">0</div></button>
-                        <button class="bet-btn sg-tile" data-choice="Big" style="--tile-color: var(--danger);" onclick="placeSharedBet('Big')">BIG (11-17)<div class="tile-bet-badge">0</div></button>
+                    <div class="bet-grid" style="display: flex; gap: 15px; align-items: center; justify-content: center;">
+                        <button class="bet-btn sg-tile" data-choice="Small" style="flex:1; --tile-color: var(--ps-glow);" onclick="placeSharedBet('Small')">SMALL (4-10)<div class="tile-bet-badge">0</div></button>
+                        <div style="color:var(--text-muted); font-weight:900; font-size:0.8rem; text-align:center; width: 60px;">TRIPLE<br>LOSES</div>
+                        <button class="bet-btn sg-tile" data-choice="Big" style="flex:1; --tile-color: var(--danger);" onclick="placeSharedBet('Big')">BIG (11-17)<div class="tile-bet-badge">0</div></button>
                     </div>`;
             }
         },
@@ -2108,7 +2155,7 @@
                         <div class="color-die c-grey"><i class="fas fa-question"></i></div>
                     </div>`;
                 document.getElementById('sg-controls-container').innerHTML = `
-                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:flex-start; width:100%; align-items:center; margin-bottom:15px; gap: 10px;">
                         <button class="btn-rules undo-btn" onclick="undoSharedBet('perya')" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
                         <div class="input-group" style="width:150px; margin:0;"><input type="number" id="sg-bet" class="input-control bet-input" placeholder="Amount (TC)"></div>
                         <div class="dropdown-wrapper" style="position:relative;">
@@ -2140,7 +2187,7 @@
                 document.getElementById('sg-bac-p-hand').innerHTML = `<div class="play-card card-back">?</div><div class="play-card card-back">?</div>`;
                 document.getElementById('sg-bac-b-hand').innerHTML = `<div class="play-card card-back">?</div><div class="play-card card-back">?</div>`;
                 document.getElementById('sg-controls-container').innerHTML = `
-                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:flex-start; width:100%; align-items:center; margin-bottom:15px; gap: 10px;">
                         <button class="btn-rules undo-btn" onclick="undoSharedBet('baccarat')" title="Undo Last Bet"><i class="fas fa-undo"></i></button>
                         <div class="input-group" style="width:150px; margin:0;"><input type="number" id="sg-bet" class="input-control bet-input" placeholder="Amount (TC)"></div>
                         <div class="dropdown-wrapper" style="position:relative;">
@@ -2270,6 +2317,8 @@
         } else if (window.activeSharedGame === 'sicbo') {
             document.getElementById('sg-sicbo-dice').innerHTML = `<i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i><i class="fas fa-dice-d20 s-die"></i>`;
             document.getElementById('sg-sicbo-sum').style.opacity = '0';
+            let dome = document.getElementById('sicbo-dome-container');
+            if (dome) dome.style.display = 'none';
         }
     });
 
@@ -2283,7 +2332,9 @@
 
         if (data.room === 'dt') {
             document.getElementById('sg-dt-dragon').innerHTML = generateCardHTML(data.dCard, false, false, true, 'dt-card'); sfx.deal();
+            await delay(800); // PACING DELAY FOR TIGER CARD
             document.getElementById('sg-dt-tiger').innerHTML = generateCardHTML(data.tCard, false, false, true, 'dt-card'); sfx.deal();
+            
             setTimeout(() => {
                 document.getElementById('sg-dt-d-val').innerText = data.dCard.dtVal; document.getElementById('sg-dt-d-val').style.opacity = '1';
                 document.getElementById('sg-dt-t-val').innerText = data.tCard.dtVal; document.getElementById('sg-dt-t-val').style.opacity = '1';
@@ -2293,8 +2344,26 @@
             else { if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2; }
         } 
         else if (data.room === 'sicbo') {
+            let domeCont = document.getElementById('sicbo-dome-container');
+            let dome = document.getElementById('sicbo-dome');
+            
+            domeCont.style.display = 'flex';
+            dome.classList.remove('reveal');
+            dome.classList.add('shaking');
+            sfx.tick(); 
+            
+            await delay(1500); 
+            
+            dome.classList.remove('shaking');
+            
             let dc = document.getElementById('sg-sicbo-dice'); dc.innerHTML = '';
-            for(let i=0; i<3; i++) { dc.innerHTML += `<i class="fas fa-${dIconMap[data.roll[i]-1]} s-die anim-deal"></i>`; sfx.tick(); await delay(200); }
+            for(let i=0; i<3; i++) { dc.innerHTML += `<i class="fas fa-${dIconMap[data.roll[i]-1]} s-die"></i>`; }
+            
+            dome.classList.add('reveal');
+            sfx.deal(); 
+            
+            await delay(500); 
+            
             document.getElementById('sg-sicbo-sum').innerText = data.sum; document.getElementById('sg-sicbo-sum').style.opacity = '1';
 
             if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2;
@@ -2304,6 +2373,9 @@
             let diceEls = dc.querySelectorAll('.color-die');
             const cols = ['Yellow', 'White', 'Pink', 'Blue', 'Red', 'Green'];
             
+            // Remove question marks, ready for flash
+            diceEls.forEach(el => el.innerHTML = '');
+
             sfx.tick();
             let flashInt = setInterval(() => {
                 diceEls.forEach(el => {
@@ -2329,13 +2401,13 @@
         else if (data.room === 'baccarat') {
             let pHand = document.getElementById('sg-bac-p-hand'); let bHand = document.getElementById('sg-bac-b-hand');
             
-            pHand.innerHTML = generateCardHTML(data.pCards[0], false, false, true); sfx.deal(); await delay(300);
-            bHand.innerHTML = generateCardHTML(data.bCards[0], false, false, true); sfx.deal(); await delay(300);
-            pHand.innerHTML += generateCardHTML(data.pCards[1], false, false, true); sfx.deal(); await delay(300);
-            bHand.innerHTML += generateCardHTML(data.bCards[1], false, false, true); sfx.deal(); await delay(500);
+            pHand.innerHTML = generateCardHTML(data.pCards[0], false, false, true); sfx.deal(); await delay(500);
+            bHand.innerHTML = generateCardHTML(data.bCards[0], false, false, true); sfx.deal(); await delay(500);
+            pHand.innerHTML += generateCardHTML(data.pCards[1], false, false, true); sfx.deal(); await delay(500);
+            bHand.innerHTML += generateCardHTML(data.bCards[1], false, false, true); sfx.deal(); await delay(800);
 
-            if (data.p3Drawn) { pHand.innerHTML += generateCardHTML(data.pCards[2], false, true); sfx.deal(); await delay(500); }
-            if (data.b3Drawn) { bHand.innerHTML += generateCardHTML(data.bCards[2], false, true); sfx.deal(); await delay(500); }
+            if (data.p3Drawn) { pHand.innerHTML += generateCardHTML(data.pCards[2], false, true); sfx.deal(); await delay(800); }
+            if (data.b3Drawn) { bHand.innerHTML += generateCardHTML(data.bCards[2], false, true); sfx.deal(); await delay(800); }
 
             document.getElementById('sg-bac-p-score').innerText = data.pScore;
             document.getElementById('sg-bac-b-score').innerText = data.bScore;
@@ -2373,17 +2445,17 @@
         let input = document.getElementById('chat-input'); let msg = input.value.trim();
         if(msg.length > 0) { 
             let box = document.getElementById('sg-chat');
-            box.innerHTML += `<div class="chat-msg-row" style="align-items: flex-end;"><div class="chat-meta">You</div><div class="chat-text me">${msg}</div></div>`;
+            box.innerHTML += `<div class="chat-line"><span class="c-name">You:</span> <span class="c-msg">${msg}</span></div>`;
             box.scrollTop = box.scrollHeight;
             socket.emit('sendChat', { msg: msg }); 
             input.value = ''; 
         }
     }
     
-    socket.on('chatMessage', (data) => {
+socket.on('chatMessage', (data) => {
         let box = document.getElementById('sg-chat');
         if (box && window.activeSharedGame && window.activeSharedGame !== 'mbj') {
-            box.innerHTML += `<div class="chat-msg-row" style="align-items: flex-start;"><div class="chat-meta">${data.user}</div><div class="chat-text other">${data.text}</div></div>`;
+            box.innerHTML += `<div class="chat-line"><span class="c-name">${data.user}:</span> <span class="c-msg">${data.text}</span></div>`;
             box.scrollTop = box.scrollHeight;
         }
     });
