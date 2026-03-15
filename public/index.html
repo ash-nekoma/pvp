@@ -27,7 +27,6 @@
             --ps-glow: #00a2ff; 
             --glass-bg: rgba(0, 10, 25, 0.75); 
             --glass-border: rgba(255, 255, 255, 0.15); 
-            --glass-hover: rgba(255, 255, 255, 0.9); 
             --danger: #ff3366; 
             --success: #00e676; 
             --credits: #ffb400; 
@@ -60,11 +59,9 @@
         .custom-scroll::-webkit-scrollbar { width: 6px; display: block; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
 
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
-        select { appearance: none; cursor: pointer; }
         
         .hidden { display: none !important; }
 
@@ -103,7 +100,7 @@
         .btn-rules { background: rgba(0,0,0,0.5); color: var(--text-muted); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0;} 
         .btn-rules:hover { background: rgba(255,255,255,0.1); color: white; border-color: white; transform: scale(1.05); }
 
-        /* ================= HUD TOPBAR & DUAL CURRENCY ================= */
+        /* ================= HUD TOPBAR ================= */
         #app-container { display: none; height: 100vh; width: 100vw; overflow: hidden;}
         .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 99999; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 12px 25px; height: 75px; display: flex; align-items: center; padding-top: calc(12px + env(safe-area-inset-top));}
         .topbar-inner { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
@@ -115,7 +112,6 @@
         .brand-sub { color: var(--ps-glow); font-weight: 800; font-size: 0.9rem; letter-spacing: 3px; margin-top: 2px; text-transform: uppercase; }
 
         .topbar-right { display: flex; flex-direction: row; align-items: center; gap: 15px;}
-        
         .player-profile { display: flex; align-items: center; gap: 8px; font-weight: 800; color: white; font-size: 1rem; text-transform: uppercase; margin-right: 10px;}
         .player-profile i { color: var(--ps-glow); font-size: 1.4rem; }
 
@@ -148,7 +144,7 @@
         .radio-marquee { display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; color: var(--ps-glow); font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* DROPDOWN POPOVERS (Forced z-index) */
+        /* DROPDOWN POPOVERS */
         .dropdown-wrapper { position: relative; display: inline-block; }
         .custom-dropdown { position: absolute; top: 45px; right: -10px; width: 350px; background: rgba(0,5,15,0.95); border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); border-radius: 8px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 999999 !important; box-shadow: 0 25px 50px rgba(0,0,0,0.9); cursor: default;}
         
@@ -209,16 +205,12 @@
         }
         .local-flash.show { display: block; animation: flashAnimSubtle 2s forwards; }
         .local-flash.success { color: var(--success); text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 15px var(--success); }
-        @keyframes flashAnimSubtle { 
-            0% { opacity: 0; transform: translateY(20px); } 
-            15% { opacity: 1; transform: translateY(0); } 
-            80% { opacity: 1; } 
-            100% { opacity: 0; transform: translateY(-10px); } 
-        }
+        @keyframes flashAnimSubtle { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes popBalance { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); } 100% { transform: scale(1); } } .anim-pop { animation: popBalance 0.6s ease-out; }
         @keyframes popBet { 0% { transform: scale(1); } 50% { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.5); } 100% { transform: scale(1); } } .anim-pop-bet { animation: popBet 0.3s ease-out; }
+        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } 100% { transform: rotate(0deg); } } .anim-shake { animation: shake 0.3s infinite; }
         
         .shake-anim { animation: shakeIt 0.1s infinite; }
         @keyframes shakeIt { 0% { transform: rotate(0deg) translate(0,0); } 25% { transform: rotate(5deg) translate(3px,-3px); } 50% { transform: rotate(0deg) translate(0,0); } 75% { transform: rotate(-5deg) translate(-3px,3px); } 100% { transform: rotate(0deg) translate(0,0); } }
@@ -291,8 +283,7 @@
         
         .game-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; perspective: 1000px; padding: 20px; overflow: hidden;}
         
-        /* Fixed clipping for tile glow */
-        .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px 25px 35px 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto; border-radius: 0 0 12px 12px;} 
+        .controls-grid { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 25px 25px 40px 25px; background: rgba(0,0,0,0.8); border-top: 1px solid var(--glass-border); flex-shrink: 0; position: relative; z-index: 100; pointer-events: auto; border-radius: 0 0 12px 12px;} 
         .controls-full { display: flex; gap: 15px; justify-content: center; width: 100%; }
 
         /* SHARED LAYOUT WIDTH FIX */
@@ -395,7 +386,7 @@
         .card-area { min-width: 200px; width: fit-content; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 240px; } 
         .bj-title { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; } 
         .bj-score { font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 15px; line-height: 1; } 
-        .card-hand { display: flex; gap: 8px; justify-content: center; width: 100%; flex-wrap: wrap; } 
+        .card-hand { display: flex; flex-direction: row; gap: 8px; justify-content: center; align-items: center; width: 100%; } 
         .play-card { background: white; color: black; border-radius: 6px; width: 65px; height: 95px; border: 1px solid #ccc; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;} 
         .play-card .val { font-size: 1.6rem; line-height: 1; margin-bottom: 2px; } 
         .play-card .suit { font-size: 1.8rem; line-height: 1; } 
@@ -1046,7 +1037,6 @@
                             <h1>BLACKJACK</h1>
                             <p>PAYS 3 TO 2</p>
                             <p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
-                            <div class="limits">MIN 10 TC | MAX 50,000 TC</div>
                         </div>
                         <div class="mbj-shoe"></div>
                         <div class="mbj-dealer-area" id="mbj-dealer-area">
@@ -1086,12 +1076,12 @@
                             <button class="btn-rules" onclick="toggleRules('blackjack', event)" title="How to Play" style="width:30px; height:30px; font-size:1rem;"><i class="fas fa-info-circle"></i></button>
                         </div>
                     </div>
-                    <div class="chat-body custom-scroll" id="mbj-chat">
+                    <div class="chat-body custom-scroll" id="mbj-chat-messages">
                         <div class="chat-line chat-sys">Welcome to VIP Premium.</div>
                     </div>
                     <div class="chat-input-area" style="padding:15px; border-top:1px solid var(--glass-border); display:flex; gap:8px; align-items:center;">
-                        <input type="text" id="mbj-chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter') sendChat(true);">
-                        <button class="mbj-chat-send-btn" onclick="sendChat(true)"><i class="fas fa-paper-plane"></i></button>
+                        <input type="text" id="mbj-chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter') sendMBJChat();">
+                        <button class="mbj-chat-send-btn" onclick="sendMBJChat()"><i class="fas fa-paper-plane"></i></button>
                         <button class="ptt-btn" id="ptt-btn-mbj" onmousedown="startPTT('ptt-btn-mbj')" onmouseup="stopPTT('ptt-btn-mbj')" onmouseleave="stopPTT('ptt-btn-mbj')" ontouchstart="startPTT('ptt-btn-mbj')" ontouchend="stopPTT('ptt-btn-mbj')" ontouchcancel="stopPTT('ptt-btn-mbj')"><i class="fas fa-microphone"></i></button>
                     </div>
                 </div>
@@ -1296,7 +1286,7 @@
     });
 
     socket.on('globalChatMessage', (data) => {
-        let cbId = window.activeSharedGame === 'mbj' ? 'mbj-chat' : 'sg-chat';
+        let cbId = window.activeSharedGame === 'mbj' ? 'mbj-chat-messages' : 'sg-chat';
         let cb = document.getElementById(cbId); 
         if (cb && window.activeSharedGame) { 
             cb.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys">${data.text}</div>`);
@@ -1378,7 +1368,8 @@
             'SMALL': 'var(--ps-glow)', 'BIG': 'var(--danger)', 'TRIPLE': 'white',
             'YELLOW': '#ffcc00', 'WHITE': '#fff', 'PINK': '#ff66b2', 'BLUE': '#00a2ff', 'RED': '#ff3366', 'GREEN': '#00e676',
             'BUST!': 'var(--danger)', 'PUSH': 'white', 'DEALER': 'var(--danger)', 'YOU': 'var(--success)',
-            'HEADS': '#ffb400', 'TAILS': '#e2e8f0'
+            'HEADS': '#ffb400', 'TAILS': '#e2e8f0',
+            'EVEN': 'var(--credits)', 'ODD': 'var(--playable)'
         };
         return map[word] || 'white';
     }
@@ -2176,9 +2167,9 @@
                 document.getElementById('sg-display').innerHTML = `
                     <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; min-height: 180px;">
                         <div class="sicbo-dice" id="sg-sicbo-dice" style="margin: 0; height: 100px;">
-                            <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
-                            <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
-                            <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                            <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                            <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                            <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
                         </div>
                     </div>
                     <div id="sg-sicbo-sum" style="font-size:3rem; font-weight:900; color:white; opacity:0; transition:0.3s; margin-top:20px;">0</div>`;
@@ -2296,9 +2287,9 @@
         
         if (window.activeSharedGame === 'sicbo') {
             document.getElementById('sg-sicbo-dice').innerHTML = `
-                <div class="color-die c-grey shake-anim" style="width:80px; height:80px; font-size:3rem;"></div>
-                <div class="color-die c-grey shake-anim" style="width:80px; height:80px; font-size:3rem;"></div>
-                <div class="color-die c-grey shake-anim" style="width:80px; height:80px; font-size:3rem;"></div>`;
+                <div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div>
+                <div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div>
+                <div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div>`;
             sfx.tick();
         }
     });
@@ -2321,12 +2312,10 @@
 
         triggerBetAnim(); sfx.click();
         
-        // Optimistic Balance
         if(myPlayable >= amt) { myPlayable -= amt; } 
         else { let rem = amt - myPlayable; myPlayable = 0; myCredits -= rem; }
         updateMyBalance({credits: myCredits, playable: myPlayable});
         
-        // Optimistic UI Updates instantly
         if(!mySBets[choice]) mySBets[choice] = 0;
         mySBets[choice] += amt;
         mySBetsStack.push({choice: choice, amount: amt});
@@ -2338,10 +2327,6 @@
             badge.innerText = fmtTC(mySBets[choice]);
             badge.style.display = 'block';
         }
-        
-        let tot = Object.values(mySBets).reduce((sum, val) => sum + val, 0);
-        let mb = document.getElementById('sg-my-bet'); 
-        if (mb) { mb.innerHTML = `${fmtTC(tot)} TC`; }
         updateCurrentBetsPopover();
 
         socket.emit('placeSharedBet', { room: window.activeSharedGame, choice: choice, amount: amt });
@@ -2371,10 +2356,6 @@
                 }
             }
         }
-        let tot = Object.values(mySBets).reduce((sum, val) => sum + val, 0);
-        let mb = document.getElementById('sg-my-bet');
-        if(mb) mb.innerHTML = `${fmtTC(tot)} TC`;
-        
         updateCurrentBetsPopover();
         updateMyBalance(data.newBalance);
         showLocalFlash('shared', 'BET UNDONE', 'success');
@@ -2382,7 +2363,6 @@
     });
 
     socket.on('sharedBetConfirmed', (data) => {
-        // Handled optimistically, just sync exact balance
         updateMyBalance(data.newBalance);
     });
 
@@ -2393,9 +2373,6 @@
             let badge = btn.querySelector('.tile-bet-badge');
             if(badge) badge.style.display = 'none';
         });
-        
-        let mb = document.getElementById('sg-my-bet'); 
-        if (mb) { mb.innerHTML = `0 TC`; }
         updateCurrentBetsPopover();
         
         let ov = document.getElementById('sg-overlay'); if(ov) ov.classList.remove('show');
@@ -2412,9 +2389,9 @@
             document.getElementById('sg-dt-d-val').style.opacity = '0'; document.getElementById('sg-dt-t-val').style.opacity = '0';
         } else if (window.activeSharedGame === 'sicbo') {
             document.getElementById('sg-sicbo-dice').innerHTML = `
-                <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
-                <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
-                <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>`;
+                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>`;
             document.getElementById('sg-sicbo-sum').style.opacity = '0';
         }
     });
@@ -2429,7 +2406,7 @@
 
         if (data.room === 'dt') {
             document.getElementById('sg-dt-dragon').innerHTML = generateCardHTML(data.dCard, false, false, true, 'dt-card'); sfx.deal();
-            await delay(800);
+            await delay(800); 
             document.getElementById('sg-dt-tiger').innerHTML = generateCardHTML(data.tCard, false, false, true, 'dt-card'); sfx.deal();
             
             setTimeout(() => {
@@ -2442,15 +2419,11 @@
         } 
         else if (data.room === 'sicbo') {
             let dc = document.getElementById('sg-sicbo-dice');
-            
-            await delay(1500); 
-            
+            await delay(1000); 
             dc.innerHTML = '';
             for(let i=0; i<3; i++) { dc.innerHTML += `<i class="fas fa-${dIconMap[data.roll[i]-1]} s-die anim-pop" style="font-size: 6rem; color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8);"></i>`; }
-            
             sfx.deal(); 
             await delay(500); 
-            
             document.getElementById('sg-sicbo-sum').innerText = data.sum; document.getElementById('sg-sicbo-sum').style.opacity = '1';
 
             if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2;
@@ -2480,7 +2453,7 @@
             }
             
             Object.keys(mySBets).forEach(choice => {
-       let matches = data.roll.filter(c => c === choice).length;
+                let matches = data.roll.filter(c => c === choice).length;
                 if(matches > 0) myWin += mySBets[choice] + (mySBets[choice] * matches);
             });
         }
@@ -2531,7 +2504,7 @@
         let input = document.getElementById('chat-input'); let msg = input.value.trim();
         if(msg.length > 0) { 
             let box = document.getElementById('sg-chat');
-            box.innerHTML += `<div class="chat-line"><span class="c-name">You:</span> <span class="c-msg">${msg}</span></div>`;
+            box.innerHTML += `<div class="chat-line"><span class="c-name" style="color:var(--ps-glow); font-weight:900;">You:</span> <span class="c-msg" style="color:white;">${msg}</span></div>`;
             box.scrollTop = box.scrollHeight;
             socket.emit('sendChat', { msg: msg }); 
             input.value = ''; 
@@ -2542,7 +2515,7 @@
         let input = document.getElementById('mbj-chat-input'); let msg = input.value.trim();
         if(msg.length > 0) { 
             let box = document.getElementById('mbj-chat-messages');
-            box.innerHTML += `<div class="chat-line"><span class="c-name">You:</span> <span class="c-msg">${msg}</span></div>`;
+            box.innerHTML += `<div class="chat-line"><span class="c-name" style="color:var(--ps-glow); font-weight:900;">You:</span> <span class="c-msg" style="color:white;">${msg}</span></div>`;
             box.scrollTop = box.scrollHeight;
             socket.emit('sendChat', { msg: msg }); 
             input.value = ''; 
@@ -2553,7 +2526,7 @@
         let boxId = window.activeSharedGame === 'mbj' ? 'mbj-chat-messages' : 'sg-chat';
         let box = document.getElementById(boxId);
         if (box && window.activeSharedGame) {
-            box.innerHTML += `<div class="chat-line"><span class="c-name">${data.user}:</span> <span class="c-msg">${data.text}</span></div>`;
+            box.innerHTML += `<div class="chat-line"><span class="c-name" style="color:var(--text-muted); font-weight:900;">${data.user}:</span> <span class="c-msg" style="color:white;">${data.text}</span></div>`;
             box.scrollTop = box.scrollHeight;
         }
     });
