@@ -606,7 +606,7 @@
             </div>
             
             <div class="topbar-actions">
-                <button class="top-icon-btn mobile-menu-btn" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+                <button class="top-icon-btn mobile-menu-btn" onclick="toggleMobileMenu(event)"><i class="fas fa-bars"></i></button>
                 
                 <div class="desktop-actions" id="desktop-nav-actions">
                     <button class="top-icon-btn admin-btn hidden" onclick="window.location.href='/admin.html'" title="Admin Panel" style="color:var(--ps-glow);">
@@ -811,16 +811,14 @@
                       <div id="d20-msg" class="result-box"></div>
                     </div>
                     <div class="controls-grid" style="display:flex; flex-direction:column; align-items:center; gap:10px; padding: 25px 25px 40px 25px;">
-                        
                         <div class="input-group" style="margin:0 auto; width:150px;">
                             <label style="text-align:center">BET AMOUNT</label>
                             <input type="number" id="d20-bet" class="input-control bet-input" placeholder="10">
                         </div>
                         <div style="display:flex; gap:10px; width:100%; justify-content:center; max-width: 300px;">
-                            <button class="btn-play d20-toggle" id="btn-d20-odd" data-type="oddeven" data-val="odd" style="flex:1; --tile-color: var(--playable); background: rgba(255,255,255,0.1); border-color: white;" onclick="toggleD20Bet(this)">Odd</button>
-                            <button class="btn-play d20-toggle" id="btn-d20-even" data-type="oddeven" data-val="even" style="flex:1; --tile-color: var(--credits); background: rgba(255,255,255,0.1); border-color: white;" onclick="toggleD20Bet(this)">Even</button>
+                            <button class="btn-play d20-toggle" onclick="playD20('Odd')" style="flex:1; background: rgba(255,255,255,0.1); border-color: white;">Odd</button>
+                            <button class="btn-play d20-toggle" onclick="playD20('Even')" style="flex:1; background: rgba(255,255,255,0.1); border-color: white;">Even</button>
                         </div>
-                        <button class="btn-play" id="btn-d20" onclick="playD20()" style="width: 100%; max-width: 300px; background: #ff3366; border: none; margin-top: 10px;">ROLL D20</button>
                     </div>
                   </div>
                 </div>
@@ -929,8 +927,9 @@
                       </div>
                     </div>
                     
-                    <div class="game-display">
+                    <div class="game-display" style="position:relative;">
                         <div id="sg-display" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;"></div>
+                        <div id="bac-center-msg" style="position:absolute; width:100%; text-align:center; bottom:20px; font-weight:900; color:var(--ps-glow); opacity:0; transition:0.3s; letter-spacing:2px; text-transform:uppercase; z-index:100;">DRAWING 3RD CARD...</div>
                         <div id="flash-shared" class="local-flash"></div> 
                         <div class="result-overlay-shared" id="sg-overlay"><div class="res-title" id="sg-res-title"></div><div class="res-payout" id="sg-res-payout" style="display:none"></div></div>
                     </div>
@@ -1393,12 +1392,6 @@
         el.style.display = 'none';
     }
 
-    function toggleMobileMenu(e) { 
-        if(e) e.stopPropagation();
-        sfx.click();
-        document.getElementById('desktop-nav-actions').classList.toggle('show'); 
-    }
-
     function addAmount(inputId, val) { 
         let i = document.getElementById(inputId); 
         let newVal = (parseInt(i.value) || 0) + val;
@@ -1447,9 +1440,9 @@
         } else {
             entries.forEach(([choice, amount]) => {
                 total += amount; let cColor = getBetColor(choice);
-                list.innerHTML += `<div style="background:rgba(0,0,0,0.4); padding:10px 15px; border-radius:6px; border-left:4px solid ${cColor}; display:flex; justify-content:space-between; align-items:center; font-weight:800; margin-bottom:5px;"><span style="text-transform:uppercase; color:${cColor};">${choice}</span><span style="color:var(--credits); font-size: 1rem; white-space: nowrap;">${fmtTC(amount)} TC</span></div>`;
+                list.insertAdjacentHTML('beforeend', `<div style="background:rgba(0,0,0,0.4); padding:10px 15px; border-radius:6px; border-left:4px solid ${cColor}; display:flex; justify-content:space-between; align-items:center; font-weight:800; margin-bottom:5px;"><span style="text-transform:uppercase; color:${cColor};">${choice}</span><span style="color:var(--credits); font-size: 1rem; white-space: nowrap;">${fmtTC(amount)} TC</span></div>`);
             });
-            list.innerHTML += `<div style="border-top:1px solid var(--glass-border); padding-top:10px; margin-top:5px; display:flex; justify-content:space-between; font-weight:900; font-size:1.1rem; color:white;"><span>TOTAL</span><span style="color:var(--credits); white-space: nowrap;">${fmtTC(total)} TC</span></div>`;
+            list.insertAdjacentHTML('beforeend', `<div style="border-top:1px solid var(--glass-border); padding-top:10px; margin-top:5px; display:flex; justify-content:space-between; font-weight:900; font-size:1.1rem; color:white;"><span>TOTAL</span><span style="color:var(--credits); white-space: nowrap;">${fmtTC(total)} TC</span></div>`);
         }
     }
 
@@ -1508,7 +1501,7 @@
                 let safeR = h.result ? h.result.toString() : '-';
                 rHtml = `<span style="font-weight:900; color:${getBetColor(safeR.split(' ')[0])}">${safeR}</span>`;
             }
-            list.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:10px; align-items:center; font-size:0.95rem; text-transform:uppercase; text-align:center; white-space:nowrap;"><div>${rHtml}</div><div>${bHtml}</div><div>${winVal}</div><div>${lossVal}</div></div>`;
+            list.insertAdjacentHTML('beforeend', `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:10px; align-items:center; font-size:0.95rem; text-transform:uppercase; text-align:center; white-space:nowrap;"><div>${rHtml}</div><div>${bHtml}</div><div>${winVal}</div><div>${lossVal}</div></div>`);
         });
     }
 
@@ -1665,7 +1658,7 @@
             if (!dailyData.canClaim && dailyData.day === 1) { statClass = 'claimed'; boxTitle = "CLAIMED"; }
             else if (i < dailyData.day) { statClass = 'claimed'; boxTitle = "CLAIMED"; } 
             else if (i === dailyData.day && dailyData.canClaim) { statClass = 'active'; }
-            container.innerHTML += `<div class="dr-day ${statClass}" id="dr-day-${i}"><div class="dr-title">${boxTitle}</div><div class="dr-coin">${rewards[i-1]}<br>Credits</div></div>`;
+            container.insertAdjacentHTML('beforeend', `<div class="dr-day ${statClass}" id="dr-day-${i}"><div class="dr-title">${boxTitle}</div><div class="dr-coin">${rewards[i-1]}<br>Credits</div></div>`);
         }
 
         let sc = document.getElementById('dr-status-container');
@@ -1809,7 +1802,6 @@
           if(window.d20AnimCycle) clearInterval(window.d20AnimCycle);
           document.getElementById('d20-icon').className = 'fas fa-dice-d20 dice-icon';
           document.getElementById('d20-icon').style.display='block'; document.getElementById('d20-num').style.display='none';
-          document.getElementById('btn-d20').disabled = false;
           document.getElementById('d20-bet').disabled = false;
           document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
       }
@@ -1856,7 +1848,6 @@
             if(window.d20AnimCycle) clearInterval(window.d20AnimCycle);
             document.getElementById('d20-icon').className = 'fas fa-dice-d20 dice-icon';
             document.getElementById('d20-icon').style.display='block'; document.getElementById('d20-num').style.display='none';
-            document.getElementById('btn-d20').disabled = false;
             document.getElementById('d20-bet').disabled = false;
             document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
         } else if (data.game === 'coinflip') {
@@ -1877,27 +1868,16 @@
     // =======================================================
     // SOLO GAMES LOGIC
     // =======================================================
-    let activeD20Bets = [];
-    function toggleD20Bet(btn) {
-        if(document.getElementById('btn-d20').disabled) return; sfx.click();
-        let val = btn.dataset.val; let type = btn.dataset.type;
-        document.querySelectorAll(`.d20-toggle[data-type="${type}"]`).forEach(b => b.classList.remove('has-bet'));
-        activeD20Bets = activeD20Bets.filter(b => b.type !== type);
-        let existingIndex = activeD20Bets.findIndex(b => b.val === val);
-        if(existingIndex === -1) { btn.classList.add('has-bet'); activeD20Bets.push({type, val}); }
-    }
-
-    function playD20() {
-        if(activeD20Bets.length === 0) { showLocalFlash('d20', 'SELECT A BET', 'error'); return; }
+    function playD20(choice) {
         let amt = formatTC(document.getElementById('d20-bet').value);
         if(isNaN(amt) || amt < 10) { showLocalFlash('d20', 'MIN BET 10 TC', 'error'); return; }
 
         triggerBetAnim(); sfx.click();
-        document.getElementById('btn-d20').disabled = true; document.getElementById('d20-bet').disabled = true;
+        document.getElementById('d20-bet').disabled = true;
         document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = true);
         
-        let betsToSend = activeD20Bets.map(b => ({ guessValue: b.val, amount: amt }));
-        socket.emit('playSolo', { game: 'd20', bets: betsToSend, choice: activeD20Bets[0].val, bet: amt });
+        window.currentD20Choice = choice;
+        socket.emit('playSolo', { game: 'd20', choice: choice, bet: amt });
         mySoloRounds.d20++;
     }
 
@@ -1922,17 +1902,16 @@
 
     function finalizeD20(data) {
         let n = document.getElementById('d20-num'); n.innerText = data.roll;
-        let betStrs = activeD20Bets.map(b => b.val.toUpperCase());
         let msg = document.getElementById('d20-msg');
         msg.classList.remove('win', 'lose', 'push');
         if (data.payout > 0) { msg.classList.add('win'); msg.innerHTML = `<div class="res-title">WON</div><div class="res-payout">+${fmtTC(data.payout)}</div>`; sfx.win('d20'); } 
         else { msg.classList.add('lose'); msg.innerHTML = `<div class="res-title">LOST</div>`; sfx.lose('d20'); }
         msg.classList.add('show');
-        logHistory('d20', betStrs.join(', '), data.resStr, data.payout, data.bet);
+        logHistory('d20', window.currentD20Choice, data.resStr, data.payout, data.bet);
         
         setTimeout(() => {
             msg.classList.remove('show');
-            document.getElementById('btn-d20').disabled = false; document.getElementById('d20-bet').disabled = false;
+            document.getElementById('d20-bet').disabled = false;
             document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
             updateMyBalance(data.newBalance, data.payout > 0);
         }, 3000);
@@ -2006,8 +1985,8 @@
             sfx.deal('blackjack');
             pHand.innerHTML = generateCardHTML(data.pHand[0], false, true); await delay(300); sfx.deal('blackjack');
             dHand.innerHTML = generateCardHTML(data.dHand[0], false, true); await delay(300); sfx.deal('blackjack');
-            pHand.innerHTML += generateCardHTML(data.pHand[1], false, true); await delay(300); sfx.deal('blackjack');
-            dHand.innerHTML += generateCardHTML(data.dHand[1], true, true); await delay(400);
+            pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pHand[1], false, true)); await delay(300); sfx.deal('blackjack');
+            dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[1], true, true)); await delay(400);
 
             document.getElementById('bj-p-score').innerText = getBJScore(data.pHand);
             document.getElementById('bj-d-score').innerText = data.dHand[0].bjVal;
@@ -2101,9 +2080,9 @@
             setupUI: () => {
                 document.getElementById('sg-display').innerHTML = `
                     <div class="dt-arena">
-                        <div class="dt-side"><div class="dt-label lbl-dragon">DRAGON</div><div id="sg-dt-dragon" style="perspective:1000px;"></div><div id="sg-dt-d-val" style="font-size:2rem; font-weight:900; color:white; opacity:0; transition:0.3s;">0</div></div>
+                        <div class="dt-side"><div class="dt-label lbl-dragon">DRAGON</div><div id="sg-dt-dragon" style="perspective:1000px;"></div></div>
                         <div style="font-size:2.5rem; font-weight:900; color:var(--text-muted); opacity:0.5;">VS</div>
-                        <div class="dt-side"><div class="dt-label lbl-tiger">TIGER</div><div id="sg-dt-tiger" style="perspective:1000px;"></div><div id="sg-dt-t-val" style="font-size:2rem; font-weight:900; color:white; opacity:0; transition:0.3s;">0</div></div>
+                        <div class="dt-side"><div class="dt-label lbl-tiger">TIGER</div><div id="sg-dt-tiger" style="perspective:1000px;"></div></div>
                     </div>`;
                 document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
                 document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
@@ -2371,12 +2350,11 @@
         } else if (window.activeSharedGame === 'dt') {
             document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
             document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
-            document.getElementById('sg-dt-d-val').style.opacity = '0'; document.getElementById('sg-dt-t-val').style.opacity = '0';
         } else if (window.activeSharedGame === 'sicbo') {
             document.getElementById('sg-sicbo-dice').innerHTML = `
-                <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
-                <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
-                <div class="color-die c-grey" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>`;
+                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>`;
             document.getElementById('sg-sicbo-sum').style.opacity = '0';
         }
     });
@@ -2393,11 +2371,6 @@
             document.getElementById('sg-dt-dragon').innerHTML = generateCardHTML(data.dCard, false, false, true, 'dt-card'); sfx.deal('dt');
             await delay(800); 
             document.getElementById('sg-dt-tiger').innerHTML = generateCardHTML(data.tCard, false, false, true, 'dt-card'); sfx.deal('dt');
-            
-            setTimeout(() => {
-                document.getElementById('sg-dt-d-val').innerText = data.dCard.dtVal; document.getElementById('sg-dt-d-val').style.opacity = '1';
-                document.getElementById('sg-dt-t-val').innerText = data.tCard.dtVal; document.getElementById('sg-dt-t-val').style.opacity = '1';
-            }, 500);
 
             if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; else if(mySBets['Dragon'] || mySBets['Tiger']) myWin = (mySBets['Dragon']||0) + (mySBets['Tiger']||0); } 
             else { if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2; }
@@ -2448,8 +2421,17 @@
             pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[1], false, false, true)); sfx.deal('baccarat'); await delay(500);
             bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[1], false, false, true)); sfx.deal('baccarat'); await delay(800);
 
-            if (data.p3Drawn) { pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[2], false, true)); sfx.deal('baccarat'); await delay(800); }
-            if (data.b3Drawn) { bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[2], false, true)); sfx.deal('baccarat'); await delay(800); }
+            let centerMsg = document.getElementById('bac-center-msg');
+            if (data.p3Drawn) { 
+                centerMsg.innerText = 'DRAWING 3RD CARD FOR PLAYER...'; centerMsg.style.opacity = '1';
+                await delay(800); centerMsg.style.opacity = '0';
+                pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[2], false, true)); sfx.deal('baccarat'); await delay(800); 
+            }
+            if (data.b3Drawn) { 
+                centerMsg.innerText = 'DRAWING 3RD CARD FOR BANKER...'; centerMsg.style.opacity = '1';
+                await delay(800); centerMsg.style.opacity = '0';
+                bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[2], false, true)); sfx.deal('baccarat'); await delay(800); 
+            }
 
             document.getElementById('sg-bac-p-score').innerText = data.pScore;
             document.getElementById('sg-bac-b-score').innerText = data.bScore;
@@ -2465,6 +2447,45 @@
         logHistory(data.room, myBetStrs, data.resStr, myWin, totalBet, totalBet > 0);
 
         if (totalBet > 0) {
+            
+            // Mario Coin Payout Animation
+            const payoutAnim = async () => {
+                let losses = Object.keys(mySBets).filter(c => c !== data.winner && !(data.winner === 'Tie' && (c === 'Player' || c === 'Banker') && data.room === 'baccarat'));
+                for(let choice of losses) {
+                    let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`);
+                    if(btn) {
+                        let bRect = btn.getBoundingClientRect();
+                        let coin = document.createElement('div');
+                        coin.className = 'animated-chip';
+                        coin.style.cssText = `background: var(--danger); color: white; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999;`;
+                        coin.innerText = `-${fmtTC(mySBets[choice])}`;
+                        document.body.appendChild(coin);
+                        setTimeout(() => { coin.style.top = '100px'; coin.style.opacity = '0'; }, 30);
+                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500);
+                        sfx.lose(data.room); await delay(300);
+                    }
+                }
+                
+                let wins = Object.keys(mySBets).filter(c => c === data.winner || (data.winner === 'Tie' && (c === 'Player' || c === 'Banker') && data.room === 'baccarat'));
+                for(let choice of wins) {
+                    let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`);
+                    if(btn) {
+                        let bRect = btn.getBoundingClientRect();
+                        let wAmt = data.winner === 'Tie' && choice === 'Tie' ? mySBets[choice] * 9 : (data.winner === 'Tie' ? mySBets[choice] : mySBets[choice] * (data.room === 'baccarat' && choice === 'Banker' ? 1.95 : 2));
+                        let coin = document.createElement('div');
+                        coin.className = 'animated-chip';
+                        coin.style.cssText = `background: var(--success); color: black; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999; box-shadow: 0 0 15px var(--success);`;
+                        coin.innerText = `+${fmtTC(wAmt)}`;
+                        document.body.appendChild(coin);
+                        setTimeout(() => { coin.style.top = '10px'; coin.style.opacity = '0'; }, 30);
+                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500);
+                        sfx.win(data.room); await delay(300);
+                    }
+                }
+            };
+            
+            await payoutAnim();
+
             rP.style.display = 'block';
             if (net > 0) { statClass = 'win'; displayStr = `+${fmtTC(net)}`; sfx.win(data.room); } 
             else if (net < 0) { statClass = 'lose'; displayStr = `LOST`; sfx.lose(data.room); } 
@@ -2503,7 +2524,12 @@
         let boxId = window.activeSharedGame === 'mbj' ? 'mbj-chat-messages' : 'sg-chat';
         let box = document.getElementById(boxId);
         if (box && window.activeSharedGame) {
-            box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--text-muted); font-weight:900;">${data.user}:</span> <span class="c-msg" style="color:white;">${data.text}</span></div>`);
+            let sysClass = data.sys ? 'chat-sys' : '';
+            if (data.sys) {
+                box.insertAdjacentHTML('beforeend', `<div class="chat-line ${sysClass}">${data.text}</div>`);
+            } else {
+                box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--text-muted); font-weight:900;">${data.user}:</span> <span class="c-msg" style="color:white;">${data.text}</span></div>`);
+            }
             box.scrollTop = box.scrollHeight;
         }
     });
@@ -2594,11 +2620,10 @@
         if(!fromEl || !toEl) return;
         let fRect = fromEl.getBoundingClientRect(); let tRect = toEl.getBoundingClientRect();
         let chip = document.createElement('div'); chip.className = `animated-chip`;
-        chip.style.cssText = `--c-bg: ${color}; left: ${fRect.left + (fRect.width/2)}px; top: ${fRect.top + (fRect.height/2)}px; margin-left: -22.5px; margin-top: -22.5px;`;
+        chip.style.cssText = `--c-bg: ${color}; left: ${fRect.left + (fRect.width/2)}px; top: ${fRect.top + (fRect.height/2)}px; margin-left: -22.5px; margin-top: -22.5px; position:absolute; z-index:9999; border-radius:50%; width:40px; height:40px; box-shadow:0 0 10px rgba(0,0,0,0.5); border:2px solid var(--c-bg); background:radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); transition: all 0.5s ease-in-out;`;
         document.body.appendChild(chip);
         void chip.offsetWidth;
-        chip.style.transform = 'scale(1.5)';
-        setTimeout(() => { chip.style.left = `${tRect.left + (tRect.width/2)}px`; chip.style.top = `${tRect.top + (tRect.height/2)}px`; chip.style.transform = 'scale(0.5)'; chip.style.opacity = '0'; }, 30);
+        setTimeout(() => { chip.style.left = `${tRect.left + (tRect.width/2)}px`; chip.style.top = `${tRect.top + (tRect.height/2)}px`; chip.style.opacity = '0'; }, 30);
         setTimeout(() => { if(chip.parentNode) chip.remove(); }, 500);
     }
 
@@ -2891,10 +2916,10 @@
                                 if (chipCont) chipCont.style.opacity = '0'; sfx.lose('mbj');
                             } else if (res.status === 'WIN') {
                                 animateMBJChipSequence('mbj-dealer-area', `mbj-circle-${i}-0`, '#00e676');
-                                setTimeout(() => { document.getElementById(`mbj-seat-name-${i}`).insertAdjacentHTML('beforeend', `<div class="payout-flare">+ ${fmtTC(res.win)}</div>`); }, 400);
+                                setTimeout(() => { document.getElementById(`mbj-seat-name-${i}`).insertAdjacentHTML('beforeend', `<div class="payout-flare" style="color:var(--success); font-weight:900; animation: popIn 0.3s ease-out;">+ ${fmtTC(res.win)}</div>`); }, 400);
                                 sfx.win('mbj');
                             } else if (res.status === 'PUSH') {
-                                setTimeout(() => { document.getElementById(`mbj-seat-name-${i}`).insertAdjacentHTML('beforeend', `<div class="payout-flare" style="color:#ffcc00;">PUSH</div>`); }, 400);
+                                setTimeout(() => { document.getElementById(`mbj-seat-name-${i}`).insertAdjacentHTML('beforeend', `<div class="payout-flare" style="color:#ffcc00; font-weight:900; animation: popIn 0.3s ease-out;">PUSH</div>`); }, 400);
                                 sfx.win('mbj');
                             }
                             await delay(300); 
