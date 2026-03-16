@@ -13,13 +13,10 @@
     }, { once: true });
 
     function canPlayGameSfx(gameId) {
-        // Mute game sfx if user is in the lobby or a different game
         let viewCasino = document.getElementById('view-casino');
         if (!viewCasino || !viewCasino.classList.contains('hidden')) return false;
-        
         let viewGame = document.getElementById('view-game-' + gameId);
         if (viewGame && !viewGame.classList.contains('hidden')) return true;
-        
         if (window.activeSharedGame === gameId) return true;
         return false;
     }
@@ -27,9 +24,8 @@
     function playTone(f, t, d, v = 0.1) { 
         if (audioCtx.state === 'suspended') return; 
         let now = Date.now();
-        if (now - lastSfxTime < 50) return; // Prevent audio crackling from spam clicks
+        if (now - lastSfxTime < 50) return; 
         lastSfxTime = now;
-
         let o = audioCtx.createOscillator(); let g = audioCtx.createGain(); 
         o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime); 
         g.gain.setValueAtTime(v * sfxGainVal, audioCtx.currentTime); 
@@ -50,8 +46,6 @@
 
     document.addEventListener('mousedown', (e) => {
        if(e.target.closest('button, .nav-link, .mode-card, .game-card, .bank-tab, .action-btn, .top-icon-btn, .brand, .wallet-pill')) sfx.click();
-       
-       // Mobile menu close on outside click
        let menu = document.getElementById('desktop-nav-actions');
        let toggleBtn = document.querySelector('.mobile-menu-btn');
        if (menu.classList.contains('show') && !menu.contains(e.target) && !toggleBtn.contains(e.target)) {
@@ -70,8 +64,7 @@
     });
 
     function updateVolume(val) {
-        let vol = val / 100; 
-        sfxGainVal = vol;
+        let vol = val / 100; sfxGainVal = vol;
         const audio = document.getElementById('global-radio');
         if(audio) audio.volume = vol;
         document.getElementById('vol-display').innerText = val + '%';
@@ -93,16 +86,11 @@
         const audio = document.getElementById('global-radio');
         const hud = document.getElementById('radio-hud');
         const djText = document.getElementById('radio-dj');
-
-        if (!data.url) { 
-            audio.pause(); audio.src = ''; hud.classList.remove('show'); return; 
-        }
-
+        if (!data.url) { audio.pause(); audio.src = ''; hud.classList.remove('show'); return; }
         djText.innerText = data.requestedBy;
         hud.classList.add('show');
         audio.src = data.url;
         audio.volume = document.getElementById('master-volume').value / 100;
-        
         audio.onloadedmetadata = () => {
             let offset = (Date.now() - data.startTime) / 1000;
             if (offset > 0) { try { audio.currentTime = offset; } catch(e) {} }
@@ -111,60 +99,30 @@
         audio.play().catch(e => {});
     }
 
-    let myUsername = '';
-    let myCredits = 0;
-    let myPlayable = 0;
-    
+    let myUsername = ''; let myCredits = 0; let myPlayable = 0;
     let myGameHistory = { d20: [], coinflip: [], baccarat: [], blackjack: [], perya: [], dt: [], sicbo: [] };
     let globalFallback = { baccarat: [], perya: [], dt: [], sicbo: [] };
     let mySoloRounds = { d20: 0, coinflip: 0, blackjack: 0 };
     let myNotifications = [];
-    
     window.activeSharedGame = null;
     let sState = { time: 15, status: 'BETTING' };
-    let mySBets = {};
-    let mySBetsStack = []; 
-    let dailyTimerInterval = null;
-    let currentHistoryGame = null;
+    let mySBets = {}; let mySBetsStack = []; let dailyTimerInterval = null; let currentHistoryGame = null;
 
     const delay = ms => new Promise(res => setTimeout(res, ms));
-
-    const formatTC = (amount) => {
-        let num = parseFloat(amount);
-        if(isNaN(num)) return 0;
-        return Math.round(num * 10) / 10;
-    };
-
-    const fmtTC = (amount) => {
-        let num = formatTC(amount);
-        return num % 1 === 0 ? num.toLocaleString() : num.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
-    };
+    const formatTC = (amount) => { let num = parseFloat(amount); if(isNaN(num)) return 0; return Math.round(num * 10) / 10; };
+    const fmtTC = (amount) => { let num = formatTC(amount); return num % 1 === 0 ? num.toLocaleString() : num.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}); };
 
     function getBJScore(hand) {
         let score = 0, aces = 0;
-        for (let card of hand) { 
-            score += card.bjVal; 
-            if (card.raw === 'A') aces += 1; 
-        }
-        while (score > 21 && aces > 0) { 
-            score -= 10; 
-            aces -= 1; 
-        }
+        for (let card of hand) { score += card.bjVal; if (card.raw === 'A') aces += 1; }
+        while (score > 21 && aces > 0) { score -= 10; aces -= 1; }
         return score;
     }
 
     function getBetColor(betWord) {
         if(!betWord) return 'white';
         let word = betWord.toString().trim().toUpperCase();
-        const map = {
-            'PLAYER': 'var(--ps-glow)', 'BANKER': 'var(--danger)', 'TIE': 'var(--success)',
-            'DRAGON': 'var(--danger)', 'TIGER': 'var(--credits)',
-            'SMALL': 'var(--ps-glow)', 'BIG': 'var(--danger)', 'TRIPLE': 'white',
-            'YELLOW': '#ffcc00', 'WHITE': '#fff', 'PINK': '#ff66b2', 'BLUE': '#00a2ff', 'RED': '#ff3366', 'GREEN': '#00e676',
-            'BUST!': 'var(--danger)', 'PUSH': 'white', 'DEALER': 'var(--danger)', 'YOU': 'var(--success)',
-            'HEADS': '#ffb400', 'TAILS': '#e2e8f0',
-            'EVEN': 'var(--credits)', 'ODD': 'var(--playable)'
-        };
+        const map = { 'PLAYER': 'var(--ps-glow)', 'BANKER': 'var(--danger)', 'TIE': 'var(--success)', 'DRAGON': 'var(--danger)', 'TIGER': 'var(--credits)', 'SMALL': 'var(--ps-glow)', 'BIG': 'var(--danger)', 'TRIPLE': 'white', 'YELLOW': '#ffcc00', 'WHITE': '#fff', 'PINK': '#ff66b2', 'BLUE': '#00a2ff', 'RED': '#ff3366', 'GREEN': '#00e676', 'BUST!': 'var(--danger)', 'PUSH': 'white', 'DEALER': 'var(--danger)', 'YOU': 'var(--success)', 'HEADS': '#ffb400', 'TAILS': '#e2e8f0', 'EVEN': 'var(--credits)', 'ODD': 'var(--playable)' };
         return map[word] || 'white';
     }
 
@@ -198,52 +156,28 @@
                 if (baseChoice === 'Big') return `<span style="color:var(--danger); font-weight:900;">B</span>`;
                 return baseChoice;
             }
-            if (id === 'perya') {
-                return `<div style="display:flex; justify-content:center; align-items:center; gap:2px; flex-wrap:nowrap;">${colorsToDice(baseChoice)}</div>`;
-            }
+            if (id === 'perya') { return `<div style="display:flex; justify-content:center; align-items:center; gap:2px; flex-wrap:nowrap;">${colorsToDice(baseChoice)}</div>`; }
             return `<span style="font-weight:800; color:${getBetColor(baseChoice)}">${baseChoice}</span>`;
         }).join(' ');
     }
 
-    function openModal(id) { 
-        let el = document.getElementById(id);
-        el.classList.remove('hidden'); 
-        el.style.display = 'flex';
-    }
-    function closeModal(id) { 
-        let el = document.getElementById(id);
-        el.classList.add('hidden'); 
-        el.style.display = 'none';
-    }
-
-    function addAmount(inputId, val) { 
-        let i = document.getElementById(inputId); 
-        let newVal = (parseInt(i.value) || 0) + val;
-        if (newVal > 100000) newVal = 100000;
-        i.value = newVal; 
-    }
+    function openModal(id) { let el = document.getElementById(id); el.classList.remove('hidden'); el.style.display = 'flex'; }
+    function closeModal(id) { let el = document.getElementById(id); el.classList.add('hidden'); el.style.display = 'none'; }
+    function addAmount(inputId, val) { let i = document.getElementById(inputId); let newVal = (parseInt(i.value) || 0) + val; if (newVal > 100000) newVal = 100000; i.value = newVal; }
 
     let flashTimeout;
     function showLocalFlash(game, msg, type='error') {
         let f = document.getElementById('flash-' + game);
         if(!f) { f = document.getElementById('flash-shared'); }
         if(!f) return;
-        
-        f.classList.remove('show', 'error', 'success');
-        void f.offsetWidth; 
-
-        f.innerText = msg;
-        f.classList.add('show');
-        if(type === 'error') { f.classList.add('error'); sfx.lose(game); } 
-        else { f.classList.add('success'); sfx.win(game); }
-        
-        clearTimeout(flashTimeout);
-        flashTimeout = setTimeout(() => f.classList.remove('show'), 2500);
+        f.classList.remove('show', 'error', 'success'); void f.offsetWidth; 
+        f.innerText = msg; f.classList.add('show');
+        if(type === 'error') { f.classList.add('error'); sfx.lose(game); } else { f.classList.add('success'); sfx.win(game); }
+        clearTimeout(flashTimeout); flashTimeout = setTimeout(() => f.classList.remove('show'), 2500);
     }
 
     function toggleCustomDropdown(id, e) {
-        if(e) e.stopPropagation();
-        sfx.click();
+        if(e) e.stopPropagation(); sfx.click();
         document.querySelectorAll('.custom-dropdown').forEach(d => { if(d.id !== id) d.classList.add('hidden'); });
         let target = document.getElementById(id);
         target.classList.toggle('hidden');
@@ -254,12 +188,8 @@
     function toggleCurrentBets(e) { toggleCustomDropdown('current-bets-popover', e); }
 
     function updateCurrentBetsPopover() {
-        const list = document.getElementById('cb-list');
-        if(!list) return;
-        list.innerHTML = '';
-        let total = 0;
-        const entries = Object.entries(mySBets);
-        
+        const list = document.getElementById('cb-list'); if(!list) return;
+        list.innerHTML = ''; let total = 0; const entries = Object.entries(mySBets);
         if(entries.length === 0) {
             list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:10px;">No active bets for this round.</div>`;
         } else {
@@ -272,8 +202,7 @@
     }
 
     function toggleHistory(id, e) {
-        if(e) e.stopPropagation();
-        sfx.click();
+        if(e) e.stopPropagation(); sfx.click();
         document.querySelectorAll('.custom-dropdown').forEach(d => { if(d.id !== 'history-popover') d.classList.add('hidden'); });
         let popover = document.getElementById('history-popover');
         if (e.currentTarget && e.currentTarget.parentElement) e.currentTarget.parentElement.appendChild(popover);
@@ -282,24 +211,17 @@
     }
 
     function toggleRules(id, e) {
-        if(e) e.stopPropagation();
-        sfx.click();
+        if(e) e.stopPropagation(); sfx.click();
         document.querySelectorAll('.custom-dropdown').forEach(d => { if(d.id !== 'rules-popover') d.classList.add('hidden'); });
         let popover = document.getElementById('rules-popover');
         if (e.currentTarget && e.currentTarget.parentElement) e.currentTarget.parentElement.appendChild(popover);
         popover.classList.toggle('hidden');
-        if(!popover.classList.contains('hidden')) {
-            document.getElementById('rules-title').innerText = gameInfoMap[id].title + " Rules";
-            document.getElementById('rules-body').innerHTML = gameInfoMap[id].body;
-        }
+        if(!popover.classList.contains('hidden')) { document.getElementById('rules-title').innerText = gameInfoMap[id].title + " Rules"; document.getElementById('rules-body').innerHTML = gameInfoMap[id].body; }
     }
 
     function updateHistoryUI(id) {
-        const list = document.getElementById('history-items');
-        list.innerHTML = '';
-        let localH = myGameHistory[id] || []; let merged = [...localH];
-        let gRes = globalFallback[id];
-        
+        const list = document.getElementById('history-items'); list.innerHTML = '';
+        let localH = myGameHistory[id] || []; let merged = [...localH]; let gRes = globalFallback[id];
         if (gRes && merged.length < 5) {
             for(let i=0; i < gRes.length; i++) {
                 if(merged.length >= 5) break;
@@ -307,50 +229,33 @@
                 merged.push({ result: cleanRes, bet: '-', wonProfit: 0, lostBet: 0, didBet: false });
             }
         }
-        
         if (id === 'd20' || id === 'coinflip' || id === 'blackjack') { document.getElementById('stat-total-rounds').innerText = mySoloRounds[id] || 0; }
-        
         if(merged.length === 0) { list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">No history available yet.</div>`; return; } 
-        
         merged.slice(0,5).forEach(h => {
             let net = formatTC(h.wonProfit - h.lostBet);
             let winVal = '-'; let lossVal = '-';
-            
             if (h.didBet) {
                 if (net > 0) { winVal = `<span style="color:var(--success)">+${fmtTC(net)}</span>`; } 
                 else if (net < 0) { lossVal = `<span style="color:var(--danger)">-${fmtTC(Math.abs(net))}</span>`; } 
                 else { winVal = '<span style="color:white; font-weight: 900;">PUSH</span>'; }
             }
-            
-            let bHtml = formatBetHistory(id, h.bet); 
-            let rHtml = h.result;
-
+            let bHtml = formatBetHistory(id, h.bet); let rHtml = h.result;
             if (id === 'perya') { rHtml = `<div style="display:flex; justify-content:center; align-items:center; gap:2px; flex-wrap:nowrap;">${colorsToDice(h.result)}</div>`; } 
-            else {
-                let safeR = h.result ? h.result.toString() : '-';
-                rHtml = `<span style="font-weight:900; color:${getBetColor(safeR.split(' ')[0])}">${safeR}</span>`;
-            }
+            else { let safeR = h.result ? h.result.toString() : '-'; rHtml = `<span style="font-weight:900; color:${getBetColor(safeR.split(' ')[0])}">${safeR}</span>`; }
             list.insertAdjacentHTML('beforeend', `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:10px; align-items:center; font-size:0.95rem; text-transform:uppercase; text-align:center; white-space:nowrap;"><div>${rHtml}</div><div>${bHtml}</div><div>${winVal}</div><div>${lossVal}</div></div>`);
         });
     }
 
     function renderNotifs() {
-        const list = document.getElementById('notif-list-popover');
-        const badge = document.getElementById('notif-badge-display');
-        const clearBtn = document.getElementById('btn-clear-notifs');
+        const list = document.getElementById('notif-list-popover'); const badge = document.getElementById('notif-badge-display'); const clearBtn = document.getElementById('btn-clear-notifs');
         list.innerHTML = '';
-        
         let unreadCount = myNotifications.filter(n => !n.read).length;
-        if(unreadCount > 0) { badge.style.display = 'flex'; badge.innerText = unreadCount; badge.classList.add('pulse'); } 
-        else { badge.style.display = 'none'; badge.classList.remove('pulse'); }
+        if(unreadCount > 0) { badge.style.display = 'flex'; badge.innerText = unreadCount; badge.classList.add('pulse'); } else { badge.style.display = 'none'; badge.classList.remove('pulse'); }
         clearBtn.disabled = unreadCount > 0 || myNotifications.length === 0;
-
         if(myNotifications.length === 0) { list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;" id="no-notif-msg">No new notifications.</div>`; return; }
-
         myNotifications.forEach(n => {
             let cl = n.read ? '' : 'unread';
-            list.insertAdjacentHTML('beforeend', `
-            <div class="notif-item ${cl}" id="notif-${n.id}" onclick="markSingleRead(${n.id}, event)">
+            list.insertAdjacentHTML('beforeend', `<div class="notif-item ${cl}" id="notif-${n.id}" onclick="markSingleRead(${n.id}, event)">
                 <div class="notif-item-header"><span class="notif-item-title">${n.title}</span><span class="notif-item-time">${new Date(n.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span></div>
                 <div class="notif-item-body">${n.msg}</div>
                 <button class="notif-item-del" onclick="deleteNotif(${n.id}, event)" ${n.read ? '' : 'style="display:none;"'}><i class="fas fa-times"></i></button>
@@ -365,114 +270,61 @@
 
     socket.on('silentNotification', (data) => {
         myNotifications.unshift({ id: data.id || Date.now(), title: data.title, msg: data.msg, read: false, date: data.date || new Date() });
-        if(myNotifications.length > 50) myNotifications.pop();
-        renderNotifs(); 
+        if(myNotifications.length > 50) myNotifications.pop(); renderNotifs(); 
     });
 
     function switchAuthTab(tab) {
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
         if(tab === 'login') {
             document.querySelectorAll('.auth-tab')[0].classList.add('active');
-            document.getElementById('auth-form-login').style.display = 'block';
-            document.getElementById('auth-form-register').style.display = 'none';
+            document.getElementById('auth-form-login').style.display = 'block'; document.getElementById('auth-form-register').style.display = 'none';
         } else {
             document.querySelectorAll('.auth-tab')[1].classList.add('active');
-            document.getElementById('auth-form-login').style.display = 'none';
-            document.getElementById('auth-form-register').style.display = 'block';
+            document.getElementById('auth-form-login').style.display = 'none'; document.getElementById('auth-form-register').style.display = 'block';
         }
         document.getElementById('auth-error-login').innerText = ''; document.getElementById('auth-error-register').innerText = '';
     }
 
-    function toggleInputPwd(inputId, icon) {
-        const input = document.getElementById(inputId);
-        if (input.type === "password") { input.type = "text"; icon.className = "fas fa-eye-slash"; } 
-        else { input.type = "password"; icon.className = "fas fa-eye"; }
-    }
-
+    function toggleInputPwd(inputId, icon) { const input = document.getElementById(inputId); if (input.type === "password") { input.type = "text"; icon.className = "fas fa-eye-slash"; } else { input.type = "password"; icon.className = "fas fa-eye"; } }
     document.getElementById('login-pass').addEventListener('keypress', function(e) { if (e.key === 'Enter') submitAuth('login'); });
 
     function submitAuth(mode) {
-        const uId = mode === 'login' ? 'login-user' : 'reg-user';
-        const pId = mode === 'login' ? 'login-pass' : 'reg-pass';
-        const user = document.getElementById(uId).value.trim();
-        const pass = document.getElementById(pId).value;
+        const uId = mode === 'login' ? 'login-user' : 'reg-user'; const pId = mode === 'login' ? 'login-pass' : 'reg-pass';
+        const user = document.getElementById(uId).value.trim(); const pass = document.getElementById(pId).value;
         const ref = mode === 'register' ? document.getElementById('reg-ref').value.trim() : null;
-
         if(!user || !pass) return document.getElementById(mode === 'login' ? 'auth-error-login' : 'auth-error-register').innerText = "Please fill all fields.";
         if (mode === 'login') { window.tempLoginUser = user; window.tempLoginPass = pass; }
         socket.emit(mode, { username: user, password: pass, referral: ref });
     }
 
-    socket.on('authError', (msg) => {
-        document.getElementById('auth-error-login').innerText = msg;
-        document.getElementById('auth-error-register').innerText = msg;
-    });
-
-    socket.on('registerSuccess', (msg) => {
-        document.getElementById('auth-error-register').className = 'auth-msg auth-success';
-        document.getElementById('auth-error-register').innerText = msg;
-        setTimeout(() => { switchAuthTab('login'); }, 1000);
-    });
+    socket.on('authError', (msg) => { document.getElementById('auth-error-login').innerText = msg; document.getElementById('auth-error-register').innerText = msg; });
+    socket.on('registerSuccess', (msg) => { document.getElementById('auth-error-register').className = 'auth-msg auth-success'; document.getElementById('auth-error-register').innerText = msg; setTimeout(() => { switchAuthTab('login'); }, 1000); });
 
     socket.on('loginSuccess', (data) => {
-        if (window.tempLoginUser && window.tempLoginPass) {
-            localStorage.setItem('snt_user', window.tempLoginUser); localStorage.setItem('snt_pass', window.tempLoginPass);
-        }
-
-        myUsername = data.username;
-        myCredits = formatTC(data.credits);
-        myPlayable = formatTC(data.playable || 0);
-        
+        if (window.tempLoginUser && window.tempLoginPass) { localStorage.setItem('snt_user', window.tempLoginUser); localStorage.setItem('snt_pass', window.tempLoginPass); }
+        myUsername = data.username; myCredits = formatTC(data.credits); myPlayable = formatTC(data.playable || 0);
         let nameHTML = data.role === 'VIP' ? `<span style="color:var(--playable); text-shadow:0 0 10px var(--playable);"><i class="fas fa-crown" style="margin-right:5px;"></i>${myUsername}</span>` : myUsername;
         document.getElementById('player-name-display').innerHTML = nameHTML;
-        
         updateMyBalance({credits: myCredits, playable: myPlayable});
-        
         if(data.role === 'Admin' || data.role === 'Moderator') { document.querySelector('.admin-btn').classList.remove('hidden'); }
         setupDailyRewardUI(data.daily);
-
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        
+        document.getElementById('auth-container').style.display = 'none'; document.getElementById('app-container').style.display = 'block';
         if (audioCtx.state === 'suspended') audioCtx.resume();
         switchView('casino');
     });
 
-    function confirmLogout() {
-        if(confirm("Are you sure you want to log out?")) {
-            localStorage.removeItem('snt_user'); localStorage.removeItem('snt_pass'); location.reload();
-        }
-    }
-    
-    function copyDiscord(el) {
-        navigator.clipboard.writeText('@sr.ashley');
-        let orig = el.innerHTML;
-        el.innerHTML = 'Copied! <i class="fas fa-check" style="margin-left:5px; color:var(--success);"></i>';
-        setTimeout(() => { el.innerHTML = orig; }, 2000);
-    }
-
-    function triggerWinAnim() { 
-      let p1 = document.getElementById('pill-credits'); 
-      if (p1) { p1.classList.remove('anim-pop'); void p1.offsetWidth; p1.classList.add('anim-pop'); } 
-    }
-
-    function triggerBetAnim() {
-        let p1 = document.getElementById('pill-credits'); let p2 = document.getElementById('pill-playable');
-        if(p1 && p1.style.display !== 'none') { p1.classList.remove('anim-pop-bet'); void p1.offsetWidth; p1.classList.add('anim-pop-bet'); }
-        if(p2 && p2.style.display !== 'none') { p2.classList.remove('anim-pop-bet'); void p2.offsetWidth; p2.classList.add('anim-pop-bet'); }
-    }
+    function confirmLogout() { if(confirm("Are you sure you want to log out?")) { localStorage.removeItem('snt_user'); localStorage.removeItem('snt_pass'); location.reload(); } }
+    function copyDiscord(el) { navigator.clipboard.writeText('@sr.ashley'); let orig = el.innerHTML; el.innerHTML = 'Copied! <i class="fas fa-check" style="margin-left:5px; color:var(--success);"></i>'; setTimeout(() => { el.innerHTML = orig; }, 2000); }
+    function triggerWinAnim() { let p1 = document.getElementById('pill-credits'); if (p1) { p1.classList.remove('anim-pop'); void p1.offsetWidth; p1.classList.add('anim-pop'); } }
+    function triggerBetAnim() { let p1 = document.getElementById('pill-credits'); let p2 = document.getElementById('pill-playable'); if(p1 && p1.style.display !== 'none') { p1.classList.remove('anim-pop-bet'); void p1.offsetWidth; p1.classList.add('anim-pop-bet'); } if(p2 && p2.style.display !== 'none') { p2.classList.remove('anim-pop-bet'); void p2.offsetWidth; p2.classList.add('anim-pop-bet'); } }
 
     function updateMyBalance(data, didWin = false) {
         let tc = formatTC(data.credits); let ptc = formatTC(data.playable || 0);
         if(didWin && tc > myCredits) { triggerWinAnim(); }
         myCredits = tc; myPlayable = ptc;
-
         document.getElementById('nav-credits').innerText = fmtTC(tc); 
-        
         const pillPlayable = document.getElementById('pill-playable'); const navPlayable = document.getElementById('nav-playable');
-        if (myPlayable > 0) { pillPlayable.style.display = 'flex'; navPlayable.innerText = fmtTC(ptc); } 
-        else { pillPlayable.style.display = 'none'; }
-        
+        if (myPlayable > 0) { pillPlayable.style.display = 'flex'; navPlayable.innerText = fmtTC(ptc); } else { pillPlayable.style.display = 'none'; }
         document.querySelectorAll('.cashier-balance-display').forEach(el => el.innerText = fmtTC(tc) + ' TC');
     }
 
@@ -481,7 +333,6 @@
     function setupDailyRewardUI(dailyData) {
         const container = document.getElementById('dr-days-container'); container.innerHTML = '';
         const rewards = [100, 250, 500, 750, 1000, 1500, 2000];
-        
         for(let i=1; i<=7; i++) {
             let statClass = ''; let boxTitle = `Day ${i}`;
             if (!dailyData.canClaim && dailyData.day === 1) { statClass = 'claimed'; boxTitle = "CLAIMED"; }
@@ -489,20 +340,15 @@
             else if (i === dailyData.day && dailyData.canClaim) { statClass = 'active'; }
             container.insertAdjacentHTML('beforeend', `<div class="dr-day ${statClass}" id="dr-day-${i}"><div class="dr-title">${boxTitle}</div><div class="dr-coin">${rewards[i-1]}<br>Credits</div></div>`);
         }
-
         let sc = document.getElementById('dr-status-container');
-        if(dailyData.canClaim) { sc.innerHTML = `<button class="btn-play dr-claim-btn" id="btn-claim-reward" onclick="claimDaily()">CLAIM REWARD</button>`; } 
-        else { startDailyTimer(dailyData.nextClaim); }
+        if(dailyData.canClaim) { sc.innerHTML = `<button class="btn-play dr-claim-btn" id="btn-claim-reward" onclick="claimDaily()">CLAIM REWARD</button>`; } else { startDailyTimer(dailyData.nextClaim); }
     }
 
     function claimDaily() { socket.emit('claimDaily'); }
-
     socket.on('dailyClaimed', (data) => {
         let activeEl = document.querySelector('.dr-day.active');
         if (activeEl) { activeEl.classList.add('active-claimed'); activeEl.querySelector('.dr-title').innerText = "CLAIMED"; }
-        updateMyBalance(data.newBalance, true);
-        startDailyTimer(data.nextClaim);
-        
+        updateMyBalance(data.newBalance, true); startDailyTimer(data.nextClaim);
         showLocalFlash('shared', `+${fmtTC(data.amt)} PLAYABLE`, 'success');
         setTimeout(() => { closeModal('daily-reward-modal'); }, 1500);
     });
@@ -512,17 +358,10 @@
         sc.innerHTML = `<div class="dr-status-text" style="margin-top:10px;">COME BACK TOMORROW</div><div class="dr-timer" id="dr-timer-display" style="margin-top:5px;">--:--:--</div>`;
         let dest = new Date(nextClaimDate).getTime();
         if(dailyTimerInterval) clearInterval(dailyTimerInterval);
-        
         dailyTimerInterval = setInterval(() => {
             let now = new Date().getTime(); let d = dest - now;
-            if(d <= 0) { 
-                clearInterval(dailyTimerInterval); 
-                sc.innerHTML = `<button class="btn-play dr-claim-btn" onclick="socket.emit('requestBalanceRefresh'); setupDailyRewardUI({canClaim:true, day:1});">REFRESH TO CLAIM</button>`; 
-                return; 
-            }
-            let h = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            let m = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
-            let s = Math.floor((d % (1000 * 60)) / 1000);
+            if(d <= 0) { clearInterval(dailyTimerInterval); sc.innerHTML = `<button class="btn-play dr-claim-btn" onclick="socket.emit('requestBalanceRefresh'); setupDailyRewardUI({canClaim:true, day:1});">REFRESH TO CLAIM</button>`; return; }
+            let h = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); let m = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60)); let s = Math.floor((d % (1000 * 60)) / 1000);
             h = (h < 10) ? "0" + h : h; m = (m < 10) ? "0" + m : m; s = (s < 10) ? "0" + s : s;
             document.getElementById('dr-timer-display').innerText = `${h}:${m}:${s}`;
         }, 1000);
@@ -541,85 +380,52 @@
     function logHistory(gid, betStr, resultStr, wonProfit, lostBet, didBet = true) {
         if(!myGameHistory[gid]) myGameHistory[gid] = [];
         let cleanRes = resultStr.replace(' WINS!', '').replace(' WINS', '');
-        
         myGameHistory[gid].unshift({ bet: betStr, result: cleanRes, wonProfit: wonProfit, lostBet: lostBet, didBet: didBet });
         if(myGameHistory[gid].length > 5) myGameHistory[gid].pop();
-        if(currentHistoryGame === gid && !document.getElementById('history-popover').classList.contains('hidden')) {
-            updateHistoryUI(gid);
-        }
+        if(currentHistoryGame === gid && !document.getElementById('history-popover').classList.contains('hidden')) { updateHistoryUI(gid); }
     }
 
-    socket.on('system_stats_reset', (data) => { 
-        if(currentHistoryGame === data.game) socket.emit('getGlobalResults', data.game); 
-    });
+    socket.on('system_stats_reset', (data) => { if(currentHistoryGame === data.game) socket.emit('getGlobalResults', data.game); });
 
     socket.on('globalResultsData', data => {
-        if (data.game === 'baccarat' || data.game === 'perya' || data.game === 'dt' || data.game === 'sicbo') {
-            globalFallback[data.game] = data.results;
-            if(data.game === currentHistoryGame) document.getElementById('stat-total-rounds').innerText = data.stats.total;
-        }
-        
+        if (data.game === 'baccarat' || data.game === 'perya' || data.game === 'dt' || data.game === 'sicbo') { globalFallback[data.game] = data.results; if(data.game === currentHistoryGame) document.getElementById('stat-total-rounds').innerText = data.stats.total; }
         if(data.game !== currentHistoryGame) return;
-        
         let statsHtml = ``;
         if (data.stats.total > 0) {
             if (data.game === 'd20' || data.game === 'blackjack') {
-                let winP = ((data.stats.Win / data.stats.total) * 100).toFixed(1);
-                let loseP = ((data.stats.Lose / data.stats.total) * 100).toFixed(1);
+                let winP = ((data.stats.Win / data.stats.total) * 100).toFixed(1); let loseP = ((data.stats.Lose / data.stats.total) * 100).toFixed(1);
                 statsHtml = `<span><span style="color:var(--success); font-weight:800;">WIN: ${winP}%</span></span><span><span style="color:var(--danger); font-weight:800;">LOSE: ${loseP}%</span></span>`;
             } else if(data.game === 'coinflip') {
-                let headsP = ((data.stats.Heads / data.stats.total) * 100).toFixed(1);
-                let tailsP = ((data.stats.Tails / data.stats.total) * 100).toFixed(1);
+                let headsP = ((data.stats.Heads / data.stats.total) * 100).toFixed(1); let tailsP = ((data.stats.Tails / data.stats.total) * 100).toFixed(1);
                 statsHtml = `<span><span style="color:#ffb400; font-weight:800;">HEADS: ${headsP}%</span></span><span><span style="color:#e2e8f0; font-weight:800;">TAILS: ${tailsP}%</span></span>`;
             } else {
                 Object.keys(data.stats).forEach(key => {
                     if (key !== 'total') {
                         let perc = ((data.stats[key] / data.stats.total) * 100).toFixed(1);
-                        if (data.game === 'perya') {
-                            statsHtml += `<div style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; margin-right:5px;"><div class="color-die c-${key.toLowerCase()}" style="width:12px; height:12px; border-radius:2px; border:1px solid rgba(255,255,255,0.2);"></div><span style="color:white; font-weight:800; font-size:0.8rem;">${perc}%</span></div>`;
-                        } else {
-                            statsHtml += `<span><span style="color:${getBetColor(key)}; font-weight:800;">${key.toUpperCase()}: ${perc}%</span></span>`;
-                        }
+                        if (data.game === 'perya') { statsHtml += `<div style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; margin-right:5px;"><div class="color-die c-${key.toLowerCase()}" style="width:12px; height:12px; border-radius:2px; border:1px solid rgba(255,255,255,0.2);"></div><span style="color:white; font-weight:800; font-size:0.8rem;">${perc}%</span></div>`; } 
+                        else { statsHtml += `<span><span style="color:${getBetColor(key)}; font-weight:800;">${key.toUpperCase()}: ${perc}%</span></span>`; }
                     }
                 });
             }
         }
-        document.getElementById('stat-percentages').innerHTML = statsHtml;
-        updateHistoryUI(data.game);
+        document.getElementById('stat-percentages').innerHTML = statsHtml; updateHistoryUI(data.game);
     });
 
     function switchView(viewId) { 
       if (audioCtx.state === 'suspended') audioCtx.resume(); 
       document.querySelectorAll('.main-wrapper > .content > .view-container').forEach(d => d.classList.add('hidden')); 
-      let v = document.getElementById('view-' + viewId); 
-      if (v) v.classList.remove('hidden'); 
-      
+      let v = document.getElementById('view-' + viewId); if (v) v.classList.remove('hidden'); 
       let backBtn = document.getElementById('global-back-btn');
-      if (viewId === 'casino') {
-          openLobbyMode('modes'); 
-      } else {
-          backBtn.classList.remove('hidden');
-          document.getElementById('back-btn-text').innerText = 'LEAVE TABLE';
-      }
+      if (viewId === 'casino') { openLobbyMode('modes'); } 
+      else { backBtn.classList.remove('hidden'); document.getElementById('back-btn-text').innerText = 'LEAVE TABLE'; }
     }
 
     function openLobbyMode(mode) { 
-      ['modes', 'indiv', 'shared'].forEach(m => {
-        let el = document.getElementById('lobby-' + m);
-        if(el) el.classList.add('hidden');
-      }); 
-      let target = document.getElementById('lobby-' + mode);
-      if(target) target.classList.remove('hidden'); 
-      
+      ['modes', 'indiv', 'shared'].forEach(m => { let el = document.getElementById('lobby-' + m); if(el) el.classList.add('hidden'); }); 
+      let target = document.getElementById('lobby-' + mode); if(target) target.classList.remove('hidden'); 
       let backBtn = document.getElementById('global-back-btn');
-      if(mode === 'modes') {
-          document.querySelector('.casino-title').classList.remove('hidden');
-          backBtn.classList.add('hidden');
-      } else { 
-          document.querySelector('.casino-title').classList.add('hidden'); 
-          backBtn.classList.remove('hidden');
-          document.getElementById('back-btn-text').innerText = 'BACK TO MODES';
-      }
+      if(mode === 'modes') { document.querySelector('.casino-title').classList.remove('hidden'); backBtn.classList.add('hidden'); } 
+      else { document.querySelector('.casino-title').classList.add('hidden'); backBtn.classList.remove('hidden'); document.getElementById('back-btn-text').innerText = 'BACK TO MODES'; }
     }
     
     function openGame(id) { 
@@ -631,8 +437,7 @@
           if(window.d20AnimCycle) clearInterval(window.d20AnimCycle);
           document.getElementById('d20-icon').className = 'fas fa-dice-d20 dice-icon';
           document.getElementById('d20-icon').style.display='block'; document.getElementById('d20-num').style.display='none';
-          document.getElementById('d20-bet').disabled = false;
-          document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
+          document.getElementById('d20-bet').disabled = false; document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
       }
       if(id === 'coinflip') {
           document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false;
@@ -641,15 +446,13 @@
       if(id === 'blackjack') {
           document.getElementById('bj-p-hand').innerHTML=''; document.getElementById('bj-d-hand').innerHTML='';
           document.getElementById('bj-p-score').innerText='0'; document.getElementById('bj-d-score').innerText='0';
-          document.getElementById('bj-start-controls').classList.remove('hidden');
-          document.getElementById('bj-action-controls').classList.add('hidden');
+          document.getElementById('bj-start-controls').classList.remove('hidden'); document.getElementById('bj-action-controls').classList.add('hidden');
           document.getElementById('btn-bj-deal').disabled = false; bjSt.active = false;
       }
     }
 
     function openSharedGame(id) {
-        window.activeSharedGame = id;
-        socket.emit('joinRoom', id);
+        window.activeSharedGame = id; socket.emit('joinRoom', id);
         if (sConf[id] && sConf[id].setupUI) sConf[id].setupUI();
         document.getElementById('sg-title').innerText = sConf[id].title;
         document.getElementById('sg-chat').innerHTML = '<div class="chat-line chat-sys">Connected to server.</div>';
@@ -658,100 +461,78 @@
 
     function backToHub() {
         let inCasinoView = !document.getElementById('view-casino').classList.contains('hidden');
-        if (inCasinoView) {
-            openLobbyMode('modes');
-        } else {
-            if (window.activeSharedGame) backToSharedLobby();
-            else backToSoloLobby();
-        }
+        if (inCasinoView) { openLobbyMode('modes'); } 
+        else { if (window.activeSharedGame) backToSharedLobby(); else backToSoloLobby(); }
     }
     
     function backToSoloLobby() { switchView('casino'); openLobbyMode('indiv'); }
 
-    // Global Error Handler for Solo Games
     socket.on('localGameError', (data) => { 
-        showLocalFlash(data.game, data.msg, "error"); 
-        socket.emit('requestBalanceRefresh');
-        
+        showLocalFlash(data.game, data.msg, "error"); socket.emit('requestBalanceRefresh');
         if (data.game === 'd20') {
             if(window.d20AnimCycle) clearInterval(window.d20AnimCycle);
             document.getElementById('d20-icon').className = 'fas fa-dice-d20 dice-icon';
             document.getElementById('d20-icon').style.display='block'; document.getElementById('d20-num').style.display='none';
-            document.getElementById('d20-bet').disabled = false;
-            document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
+            document.getElementById('d20-bet').disabled = false; document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
         } else if (data.game === 'coinflip') {
             document.getElementById('coin-wrapper').classList.remove('tossing');
-            document.getElementById('btn-heads').disabled = false; 
-            document.getElementById('btn-tails').disabled = false;
+            document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false;
         } else if (data.game === 'blackjack') {
-            bjSt.active = false; 
-            document.getElementById('btn-bj-deal').disabled = false; 
-            document.getElementById('bj-start-controls').classList.remove('hidden');
-            document.getElementById('bj-action-controls').classList.add('hidden');
+            bjSt.active = false; document.getElementById('btn-bj-deal').disabled = false; 
+            document.getElementById('bj-start-controls').classList.remove('hidden'); document.getElementById('bj-action-controls').classList.add('hidden');
         } else if (data.game === 'mbj') {
-            localPendingBet = 0;
-            renderMBJSeats();
+            localPendingBet = 0; renderMBJSeats();
         }
     });
 
     // =======================================================
-    // SOLO GAMES LOGIC
+    // SOLO GAMES LOGIC (D20 & COINFLIP PHYSICS)
     // =======================================================
     function playD20(choice) {
         let amt = formatTC(document.getElementById('d20-bet').value);
         if(isNaN(amt) || amt < 10) { showLocalFlash('d20', 'MIN BET 10 TC', 'error'); return; }
-
         triggerBetAnim(); sfx.click();
-        document.getElementById('d20-bet').disabled = true;
-        document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = true);
-        
+        document.getElementById('d20-bet').disabled = true; document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = true);
         window.currentD20Choice = choice;
         socket.emit('playSolo', { game: 'd20', choice: choice, bet: amt });
         mySoloRounds.d20++;
     }
 
     socket.on('d20Result', async (data) => {
-        let icon = document.getElementById('d20-icon');
+        let icon = document.getElementById('d20-icon'); 
         icon.className = 'fas fa-dice-d20 dice-icon shake-anim'; 
         sfx.tick('d20');
         await delay(1000); 
         
-        icon.classList.remove('shake-anim');
+        icon.classList.remove('shake-anim'); 
         icon.style.transform = 'scale(0) rotate(360deg)';
         icon.style.opacity = '0';
         
         await delay(300);
         icon.style.display = 'none';
-        icon.style.transform = 'scale(1) rotate(0deg)';
+        icon.style.transform = 'scale(1) rotate(0deg)'; 
         icon.style.opacity = '1';
         
-        let n = document.getElementById('d20-num');
+        let n = document.getElementById('d20-num'); 
         n.style.display = 'block';
         n.style.animation = 'popIn 0.3s ease-out forwards';
         
         let count = 0; sfx.coin('d20');
-        
         window.d20AnimCycle = setInterval(() => { 
-            n.innerText = Math.floor(Math.random()*20)+1; 
-            count++; 
+            n.innerText = Math.floor(Math.random()*20)+1; count++; 
             if(count > 15) { clearInterval(window.d20AnimCycle); finalizeD20(data); } 
         }, 50);
     });
 
     function finalizeD20(data) {
         let n = document.getElementById('d20-num'); n.innerText = data.roll;
-        let msg = document.getElementById('d20-msg');
-        msg.classList.remove('win', 'lose', 'push');
+        let msg = document.getElementById('d20-msg'); msg.classList.remove('win', 'lose', 'push');
         if (data.payout > 0) { msg.classList.add('win'); msg.innerHTML = `<div class="res-title">WON</div><div class="res-payout">+${fmtTC(data.payout)}</div>`; sfx.win('d20'); } 
         else { msg.classList.add('lose'); msg.innerHTML = `<div class="res-title">LOST</div>`; sfx.lose('d20'); }
         msg.classList.add('show');
         logHistory('d20', window.currentD20Choice, data.resStr, data.payout, data.bet);
-        
         setTimeout(() => {
-            msg.classList.remove('show');
-            document.getElementById('d20-bet').disabled = false;
-            document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false);
-            updateMyBalance(data.newBalance, data.payout > 0);
+            msg.classList.remove('show'); document.getElementById('d20-bet').disabled = false; document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false); updateMyBalance(data.newBalance, data.payout > 0);
         }, 3000);
     }
 
@@ -783,26 +564,24 @@
         }, 2200);
 
         setTimeout(() => {
-            let msg = document.getElementById('coin-msg');
-            msg.classList.remove('win', 'lose', 'push');
+            let msg = document.getElementById('coin-msg'); msg.classList.remove('win', 'lose', 'push');
             if (data.payout > 0) { msg.classList.add('win'); msg.innerHTML = `<div class="res-title">WON</div><div class="res-payout">+${fmtTC(data.payout)}</div>`; sfx.win('coinflip'); } 
             else { msg.classList.add('lose'); msg.innerHTML = `<div class="res-title">LOST</div>`; sfx.lose('coinflip'); }
             msg.classList.add('show');
-
             logHistory('coinflip', window.currentCoinChoice, data.resStr, data.payout, data.bet);
             
-            setTimeout(() => {
-                msg.classList.remove('show');
-                document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false;
-                updateMyBalance(data.newBalance, data.payout > 0);
+            setTimeout(() => { 
+                msg.classList.remove('show'); 
+                document.getElementById('btn-heads').disabled = false; 
+                document.getElementById('btn-tails').disabled = false; 
+                updateMyBalance(data.newBalance, data.payout > 0); 
             }, 2500);
-        }, 2600);
+        }, 2600); 
     });
 
     function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, extraClass = '') {
         let animClass = '';
-        if(animateIn) animClass = 'anim-deal';
-        if(animateReveal) animClass = 'anim-flip'; 
+        if(animateIn) animClass = 'anim-deal'; if(animateReveal) animClass = 'anim-flip'; 
         if(isHidden) return `<div class="play-card card-back ${animClass} ${extraClass}">?</div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : '';
@@ -816,41 +595,33 @@
         if(isNaN(amt) || amt < 10) { showLocalFlash('blackjack', 'MIN BET 10 TC', 'error'); return; }
         triggerBetAnim(); sfx.click();
         document.getElementById('btn-bj-deal').disabled = true; bjSt.active = true;
-        
-        document.getElementById('bj-p-hand').innerHTML = '';
-        document.getElementById('bj-d-hand').innerHTML = '';
+        document.getElementById('bj-p-hand').innerHTML = ''; document.getElementById('bj-d-hand').innerHTML = '';
         document.getElementById('bj-p-score').innerText = '0'; document.getElementById('bj-d-score').innerText = '0';
         document.getElementById('btn-bj-double').classList.add('hidden'); 
-        
         socket.emit('playSolo', { game: 'blackjack', action: 'start', bet: amt });
         mySoloRounds.blackjack++;
     }
 
     async function renderBJHands(data) {
         let pHand = document.getElementById('bj-p-hand'); let dHand = document.getElementById('bj-d-hand');
-        
         if (data.event === 'deal') {
             sfx.deal('blackjack');
             pHand.innerHTML = generateCardHTML(data.pHand[0], false, true); await delay(300); sfx.deal('blackjack');
             dHand.innerHTML = generateCardHTML(data.dHand[0], false, true); await delay(300); sfx.deal('blackjack');
-            pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pHand[1], false, true));
-            await delay(300); sfx.deal('blackjack');
+            pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pHand[1], false, true)); await delay(300); sfx.deal('blackjack');
             dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[1], true, true)); await delay(400);
 
             document.getElementById('bj-p-score').innerText = getBJScore(data.pHand);
             document.getElementById('bj-d-score').innerText = data.dHand[0].bjVal;
             
             if (!data.naturalBJ) {
-                document.getElementById('bj-start-controls').classList.add('hidden');
-                document.getElementById('bj-action-controls').classList.remove('hidden');
+                document.getElementById('bj-start-controls').classList.add('hidden'); document.getElementById('bj-action-controls').classList.remove('hidden');
                 if (data.pHand.length === 2) { document.getElementById('btn-bj-double').classList.remove('hidden'); }
             } else { finalizeBJ(data); }
         } 
         else if (data.event === 'hit') {
-            document.getElementById('btn-bj-double').classList.add('hidden');
-            sfx.deal('blackjack');
-            let c = data.pHand[data.pHand.length - 1];
-            pHand.insertAdjacentHTML('beforeend', generateCardHTML(c, false, true));
+            document.getElementById('btn-bj-double').classList.add('hidden'); sfx.deal('blackjack');
+            let c = data.pHand[data.pHand.length - 1]; pHand.insertAdjacentHTML('beforeend', generateCardHTML(c, false, true));
             document.getElementById('bj-p-score').innerText = getBJScore(data.pHand);
         }
         else if (data.event === 'resolved') {
@@ -859,16 +630,12 @@
             document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, 2));
             
             if (data.pHand.length > pHand.children.length) {
-                sfx.deal('blackjack');
-                let c = data.pHand[data.pHand.length - 1];
-                pHand.insertAdjacentHTML('beforeend', generateCardHTML(c, false, true));
+                sfx.deal('blackjack'); let c = data.pHand[data.pHand.length - 1]; pHand.insertAdjacentHTML('beforeend', generateCardHTML(c, false, true));
                 document.getElementById('bj-p-score').innerText = getBJScore(data.pHand);
             }
-            
             await delay(600);
             for (let i = 2; i < data.dHand.length; i++) {
-                sfx.deal('blackjack');
-                dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[i], false, true));
+                sfx.deal('blackjack'); dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[i], false, true));
                 document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, i+1));
                 await delay(600);
             }
@@ -880,8 +647,7 @@
     socket.on('bjUpdate', (data) => { isSoloActionTimeout = false; renderBJHands(data); });
 
     function finalizeBJ(data) {
-        let msg = document.getElementById('bj-msg');
-        msg.classList.remove('win', 'lose', 'push');
+        let msg = document.getElementById('bj-msg'); msg.classList.remove('win', 'lose', 'push');
         let displayPayout = '';
         if (data.payout > 0) { 
             if (data.msg === 'Push') { msg.classList.add('push'); displayPayout = `PUSH`; sfx.win('blackjack'); }
@@ -891,7 +657,6 @@
         msg.innerHTML = `<div class="res-title">${data.msg.toUpperCase()}</div><div class="res-payout">${displayPayout}</div>`;
         msg.classList.add('show');
         logHistory('blackjack', '-', data.resStr, data.payout, data.bet);
-        
         setTimeout(() => {
             msg.classList.remove('show'); document.getElementById('btn-bj-deal').disabled = false; bjSt.active = false;
             document.getElementById('bj-start-controls').classList.remove('hidden'); updateMyBalance(data.newBalance, data.payout > data.bet);
@@ -899,24 +664,21 @@
     }
 
     function hitBlackjack() { 
-        if(isSoloActionTimeout) return; isSoloActionTimeout = true;
-        sfx.click(); 
+        if(isSoloActionTimeout) return; isSoloActionTimeout = true; sfx.click(); 
         document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true);
-        socket.emit('playSolo', { game: 'blackjack', action: 'hit' });
+        socket.emit('playSolo', { game: 'blackjack', action: 'hit' }); 
         setTimeout(()=>{ document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); isSoloActionTimeout=false; }, 500);
     }
     function standBlackjack() { 
-        if(isSoloActionTimeout) return; isSoloActionTimeout = true;
-        sfx.click(); 
+        if(isSoloActionTimeout) return; isSoloActionTimeout = true; sfx.click(); 
         document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true);
-        socket.emit('playSolo', { game: 'blackjack', action: 'stand' });
+        socket.emit('playSolo', { game: 'blackjack', action: 'stand' }); 
         setTimeout(()=>{ document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); isSoloActionTimeout=false; }, 500);
     }
     function doubleBlackjack() { 
-        if(isSoloActionTimeout) return; isSoloActionTimeout = true;
-        sfx.click(); 
+        if(isSoloActionTimeout) return; isSoloActionTimeout = true; sfx.click(); 
         document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true);
-        socket.emit('playSolo', { game: 'blackjack', action: 'double' });
+        socket.emit('playSolo', { game: 'blackjack', action: 'double' }); 
         setTimeout(()=>{ document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); isSoloActionTimeout=false; }, 500);
     }
 
@@ -1017,7 +779,7 @@
             }
         },
         'baccarat': {
-            title: 'BACCARAT',
+           title: 'BACCARAT',
             setupUI: () => {
                 document.getElementById('sg-display').innerHTML = `
                     <div class="blackjack-scores" style="gap:20px;">
@@ -1111,98 +873,63 @@
         
         let currentTileBet = mySBets[choice] || 0;
         if (currentTileBet + amt > 50000) { showLocalFlash('shared', "Max 50K TC Per Tile", "error"); return; }
-        
         if (amt > (myCredits + myPlayable)) { showLocalFlash('shared', "Insufficient TC", "error"); return; }
         
-        isBettingTimeout = true;
-        setTimeout(() => { isBettingTimeout = false; }, 250);
-
+        isBettingTimeout = true; setTimeout(() => { isBettingTimeout = false; }, 250);
         triggerBetAnim(); sfx.click();
         
-        // Optimistic Balance
-        if(myPlayable >= amt) { myPlayable -= amt; } 
-        else { let rem = amt - myPlayable; myPlayable = 0; myCredits -= rem; }
+        if(myPlayable >= amt) { myPlayable -= amt; } else { let rem = amt - myPlayable; myPlayable = 0; myCredits -= rem; }
         updateMyBalance({credits: myCredits, playable: myPlayable});
         
-        // Optimistic UI Updates instantly
         if(!mySBets[choice]) mySBets[choice] = 0;
-        mySBets[choice] += amt;
-        mySBetsStack.push({choice: choice, amount: amt});
+        mySBets[choice] += amt; mySBetsStack.push({choice: choice, amount: amt});
         
         let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`);
-        if(btn) {
-            btn.classList.add('has-bet');
-            let badge = btn.querySelector('.tile-bet-badge');
-            badge.innerText = fmtTC(mySBets[choice]);
-            badge.style.display = 'block';
-        }
+        if(btn) { btn.classList.add('has-bet'); let badge = btn.querySelector('.tile-bet-badge'); badge.innerText = fmtTC(mySBets[choice]); badge.style.display = 'block'; }
         
         updateCurrentBetsPopover();
-
         socket.emit('placeSharedBet', { room: window.activeSharedGame, choice: choice, amount: amt });
     }
 
     function undoSharedBet(room) {
         if (sState.status !== 'BETTING') return;
         if (mySBetsStack.length === 0) { showLocalFlash('shared', 'NO BETS TO UNDO', 'error'); return; }
-        sfx.click();
-        socket.emit('undoSharedBet', { room: window.activeSharedGame });
+        sfx.click(); socket.emit('undoSharedBet', { room: window.activeSharedGame });
     }
 
     socket.on('undoSuccess', (data) => {
         mySBetsStack.pop();
         if(mySBets[data.choice]) {
             mySBets[data.choice] -= data.amount;
-            
             let btn = document.querySelector(`.sg-tile[data-choice="${data.choice}"]`);
             if(btn) {
                 let badge = btn.querySelector('.tile-bet-badge');
-                if (mySBets[data.choice] > 0) {
-                    badge.innerText = fmtTC(mySBets[data.choice]);
-                } else {
-                    delete mySBets[data.choice];
-                    badge.style.display = 'none';
-                    btn.classList.remove('has-bet');
-                }
+                if (mySBets[data.choice] > 0) { badge.innerText = fmtTC(mySBets[data.choice]); } 
+                else { delete mySBets[data.choice]; badge.style.display = 'none'; btn.classList.remove('has-bet'); }
             }
         }
-        
-        updateCurrentBetsPopover();
-        updateMyBalance(data.newBalance);
-        showLocalFlash('shared', 'BET UNDONE', 'success');
-        sfx.tick();
+        updateCurrentBetsPopover(); updateMyBalance(data.newBalance);
+        showLocalFlash('shared', 'BET UNDONE', 'success'); sfx.tick();
     });
 
-    socket.on('sharedBetConfirmed', (data) => {
-        updateMyBalance(data.newBalance);
-    });
+    socket.on('sharedBetConfirmed', (data) => { updateMyBalance(data.newBalance); });
 
     socket.on('newRound', () => {
         sState.status = 'BETTING'; mySBets = {}; mySBetsStack = [];
-        document.querySelectorAll('.sg-tile').forEach(btn => { 
-            btn.disabled = false; btn.classList.remove('has-bet'); 
-            let badge = btn.querySelector('.tile-bet-badge');
-            if(badge) badge.style.display = 'none';
-        });
-        
+        document.querySelectorAll('.sg-tile').forEach(btn => { btn.disabled = false; btn.classList.remove('has-bet'); let badge = btn.querySelector('.tile-bet-badge'); if(badge) badge.style.display = 'none'; });
         updateCurrentBetsPopover();
         
         let ov = document.getElementById('sg-overlay'); if(ov) ov.classList.remove('show');
         
         if (window.activeSharedGame === 'baccarat') {
-            document.getElementById('sg-bac-p-hand').innerHTML = ``;
-            document.getElementById('sg-bac-b-hand').innerHTML = ``;
+            document.getElementById('sg-bac-p-hand').innerHTML = ``; document.getElementById('sg-bac-b-hand').innerHTML = ``;
             document.getElementById('sg-bac-p-score').innerText = '0'; document.getElementById('sg-bac-b-score').innerText = '0';
         } else if (window.activeSharedGame === 'perya') {
             document.getElementById('sg-perya-dice').innerHTML = `<div class="color-die c-grey"><i class="fas fa-question"></i></div><div class="color-die c-grey"><i class="fas fa-question"></i></div><div class="color-die c-grey"><i class="fas fa-question"></i></div>`;
         } else if (window.activeSharedGame === 'dt') {
-            document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
-            document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
+            document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`; document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`;
         } else if (window.activeSharedGame === 'sicbo') {
-            document.getElementById('sg-sicbo-dice').innerHTML = `
-                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
-                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
-                <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>`;
+            document.getElementById('sg-sicbo-dice').innerHTML = `<div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div><div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div><div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>`;
             document.getElementById('sg-sicbo-sum').style.opacity = '0';
         }
     });
@@ -1219,126 +946,70 @@
             document.getElementById('sg-dt-dragon').innerHTML = generateCardHTML(data.dCard, false, false, true, 'dt-card'); sfx.deal('dt');
             await delay(800); 
             document.getElementById('sg-dt-tiger').innerHTML = generateCardHTML(data.tCard, false, false, true, 'dt-card'); sfx.deal('dt');
-
-            if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; else if(mySBets['Dragon'] || mySBets['Tiger']) myWin = (mySBets['Dragon']||0) + (mySBets['Tiger']||0);
-            } 
-            else { if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2;
-            }
+            if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; else if(mySBets['Dragon'] || mySBets['Tiger']) myWin = (mySBets['Dragon']||0) + (mySBets['Tiger']||0); } 
+            else { if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2; }
         } 
         else if (data.room === 'sicbo') {
-            let dc = document.getElementById('sg-sicbo-dice');
-            await delay(1000); 
-            dc.innerHTML = '';
-            for(let i=0; i<3; i++) { dc.innerHTML += `<i class="fas fa-${dIconMap[data.roll[i]-1]} s-die anim-pop" style="font-size: 6rem; color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8);"></i>`;
-            }
-            sfx.deal('sicbo'); 
-            await delay(500); 
-            document.getElementById('sg-sicbo-sum').innerText = data.sum;
-            document.getElementById('sg-sicbo-sum').style.opacity = '1';
-
+            let dc = document.getElementById('sg-sicbo-dice'); await delay(1000);  dc.innerHTML = '';
+            for(let i=0; i<3; i++) { dc.innerHTML += `<i class="fas fa-${dIconMap[data.roll[i]-1]} s-die anim-pop" style="font-size: 6rem; color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8);"></i>`; }
+            sfx.deal('sicbo'); await delay(500); 
+            document.getElementById('sg-sicbo-sum').innerText = data.sum; document.getElementById('sg-sicbo-sum').style.opacity = '1';
             if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2;
         } 
         else if (data.room === 'perya') {
-            let dc = document.getElementById('sg-perya-dice');
-            let diceEls = dc.querySelectorAll('.color-die');
-            const cols = ['Yellow', 'White', 'Pink', 'Blue', 'Red', 'Green'];
-            
-            sfx.tick('perya');
-            let flashInt = setInterval(() => {
-                diceEls.forEach(el => {
-                    let randomCol = cols[Math.floor(Math.random() * cols.length)].toLowerCase();
-                    el.className = `color-die c-${randomCol}`;
-                });
-            }, 100);
-
-            await delay(1500);
-            clearInterval(flashInt);
-            
-            for(let i=0; i<3; i++) {
-                diceEls[i].className = `color-die c-${data.roll[i].toLowerCase()} anim-pop`;
-                sfx.coin('perya');
-                await delay(200);
-            }
-            
-            Object.keys(mySBets).forEach(choice => {
-                let matches = data.roll.filter(c => c === choice).length;
-                if(matches > 0) myWin += mySBets[choice] + (mySBets[choice] * matches);
-            });
+            let dc = document.getElementById('sg-perya-dice'); let diceEls = dc.querySelectorAll('.color-die');
+            const cols = ['Yellow', 'White', 'Pink', 'Blue', 'Red', 'Green']; sfx.tick('perya');
+            let flashInt = setInterval(() => { diceEls.forEach(el => { el.className = `color-die c-${cols[Math.floor(Math.random() * cols.length)].toLowerCase()}`; }); }, 100);
+            await delay(1500); clearInterval(flashInt);
+            for(let i=0; i<3; i++) { diceEls[i].className = `color-die c-${data.roll[i].toLowerCase()} anim-pop`; sfx.coin('perya'); await delay(200); }
+            Object.keys(mySBets).forEach(choice => { let matches = data.roll.filter(c => c === choice).length; if(matches > 0) myWin += mySBets[choice] + (mySBets[choice] * matches); });
         }
         else if (data.room === 'baccarat') {
-            let pHand = document.getElementById('sg-bac-p-hand');
-            let bHand = document.getElementById('sg-bac-b-hand');
-            
+            let pHand = document.getElementById('sg-bac-p-hand'); let bHand = document.getElementById('sg-bac-b-hand');
             pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[0], false, false, true)); sfx.deal('baccarat'); await delay(500);
             bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[0], false, false, true)); sfx.deal('baccarat'); await delay(500);
             pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[1], false, false, true)); sfx.deal('baccarat'); await delay(500);
             bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[1], false, false, true)); sfx.deal('baccarat'); await delay(800);
 
             let centerMsg = document.getElementById('bac-center-msg');
-            if (data.p3Drawn) { 
-                centerMsg.innerText = 'DRAWING 3RD CARD FOR PLAYER...';
-                centerMsg.style.opacity = '1';
-                await delay(800); centerMsg.style.opacity = '0';
-                pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[2], false, true)); sfx.deal('baccarat'); await delay(800);
-            }
-            if (data.b3Drawn) { 
-                centerMsg.innerText = 'DRAWING 3RD CARD FOR BANKER...';
-                centerMsg.style.opacity = '1';
-                await delay(800); centerMsg.style.opacity = '0';
-                bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[2], false, true)); sfx.deal('baccarat'); await delay(800);
-            }
+            if (data.p3Drawn) { centerMsg.innerText = 'DRAWING 3RD CARD FOR PLAYER...'; centerMsg.style.opacity = '1'; await delay(800); centerMsg.style.opacity = '0'; pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[2], false, true)); sfx.deal('baccarat'); await delay(800); }
+            if (data.b3Drawn) { centerMsg.innerText = 'DRAWING 3RD CARD FOR BANKER...'; centerMsg.style.opacity = '1'; await delay(800); centerMsg.style.opacity = '0'; bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[2], false, true)); sfx.deal('baccarat'); await delay(800); }
 
-            document.getElementById('sg-bac-p-score').innerText = data.pScore;
-            document.getElementById('sg-bac-b-score').innerText = data.bScore;
-            if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9;
-            else if(mySBets['Player'] || mySBets['Banker']) myWin = (mySBets['Player']||0) + (mySBets['Banker']||0); } 
-            else if (data.winner === 'Player') { if (mySBets['Player']) myWin = mySBets['Player'] * 2;
-            } 
-            else if (data.winner === 'Banker') { if (mySBets['Banker']) myWin = mySBets['Banker'] * 1.95;
-            }
+            document.getElementById('sg-bac-p-score').innerText = data.pScore; document.getElementById('sg-bac-b-score').innerText = data.bScore;
+
+            if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; else if(mySBets['Player'] || mySBets['Banker']) myWin = (mySBets['Player']||0) + (mySBets['Banker']||0); } 
+            else if (data.winner === 'Player') { if (mySBets['Player']) myWin = mySBets['Player'] * 2; } 
+            else if (data.winner === 'Banker') { if (mySBets['Banker']) myWin = mySBets['Banker'] * 1.95; }
         }
 
         net = formatTC(myWin - totalBet);
         let myBetStrs = Object.keys(mySBets).length > 0 ? Object.keys(mySBets).join(', ') : '-';
-        
         logHistory(data.room, myBetStrs, data.resStr, myWin, totalBet, totalBet > 0);
+
         if (totalBet > 0) {
-            
             // Mario Coin Payout Animation
             const payoutAnim = async () => {
                 let losses = Object.keys(mySBets).filter(c => c !== data.winner && !(data.winner === 'Tie' && (c === 'Player' || c === 'Banker') && data.room === 'baccarat'));
                 for(let choice of losses) {
                     let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`);
                     if(btn) {
-                        let bRect = btn.getBoundingClientRect();
-                        let coin = document.createElement('div');
-                        coin.className = 'animated-chip';
-                        coin.style.cssText = `background: var(--danger); color: white; width: auto; padding: 5px 10px; border-radius: 8px;
-                        font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999;`;
-                        coin.innerText = `-${fmtTC(mySBets[choice])}`;
-                        document.body.appendChild(coin);
-                        setTimeout(() => { coin.style.top = '100px'; coin.style.opacity = '0'; }, 30);
-                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500);
-                        sfx.lose(data.room);
-                        await delay(300);
+                        let bRect = btn.getBoundingClientRect(); let coin = document.createElement('div'); coin.className = 'animated-chip';
+                        coin.style.cssText = `background: var(--danger); color: white; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999;`;
+                        coin.innerText = `-${fmtTC(mySBets[choice])}`; document.body.appendChild(coin);
+                        setTimeout(() => { coin.style.top = '100px'; coin.style.opacity = '0'; }, 30); setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500);
+                        sfx.lose(data.room); await delay(300);
                     }
                 }
-                
                 let wins = Object.keys(mySBets).filter(c => c === data.winner || (data.winner === 'Tie' && (c === 'Player' || c === 'Banker') && data.room === 'baccarat'));
                 for(let choice of wins) {
                     let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`);
                     if(btn) {
                         let bRect = btn.getBoundingClientRect();
-                        let wAmt = data.winner === 'Tie' && choice === 'Tie' ?
-                        mySBets[choice] * 9 : (data.winner === 'Tie' ? mySBets[choice] : mySBets[choice] * (data.room === 'baccarat' && choice === 'Banker' ? 1.95 : 2));
-                        let coin = document.createElement('div');
-                        coin.className = 'animated-chip';
-                        coin.style.cssText = `background: var(--success); color: black; width: auto; padding: 5px 10px; border-radius: 8px;
-                        font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999; box-shadow: 0 0 15px var(--success);`;
-                        coin.innerText = `+${fmtTC(wAmt)}`;
-                        document.body.appendChild(coin);
-                        setTimeout(() => { coin.style.top = '10px'; coin.style.opacity = '0'; }, 30);
-                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500);
+                        let wAmt = data.winner === 'Tie' && choice === 'Tie' ? mySBets[choice] * 9 : (data.winner === 'Tie' ? mySBets[choice] : mySBets[choice] * (data.room === 'baccarat' && choice === 'Banker' ? 1.95 : 2));
+                        let coin = document.createElement('div'); coin.className = 'animated-chip';
+                        coin.style.cssText = `background: var(--success); color: black; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999; box-shadow: 0 0 15px var(--success);`;
+                        coin.innerText = `+${fmtTC(wAmt)}`; document.body.appendChild(coin);
+                        setTimeout(() => { coin.style.top = '10px'; coin.style.opacity = '0'; }, 30); setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500);
                         sfx.win(data.room); await delay(300);
                     }
                 }
@@ -1346,17 +1017,11 @@
             await payoutAnim();
 
             rP.style.display = 'block';
-            if (net > 0) { statClass = 'win'; displayStr = `+${fmtTC(net)}`; sfx.win(data.room);
-            } 
-            else if (net < 0) { statClass = 'lose';
-            displayStr = `LOST`; sfx.lose(data.room); } 
-            else { statClass = 'push';
-            displayStr = `PUSH`; sfx.win(data.room); }
+            if (net > 0) { statClass = 'win'; displayStr = `+${fmtTC(net)}`; sfx.win(data.room); } 
+            else if (net < 0) { statClass = 'lose'; displayStr = `LOST`; sfx.lose(data.room); } 
+            else { statClass = 'push'; displayStr = `PUSH`; sfx.win(data.room); }
             
-            ov.classList.add(statClass);
-            rT.innerText = data.resStr;
-            rP.innerText = displayStr;
-            ov.classList.add('show');
+            ov.classList.add(statClass); rT.innerText = data.resStr; rP.innerText = displayStr; ov.classList.add('show');
             setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1000);
         } else {
             showLocalFlash('shared', data.resStr, 'success');
@@ -1368,6 +1033,7 @@
     // =======================================================
     function sendChat(isMbj = false) {
         let inputId = isMbj ? 'mbj-chat-input' : 'chat-input';
+        // FIXED VIP BLACKJACK CHAT ID HERE
         let boxId = isMbj ? 'mbj-chat' : 'sg-chat';
         
         let input = document.getElementById(inputId); let msg = input.value.trim();
@@ -1376,22 +1042,20 @@
             box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--ps-glow); font-weight:900;">You:</span> <span class="c-msg" style="color:white;">${msg}</span></div>`);
             box.scrollTop = box.scrollHeight;
             socket.emit('sendChat', { msg: msg }); 
-            input.value = '';
+            input.value = ''; 
         }
     }
     
     function sendMBJChat() { sendChat(true); }
 
     socket.on('chatMessage', (data) => {
+        // FIXED VIP BLACKJACK CHAT ID HERE
         let boxId = window.activeSharedGame === 'mbj' ? 'mbj-chat' : 'sg-chat';
         let box = document.getElementById(boxId);
         if (box && window.activeSharedGame) {
             let sysClass = data.sys ? 'chat-sys' : '';
-            if (data.sys) {
-                box.insertAdjacentHTML('beforeend', `<div class="chat-line ${sysClass}">${data.text}</div>`);
-            } else {
-                box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--text-muted); font-weight:900;">${data.user}:</span> <span class="c-msg" style="color:white;">${data.text}</span></div>`);
-            }
+            if (data.sys) { box.insertAdjacentHTML('beforeend', `<div class="chat-line ${sysClass}">${data.text}</div>`); } 
+            else { box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--text-muted); font-weight:900;">${data.user}:</span> <span class="c-msg" style="color:white;">${data.text}</span></div>`); }
             box.scrollTop = box.scrollHeight;
         }
     });
@@ -1399,57 +1063,36 @@
     function backToSharedLobby() { 
         if (window.activeSharedGame === 'mbj') {
             if (localSeatId && currentMBJSeats[localSeatId] && currentMBJSeats[localSeatId].hands.length > 0 && currentMBJSeats[localSeatId].hands[0].bet > 0 && mbjGameState === 'BETTING') {
-                showLocalFlash('mbj', "Wait for round to finish.", "error");
-                return;
+                showLocalFlash('mbj', "Wait for round to finish.", "error"); return;
             }
-            sitUp();
-            document.getElementById('view-game-mbj').classList.add('hidden');
-            socket.emit('leaveRoom', 'mbj');
-            window.activeSharedGame = null;
-            switchView('casino');
-            openLobbyMode('shared');
-            return;
+            sitUp(); document.getElementById('view-game-mbj').classList.add('hidden');
+            socket.emit('leaveRoom', 'mbj'); window.activeSharedGame = null; switchView('casino'); openLobbyMode('shared'); return;
         }
-
-        if (window.activeSharedGame && mySBets && Object.values(mySBets).reduce((a,b)=>a+b,0) > 0 && sState.status === 'BETTING') {
-            showLocalFlash('shared', "Wait for round to finish.", "error");
-            return;
-        }
+        if (window.activeSharedGame && mySBets && Object.values(mySBets).reduce((a,b)=>a+b,0) > 0 && sState.status === 'BETTING') { showLocalFlash('shared', "Wait for round to finish.", "error"); return; }
         document.getElementById('view-shared-game').classList.add('hidden'); 
-        socket.emit('leaveRoom', window.activeSharedGame);
-        window.activeSharedGame = null; 
-        switchView('casino'); 
-        openLobbyMode('shared');
+        socket.emit('leaveRoom', window.activeSharedGame); window.activeSharedGame = null; 
+        switchView('casino'); openLobbyMode('shared'); 
     }
     
     // =======================================================
     // VIP BLACKJACK LOGIC & UI INTEGRATION
     // =======================================================
-    let mbjGameState = 'BETTING';
-    let localPendingBet = 0;
-    let localSeatId = null;
+    let mbjGameState = 'BETTING'; let localPendingBet = 0; let localSeatId = null;
     let renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
     let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
     function openMBJ() {
-        window.activeSharedGame = 'mbj';
-        socket.emit('joinRoom', 'mbj');
-        renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
-        renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
+        window.activeSharedGame = 'mbj'; socket.emit('joinRoom', 'mbj');
+        renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null });
         document.getElementById('mbj-chat').innerHTML = '<div class="chat-line chat-sys">Welcome to VIP Premium.</div>';
         switchView('game-mbj');
     }
 
     function getMBJDisplayScore(handCards) {
         let score = 0, aces = 0;
-        for (let c of handCards) {
-            score += c.bjVal; 
-            if (c.raw === 'A') aces++;
-        }
+        for (let c of handCards) { score += c.bjVal; if (c.raw === 'A') aces++; }
         while (score > 21 && aces > 0) { score -= 10; aces--; }
-        if (aces > 0 && score < 21) {
-            return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`;
-        }
+        if (aces > 0 && score < 21) { return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`; }
         return `<span style="font-size:1.05rem;">${score}</span>`;
     }
 
@@ -1457,8 +1100,7 @@
         let animClass = '';
         if(animateIn) { animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in'; }
         if(animateReveal) animClass = 'anim-reveal'; 
-        let doubleClass = isDoubled ? 'card-doubled' : '';
-        let styleStr = `left: ${leftOffset}px;`;
+        let doubleClass = isDoubled ? 'card-doubled' : ''; let styleStr = `left: ${leftOffset}px;`;
         if(isHidden) return `<div class="mbj-card card-back ${animClass} ${doubleClass}" style="${styleStr}"></div>`;
         let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
         let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black';
@@ -1485,194 +1127,123 @@
         let fRect = fromEl.getBoundingClientRect(); let tRect = toEl.getBoundingClientRect();
         let chip = document.createElement('div'); chip.className = `animated-chip`;
         chip.style.cssText = `--c-bg: ${color}; left: ${fRect.left + (fRect.width/2)}px; top: ${fRect.top + (fRect.height/2)}px; margin-left: -22.5px; margin-top: -22.5px; position:absolute; z-index:9999; border-radius:50%; width:40px; height:40px; box-shadow:0 0 10px rgba(0,0,0,0.5); border:2px solid var(--c-bg); background:radial-gradient(circle at center, #fff 0%, #fff 40%, transparent 41%), repeating-conic-gradient(var(--c-bg) 0% 10%, #fff 10% 20%); transition: all 0.5s ease-in-out;`;
-        document.body.appendChild(chip);
-        void chip.offsetWidth;
+        document.body.appendChild(chip); void chip.offsetWidth;
         setTimeout(() => { chip.style.left = `${tRect.left + (tRect.width/2)}px`; chip.style.top = `${tRect.top + (tRect.height/2)}px`; chip.style.opacity = '0'; }, 30);
         setTimeout(() => { if(chip.parentNode) chip.remove(); }, 500);
     }
 
     let isMbjActionTimeout = false;
     function sendMBJAction(type) {
-        if(isMbjActionTimeout) return; isMbjActionTimeout = true;
-        sfx.click();
-        socket.emit('mbjAction', { type: type });
-        setTimeout(() => { isMbjActionTimeout = false; }, 500);
+        if(isMbjActionTimeout) return; isMbjActionTimeout = true; sfx.click();
+        socket.emit('mbjAction', { type: type }); setTimeout(() => { isMbjActionTimeout = false; }, 500);
     }
 
-    function sitDown(seatNum) {
-        sfx.click();
-        socket.emit('mbjTakeSeat', seatNum);
-        currentMBJSeats[seatNum] = { username: myUsername, hands: [] };
-        renderMBJSeats();
-    }
-    
-    function sitUp() {
-        sfx.click();
-        socket.emit('mbjLeaveSeat');
-        if(localSeatId) currentMBJSeats[localSeatId] = null;
-        localSeatId = null;
-        renderMBJSeats();
-    }
+    function sitDown(seatNum) { sfx.click(); socket.emit('mbjTakeSeat', seatNum); currentMBJSeats[seatNum] = { username: myUsername, hands: [] }; renderMBJSeats(); }
+    function sitUp() { sfx.click(); socket.emit('mbjLeaveSeat'); if(localSeatId) currentMBJSeats[localSeatId] = null; localSeatId = null; renderMBJSeats(); }
 
     function renderMBJSeats(seats, activeTurnObj = null) {
         currentMBJSeats = seats || currentMBJSeats; 
-        let cont = document.getElementById('mbj-seats-row'); 
-        if(!cont) return; 
-        
-        let htmlBuffer = '';
-        let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null;
-        let activeHandIdx = activeTurnObj ? activeTurnObj.handIdx : 0;
-        localSeatId = null;
+        let cont = document.getElementById('mbj-seats-row'); if(!cont) return; 
+        let htmlBuffer = ''; let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null; let activeHandIdx = activeTurnObj ? activeTurnObj.handIdx : 0; localSeatId = null;
 
         for(let i=1; i<=5; i++) {
-            let s = currentMBJSeats[i]; 
-            let isMe = s && s.username === myUsername; 
-            if (isMe) localSeatId = i;
-
+            let s = currentMBJSeats[i]; let isMe = s && s.username === myUsername; if (isMe) localSeatId = i;
             if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { continue; }
 
-            let isMySeatTurn = activeSeatNum == i;
-            let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
-            let activeClass = isMySeatTurn ? 'active-turn' : '';
-            let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
-            
+            let isMySeatTurn = activeSeatNum == i; let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : '';
+            let activeClass = isMySeatTurn ? 'active-turn' : ''; let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
             let canSit = !s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername);
             let clickAction = canSit ? `sitDown(${i})` : ``; 
 
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
-            
             let displayBet = s && s.hands && s.hands.length > 0 ? s.hands[0].bet : 0;
             if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) displayBet = localPendingBet;
 
             if (s && s.hands && s.hands.length > 0) {
                 if (!renderedCardCount[i]) renderedCardCount[i] = [];
-                
                 html += `<div class="mbj-hands-wrapper">`;
                 s.hands.forEach((hand, hIdx) => {
-                    let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx;
-                    let cardCount = hand.cards.length;
-                    
+                    let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx; let cardCount = hand.cards.length;
                     let splitClass = s.hands.length > 1 ? (hIdx === 0 ? 'mbj-hand-split-0' : 'mbj-hand-split-1') : '';
-                    
                     html += `<div class="mbj-hand-column ${splitClass}">`;
-                    
                     if (isThisHandActive && mbjGameState === 'PLAYER_TURN' && isMe) {
                         document.getElementById('mbj-actions-ui').style.display = 'flex';
                         document.getElementById('mbj-btn-double').style.display = hand.cards.length === 2 ? 'flex' : 'none';
                         document.getElementById('mbj-btn-split').style.display = (hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1) ? 'flex' : 'none';
                     }
-                    
                     let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
                     html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
                     
-                    let previouslyRendered = renderedCardCount[i][hIdx] || 0;
-                    let isNewCard = cardCount > previouslyRendered;
-                    let delayClassBadge = isNewCard ? 'mbj-delay-badge' : '';
-                    let delayClassPill = isNewCard ? 'mbj-delay-pill' : '';
+                    let previouslyRendered = renderedCardCount[i][hIdx] || 0; let isNewCard = cardCount > previouslyRendered;
+                    let delayClassBadge = isNewCard ? 'mbj-delay-badge' : ''; let delayClassPill = isNewCard ? 'mbj-delay-pill' : '';
 
                     if(hand.cards.length > 0 && hand.status !== 'BUST') { 
-                        if(hand.status === 'BLACKJACK') {
-                            html += `<div class="mbj-status-pill mbj-pill-bj ${delayClassPill}">BLACKJACK</div>`;
-                        } else {
-                            let badgeClass = isThisHandActive ? 'mbj-score-active' : 'mbj-score-inactive';
-                            html += `<div class="mbj-score-badge ${badgeClass} ${delayClassBadge}">${getMBJDisplayScore(hand.cards)}</div>`; 
-                        }
-                    } else if (hand.status === 'BUST') {
-                        html += `<div class="mbj-status-pill mbj-pill-bust ${delayClassPill}">${hand.score} BUST</div>`;
-                    }
+                        if(hand.status === 'BLACKJACK') { html += `<div class="mbj-status-pill mbj-pill-bj ${delayClassPill}">BLACKJACK</div>`; } 
+                        else { let badgeClass = isThisHandActive ? 'mbj-score-active' : 'mbj-score-inactive'; html += `<div class="mbj-score-badge ${badgeClass} ${delayClassBadge}">${getMBJDisplayScore(hand.cards)}</div>`; }
+                    } else if (hand.status === 'BUST') { html += `<div class="mbj-status-pill mbj-pill-bust ${delayClassPill}">${hand.score} BUST</div>`; }
 
                     hand.cards.forEach((c, cIdx) => { 
-                        let animateThisCard = cIdx >= previouslyRendered;
-                        let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
+                        let animateThisCard = cIdx >= previouslyRendered; let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1);
                         html += generateMBJCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard);
                     });
                     html += `</div></div>`; 
                 });
-                html += `</div>`;
-                renderedCardCount[i] = s.hands.map(h => h.cards.length);
+                html += `</div>`; renderedCardCount[i] = s.hands.map(h => h.cards.length);
             } else { 
                 renderedCardCount[i] = []; 
-                html += `<div class="mbj-hands-wrapper"><div class="mbj-hand-column" style="position: relative;">`;
-                html += `<div class="mbj-hand-container" style="width: 70px;"></div>`;
-                html += `</div></div>`; 
+                html += `<div class="mbj-hands-wrapper"><div class="mbj-hand-column" style="position: relative;"><div class="mbj-hand-container" style="width: 70px;"></div></div></div>`; 
             }
             
-            html += `<div class="mbj-circle-container" id="mbj-circle-${i}-0">`;
-            html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
-            if (displayBet > 0) { 
-                html += `<div id="mbj-chip-stack-${i}-0" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">${getMBJChipStackHTML(displayBet, (s && s.hands && s.hands.length > 0 && s.hands[0].bet > 0) ? false : true)}</div>`;
-            } else {
-                html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`;
-            }
+            html += `<div class="mbj-circle-container" id="mbj-circle-${i}-0"><div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
+            if (displayBet > 0) { html += `<div id="mbj-chip-stack-${i}-0" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">${getMBJChipStackHTML(displayBet, (s && s.hands && s.hands.length > 0 && s.hands[0].bet > 0) ? false : true)}</div>`; } 
+            else { html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`; }
             html += `</div></div>`; 
 
             if (displayBet > 0) html += `<div class="bet-pill">${fmtTC(displayBet)} TC</div>`;
-
             let nameHTML = s ? s.username : 'EMPTY';
             html += `<div class="mbj-seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${s || mbjGameState==='BETTING' ? 1 : 0.3};" id="mbj-seat-name-${i}">${nameHTML}</div>`;
             html += `<div class="player-timer-track"><div class="player-timer-fill" id="mbj-timer-fill-${i}"></div></div>`;
 
-            if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') {
-                html += `<div style="margin-top:5px;"><button class="btn-play" onclick="sitUp();" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`;
-            }
-            html += `</div>`; 
-            htmlBuffer += html;
+            if(isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') { html += `<div style="margin-top:5px;"><button class="btn-play" onclick="sitUp();" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`; }
+            html += `</div>`; htmlBuffer += html;
         }
         
         cont.innerHTML = htmlBuffer;
-
-        let bettingUi = document.getElementById('mbj-betting-ui');
-        let actionsUi = document.getElementById('mbj-actions-ui');
+        let bettingUi = document.getElementById('mbj-betting-ui'); let actionsUi = document.getElementById('mbj-actions-ui');
         
         if (mbjGameState === 'BETTING') {
             actionsUi.style.display = 'none';
-            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) {
-                bettingUi.style.display = 'flex';
-            } else {
-                bettingUi.style.display = 'none';
-            }
+            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) { bettingUi.style.display = 'flex'; } 
+            else { bettingUi.style.display = 'none'; }
         } else {
             bettingUi.style.display = 'none';
-            if (mbjGameState !== 'PLAYER_TURN' || !activeSeatNum || currentMBJSeats[activeSeatNum].username !== myUsername) {
-                actionsUi.style.display = 'none';
-            }
+            if (mbjGameState !== 'PLAYER_TURN' || !activeSeatNum || currentMBJSeats[activeSeatNum].username !== myUsername) { actionsUi.style.display = 'none'; }
             localPendingBet = 0;
         }
     }
 
     let isMBJBettingTimeout = false;
     function mbjConfirmLocalBet() {
-        if (isMBJBettingTimeout) return;
-        sfx.click();
-        
-        let customInput = document.getElementById('mbj-custom-bet').value;
-        let v = parseInt(customInput);
+        if (isMBJBettingTimeout) return; sfx.click();
+        let customInput = document.getElementById('mbj-custom-bet').value; let v = parseInt(customInput);
         if (!isNaN(v) && v > 0) { 
             if (v > 50000) { showLocalFlash('mbj', 'Max Bet 50K TC', 'error'); return; }
             if (v > (myCredits + myPlayable)) { showLocalFlash('mbj', 'Insufficient TC', 'error'); return; }
-            localPendingBet = v; 
-            document.getElementById('mbj-custom-bet').value = ''; 
+            localPendingBet = v; document.getElementById('mbj-custom-bet').value = ''; 
         }
-        
         if(localPendingBet < 10) return showLocalFlash('mbj', 'Min Bet 10 TC');
 
-        isMBJBettingTimeout = true;
-        setTimeout(() => { isMBJBettingTimeout = false; }, 250);
+        isMBJBettingTimeout = true; setTimeout(() => { isMBJBettingTimeout = false; }, 250);
 
-        if(myPlayable >= localPendingBet) { myPlayable -= localPendingBet; } 
-        else { let rem = localPendingBet - myPlayable; myPlayable = 0; myCredits -= rem; }
+        if(myPlayable >= localPendingBet) { myPlayable -= localPendingBet; } else { let rem = localPendingBet - myPlayable; myPlayable = 0; myCredits -= rem; }
         updateMyBalance({credits: myCredits, playable: myPlayable});
 
         if (localSeatId && currentMBJSeats[localSeatId]) {
-            let s = currentMBJSeats[localSeatId];
-            if (!s.hands) s.hands = [];
+            let s = currentMBJSeats[localSeatId]; if (!s.hands) s.hands = [];
             if (s.hands.length === 0) { s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false }); }
             s.hands[0].bet += localPendingBet;
         }
-
-        socket.emit('mbjPlaceBet', localPendingBet);
-        localPendingBet = 0; 
-        renderMBJSeats(); 
+        socket.emit('mbjPlaceBet', localPendingBet); localPendingBet = 0; renderMBJSeats(); 
     }
 
     socket.on('mbjUpdate', async (data) => {
@@ -1681,22 +1252,14 @@
 
         if(data.event === 'timer') {
             mbjGameState = 'BETTING'; 
-            if(data.active) { dTimerText.style.display = 'block'; dTimerText.innerText = data.time; sfx.tick('mbj'); } 
-            else { dTimerText.style.display = 'none'; }
+            if(data.active) { dTimerText.style.display = 'block'; dTimerText.innerText = data.time; sfx.tick('mbj'); } else { dTimerText.style.display = 'none'; }
         } 
         else if (data.event === 'sync_seats') { renderMBJSeats(data.seats, data.activeTurn); } 
         else if (data.event === 'lock_bets') { mbjGameState = 'DEALING'; dTimerText.style.display = 'none'; renderMBJSeats(data.seats, null); } 
         else if (data.event === 'deal') {
-            mbjGameState = 'DEALING';
-            let targetSeats = JSON.parse(JSON.stringify(data.seats));
-            for (let i = 1; i <= 5; i++) {
-                if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) {
-                    currentMBJSeats[i].hands[0].cards = []; currentMBJSeats[i].hands[0].score = 0; currentMBJSeats[i].hands[0].status = 'WAITING';
-                }
-            }
-            
-            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] };
-            renderMBJSeats(currentMBJSeats, null); 
+            mbjGameState = 'DEALING'; let targetSeats = JSON.parse(JSON.stringify(data.seats));
+            for (let i = 1; i <= 5; i++) { if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) { currentMBJSeats[i].hands[0].cards = []; currentMBJSeats[i].hands[0].score = 0; currentMBJSeats[i].hands[0].status = 'WAITING'; } }
+            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; renderMBJSeats(currentMBJSeats, null); 
             
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
