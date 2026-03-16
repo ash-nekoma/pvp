@@ -2938,6 +2938,207 @@
         }
     });
 
+    // =======================================================
+    // CASHIER & MODAL NAVIGATION LOGIC
+    // =======================================================
+    function openCashier() { 
+        sfx.click();
+        openModal('support-center-modal'); 
+        switchSupportCenterTab('deposit', document.querySelectorAll('#cashier-tabs-nav .bank-tab')[0]);
+    }
+
+    function switchSupportCenterTab(tab, btn) {
+        if(btn) sfx.click();
+        document.querySelectorAll('.bank-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.bank-section').forEach(s => s.classList.add('hidden'));
+        document.querySelectorAll('.bank-section').forEach(s => s.classList.remove('active'));
+        
+        if(btn) btn.classList.add('active');
+        let targetSection = document.getElementById('sc-tab-' + tab);
+        if(targetSection) {
+            targetSection.classList.remove('hidden');
+            targetSection.classList.add('active');
+        }
+        
+        if(tab === 'ledger') socket.emit('getWalletLogs');
+    }
+
+    function submitDeposit() {
+        sfx.click();
+        let amt = document.getElementById('dep-amount').value;
+        let snt = document.getElementById('dep-snt').value;
+        let disc = document.getElementById('dep-discord').value;
+        let ref = snt + ' / ' + disc;
+        
+        if(!amt || amt < 1000) return alert('Minimum deposit is 1,000 TC');
+        socket.emit('submitTransaction', {type: 'Deposit', amount: amt, ref: ref});
+        document.getElementById('dep-amount').value = '';
+        document.getElementById('deposit-msg').style.color = 'var(--success)';
+        document.getElementById('deposit-msg').innerText = 'Deposit Request Submitted!';
+        setTimeout(() => { document.getElementById('deposit-msg').innerText = ''; }, 3000);
+    }
+
+    function submitWithdrawal() {
+        sfx.click();
+        let amt = document.getElementById('wit-amount').value;
+        let snt = document.getElementById('wit-snt').value;
+        let disc = document.getElementById('wit-discord').value;
+        let ref = snt + ' / ' + disc;
+        
+        if(!amt || amt < 10000) return alert('Minimum withdrawal is 10,000 TC');
+        socket.emit('submitTransaction', {type: 'Withdrawal', amount: amt, ref: ref});
+        document.getElementById('wit-amount').value = '';
+        document.getElementById('withdraw-msg').style.color = 'var(--success)';
+        document.getElementById('withdraw-msg').innerText = 'Withdrawal Request Submitted!';
+        setTimeout(() => { document.getElementById('withdraw-msg').innerText = ''; }, 3000);
+    }
+
+    function submitPromo() {
+        sfx.click();
+        let code = document.getElementById('promo-code').value.trim();
+        if(code) socket.emit('redeemPromo', code);
+    }
+
+    socket.on('promoResult', (data) => {
+        let res = document.getElementById('promo-response');
+        if(data.success) { 
+            res.style.color = 'var(--success)'; 
+            res.innerText = `SUCCESS! +${fmtTC(data.amt)} ${data.type === 'playable' ? 'P' : 'TC'}`; 
+            sfx.win();
+        } else { 
+            res.style.color = 'var(--danger)'; 
+            res.innerText = data.msg.toUpperCase(); 
+            sfx.lose();
+        }
+    });
+
+    socket.on('transactionsData', (txs) => {
+        let c = document.getElementById('bank-logs-container');
+        if(!c) return;
+        c.innerHTML = '';
+        if(txs.length === 0) { c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">No transaction history.</div>'; return; }
+        
+        txs.forEach(t => {
+            let color = t.status === 'Approved' ? 'var(--success)' : (t.status === 'Rejected' ? 'var(--danger)' : 'var(--credits)');
+            c.insertAdjacentHTML('beforeend', `
+            <div class="ticket-log-item">
+                <div class="ticket-log-header">
+                    <span class="ticket-log-id">${t.type.toUpperCase()}</span>
+                    <span class="ticket-log-status" style="color:${color}; border-color:${color}">${t.status.toUpperCase()}</span>
+                </div>
+                <div style="color:white; font-weight:900; font-size:1.2rem; font-family:'Rajdhani', sans-serif;">${fmtTC(t.amount)} TC</div>
+                <div style="color:var(--text-muted); font-size:0.75rem;">${new Date(t.date).toLocaleString()}</div>
+            </div>`);
+        });
+    });
+
+    socket.on('walletLogsData', (data) => {
+        let dProf = document.getElementById('ledger-daily-profit');
+        if(dProf) {
+            dProf.innerText = fmtTC(data.dailyProfit) + ' TC';
+            dProf.style.color = data.dailyProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+        }
+        
+        let c = document.getElementById('ledger-logs-container');
+        if(!c) return;
+        c.innerHTML = '';
+        if(data.logs.length === 0) { c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px; grid-column: span 4;">No ledger history.</div>'; return; }
+        
+        data.logs.forEach(l => {
+            let color = l.amount > 0 ? 'var(--success)' : (l.amount < 0 ? 'var(--danger)' : 'white');
+            let amtStr = l.amount > 0 ? `+${fmtTC(l.amount)}` : fmtTC(l.amount);
+            c.insertAdjacentHTML('beforeend', `
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.85rem; font-weight:800; color:white; text-align:center; white-space:nowrap; align-items:center;">
+                <div>${l.action}</div>
+                <div style="color:${color}; font-family:'Rajdhani', sans-serif; font-size:1rem;">${amtStr}</div>
+                <div style="white-space:normal; font-size:0.75rem; color:var(--text-muted);">${l.details}</div>
+                <div style="color:var(--text-muted)">${new Date(l.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+            </div>`);
+        });
+    });
+
+    function clearLedger() { 
+        if(confirm("Clear your entire local ledger history?")) {
+            sfx.click();
+            socket.emit('clearWalletLogs'); 
+        }
+    }
+
+    // =======================================================
+    // PUSH-TO-TALK (VOICE CHAT ENGINE)
+    // =======================================================
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    async function initAudio() {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = e => { 
+                    if (e.data.size > 0) audioChunks.push(e.data); 
+                };
+                
+                mediaRecorder.onstop = () => {
+                    if (audioChunks.length > 0) {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const reader = new FileReader();
+                        reader.readAsDataURL(audioBlob);
+                        reader.onloadend = () => {
+                            socket.emit('voiceStream', { audio: reader.result, user: myUsername });
+                        };
+                        audioChunks = [];
+                    }
+                };
+            } catch (err) { 
+                console.error("Mic access denied or unavailable", err); 
+            }
+        }
+    }
+    
+    // Initialize audio permissions when user logs in
+    document.getElementById('auth-container').addEventListener('click', initAudio, { once: true });
+
+    function startPTT(btnId) {
+        if (!mediaRecorder || mediaRecorder.state === 'recording') return;
+        isRecording = true;
+        audioChunks = [];
+        try {
+            mediaRecorder.start();
+            let btn = document.getElementById(btnId);
+            if(btn) {
+                btn.classList.add('recording');
+                sfx.click(); // Small beep to indicate recording started
+            }
+        } catch(e) {}
+    }
+
+    function stopPTT(btnId) {
+        if (!isRecording || !mediaRecorder || mediaRecorder.state !== 'recording') return;
+        isRecording = false;
+        try {
+            mediaRecorder.stop();
+            let btn = document.getElementById(btnId);
+            if(btn) btn.classList.remove('recording');
+        } catch(e) {}
+    }
+
+    socket.on('voiceStream', (data) => {
+        // Prevent playing if master volume is 0
+        if(document.getElementById('master-volume').value == 0) return;
+        
+        fetch(data.audio)
+            .then(res => res.blob())
+            .then(blob => {
+                const audioUrl = URL.createObjectURL(blob);
+                const audio = new Audio(audioUrl);
+                audio.volume = document.getElementById('master-volume').value / 100;
+                audio.play().catch(e => console.error("Audio playback blocked", e));
+            })
+            .catch(err => console.error("Voice stream fetch error", err));
+    });
   </script>
 </body>
 </html>
