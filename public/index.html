@@ -536,7 +536,7 @@
         if (window.activeSharedGame && mySBets && Object.values(mySBets).reduce((a,b)=>a+b,0) > 0 && sState.status === 'BETTING') { showLocalFlash('shared', "Wait for round to finish.", "error"); return; } document.getElementById('view-shared-game').classList.add('hidden'); socket.emit('leaveRoom', window.activeSharedGame); window.activeSharedGame = null; switchView('casino'); openLobbyMode('shared'); 
     }
     
- // =======================================================
+// =======================================================
     // VIP BLACKJACK LOGIC & UI INTEGRATION
     // =======================================================
     let mbjGameState = 'BETTING';
