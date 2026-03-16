@@ -1,6 +1,7 @@
 <script>
     const socket = io(); 
 
+    // Audio Context & Throttling
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let sfxGainVal = 0.5;
     let lastSfxTime = 0;
@@ -85,11 +86,14 @@
         const audio = document.getElementById('global-radio');
         const hud = document.getElementById('radio-hud');
         const djText = document.getElementById('radio-dj');
+
         if (!data.url) { audio.pause(); audio.src = ''; hud.classList.remove('show'); return; }
+
         djText.innerText = data.requestedBy;
         hud.classList.add('show');
         audio.src = data.url;
         audio.volume = document.getElementById('master-volume').value / 100;
+        
         audio.onloadedmetadata = () => {
             let offset = (Date.now() - data.startTime) / 1000;
             if (offset > 0) { try { audio.currentTime = offset; } catch(e) {} }
@@ -103,6 +107,7 @@
     let globalFallback = { baccarat: [], perya: [], dt: [], sicbo: [] };
     let mySoloRounds = { d20: 0, coinflip: 0, blackjack: 0 };
     let myNotifications = [];
+    
     window.activeSharedGame = null;
     let sState = { time: 15, status: 'BETTING' };
     let mySBets = {}; let mySBetsStack = []; let dailyTimerInterval = null; let currentHistoryGame = null;
@@ -121,7 +126,9 @@
     function getBetColor(betWord) {
         if(!betWord) return 'white';
         let word = betWord.toString().trim().toUpperCase();
-        const map = { 'PLAYER': 'var(--ps-glow)', 'BANKER': 'var(--danger)', 'TIE': 'var(--success)', 'DRAGON': 'var(--danger)', 'TIGER': 'var(--credits)', 'SMALL': 'var(--ps-glow)', 'BIG': 'var(--danger)', 'TRIPLE': 'white', 'YELLOW': '#ffcc00', 'WHITE': '#fff', 'PINK': '#ff66b2', 'BLUE': '#00a2ff', 'RED': '#ff3366', 'GREEN': '#00e676', 'BUST!': 'var(--danger)', 'PUSH': 'white', 'DEALER': 'var(--danger)', 'YOU': 'var(--success)', 'HEADS': '#ffb400', 'TAILS': '#e2e8f0', 'EVEN': 'var(--credits)', 'ODD': 'var(--playable)' };
+        const map = {
+            'PLAYER': 'var(--ps-glow)', 'BANKER': 'var(--danger)', 'TIE': 'var(--success)', 'DRAGON': 'var(--danger)', 'TIGER': 'var(--credits)', 'SMALL': 'var(--ps-glow)', 'BIG': 'var(--danger)', 'TRIPLE': 'white', 'YELLOW': '#ffcc00', 'WHITE': '#fff', 'PINK': '#ff66b2', 'BLUE': '#00a2ff', 'RED': '#ff3366', 'GREEN': '#00e676', 'BUST!': 'var(--danger)', 'PUSH': 'white', 'DEALER': 'var(--danger)', 'YOU': 'var(--success)', 'HEADS': '#ffb400', 'TAILS': '#e2e8f0', 'EVEN': 'var(--credits)', 'ODD': 'var(--playable)'
+        };
         return map[word] || 'white';
     }
 
@@ -155,7 +162,9 @@
                 if (baseChoice === 'Big') return `<span style="color:var(--danger); font-weight:900;">B</span>`;
                 return baseChoice;
             }
-            if (id === 'perya') { return `<div style="display:flex; justify-content:center; align-items:center; gap:2px; flex-wrap:nowrap;">${colorsToDice(baseChoice)}</div>`; }
+            if (id === 'perya') {
+                return `<div style="display:flex; justify-content:center; align-items:center; gap:2px; flex-wrap:nowrap;">${colorsToDice(baseChoice)}</div>`;
+            }
             return `<span style="font-weight:800; color:${getBetColor(baseChoice)}">${baseChoice}</span>`;
         }).join(' ');
     }
@@ -169,6 +178,7 @@
         let f = document.getElementById('flash-' + game);
         if(!f) { f = document.getElementById('flash-shared'); }
         if(!f) return;
+        
         f.classList.remove('show', 'error', 'success'); void f.offsetWidth; 
         f.innerText = msg; f.classList.add('show');
         if(type === 'error') { f.classList.add('error'); sfx.lose(game); } else { f.classList.add('success'); sfx.win(game); }
@@ -189,9 +199,8 @@
     function updateCurrentBetsPopover() {
         const list = document.getElementById('cb-list'); if(!list) return;
         list.innerHTML = ''; let total = 0; const entries = Object.entries(mySBets);
-        if(entries.length === 0) {
-            list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:10px;">No active bets for this round.</div>`;
-        } else {
+        if(entries.length === 0) { list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:10px;">No active bets for this round.</div>`; } 
+        else {
             entries.forEach(([choice, amount]) => {
                 total += amount; let cColor = getBetColor(choice);
                 list.insertAdjacentHTML('beforeend', `<div style="background:rgba(0,0,0,0.4); padding:10px 15px; border-radius:6px; border-left:4px solid ${cColor}; display:flex; justify-content:space-between; align-items:center; font-weight:800; margin-bottom:5px;"><span style="text-transform:uppercase; color:${cColor};">${choice}</span><span style="color:var(--credits); font-size: 1rem; white-space: nowrap;">${fmtTC(amount)} TC</span></div>`);
@@ -228,8 +237,10 @@
                 merged.push({ result: cleanRes, bet: '-', wonProfit: 0, lostBet: 0, didBet: false });
             }
         }
+        
         if (id === 'd20' || id === 'coinflip' || id === 'blackjack') { document.getElementById('stat-total-rounds').innerText = mySoloRounds[id] || 0; }
         if(merged.length === 0) { list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">No history available yet.</div>`; return; } 
+        
         merged.slice(0,5).forEach(h => {
             let net = formatTC(h.wonProfit - h.lostBet);
             let winVal = '-'; let lossVal = '-';
@@ -252,6 +263,7 @@
         if(unreadCount > 0) { badge.style.display = 'flex'; badge.innerText = unreadCount; badge.classList.add('pulse'); } else { badge.style.display = 'none'; badge.classList.remove('pulse'); }
         clearBtn.disabled = unreadCount > 0 || myNotifications.length === 0;
         if(myNotifications.length === 0) { list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:20px;" id="no-notif-msg">No new notifications.</div>`; return; }
+
         myNotifications.forEach(n => {
             let cl = n.read ? '' : 'unread';
             list.insertAdjacentHTML('beforeend', `<div class="notif-item ${cl}" id="notif-${n.id}" onclick="markSingleRead(${n.id}, event)">
@@ -498,10 +510,24 @@
     }
 
     socket.on('d20Result', async (data) => {
-        let icon = document.getElementById('d20-icon'); icon.classList.add('shake-anim'); sfx.tick('d20');
+        let icon = document.getElementById('d20-icon'); 
+        icon.className = 'fas fa-dice-d20 dice-icon shake-anim'; 
+        sfx.tick('d20');
         await delay(1000); 
-        icon.classList.remove('shake-anim'); icon.style.display = 'none';
-        let n = document.getElementById('d20-num'); n.style.display = 'block';
+        
+        icon.classList.remove('shake-anim'); 
+        icon.style.transform = 'scale(0) rotate(360deg)';
+        icon.style.opacity = '0';
+        
+        await delay(300);
+        icon.style.display = 'none';
+        icon.style.transform = 'scale(1) rotate(0deg)';
+        icon.style.opacity = '1';
+        
+        let n = document.getElementById('d20-num'); 
+        n.style.display = 'block';
+        n.style.animation = 'popIn 0.3s ease-out forwards';
+        
         let count = 0; sfx.coin('d20');
         window.d20AnimCycle = setInterval(() => { 
             n.innerText = Math.floor(Math.random()*20)+1; count++; 
@@ -532,17 +558,36 @@
     }
 
     socket.on('coinResult', (data) => {
-        let coin = document.getElementById('coin-wrapper'); sfx.coin('coinflip');
-        coin.classList.remove('tossing'); void coin.offsetWidth; coin.classList.add('tossing');
-        setTimeout(() => { document.getElementById('coin-obj').style.transform = data.result === 'Heads' ? 'rotateY(0deg)' : 'rotateY(180deg)'; }, 1000);
+        let coinWrapper = document.getElementById('coin-wrapper'); 
+        let coinObj = document.getElementById('coin-obj');
+        sfx.coin('coinflip');
+        
+        coinObj.style.transition = 'none';
+        coinObj.style.transform = 'rotateX(0deg)';
+        
+        coinWrapper.classList.remove('tossing'); 
+        void coinWrapper.offsetWidth; 
+        coinWrapper.classList.add('tossing');
+        
+        setTimeout(() => {
+            coinObj.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            coinObj.style.transform = data.result === 'Heads' ? 'rotateX(0deg)' : 'rotateX(180deg)';
+        }, 2200);
+
         setTimeout(() => {
             let msg = document.getElementById('coin-msg'); msg.classList.remove('win', 'lose', 'push');
             if (data.payout > 0) { msg.classList.add('win'); msg.innerHTML = `<div class="res-title">WON</div><div class="res-payout">+${fmtTC(data.payout)}</div>`; sfx.win('coinflip'); } 
             else { msg.classList.add('lose'); msg.innerHTML = `<div class="res-title">LOST</div>`; sfx.lose('coinflip'); }
             msg.classList.add('show');
             logHistory('coinflip', window.currentCoinChoice, data.resStr, data.payout, data.bet);
-            setTimeout(() => { msg.classList.remove('show'); document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false; updateMyBalance(data.newBalance, data.payout > 0); }, 2500);
-        }, 2200);
+            
+            setTimeout(() => { 
+                msg.classList.remove('show'); 
+                document.getElementById('btn-heads').disabled = false; 
+                document.getElementById('btn-tails').disabled = false; 
+                updateMyBalance(data.newBalance, data.payout > 0); 
+            }, 2500);
+        }, 2600); 
     });
 
     function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, extraClass = '') {
@@ -1168,11 +1213,16 @@
         
         if (mbjGameState === 'BETTING') {
             actionsUi.style.display = 'none';
-            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) { bettingUi.style.display = 'flex'; } 
-            else { bettingUi.style.display = 'none'; }
+            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) { 
+                bettingUi.style.display = 'flex'; 
+            } else { 
+                bettingUi.style.display = 'none'; 
+            }
         } else {
             bettingUi.style.display = 'none';
-            if (mbjGameState !== 'PLAYER_TURN' || !activeSeatNum || currentMBJSeats[activeSeatNum].username !== myUsername) { actionsUi.style.display = 'none'; }
+            if (mbjGameState !== 'PLAYER_TURN' || !activeSeatNum || currentMBJSeats[activeSeatNum].username !== myUsername) { 
+                actionsUi.style.display = 'none'; 
+            }
             localPendingBet = 0;
         }
     }
@@ -1392,13 +1442,19 @@
     }
 
     socket.on('voiceStream', (data) => {
+        // Prevent playing if master volume is 0
         if(document.getElementById('master-volume').value == 0) return;
-        fetch(data.audio).then(res => res.blob()).then(blob => {
-            const audioUrl = URL.createObjectURL(blob); const audio = new Audio(audioUrl);
-            audio.volume = document.getElementById('master-volume').value / 100;
-            audio.play().catch(e => {});
-        }).catch(err => {});
+        
+        fetch(data.audio)
+            .then(res => res.blob())
+            .then(blob => {
+                const audioUrl = URL.createObjectURL(blob);
+                const audio = new Audio(audioUrl);
+                audio.volume = document.getElementById('master-volume').value / 100;
+                audio.play().catch(e => console.error("Audio playback blocked", e));
+            })
+            .catch(err => console.error("Voice stream fetch error", err));
     });
-  </script>
+</script>
 </body>
 </html>
