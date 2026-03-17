@@ -32,7 +32,6 @@ app.get('/', (req, res) => {
 
 const formatTC = (amount) => Math.round(amount * 10) / 10;
 
-// PATCH 1: Atomic deductBet with race condition prevention
 async function deductBet(userId, betAmount) {
     let amt = formatTC(betAmount);
     if (amt <= 0) return { success: false };
@@ -75,12 +74,10 @@ async function deductBet(userId, betAmount) {
     return { success: false, error: 'System busy, please try again.' };
 }
 
-// Admin Live Pulse Emitter
 function sendPulse(msg, type='info') {
     io.to('admin_room').emit('adminPulse', { msg, type, time: Date.now() });
 }
 
-// 1% Referral Commission Engine
 async function processReferralBetCommission(user, betAmount) {
     if (!user.referredBy) return;
     let comm = formatTC(betAmount * 0.01);
@@ -193,7 +190,6 @@ function getBJScore(hand) {
     return score;
 }
 
-// Global Shared Table Loop
 setInterval(() => {
     if (sharedTables.status === 'BETTING') {
         sharedTables.time--;
@@ -202,6 +198,8 @@ setInterval(() => {
         if (sharedTables.time <= 0) {
             sharedTables.status = 'RESOLVING';
             io.emit('lockBets');
+            // Cleaned up System Chats
+            io.emit('chatMessage', { user: 'System', text: 'Bets are now closed. Good luck!', sys: true });
 
             setTimeout(async () => {
                 let dtD = drawCard(), dtT = drawCard();
@@ -296,6 +294,7 @@ setInterval(() => {
                 sharedTables.status = 'BETTING';
                 sharedTables.bets = [];
                 io.emit('newRound'); 
+                io.emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true });
                 pushAdminData();
             }, 9000); 
         }
@@ -346,7 +345,6 @@ io.on('connection', (socket) => {
     socket.isCashier = false;
     socket.isAuth = false;
 
-    // Room specific voice broadcast
     socket.on('voiceStream', (data) => {
         if (socket.currentRoom) {
             socket.to(socket.currentRoom).emit('voiceStream', data);
@@ -1502,6 +1500,8 @@ async function mbjResolveDealer() {
         }
         mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
+        // Cleaned up System Chats
+        io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true });
     }, 4500); 
 }
 
@@ -1518,6 +1518,8 @@ setInterval(() => {
         }
         
         if (mbjState.time <= 0 && hasBets) {
+            // Cleaned up System Chats
+            io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets are closed! Dealing...', sys: true });
             for (let i = 1; i <= 5; i++) {
                 if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) { mbjState.seats[i] = null; }
             }
