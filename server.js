@@ -32,25 +32,47 @@ app.get('/', (req, res) => {
 
 const formatTC = (amount) => Math.round(amount * 10) / 10;
 
-async function deductBet(user, betAmount) {
+// PATCH 1: Atomic deductBet with race condition prevention
+async function deductBet(userId, betAmount) {
     let amt = formatTC(betAmount);
-    let totalBal = formatTC((user.credits || 0) + (user.playableCredits || 0));
-    
-    if (amt <= 0 || totalBal < amt) return { success: false };
+    if (amt <= 0) return { success: false };
 
-    let fromPlayable = 0;
-    let fromMain = 0;
+    const MAX_RETRIES = 3;
+    for (let i = 0; i < MAX_RETRIES; i++) {
+        let user = await User.findById(userId);
+        if (!user) return { success: false };
 
-    if ((user.playableCredits || 0) >= amt) {
-        fromPlayable = amt;
-        user.playableCredits = formatTC(user.playableCredits - amt);
-    } else {
-        fromPlayable = user.playableCredits || 0;
-        fromMain = formatTC(amt - fromPlayable);
-        user.playableCredits = 0;
-        user.credits = formatTC((user.credits || 0) - fromMain);
+        let totalBal = formatTC((user.credits || 0) + (user.playableCredits || 0));
+        if (totalBal < amt) return { success: false };
+
+        let fromPlayable = 0;
+        let fromMain = 0;
+        let newPlayable = user.playableCredits || 0;
+        let newCredits = user.credits || 0;
+
+        if (newPlayable >= amt) {
+            fromPlayable = amt;
+            newPlayable = formatTC(newPlayable - amt);
+        } else {
+            fromPlayable = newPlayable;
+            fromMain = formatTC(amt - fromPlayable);
+            newPlayable = 0;
+            newCredits = formatTC(newCredits - fromMain);
+        }
+
+        let updatedUser = await User.findOneAndUpdate({
+            _id: userId,
+            credits: user.credits,
+            playableCredits: user.playableCredits
+        }, {
+            $set: { credits: newCredits, playableCredits: newPlayable }
+        }, { new: true });
+
+        if (updatedUser) {
+            return { success: true, fromPlayable, fromMain, user: updatedUser };
+        }
     }
-    return { success: true, fromPlayable, fromMain };
+    return { success: false, error: 'System busy, please try again.' };
 }
 
 // Admin Live Pulse Emitter
@@ -371,7 +393,8 @@ io.on('connection', (socket) => {
         socket.isBetting = true;
 
         try {
-            const user = await User.findById(socket.user._id);
+            // PATCH: Updated to 'let' instead of 'const' to allow object refresh
+            let user = await User.findById(socket.user._id);
             if (!user) return;
             
             let isNewBet = (data.game === 'd20' || data.game === 'coinflip' || (data.game === 'blackjack' && data.action === 'start'));
@@ -411,11 +434,13 @@ io.on('connection', (socket) => {
                     socket.emit('localGameError', { msg: 'VAULT LIMIT REACHED. CANNOT COVER BET.', game: data.game }); return;
                 }
                 
-                let deduction = await deductBet(user, amt);
+                // PATCH: Call atomic deduction and refresh user object
+                let deduction = await deductBet(user._id, amt);
                 if (!deduction.success) {
                     socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: data.game }); return;
                 }
-                await user.save();
+                user = deduction.user;
+
                 sendPulse(`${user.username} bet ${amt} TC on ${data.game.toUpperCase()}`, 'bet');
 
                 processReferralBetCommission(user, amt);
@@ -527,9 +552,11 @@ io.on('connection', (socket) => {
                 else if (data.action === 'double') {
                     if(!socket.bjState || socket.bjState.pHand.length !== 2) return;
                     
-                    let deduction = await deductBet(user, socket.bjState.bet);
+                    // PATCH: Call atomic deduction and refresh user object
+                    let deduction = await deductBet(user._id, socket.bjState.bet);
                     if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'blackjack' }); return; }
-                    await user.save();
+                    user = deduction.user;
+                    
                     processReferralBetCommission(user, socket.bjState.bet);
 
                     socket.bjState.fromPlayable += deduction.fromPlayable;
@@ -694,7 +721,8 @@ io.on('connection', (socket) => {
         socket.isSharedBetting = true;
         
         try {
-            const user = await User.findById(socket.user._id);
+            // PATCH: Updated to let
+            let user = await User.findById(socket.user._id);
             if (!user) return;
 
             let amt = formatTC(data.amount);
@@ -713,11 +741,13 @@ io.on('connection', (socket) => {
                 socket.emit('localGameError', { msg: 'VAULT LIMIT REACHED. CANNOT COVER BET.', game: data.room }); return;
             }
             
-            let deduction = await deductBet(user, amt);
+            // PATCH: Call atomic deduction and refresh user object
+            let deduction = await deductBet(user._id, amt);
             if (!deduction.success) {
                 socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: data.room }); return;
             }
-            await user.save();
+            user = deduction.user;
+
             sendPulse(`${user.username} placed ${amt} TC on ${data.room.toUpperCase()}`, 'bet');
 
             processReferralBetCommission(user, amt);
@@ -932,6 +962,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on('adminAction', async (data) => {
+        // PATCH: Admin Authentication Verification
+        if (!socket.user || (socket.user.role !== 'Admin' && socket.user.role !== 'Moderator')) {
+            return socket.emit('adminError', 'Unauthorized action attempt detected.');
+        }
+
         if (!socket.rooms.has('admin_room')) return; 
         try {
             const adminName = socket.user ? socket.user.username : 'System';
@@ -963,7 +998,23 @@ io.on('connection', (socket) => {
             }
             else if (data.type === 'ban') { 
                 let u = await User.findById(data.id);
-                if(u) { u.status = 'Banned'; await u.save(); await new AdminLog({ adminName, action: 'BAN', details: `Banned user ${u.username}` }).save(); sendPulse(`${adminName} BANNED ${u.username}`, 'alert'); socket.emit('adminSuccess', `Banned ${u.username}.`); }
+                if(u) { 
+                    u.status = 'Banned'; await u.save(); 
+                    await new AdminLog({ adminName, action: 'BAN', details: `Banned user ${u.username}` }).save(); 
+                    sendPulse(`${adminName} BANNED ${u.username}`, 'alert'); 
+                    socket.emit('adminSuccess', `Banned ${u.username}.`); 
+                    
+                    // PATCH: Forceful Ghost Player disconnect
+                    let targetSocketId = connectedUsers[u.username];
+                    if (targetSocketId) {
+                        let targetSocket = io.sockets.sockets.get(targetSocketId);
+                        if (targetSocket) {
+                            targetSocket.emit('authError', 'Your account has been banned by an admin.');
+                            targetSocket.disconnect(true);
+                        }
+                        delete connectedUsers[u.username];
+                    }
+                }
             }
             else if (data.type === 'unban') { 
                 let u = await User.findById(data.id);
@@ -1143,15 +1194,18 @@ io.on('connection', (socket) => {
 
         let amt = formatTC(amount);
         try {
+            // PATCH: Changed from const u to let u to allow overwrite
             let u = await User.findById(socket.user._id);
             if (!u) return;
             
-            let deduction = await deductBet(u, amt);
+            // PATCH: Use atomic deduction logic
+            let deduction = await deductBet(u._id, amt);
             if (!deduction.success) {
                 socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' });
                 return;
             }
-            await u.save();
+            u = deduction.user;
+
             processReferralBetCommission(u, amt);
 
             let s = mbjState.seats[seatNum];
@@ -1195,9 +1249,12 @@ io.on('connection', (socket) => {
                 
                 let u = await User.findById(socket.user._id);
                 if (!u) return;
-                let deduction = await deductBet(u, hand.bet);
+                
+                // PATCH: Call atomic deduction and refresh user object
+                let deduction = await deductBet(u._id, hand.bet);
                 if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' }); return; }
-                await u.save();
+                u = deduction.user;
+                
                 processReferralBetCommission(u, hand.bet);
                 
                 hand.fromPlayable += deduction.fromPlayable;
@@ -1219,9 +1276,12 @@ io.on('connection', (socket) => {
                 
                 let u = await User.findById(socket.user._id);
                 if (!u) return;
-                let deduction = await deductBet(u, hand.bet);
+                
+                // PATCH: Call atomic deduction and refresh user object
+                let deduction = await deductBet(u._id, hand.bet);
                 if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' }); return; }
-                await u.save();
+                u = deduction.user;
+                
                 processReferralBetCommission(u, hand.bet);
 
                 let splitCard = hand.cards.pop();
@@ -1246,6 +1306,30 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', async () => {
         if (socket.user) { 
+
+            // PATCH: Shared table memory leak & auto-refund
+            if (sharedTables && sharedTables.status === 'BETTING') {
+                let refundedPlayable = 0;
+                let refundedMain = 0;
+                
+                sharedTables.bets = sharedTables.bets.filter(b => {
+                    if (b.userId.toString() === socket.user._id.toString()) {
+                        refundedPlayable += b.fromPlayable;
+                        refundedMain += b.fromMain;
+                        return false; 
+                    }
+                    return true; 
+                });
+
+                if (refundedPlayable > 0 || refundedMain > 0) {
+                    try {
+                        await User.findByIdAndUpdate(socket.user._id, {
+                            $inc: { playableCredits: refundedPlayable, credits: refundedMain }
+                        });
+                    } catch (err) { console.error("Refund error on disconnect:", err); }
+                }
+            }
+
             // Handle VIP Blackjack Seat Cleanup if they disconnect
             for(let i = 1; i <= 5; i++) {
                 let s = mbjState.seats[i];
