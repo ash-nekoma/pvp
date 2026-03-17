@@ -202,7 +202,6 @@ setInterval(() => {
         if (sharedTables.time <= 0) {
             sharedTables.status = 'RESOLVING';
             io.emit('lockBets');
-            io.emit('chatMessage', { user: 'System', text: '🔴 Bets are now closed. Good luck!', sys: true });
 
             setTimeout(async () => {
                 let dtD = drawCard(), dtT = drawCard();
@@ -297,7 +296,6 @@ setInterval(() => {
                 sharedTables.status = 'BETTING';
                 sharedTables.bets = [];
                 io.emit('newRound'); 
-                io.emit('chatMessage', { user: 'System', text: '🟢 Bets are now open!', sys: true });
                 pushAdminData();
             }, 9000); 
         }
@@ -393,7 +391,6 @@ io.on('connection', (socket) => {
         socket.isBetting = true;
 
         try {
-            // PATCH: Updated to 'let' instead of 'const' to allow object refresh
             let user = await User.findById(socket.user._id);
             if (!user) return;
             
@@ -434,7 +431,6 @@ io.on('connection', (socket) => {
                     socket.emit('localGameError', { msg: 'VAULT LIMIT REACHED. CANNOT COVER BET.', game: data.game }); return;
                 }
                 
-                // PATCH: Call atomic deduction and refresh user object
                 let deduction = await deductBet(user._id, amt);
                 if (!deduction.success) {
                     socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: data.game }); return;
@@ -552,7 +548,6 @@ io.on('connection', (socket) => {
                 else if (data.action === 'double') {
                     if(!socket.bjState || socket.bjState.pHand.length !== 2) return;
                     
-                    // PATCH: Call atomic deduction and refresh user object
                     let deduction = await deductBet(user._id, socket.bjState.bet);
                     if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'blackjack' }); return; }
                     user = deduction.user;
@@ -721,7 +716,6 @@ io.on('connection', (socket) => {
         socket.isSharedBetting = true;
         
         try {
-            // PATCH: Updated to let
             let user = await User.findById(socket.user._id);
             if (!user) return;
 
@@ -741,7 +735,6 @@ io.on('connection', (socket) => {
                 socket.emit('localGameError', { msg: 'VAULT LIMIT REACHED. CANNOT COVER BET.', game: data.room }); return;
             }
             
-            // PATCH: Call atomic deduction and refresh user object
             let deduction = await deductBet(user._id, amt);
             if (!deduction.success) {
                 socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: data.room }); return;
@@ -962,7 +955,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('adminAction', async (data) => {
-        // PATCH: Admin Authentication Verification
         if (!socket.user || (socket.user.role !== 'Admin' && socket.user.role !== 'Moderator')) {
             return socket.emit('adminError', 'Unauthorized action attempt detected.');
         }
@@ -1004,7 +996,6 @@ io.on('connection', (socket) => {
                     sendPulse(`${adminName} BANNED ${u.username}`, 'alert'); 
                     socket.emit('adminSuccess', `Banned ${u.username}.`); 
                     
-                    // PATCH: Forceful Ghost Player disconnect
                     let targetSocketId = connectedUsers[u.username];
                     if (targetSocketId) {
                         let targetSocket = io.sockets.sockets.get(targetSocketId);
@@ -1194,11 +1185,9 @@ io.on('connection', (socket) => {
 
         let amt = formatTC(amount);
         try {
-            // PATCH: Changed from const u to let u to allow overwrite
             let u = await User.findById(socket.user._id);
             if (!u) return;
             
-            // PATCH: Use atomic deduction logic
             let deduction = await deductBet(u._id, amt);
             if (!deduction.success) {
                 socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' });
@@ -1250,7 +1239,6 @@ io.on('connection', (socket) => {
                 let u = await User.findById(socket.user._id);
                 if (!u) return;
                 
-                // PATCH: Call atomic deduction and refresh user object
                 let deduction = await deductBet(u._id, hand.bet);
                 if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' }); return; }
                 u = deduction.user;
@@ -1277,7 +1265,6 @@ io.on('connection', (socket) => {
                 let u = await User.findById(socket.user._id);
                 if (!u) return;
                 
-                // PATCH: Call atomic deduction and refresh user object
                 let deduction = await deductBet(u._id, hand.bet);
                 if (!deduction.success) { socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' }); return; }
                 u = deduction.user;
@@ -1307,7 +1294,6 @@ io.on('connection', (socket) => {
     socket.on('disconnect', async () => {
         if (socket.user) { 
 
-            // PATCH: Shared table memory leak & auto-refund
             if (sharedTables && sharedTables.status === 'BETTING') {
                 let refundedPlayable = 0;
                 let refundedMain = 0;
@@ -1330,7 +1316,6 @@ io.on('connection', (socket) => {
                 }
             }
 
-            // Handle VIP Blackjack Seat Cleanup if they disconnect
             for(let i = 1; i <= 5; i++) {
                 let s = mbjState.seats[i];
                 if (s && s.userId.toString() === socket.user._id.toString() && mbjState.status === 'BETTING') {
@@ -1517,7 +1502,6 @@ async function mbjResolveDealer() {
         }
         mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-        io.to('mbj').emit('chatMessage', { user: 'System', text: '🟢 Bets are now open!', sys: true });
     }, 4500); 
 }
 
@@ -1534,7 +1518,6 @@ setInterval(() => {
         }
         
         if (mbjState.time <= 0 && hasBets) {
-            io.to('mbj').emit('chatMessage', { user: 'System', text: '🔴 Bets are closed! Dealing...', sys: true });
             for (let i = 1; i <= 5; i++) {
                 if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) { mbjState.seats[i] = null; }
             }
