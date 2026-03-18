@@ -87,14 +87,12 @@ const MONGO_URI = process.env.MONGO_URL || 'mongodb://localhost:27017/stickntrad
 mongoose.connect(MONGO_URI).then(async () => {
     console.log('✅ Connected to MongoDB Database');
     
-    // --- DB WIPE PROTOCOL (Keeps Head Admin) ---
     await User.deleteMany({ username: { $ne: 'admin' } });
     await Transaction.deleteMany({});
     await CreditLog.deleteMany({});
     await GiftCode.deleteMany({});
     await AdminLog.deleteMany({});
     console.log('🧹 Executed Clean Wipe. All player data erased.');
-    // -------------------------------------------
 
     const adminExists = await User.findOne({ username: 'admin' });
     if (!adminExists) {
@@ -131,7 +129,6 @@ let rooms = { baccarat: 0, perya: 0, dt: 0, sicbo: 0, mbj: 0 };
 let connectedUsers = {}; 
 let globalResults = { baccarat: [], perya: [], dt: [], sicbo: [] }; 
 
-// DECOUPLED SHARED ROOM STATE
 const ROOM_TIMERS = { baccarat: 15, perya: 15, dt: 10, sicbo: 10 };
 let stRooms = {
     'baccarat': { time: 15, status: 'BETTING', bets: [] },
@@ -171,7 +168,6 @@ function drawCard() {
     return { val: v, suit: s, bacVal: bac, bjVal: bj, dtVal: dt, raw: v, suitHtml: suitHtml };
 }
 
-// DECOUPLED SHARED TABLE ENGINE
 setInterval(() => {
     Object.keys(stRooms).forEach(room => {
         let st = stRooms[room];
@@ -310,6 +306,10 @@ io.on('connection', (socket) => {
 
     socket.on('voiceStream', (data) => { if (socket.currentRoom) socket.to(socket.currentRoom).emit('voiceStream', data); });
     socket.on('requestBalanceRefresh', async () => { if(socket.user) { let u = await User.findById(socket.user._id); if(u) socket.emit('balanceUpdateData', { credits: formatTC(u.credits), playable: formatTC(u.playableCredits) }); } });
+
+    socket.on('getGlobalResults', (game) => {
+        socket.emit('globalResultsData', { game: game, results: globalResults[game] || [], stats: gameStats[game] });
+    });
 
     socket.on('getWalletLogs', async () => {
         if(socket.user) {
@@ -772,7 +772,6 @@ io.on('connection', (socket) => {
         } catch(e) { socket.emit('adminError', "Server Error: " + e.message); }
     });
 
-    // --- VIP BLACKJACK & PUSH-TO-TALK SOCKETS ---
     socket.on('mbjTakeSeat', (seatNum) => {
         if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
         for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) return; }
