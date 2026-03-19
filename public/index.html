@@ -12,14 +12,9 @@
     
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // STRICT ANTI-CHEAT
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false;
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) return false;
         };
     </script>
     
@@ -109,10 +104,13 @@
         .notif-badge { display: none; position: absolute; top: -6px; right: -8px; background: var(--danger); color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 5px; border-radius: 50px; border: 2px solid var(--ps-bg); box-shadow: 0 0 10px var(--danger); pointer-events: none;}
         .notif-badge.pulse { animation: pulseBadge 1.5s infinite; } @keyframes pulseBadge { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 51, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); } }
         
-        .radio-hud { flex: 1; overflow: hidden; position: relative; margin: 0 20px; height: 20px; display: none; align-items: center; } 
-        .radio-hud.show { display: flex; } 
-        .radio-marquee { display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; color: var(--ps-glow); font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; } 
+        /* THE RADIO HUD */
+        .radio-hud { flex: 1; overflow: hidden; position: relative; margin: 0 20px; height: 35px; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--glass-border); border-radius: 8px; display: none; align-items: center; padding: 0 15px; gap: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);} 
+        .radio-hud.show { display: flex; animation: slideDown 0.3s ease-out; } 
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .radio-marquee { flex: 1; display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; color: var(--ps-glow); font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; } 
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .radio-hud i { color: var(--ps-glow); animation: pulseRecord 1s infinite; font-size: 1.1rem; }
 
         /* POPOVERS (History, Rules, Notifs) */
         .dropdown-wrapper { position: relative; display: inline-block; } 
@@ -140,7 +138,6 @@
         .mode-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent); z-index: 1; } 
         .mode-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 20px rgba(0,162,255,0.2); background: rgba(0, 30, 60, 0.8); } 
         .mode-icon { font-size: 6.5rem; margin-bottom: 2rem; color: var(--ps-light-blue); transition: 0.3s; position: relative; z-index: 2; } 
-        .mode-card:hover .mode-icon { transform: scale(1.1); color: white; text-shadow: 0 0 20px var(--ps-glow); } 
         .mode-title { font-size: 2.2rem; font-weight: 900; color: white; text-transform: uppercase; margin-bottom: 10px; position: relative; z-index: 2; letter-spacing: 1px; } 
         .mode-desc { color: var(--text-muted); font-size: 1.1rem; position: relative; z-index: 2; font-weight: 600; line-height: 1.4; padding: 0 20px; }
         
@@ -219,8 +216,8 @@
         .bank-tab:hover { color: white; } .bank-tab.active { border-bottom: 3px solid var(--ps-glow); color: var(--ps-glow); } 
         .bank-section { display: none; flex: 1; padding-right: 15px;} .bank-section.active { display: block; }
         .quick-chips { display: flex; gap: 10px; justify-content: space-between; margin-bottom: 20px; flex-shrink: 0;} 
-        .chip-btn { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 8px 0; border-radius: 6px; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center;} 
-        .chip-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .chip-btn { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 12px 0; border-radius: 6px; font-size: 0.95rem; font-weight: 900; cursor: pointer; transition: 0.2s; text-align: center;} 
+        .chip-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
         
         thead th { position: sticky; top: 0; background: #000a1f; z-index: 10; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; border-bottom: 1px solid var(--glass-border); padding: 10px 15px; white-space: nowrap;} tbody td { white-space: nowrap; }
 
@@ -289,7 +286,7 @@
         .lbl-dragon { color: var(--danger); text-shadow: 0 0 20px rgba(255,51,102,0.6); } .lbl-tiger { color: var(--credits); text-shadow: 0 0 20px rgba(255,180,0,0.6); } 
         .dt-card { width: 120px !important; height: 170px !important; flex-shrink: 0 !important;} .dt-card .val { font-size: 3rem; } .dt-card .suit { font-size: 3.5rem; }
         
-        /* SIC BO DICE FIX */
+        /* SIC BO DICE FIX (No shrinking) */
         .sicbo-dice { display: flex; justify-content: center; gap: 30px; margin-bottom: 10px; align-items: center; min-height: 120px;} 
         .s-die { color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8); z-index: 1; width: 100px !important; height: 100px !important; font-size: 4rem !important; display: flex; justify-content: center; align-items: center; flex-shrink: 0 !important;}
         @keyframes popBounce { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
@@ -348,17 +345,14 @@
         /* PREMIUM EVOLUTION-STYLE BUTTONS */
         .mbj-actions-group { display: none; align-items: center; gap: 25px; width: 100%; justify-content: center; transition: opacity 0.2s ease;} 
         .mbj-action-container { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        
         .mbj-panel-btn { width: 75px; height: 75px; border-radius: 50%; font-size: 2.2rem; cursor: pointer; border: 3px solid white; color: white; transition: 0.1s; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.8); pointer-events: auto; background-color: #333; } 
         .mbj-panel-btn:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.8), inset 0 2px 6px rgba(255,255,255,0.2); } 
         .mbj-btn-hit { background: #00cc00; } 
         .mbj-btn-stand { background: #cc0000; } 
-        .mbj-btn-double { background: #ffcc00; color: black; font-family: 'Outfit'; font-weight: 900; font-size: 1.5rem; display: none; border-color: white;} 
-        .mbj-btn-split { background: #ffcc00; color: black; display: none;}
+        .mbj-btn-double { background: #ffcc00; color: black; font-family: 'Outfit'; font-weight: 900; font-size: 1.5rem; border-color: white;} 
+        .mbj-btn-split { background: #ffcc00; color: black; }
         .mbj-btn-label { font-size: 0.8rem; font-weight: 900; text-transform: uppercase; color: white; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        
-        .anim-fly-in { animation: flyInFromShoe 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform-origin: center; } @keyframes flyInFromShoe { 0% { opacity: 0; transform: translate(0, -300px) scale(0.2); } 100% { opacity: 1; transform: translate(0, 0) scale(1); } } 
-        .anim-fly-in-doubled { animation: flyInDoubledFromShoe 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform-origin: center; } @keyframes flyInDoubledFromShoe { 0% { opacity: 0; transform: translate(0, -300px) scale(0.2); } 100% { opacity: 1; transform: translate(30px, 15px) rotate(90deg) scale(1); } }
-        .player-timer-track { width: 50%; margin: 5px auto 0 auto; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden; position: relative; transition: opacity 0.3s;} .player-timer-fill { height: 100%; background: var(--success); width: 0%; transition: width 1s linear; } .player-timer-fill.danger { background: var(--danger); } .dimmed { opacity: 0.4; filter: grayscale(50%); }
 
         .rules-text { display: flex; justify-content: center; width: 100%; padding: 0 10px; } .rules-text ul { margin: 0; text-align: left; padding-left: 20px; display: inline-block; color: var(--text-muted); line-height: 1.6; } .rules-text li { margin-bottom: 8px; }
     </style>
@@ -392,7 +386,9 @@
       <header class="topbar">
       <div class="topbar-inner">
         <div class="brand" onclick="backToHub()" title="Return to Lobby"><div class="brand-dot"></div><div class="brand-title" style="margin-top: 3px;">STICK N' TRADE</div></div>
-        <div id="radio-hud" class="radio-hud"><div class="radio-marquee">🎵 NOW PLAYING: <span id="radio-dj"></span>'s TRACK</div></div>
+        
+        <div id="radio-hud" class="radio-hud"><i class="fas fa-volume-up"></i><div class="radio-marquee">NOW PLAYING: <span id="radio-dj"></span>'s TRACK</div></div>
+        
         <div class="topbar-right">
             <div class="player-profile"><i class="fas fa-user-circle"></i><span id="player-name-display">Player</span></div>
             <div class="wallet-pill" id="pill-playable" onclick="openModal('playable-info-modal')"><div class="wallet-main"><i class="fas fa-star" style="color: var(--playable);"></i><span id="nav-playable">0</span><span class="wallet-unit" style="color: var(--playable); opacity: 0.8;">P</span></div></div>
@@ -409,7 +405,7 @@
                 <div class="dropdown-wrapper">
                     <button type="button" class="top-icon-btn" onclick="toggleCustomDropdown('gift-dropdown', event)" title="Gift Code" style="color:var(--ps-glow);"><i class="fas fa-gift"></i></button>
                     <div id="gift-dropdown" class="custom-dropdown hidden" style="padding: 20px;" onclick="event.stopPropagation()">
-                        <div style="font-weight:900; color:white; text-transform:uppercase; margin-bottom:15px; text-align:center;">Redeem Code</div>
+                        <div style="font-weight:900; color:white; text-transform:uppercase; margin-bottom:15px; font-size:1.1rem; text-align:center;">Redeem Code</div>
                         <div class="input-group" style="margin-bottom:10px;"><input type="text" id="promo-code" class="input-control bet-input" placeholder="XXXX-XXXX-XXXX" onkeypress="if(event.key==='Enter'){submitPromo();}"></div>
                         <button type="button" class="btn-play" style="width:100%; margin-top: 10px;" onclick="submitPromo()">REDEEM</button>
                         <div id="promo-response" style="text-align:center; font-weight:800; min-height:25px; margin-top:15px; font-size: 1rem; line-height:1.4;"></div>
@@ -465,7 +461,7 @@
             <div class="game-wrapper solo-wrap">
                 <div class="game-box">
                   <div class="main-panel glass-panel">
-                    <div class="glass-header"><h2 style="margin:0; line-height:1;">D20</h2><div style="display:flex; gap:8px; position: relative;"><button type="button" class="btn-rules" onclick="toggleRules('d20', event)" title="How to Play"><i class="fas fa-info-circle"></i></button><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleHistory('d20', event)" title="History"><i class="fas fa-list-alt"></i></button></div></div></div>
+                    <div class="glass-header"><h2 style="margin:0; line-height:1;">D20</h2><div style="display:flex; gap:8px; position: relative;"><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleCustomDropdown('d20-rules', event)" title="How to Play"><i class="fas fa-info-circle"></i></button><div id="d20-rules" class="custom-dropdown hidden" style="width: 350px; padding: 20px;" onclick="event.stopPropagation()"><div style="font-weight:900; color:white; text-transform:uppercase; margin-bottom:15px; font-size:1.1rem; text-align:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">How to Play</div><div class="rules-text"><ul><li>Select your bet to increase your coverage.</li><li><strong>Odd/Even:</strong> Pays <strong>1.95x</strong>.</li></ul></div></div></div><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleHistory('d20', event)" title="History"><i class="fas fa-list-alt"></i></button></div></div></div>
                     <div class="game-display">
                       <div id="d20-display-container" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;">
                           <i class="fas fa-dice-d20 dice-icon" id="d20-icon"></i><div id="d20-num" style="display:none; color:white; font-weight:900; font-size:6rem; line-height:1; text-shadow:0 10px 30px rgba(0,0,0,0.8);">0</div>
@@ -487,7 +483,7 @@
             <div class="game-wrapper solo-wrap">
                 <div class="game-box" style="overflow: visible;">
                   <div class="main-panel glass-panel" style="overflow: visible;">
-                    <div class="glass-header"><h2 style="margin:0; line-height:1;">Coin Flip</h2><div style="display:flex; gap:8px; position: relative;"><button type="button" class="btn-rules" onclick="toggleRules('coinflip', event)" title="How to Play"><i class="fas fa-info-circle"></i></button><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleHistory('coinflip', event)" title="History"><i class="fas fa-list-alt"></i></button></div></div></div>
+                    <div class="glass-header"><h2 style="margin:0; line-height:1;">Coin Flip</h2><div style="display:flex; gap:8px; position: relative;"><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleCustomDropdown('cf-rules', event)" title="How to Play"><i class="fas fa-info-circle"></i></button><div id="cf-rules" class="custom-dropdown hidden" style="width: 350px; padding: 20px;" onclick="event.stopPropagation()"><div style="font-weight:900; color:white; text-transform:uppercase; margin-bottom:15px; font-size:1.1rem; text-align:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">How to Play</div><div class="rules-text"><ul><li>Enter your bet and choose <strong>Heads</strong> or <strong>Tails</strong>.</li><li>Winning pays <strong>1.95x</strong> your bet.</li><li>Playable Bonus is used before Main TC.</li></ul></div></div></div><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleHistory('coinflip', event)" title="History"><i class="fas fa-list-alt"></i></button></div></div></div>
                     <div class="game-display" style="overflow: visible; z-index: 50;">
                       <div id="coin-display-container" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;">
                           <div class="coin-wrapper" id="coin-wrapper"><div class="coin-inner" id="coin-obj"><div class="coin-face coin-heads"><i class="fas fa-coins"></i></div><div class="coin-face coin-tails"><i class="fas fa-gem"></i></div></div></div><div class="coin-shadow"></div>
@@ -509,7 +505,7 @@
             <div class="game-wrapper solo-wrap" style="max-width:1000px;">
                 <div class="game-box">
                   <div class="main-panel glass-panel">
-                    <div class="glass-header"><h2 style="margin:0; line-height:1;">Blackjack</h2><div style="display:flex; gap:8px; position: relative;"><button type="button" class="btn-rules" onclick="toggleRules('blackjack', event)" title="How to Play"><i class="fas fa-info-circle"></i></button><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleHistory('blackjack', event)" title="History"><i class="fas fa-list-alt"></i></button></div></div></div>
+                    <div class="glass-header"><h2 style="margin:0; line-height:1;">Blackjack</h2><div style="display:flex; gap:8px; position: relative;"><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleCustomDropdown('bj-rules', event)" title="How to Play"><i class="fas fa-info-circle"></i></button><div id="bj-rules" class="custom-dropdown hidden" style="width: 350px; padding: 20px;" onclick="event.stopPropagation()"><div style="font-weight:900; color:white; text-transform:uppercase; margin-bottom:15px; font-size:1.1rem; text-align:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">How to Play</div><div class="rules-text"><ul><li>Beat the dealer without going over 21.</li><li>Dealer must stand on <strong>17 or higher</strong>.</li><li>Natural Blackjack pays <strong>2.5x</strong>. Standard wins pay <strong>2x</strong>. Ties push.</li></ul></div></div></div><div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleHistory('blackjack', event)" title="History"><i class="fas fa-list-alt"></i></button></div></div></div>
                     <div class="game-display">
                       <div id="bj-display-container" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                           <div class="blackjack-scores"><div class="card-area"><div class="bj-title">Dealer</div><div class="bj-score" id="bj-d-score">0</div><div class="card-hand" id="bj-d-hand"></div></div><div class="card-area"><div class="bj-title">You</div><div class="bj-score" id="bj-p-score">0</div><div class="card-hand" id="bj-p-hand"></div></div></div>
@@ -537,7 +533,7 @@
                       <div style="display:flex; align-items:center; gap:15px;"><h2 id="sg-title" style="margin:0; line-height:1;">Table</h2></div>
                       <div style="display:flex; align-items:center; gap:8px; position: relative;">
                           <div class="timer-box" id="sg-timer-box"><i class="fas fa-clock"></i><div style="display:flex; align-items:baseline;"><span id="sg-timer">15</span><span class="timer-sec">s</span></div></div>
-                          <button type="button" class="btn-rules" onclick="toggleRules(window.activeSharedGame, event)" title="How to Play"><i class="fas fa-info-circle"></i></button>
+                          <div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleRules(window.activeSharedGame, event)" title="How to Play"><i class="fas fa-info-circle"></i></button></div>
                           <div class="dropdown-wrapper"><button type="button" class="btn-rules" onclick="toggleHistory(window.activeSharedGame, event)" title="History"><i class="fas fa-list-alt"></i></button></div>
                       </div>
                     </div>
@@ -566,11 +562,6 @@
                     <div class="chat-input-area" style="padding:15px; border-top:1px solid var(--glass-border); flex-shrink: 0; display:flex; gap:8px; align-items:center;">
                         <input type="text" id="chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter'){sendChat();}">
                         <button type="button" class="ptt-btn" style="background:var(--ps-glow); color:black;" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
-                        <button type="button" class="ptt-btn" id="ptt-btn-shared" 
-                                onmousedown="startPTT('ptt-btn-shared')" onmouseup="stopPTT('ptt-btn-shared')" onmouseleave="stopPTT('ptt-btn-shared')" 
-                                ontouchstart="event.preventDefault(); startPTT('ptt-btn-shared')" ontouchend="event.preventDefault(); stopPTT('ptt-btn-shared')" ontouchcancel="event.preventDefault(); stopPTT('ptt-btn-shared')">
-                            <i class="fas fa-microphone"></i>
-                        </button>
                     </div>
                   </div>
                 </div>
@@ -582,7 +573,7 @@
                 <div class="game-board-wrapper" style="display:flex; flex-direction:column; align-items:center; flex:1;">
                     <div class="mbj-board" id="mbj-board-container">
                         <div class="mbj-table-line"></div>
-                        <div class="mbj-logo"><h1>BLACKJACK</h1><p>PAYS 3 TO 2</p></div>
+                        <div class="mbj-logo"><h1>BLACKJACK</h1><p>PAYS 3 TO 2</p><p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p></div>
                         <div class="mbj-shoe"></div>
                         <div class="mbj-dealer-area" id="mbj-dealer-area">
                             <div class="dealer-timer-text" id="mbj-dealer-timer-text">15</div>
@@ -594,13 +585,13 @@
                     <div class="mbj-control-panel" id="mbj-control-panel">
                         <div class="mbj-input-group" id="mbj-betting-ui">
                             <input type="number" id="mbj-custom-bet" placeholder="Bet Amount (TC)" min="10">
-                            <button onclick="mbjConfirmLocalBet()">PLACE BET</button>
+                            <button type="button" onclick="mbjConfirmLocalBet()">PLACE BET</button>
                         </div>
                         
                         <div class="mbj-actions-group" id="mbj-actions-ui">
-                            <div class="mbj-action-container">
-                                <button type="button" class="mbj-panel-btn mbj-btn-double" id="mbj-btn-double" onclick="sendMBJAction('double')"><span>x2</span></button>
-                                <div class="mbj-btn-label" id="label-double" style="display:none;">DOUBLE</div>
+                            <div class="mbj-action-container" id="action-container-double" style="display:none;">
+                                <button type="button" class="mbj-panel-btn mbj-btn-double" onclick="sendMBJAction('double')"><span>x2</span></button>
+                                <div class="mbj-btn-label">DOUBLE</div>
                             </div>
                             <div class="mbj-action-container">
                                 <button type="button" class="mbj-panel-btn mbj-btn-hit" onclick="sendMBJAction('hit')">
@@ -612,9 +603,9 @@
                                 <button type="button" class="mbj-panel-btn mbj-btn-stand" onclick="sendMBJAction('stand')"><i class="fas fa-hand-paper"></i></button>
                                 <div class="mbj-btn-label">STAND</div>
                             </div>
-                            <div class="mbj-action-container">
-                                <button type="button" class="mbj-panel-btn mbj-btn-split" id="mbj-btn-split" onclick="sendMBJAction('split')"><i class="fas fa-arrows-alt-h"></i></button>
-                                <div class="mbj-btn-label" id="label-split" style="display:none;">SPLIT</div>
+                            <div class="mbj-action-container" id="action-container-split" style="display:none;">
+                                <button type="button" class="mbj-panel-btn mbj-btn-split" onclick="sendMBJAction('split')"><i class="fas fa-arrows-alt-h"></i></button>
+                                <div class="mbj-btn-label">SPLIT</div>
                             </div>
                         </div>
                     </div>
@@ -636,7 +627,7 @@
                     <div class="chat-body custom-scroll" id="mbj-chat"></div>
                     <div class="chat-input-area" style="padding:15px; border-top:1px solid var(--glass-border); flex-shrink: 0; display:flex; gap:8px; align-items:center;">
                         <input type="text" id="mbj-chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter') sendMBJChat();">
-                        <button class="btn-play" style="padding:10px 15px; background:var(--ps-glow); color:black;" onclick="sendMBJChat()"><i class="fas fa-paper-plane"></i></button>
+                        <button type="button" class="ptt-btn" style="background:var(--ps-glow); color:black;" onclick="sendMBJChat()"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
             </div>
@@ -646,13 +637,13 @@
       </div>
   </div>
 
-  <div id="history-popover" class="custom-dropdown hidden" style="width: 450px; padding: 0; overflow: hidden; cursor: default; z-index: 999999;" onclick="event.stopPropagation()">
+  <div id="history-popover" class="custom-dropdown hidden" style="width: 450px; padding: 0; overflow: hidden; cursor: default; z-index: 999999; top: 45px; right: 0;" onclick="event.stopPropagation()">
         <div style="background:rgba(0,0,0,0.5); border-bottom:1px solid var(--glass-border); padding:15px; text-align:center;"><div style="font-weight:900; color:white; font-size:1.1rem; margin-bottom:5px;">TOTAL ROUNDS: <span id="stat-total-rounds" style="color:var(--credits);">0</span></div><div id="stat-percentages" style="display:flex; flex-wrap:nowrap; justify-content:center; align-items:center; gap:8px; font-size:0.95rem; font-weight:800;"></div></div>
         <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; padding:12px 15px; border-bottom:1px solid rgba(255,255,255,0.1); font-size:0.85rem; font-weight:900; color:var(--text-muted); text-align:center; text-transform:uppercase; background: rgba(0,0,0,0.4);"><div>Result</div><div>Bet</div><div style="color:var(--success)">Win</div><div style="color:var(--danger)">Loss</div></div>
         <div id="history-items" style="padding:15px; display:flex; flex-direction:column; gap:10px;"></div>
   </div>
 
-  <div id="rules-popover" class="custom-dropdown hidden" style="width: 350px; padding: 20px; cursor: default; z-index: 999999;" onclick="event.stopPropagation()">
+  <div id="rules-popover" class="custom-dropdown hidden" style="width: 350px; padding: 20px; cursor: default; z-index: 999999; top: 45px; right: 0;" onclick="event.stopPropagation()">
         <div style="font-weight:900; color:white; text-transform:uppercase; margin-bottom:15px; font-size:1.1rem; text-align:center; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;" id="rules-title">How to Play</div>
         <div id="rules-body" class="rules-text"></div>
   </div>
@@ -755,16 +746,60 @@
         }
     }
 
+    // FIXED: POPOVERS - Appends them to the clicked wrapper so they position perfectly
     function toggleCustomDropdown(id, e) { 
         if(e) e.stopPropagation(); 
         document.querySelectorAll('.custom-dropdown').forEach(d => { 
             if(d.id !== id) d.classList.add('hidden'); 
         }); 
+        
         let target = document.getElementById(id); 
         if(target) {
+            if (e && e.currentTarget && e.currentTarget.parentElement) {
+                e.currentTarget.parentElement.appendChild(target);
+            }
             target.classList.toggle('hidden'); 
             if(id === 'notif-dropdown' && !target.classList.contains('hidden')) renderNotifs();
             if(id === 'gift-dropdown') document.getElementById('promo-response').innerText = ''; 
+        }
+    }
+
+    // FIXED: HISTORY POPOVER
+    function toggleHistory(id, e) { 
+        if(e) e.stopPropagation(); 
+        document.querySelectorAll('.custom-dropdown').forEach(d => { 
+            if(d.id !== 'history-popover') d.classList.add('hidden'); 
+        }); 
+        
+        let popover = document.getElementById('history-popover'); 
+        if(popover) {
+            if (e && e.currentTarget && e.currentTarget.parentElement) {
+                e.currentTarget.parentElement.appendChild(popover);
+            }
+            popover.classList.toggle('hidden'); 
+            if(!popover.classList.contains('hidden')) { 
+                currentHistoryGame = id; updateHistoryUI(id); socket.emit('getGlobalResults', id); 
+            }
+        }
+    }
+
+    // FIXED: RULES POPOVER
+    function toggleRules(id, e) { 
+        if(e) e.stopPropagation(); 
+        document.querySelectorAll('.custom-dropdown').forEach(d => { 
+            if(d.id !== 'rules-popover') d.classList.add('hidden'); 
+        }); 
+        
+        let popover = document.getElementById('rules-popover'); 
+        if(popover) {
+            if (e && e.currentTarget && e.currentTarget.parentElement) {
+                e.currentTarget.parentElement.appendChild(popover);
+            }
+            popover.classList.toggle('hidden'); 
+            if(!popover.classList.contains('hidden')) { 
+                document.getElementById('rules-title').innerText = gameInfoMap[id].title + " Rules"; 
+                document.getElementById('rules-body').innerHTML = gameInfoMap[id].body; 
+            }
         }
     }
 
@@ -996,17 +1031,6 @@
         i.value = newVal; 
     }
 
-    socket.on('transactionsData', (txs) => {
-        let c = document.getElementById('bank-logs-container');
-        if(!c) return;
-        c.innerHTML = '';
-        if (txs.length === 0) { c.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding: 20px;">No transaction history.</div>'; return; }
-        txs.forEach(t => {
-            let col = t.status === 'Approved' ? 'var(--success)' : (t.status === 'Rejected' ? 'var(--danger)' : 'var(--credits)');
-            c.insertAdjacentHTML('beforeend', `<div style="background:rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 8px; margin-bottom: 5px; display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:900; color:white;">${t.type.toUpperCase()}</div><div style="font-size:0.8rem; color:var(--text-muted);">${new Date(t.date).toLocaleDateString()}</div></div><div style="text-align:right;"><div style="font-weight:900; color:white;">${fmtTC(t.amount)} TC</div><div style="font-size:0.8rem; font-weight:900; color:${col}; text-transform:uppercase;">${t.status}</div></div></div>`);
-        });
-    });
-
     socket.on('walletLogsData', (data) => {
         document.getElementById('ledger-daily-profit').innerText = fmtTC(data.dailyProfit) + ' TC';
         document.getElementById('ledger-daily-profit').style.color = data.dailyProfit >= 0 ? 'var(--success)' : 'var(--danger)';
@@ -1036,6 +1060,32 @@
             document.getElementById('promo-code').value = ''; 
         } 
         else { el.style.color = 'var(--danger)'; el.innerText = res.msg; }
+    });
+
+    // FIXED: RADIO HUD BEHAVIOR
+    socket.on('radioPlay', (data) => { 
+        const hud = document.getElementById('radio-hud'); 
+        const djText = document.getElementById('radio-dj'); 
+        if(hud && djText && data.url) {
+            djText.innerText = data.requestedBy; 
+            hud.classList.add('show'); 
+        }
+    });
+    
+    socket.on('radioStop', () => { 
+        const hud = document.getElementById('radio-hud'); 
+        if(hud) hud.classList.remove('show'); 
+    });
+    
+    socket.on('radioSync', (data) => { 
+        const hud = document.getElementById('radio-hud'); 
+        const djText = document.getElementById('radio-dj'); 
+        if(hud && djText && data.url) {
+            djText.innerText = data.requestedBy; 
+            hud.classList.add('show'); 
+        } else if (hud) {
+            hud.classList.remove('show');
+        }
     });
 
     // --- NAVIGATION ---
@@ -1202,13 +1252,14 @@
         let pHand = document.getElementById('bj-p-hand'); let dHand = document.getElementById('bj-d-hand'); 
         if (data.event === 'deal') { 
             let pS = 0, dS = 0;
+            // FIXED: Dealer Card 1 is Face UP, Card 2 is Face DOWN (Hole Card)
             pHand.innerHTML = generateCardHTML(data.pHand[0], false, true); document.getElementById('bj-p-score').innerText = getBJScore([data.pHand[0]]); await delay(300); 
-            dHand.innerHTML = generateCardHTML(data.dHand[0], true, true); document.getElementById('bj-d-score').innerText = getBJScore([data.dHand[0]]); await delay(300); 
+            dHand.innerHTML = generateCardHTML(data.dHand[0], false, true); document.getElementById('bj-d-score').innerText = getBJScore([data.dHand[0]]); await delay(300); 
             pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pHand[1], false, true)); document.getElementById('bj-p-score').innerText = getBJScore(data.pHand); await delay(300); 
-            dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[1], false, true)); await delay(400); 
+            dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[1], true, true)); await delay(400); 
             
             if (data.autoStand) {
-                // FIXED: Solo Blackjack Suspense for Natural 21
+                // FIXED: Solo Blackjack Suspense for Natural 21. The server handles the payout automatically, we just wait for the resolved event to flip the cards.
                 return;
             }
 
@@ -1233,7 +1284,8 @@
                 await delay(600); 
             } 
             
-            dHand.innerHTML = generateCardHTML(data.dHand[0], false, false, true) + generateCardHTML(data.dHand[1], false, false); 
+            // FIXED: Dealer Reveal Animation (First card stays face up, Second card flips face up)
+            dHand.innerHTML = generateCardHTML(data.dHand[0], false, false) + generateCardHTML(data.dHand[1], false, false, true); 
             document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, 2)); 
             await delay(600); 
             
@@ -1438,8 +1490,8 @@
                     
                     if (isThisHandActive && mbjGameState === 'PLAYER_TURN' && isMe) {
                         document.getElementById('mbj-actions-ui').style.display = 'flex'; 
-                        document.getElementById('mbj-btn-double').parentElement.style.display = hand.cards.length === 2 ? 'flex' : 'none'; 
-                        document.getElementById('mbj-btn-split').parentElement.style.display = (hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1) ? 'flex' : 'none';
+                        document.getElementById('action-container-double').style.display = hand.cards.length === 2 ? 'flex' : 'none'; 
+                        document.getElementById('action-container-split').style.display = (hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1) ? 'flex' : 'none';
                     }
                     
                     let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 75 : 75; 
