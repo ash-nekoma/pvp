@@ -182,7 +182,7 @@ let mbjState = {
     seats: { 1: null, 2: null, 3: null, 4: null, 5: null } 
 };
 
-// MASTER VIP BLACKJACK GAME LOOP (Moved Outside Connection Block)
+// FIXED: MASTER VIP BLACKJACK GAME LOOP (Moved Outside Connection Block)
 setInterval(() => {
     try {
         if (mbjState.status === 'BETTING') {
@@ -200,7 +200,6 @@ setInterval(() => {
             if (mbjState.time <= 0 && hasBets) {
                 io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets are closed! Dealing...', sys: true });
                 
-                // Clear empty seats
                 for (let i = 1; i <= 5; i++) { 
                     if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) { 
                         mbjState.seats[i] = null; 
@@ -224,7 +223,6 @@ setInterval(() => {
                         mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
                     });
                     
-                    // Dealer Hole Card Logic
                     let hiddenDealer = [mbjState.dealer.hand[0], { raw: '', suitHtml: ``, bjVal: 0 }];
                     let animTime = ((activeSeats.length * 2) + 2) * 400 + 400; 
                     
@@ -797,7 +795,7 @@ io.on('connection', (socket) => {
         try {
             let amount = formatTC(data.amount); if(isNaN(amount) || amount <= 0) return;
             if (data.type === 'Deposit' && amount < 1000) return socket.emit('localGameError', { msg: 'MIN DEPOSIT IS 1,000 TC', game: 'cashier' });
-            if (data.type === 'Withdrawal' && amount < 10000) return socket.emit('localGameError', { msg: 'MIN WITHDRAWAL IS 10,000 TC', game: 'cashier' });
+            if (data.type === 'Withdrawal' && amount < 10000) return socket.emit('localGameError', { msg: 'MIN WITHDRAWAL IS 10,000 TC ', game: 'cashier' });
             if (data.type === 'Deposit' && amount > 100000) return socket.emit('localGameError', { msg: 'MAX DEPOSIT IS 100,000 TC', game: 'cashier' });
             if (data.type === 'Withdrawal' && amount > 100000) return socket.emit('localGameError', { msg: 'MAX WITHDRAWAL IS 100,000 TC', game: 'cashier' });
 
@@ -824,84 +822,6 @@ io.on('connection', (socket) => {
                 socket.emit('adminLoginSuccess', { username: user.username, role: user.role }); await pushAdminData(socket);
             } else { socket.emit('authError', 'Invalid Admin Credentials.'); }
         } catch(e) { socket.emit('authError', 'System Error: ' + e.message); }
-    });
-
-    socket.on('login', async (data) => {
-        if (socket.isAuth) return; socket.isAuth = true;
-        try {
-            if (mongoose.connection.readyState !== 1) return socket.emit('authError', 'Database Offline.');
-            const user = await User.findOne({ username: data.username, password: data.password });
-            if (!user) return socket.emit('authError', 'Invalid login credentials.');
-            if (user.status === 'Banned') return socket.emit('authError', 'This account has been banned.');
-
-            if (isNaN(user.credits) || user.credits === null) user.credits = 0; if (isNaN(user.playableCredits) || user.playableCredits === null) user.playableCredits = 0;
-            let ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address; user.ipAddress = ip; user.status = 'Active'; await user.save(); 
-            socket.user = user; connectedUsers[user.username] = socket.id;
-            
-            sendPulse(`${user.username} logged in.`, 'info'); pushAdminData();
-            
-            let now = new Date(), canClaim = true, day = 1, nextClaim = null;
-            if (user.dailyReward.lastClaim) {
-                let diffHours = (now - user.dailyReward.lastClaim) / (1000 * 60 * 60);
-                if (diffHours < 24) { canClaim = false; nextClaim = new Date(user.dailyReward.lastClaim.getTime() + 24 * 60 * 60 * 1000); } 
-                else if (diffHours > 48) { user.dailyReward.streak = 0; }
-                day = (user.dailyReward.streak % 7) + 1;
-            }
-            socket.emit('loginSuccess', { username: user.username, credits: formatTC(user.credits), playable: formatTC(user.playableCredits), role: user.role, daily: { canClaim, day, nextClaim } });
-        } catch(e) { socket.emit('authError', 'System Error: ' + e.message); } finally { socket.isAuth = false; }
-    });
-
-    socket.on('register', async (data) => {
-        if (socket.isAuth) return; socket.isAuth = true;
-        try {
-            if (mongoose.connection.readyState !== 1) return socket.emit('authError', 'Database Offline.');
-            const exists = await User.findOne({ username: data.username }); if (exists) return socket.emit('authError', 'Username is already taken.');
-            
-            let refUser = null;
-            if (data.referral) {
-                refUser = await User.findOne({ username: new RegExp('^' + data.referral + '$', 'i') });
-                if (!refUser) return socket.emit('authError', 'Invalid Referral Code.');
-                if (refUser.username.toLowerCase() === data.username.toLowerCase()) return socket.emit('authError', 'Cannot refer yourself.');
-            }
-            
-            let ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-            let newUser = new User({ username: data.username, password: data.password, ipAddress: ip, referredBy: refUser ? refUser.username : null });
-
-            if (refUser) {
-                newUser.playableCredits = 500; refUser.playableCredits = formatTC((refUser.playableCredits || 0) + 500); await refUser.save();
-                await new CreditLog({ username: refUser.username, action: 'REFERRAL', amount: 500, details: `Signup Bonus (${newUser.username})` }).save();
-                let refSock = connectedUsers[refUser.username];
-                if (refSock) { io.to(refSock).emit('balanceUpdateData', { credits: refUser.credits, playable: refUser.playableCredits }); io.to(refSock).emit('silentNotification', { id: Date.now(), title: 'Referral Bonus!', msg: `${newUser.username} used your code! +500 P`, date: new Date() }); }
-            }
-            await newUser.save();
-            if (refUser) await new CreditLog({ username: newUser.username, action: 'REFERRAL', amount: 500, details: `Used code ${refUser.username}` }).save();
-            sendPulse(`New account created: ${data.username}`, 'success'); pushAdminData(); socket.emit('registerSuccess', 'Account created! You may now login.');
-        } catch(e) { socket.emit('authError', 'System Error: ' + e.message); } finally { socket.isAuth = false; }
-    });
-
-    socket.on('claimDaily', async () => {
-        if (!socket.user) return; const user = await User.findById(socket.user._id); let now = new Date();
-        if (user.dailyReward.lastClaim && (now - user.dailyReward.lastClaim) / (1000 * 60 * 60) < 24) return; 
-
-        let day = (user.dailyReward.streak % 7) + 1; const rewards = [100, 250, 500, 750, 1000, 1500, 2000]; let amt = formatTC(rewards[day - 1]);
-        user.playableCredits = formatTC((user.playableCredits || 0) + amt); user.dailyReward.lastClaim = now; user.dailyReward.streak += 1; await user.save();
-        
-        await new CreditLog({ username: user.username, action: 'GIFT', amount: amt, details: `Daily Reward` }).save();
-        sendPulse(`${user.username} claimed Day ${day} Daily Reward.`, 'info'); pushAdminData();
-        socket.emit('dailyClaimed', { amt, newBalance: { credits: user.credits, playable: user.playableCredits }, nextClaim: new Date(now.getTime() + 24 * 60 * 60 * 1000) });
-    });
-
-    socket.on('redeemPromo', async (code) => {
-        if (!socket.user) return;
-        try {
-            const gc = await GiftCode.findOneAndUpdate({ code: code, redeemedBy: null }, { redeemedBy: socket.user.username }, { new: true });
-            if (!gc) return socket.emit('promoResult', { success: false, msg: 'Invalid or already used' });
-            const user = await User.findById(socket.user._id);
-            if(gc.creditType === 'playable') { user.playableCredits = formatTC((user.playableCredits || 0) + gc.amount); } else { user.credits = formatTC((user.credits || 0) + gc.amount); }
-            await user.save(); await new CreditLog({ username: user.username, action: 'CODE', amount: gc.amount, details: `Redeemed` }).save();
-            sendPulse(`${socket.user.username} redeemed Promo Code for ${gc.amount}.`, 'success'); pushAdminData();
-            socket.emit('promoResult', { success: true, amt: gc.amount, type: gc.creditType }); socket.emit('balanceUpdateData', { credits: user.credits, playable: user.playableCredits });
-        } catch(e) { socket.emit('promoResult', { success: false, msg: 'Server error' }); }
     });
 
     socket.on('adminAction', async (data) => {
@@ -1016,97 +936,6 @@ io.on('connection', (socket) => {
             }
             await pushAdminData();
         } catch(e) { socket.emit('adminError', "Server Error: " + e.message); }
-    });
-
-    socket.on('mbjTakeSeat', (seatNum) => {
-        if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
-        for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) return; }
-        mbjState.seats[seatNum] = { userId: socket.user._id, username: socket.user.username, hands: [] };
-        io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
-    });
-
-    socket.on('mbjLeaveSeat', async () => {
-        if (!socket.user) return;
-        for(let i = 1; i <= 5; i++) {
-            let s = mbjState.seats[i];
-            if (s && s.userId.toString() === socket.user._id.toString() && mbjState.status === 'BETTING') {
-                if (s.hands.length > 0 && s.hands[0].bet > 0) {
-                    try {
-                        let u = await User.findById(socket.user._id);
-                        if (u) { u.playableCredits = formatTC((u.playableCredits || 0) + s.hands[0].fromPlayable); u.credits = formatTC((u.credits || 0) + s.hands[0].fromMain); await u.save(); socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits }); }
-                    } catch(e) {}
-                }
-                mbjState.seats[i] = null; io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(st => st && st.hands.length > 0 && st.hands[0].bet > 0) }); break;
-            }
-        }
-    });
-
-    socket.on('mbjPlaceBet', async (amount) => {
-        if (!socket.user || mbjState.status !== 'BETTING') return;
-        let seatNum = null; for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) seatNum = i; } if (!seatNum) return;
-
-        let amt = formatTC(amount);
-        try {
-            let u = await User.findById(socket.user._id); if (!u) return;
-            let deduction = await deductBet(u._id, amt);
-            if (!deduction.success) return socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' });
-            u = deduction.user; processReferralBetCommission(u, amt);
-
-            let s = mbjState.seats[seatNum];
-            if (s.hands.length === 0) s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false, fromPlayable: 0, fromMain: 0 });
-            s.hands[0].bet += amt; s.hands[0].originalBet += amt; s.hands[0].fromPlayable += deduction.fromPlayable; s.hands[0].fromMain += deduction.fromMain;
-            socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits }); io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
-        } catch(e) {}
-    });
-
-    socket.on('mbjAction', async (actionData) => {
-        if (!socket.user || mbjState.status !== 'PLAYER_TURN' || mbjState.activeTurn.seat === null) return;
-        let seatNum = mbjState.activeTurn.seat; let handIdx = mbjState.activeTurn.handIdx; let seat = mbjState.seats[seatNum];
-        if (seat.userId.toString() !== socket.user._id.toString()) return; let hand = seat.hands[handIdx];
-
-        try {
-            if (actionData.type === 'hit') {
-                if (hand.isSplitAce) return; 
-                hand.cards.push(mbjDrawCard()); hand.score = getBJScore(hand.cards); mbjState.turnTimer = 15; 
-                if (hand.score >= 21) { 
-                    hand.status = hand.score > 21 ? 'BUST' : 'STAND'; 
-                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                    setTimeout(() => mbjNextTurn(), 1200); 
-                } 
-                else { 
-                    io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); 
-                }
-            } 
-            else if (actionData.type === 'stand') {
-                hand.status = 'STAND'; io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); mbjNextTurn();
-            }
-            else if (actionData.type === 'double') {
-                if (hand.cards.length !== 2) return;
-                let u = await User.findById(socket.user._id); if (!u) return;
-                let deduction = await deductBet(u._id, hand.bet); if (!deduction.success) return socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' });
-                u = deduction.user; processReferralBetCommission(u, hand.bet);
-                
-                hand.fromPlayable += deduction.fromPlayable; hand.fromMain += deduction.fromMain; hand.doubledAmount = hand.bet; hand.bet *= 2; 
-                hand.cards.push(mbjDrawCard()); hand.score = getBJScore(hand.cards); hand.status = hand.score > 21 ? 'BUST' : 'STAND'; mbjState.turnTimer = 15; 
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits }); setTimeout(() => mbjNextTurn(), 1200);
-            }
-            else if (actionData.type === 'split') {
-                if (hand.cards.length !== 2 || seat.hands.length >= 2) return; 
-                let val1 = hand.cards[0].bjVal; let val2 = hand.cards[1].bjVal; if (val1 !== val2) return; 
-                let u = await User.findById(socket.user._id); if (!u) return;
-                let deduction = await deductBet(u._id, hand.bet); if (!deduction.success) return socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' });
-                u = deduction.user; processReferralBetCommission(u, hand.bet);
-
-                let splitCard = hand.cards.pop();
-                let hand2 = { bet: hand.bet, originalBet: hand.bet, doubledAmount: 0, cards: [splitCard], score: 0, status: 'PLAYING', isSplitHand: true, fromPlayable: deduction.fromPlayable, fromMain: deduction.fromMain };
-                hand.isSplitHand = true;
-                hand.cards.push(mbjDrawCard()); hand.score = getBJScore(hand.cards); if (hand.score === 21) hand.status = 'STAND';
-                hand2.cards.push(mbjDrawCard()); hand2.score = getBJScore(hand2.cards); if (hand2.score === 21) hand2.status = 'STAND';
-
-                seat.hands.push(hand2); mbjState.turnTimer = 15; 
-                io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits }); if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200); 
-            }
-        } catch(e) {}
     });
 
     socket.on('disconnect', async () => {
