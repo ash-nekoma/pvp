@@ -96,7 +96,7 @@
         .wallet-main { display: flex; align-items: center; gap: 6px; } .wallet-main i { color: var(--credits); font-size: 1.1rem; } 
         #nav-credits, #nav-playable { font-family: 'Rajdhani', sans-serif; font-weight: 900; font-size: 1.2rem; line-height: 1; margin-top: 2px;} #nav-credits { color: var(--credits); }
         .wallet-unit { color: var(--text-muted); font-size: 0.8rem; font-weight: 800; }
-        #pill-playable { display: none; border-color: rgba(179, 102, 255, 0.4); } #pill-playable:hover { border-color: var(--playable); box-shadow: 0 0 15px rgba(179, 102, 255, 0.3); } #nav-playable { color: var(--playable); }
+        #pill-playable { display: none; border-color: rgba(179, 102, 255, 0.4); box-shadow: inset 0 0 10px rgba(179, 102, 255, 0.1); margin-right: 4px; } #pill-playable:hover { border-color: var(--playable); box-shadow: 0 0 15px rgba(179, 102, 255, 0.3); } #nav-playable { color: var(--playable); }
         
         .topbar-actions { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.8); padding: 8px 20px; border-radius: 50px; border: 1px solid var(--glass-border); position: relative;} 
         .top-icon-btn { cursor: pointer; background: transparent; border: none; font-size: 1.15rem; transition: 0.2s; color: white; width: 20px; pointer-events: auto;} 
@@ -105,7 +105,7 @@
         .notif-badge { display: none; position: absolute; top: -6px; right: -8px; background: var(--danger); color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 5px; border-radius: 50px; border: 2px solid var(--ps-bg); box-shadow: 0 0 10px var(--danger); pointer-events: none;}
         .notif-badge.pulse { animation: pulseBadge 1.5s infinite; } @keyframes pulseBadge { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 51, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); } }
         
-        /* THE RADIO HUD */
+        /* RADIO HUD */
         .radio-hud { flex: 1; overflow: hidden; position: relative; margin: 0 20px; height: 35px; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--glass-border); border-radius: 8px; display: none; align-items: center; padding: 0 15px; gap: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);} 
         .radio-hud.show { display: flex; animation: slideDown 0.3s ease-out; } 
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -121,6 +121,11 @@
         .notif-actions { display: flex; gap: 10px; } 
         .notif-action-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.8rem; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; pointer-events: auto;} 
         .notif-action-btn:hover { color: white; } 
+        .notif-popover-list { display: flex; flex-direction: column; gap: 8px; padding: 15px; max-height: 400px; } 
+        .notif-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 5px; position: relative; transition: 0.2s; cursor: pointer;} .notif-item.unread { border-left: 3px solid var(--ps-glow); background: rgba(0,162,255,0.05); } 
+        .notif-item-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; pointer-events: none;} .notif-item-title { color: white; } .notif-item.unread .notif-item-title { color: var(--ps-glow); } .notif-item-time { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; } 
+        .notif-item-body { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; padding-right: 20px; pointer-events: none;} 
+        .notif-item-del { position: absolute; right: 12px; bottom: 12px; background: transparent; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; transition: 0.2s; } .notif-item-del:hover { color: var(--danger); transform: scale(1.1); }
 
         /* --- CASINO LOBBY UI --- */
         .main-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; flex: 1; width: 100vw; overflow-y: auto; overflow-x: hidden; position: relative; padding-bottom: 50px; } 
@@ -139,7 +144,6 @@
         .mode-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent); z-index: 1; } 
         .mode-card:hover { transform: translateY(-8px); border-color: var(--ps-glow); box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 20px rgba(0,162,255,0.2); background: rgba(0, 30, 60, 0.8); } 
         .mode-icon { font-size: 6.5rem; margin-bottom: 2rem; color: var(--ps-light-blue); transition: 0.3s; position: relative; z-index: 2; } 
-        .mode-card:hover .mode-icon { transform: scale(1.1); color: white; text-shadow: 0 0 20px var(--ps-glow); } 
         .mode-title { font-size: 2.2rem; font-weight: 900; color: white; text-transform: uppercase; margin-bottom: 10px; position: relative; z-index: 2; letter-spacing: 1px; } 
         .mode-desc { color: var(--text-muted); font-size: 1.1rem; position: relative; z-index: 2; font-weight: 600; line-height: 1.4; padding: 0 20px; }
         
@@ -207,6 +211,22 @@
         @keyframes popBalance { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); } 100% { transform: scale(1); } } .anim-pop { animation: popBalance 0.6s ease-out; } 
         @keyframes shakeIt { 0% { transform: rotate(0deg) translate(0,0); } 25% { transform: rotate(5deg) translate(3px,-3px); } 50% { transform: rotate(0deg) translate(0,0); } 75% { transform: rotate(-5deg) translate(-3px,3px); } 100% { transform: rotate(0deg) translate(0,0); } } .shake-anim { animation: shakeIt 0.1s infinite; } 
 
+        /* MODALS & CASHIER */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 1000000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); pointer-events: auto;} 
+        .modal-content { background: rgba(0, 5, 15, 0.95); width: 500px; max-width: 95vw; padding: 2.5rem; border-radius: 12px; border: 1px solid rgba(0, 162, 255, 0.4); border-top: 3px solid var(--ps-glow); color: white; box-shadow: 0 25px 80px rgba(0,0,0,0.9); position: relative; display: flex; flex-direction: column; max-height: 90vh;} 
+        .modal-close-icon { position: absolute; top: 25px; right: 25px; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10;} .modal-close-icon:hover { color: var(--danger); transform: scale(1.1); } 
+        .modal-content h3 { font-size: 1.8rem; font-weight: 900; margin-bottom: 1.5rem; margin-top: 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
+        
+        .bank-tabs { display: flex; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; flex-shrink: 0;} 
+        .bank-tab { flex: 1; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-muted); font-weight: 900; padding: 12px; cursor: pointer; text-transform: uppercase; transition: 0.2s; font-size: 1.1rem; letter-spacing: 1px;} 
+        .bank-tab:hover { color: white; } .bank-tab.active { border-bottom: 3px solid var(--ps-glow); color: var(--ps-glow); } 
+        .bank-section { display: none; flex: 1; padding-right: 15px;} .bank-section.active { display: block; }
+        .quick-chips { display: flex; gap: 10px; justify-content: space-between; margin-bottom: 20px; flex-shrink: 0;} 
+        .chip-btn { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 12px 0; border-radius: 6px; font-size: 0.95rem; font-weight: 900; cursor: pointer; transition: 0.2s; text-align: center;} 
+        .chip-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
+        
+        thead th { position: sticky; top: 0; background: #000a1f; z-index: 10; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; border-bottom: 1px solid var(--glass-border); padding: 10px 15px; white-space: nowrap;} tbody td { white-space: nowrap; }
+
         /* DAILY REWARDS */
         .dr-days { display: flex; gap: 10px; justify-content: center; align-items: flex-end; margin-bottom: 25px; height: 180px; flex-wrap: wrap;} 
         .dr-day { flex: 1; background: linear-gradient(180deg, #1a2a6c 0%, #001f4d 100%); border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 15px 5px; height: 150px; min-width: 80px; transition: 0.3s; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); } 
@@ -225,28 +245,36 @@
         .dr-claim-btn { width: 100%; max-width: 250px; margin: 0 auto; background: #ffcc00; color: #000; font-size: 1.2rem; border: 2px solid #fff; box-shadow: 0 5px 15px rgba(255,204,0,0.4); pointer-events: auto;} 
         .dr-claim-btn:hover:not(:disabled) { background: #ff9900; transform: translateY(-2px); }
 
-        /* --- THE PERFECTED CARDS (Based on Reference Image) --- */
+        /* --- THE PERFECTED CARDS (Matches Reference Exactly) --- */
         .blackjack-scores { display: flex; justify-content: center; gap: 40px; width: 100%; align-items: flex-start; } 
         .card-area { min-width: 200px; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 240px; position: relative;} 
         .bj-title { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; } 
         .bj-score { font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 15px; line-height: 1; font-family: 'Rajdhani', sans-serif; text-shadow: 0 2px 5px rgba(0,0,0,0.8);} 
-        .card-hand { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 8px; justify-content: center; align-items: center; width: 100%; } 
+        .card-hand { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; align-items: center; width: 100%; position: relative; } 
         
         /* 1:1.4 Ratio Cards - Flawless Match to Image */
         .play-card, .mbj-card { 
-            background: white; border-radius: 8px; width: 80px !important; height: 115px !important; 
-            border: 1px solid #ccc; box-shadow: -2px 4px 10px rgba(0,0,0,0.3); 
-            display: flex; flex-direction: column; position: relative; font-weight: 800; 
-            flex-shrink: 0 !important; font-family: 'Outfit', sans-serif; color: #111;
+            background: white; border-radius: 6px; width: 70px !important; height: 100px !important; 
+            border: 1px solid #ccc; box-shadow: -2px 4px 8px rgba(0,0,0,0.4); 
+            display: flex; flex-direction: column; position: absolute; font-weight: 800; 
+            flex-shrink: 0 !important; font-family: 'Outfit', sans-serif; color: #111; bottom: 0;
         } 
-        .card-red { color: #ff3333; } 
+        /* Solo layout override */
+        #bj-p-hand .play-card, #bj-d-hand .play-card { position: relative; margin-right: 8px; box-shadow: 2px 4px 8px rgba(0,0,0,0.4); }
+        
+        .card-red { color: #d32f2f; } 
         .card-black { color: #111; }
         
         /* Inner Card Alignment */
-        .card-tl { position: absolute; top: 6px; left: 6px; display: flex; flex-direction: column; align-items: center; font-size: 1.1rem; line-height: 1; font-weight: 900; } 
-        .card-br { position: absolute; bottom: 6px; right: 6px; display: flex; flex-direction: column; align-items: center; font-size: 1.1rem; line-height: 1; font-weight: 900; transform: rotate(180deg); } 
-        .tiny-suit { font-size: 0.85rem; margin-top: 1px; }
-        .card-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.8rem; }
+        .card-tl { position: absolute; top: 4px; left: 5px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; text-align: center; } 
+        .card-tl .val { font-size: 1.2rem; font-weight: 900; } 
+        .card-tl .tiny-suit { font-size: 1rem; } 
+        
+        .card-br { position: absolute; bottom: 4px; right: 5px; display: flex; flex-direction: column; align-items: center; line-height: 0.9; text-align: center; transform: rotate(180deg); } 
+        .card-br .val { font-size: 1.2rem; font-weight: 900; } 
+        .card-br .tiny-suit { font-size: 1rem; } 
+        
+        .card-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; }
         
         .card-back { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px) !important; border: 2px solid rgba(255,255,255,0.8) !important; color: transparent !important; } 
         
@@ -283,7 +311,7 @@
         .dt-side { display: flex; flex-direction: column; align-items: center; gap: 20px; min-width: 120px; } 
         .dt-label { font-size: 2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; } 
         .lbl-dragon { color: var(--danger); text-shadow: 0 0 20px rgba(255,51,102,0.6); } .lbl-tiger { color: var(--credits); text-shadow: 0 0 20px rgba(255,180,0,0.6); } 
-        .dt-card { width: 120px !important; height: 170px !important; flex-shrink: 0 !important;} .dt-card .card-tl, .dt-card .card-br { font-size: 1.5rem; } .dt-card .card-center { font-size: 4rem; }
+        .dt-card { position: relative !important; margin-top: 10px; } 
         
         /* SIC BO DICE FIX (No shrinking) */
         .sicbo-dice { display: flex; justify-content: center; gap: 30px; margin-bottom: 10px; align-items: center; min-height: 120px;} 
@@ -315,14 +343,14 @@
         .mbj-hands-wrapper { display: flex; justify-content: center; align-items: flex-end; position: relative; width: 100%; height: 120px; margin-bottom: 10px; z-index: 10;} 
         .mbj-hand-column { display: flex; flex-direction: column; align-items: center; position: absolute; bottom: 0; transition: 0.3s ease-in-out; } 
         .mbj-hand-split-0 { transform: translate(-45px, 0); z-index: 1; } .mbj-hand-split-1 { transform: translate(45px, 0); z-index: 2; } 
-        .mbj-hand-container { position: relative; pointer-events: none; display: flex; justify-content: center; align-items: flex-end; min-height: 115px; min-width: 80px;} 
+        .mbj-hand-container { position: relative; pointer-events: none; display: flex; justify-content: center; align-items: flex-end; min-height: 105px; min-width: 75px;} 
         
         /* PREMIUM BADGE PLACEMENT (Perfect Circle, anchored to Left Edge of Hand) */
-        .mbj-score-badge { position: absolute; top: 50%; left: -20px; transform: translateY(-50%); width: 44px; height: 44px; padding: 0; border-radius: 50%; z-index: 50; font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; align-items: center; text-align: center; font-weight: 900; font-size: 1.15rem; box-shadow: 0 4px 10px rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0; white-space: nowrap;} 
-        .mbj-score-active { background: linear-gradient(to bottom, #f2c94c, #f2994a); color: black; border-color: #fff; } 
-        .mbj-score-inactive { background: linear-gradient(to bottom, #444, #111); color: white; border-color: #666; } 
+        .mbj-score-badge { position: absolute; top: 50%; left: -25px; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; z-index: 50; font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 1.2rem; box-shadow: -2px 4px 8px rgba(0,0,0,0.6); } 
+        .mbj-score-active { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #000; border: 2px solid #fff; } 
+        .mbj-score-inactive { background: linear-gradient(135deg, #434343 0%, #000000 100%); color: #fff; border: 2px solid #555; } 
         
-        .mbj-status-pill { position: absolute; top: 50%; left: -15px; transform: translateY(-50%); padding: 4px 10px; border-radius: 8px; color: white; font-weight: 900; font-size: 0.9rem; z-index: 60; box-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap; letter-spacing: 1px; } 
+        .mbj-status-pill { position: absolute; top: 50%; left: -25px; transform: translateY(-50%); padding: 4px 10px; border-radius: 8px; color: white; font-weight: 900; font-size: 0.9rem; z-index: 60; box-shadow: 0 4px 10px rgba(0,0,0,0.8); white-space: nowrap; letter-spacing: 1px; } 
         .mbj-pill-bj { background: linear-gradient(to bottom, #00b359, #008040); border: 2px solid #00e676; } .mbj-pill-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); border: 2px solid #ff3366; } 
         
         .card-doubled { transform-origin: center; transform: translate(30px, 15px) rotate(90deg); z-index: 10; }
@@ -333,9 +361,9 @@
         .mbj-seat-circle { width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.4); z-index: 5; pointer-events: auto;} 
         .mbj-seat-circle:hover { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.2); } .mbj-seat-circle.occupied { border: 2px solid transparent; background: transparent; cursor: default; } 
         
-        /* Clean Bet Amount placed directly above name */
-        .bet-pill-text { font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 900; color: white; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.9); background: rgba(0,0,0,0.8); padding: 2px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); z-index: 10; margin-bottom: 5px; white-space: nowrap;} 
-        .mbj-seat-name { font-weight: 900; font-size: 0.85rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative; margin-top: 2px; } 
+        /* Clean Bet Amount placed directly above name, overlapping cards */
+        .bet-pill-text { position: relative; z-index: 30; margin-top: -12px; background: #111; color: white; border: 2px solid #333; border-radius: 20px; padding: 4px 12px; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.6); white-space: nowrap; text-align: center;} 
+        .mbj-seat-name { font-weight: 900; font-size: 0.85rem; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.9); color: white; text-align: center; position: relative; margin-top: 5px; } 
         
         /* Control Panel */
         .mbj-control-panel { width: 1000px; height: 110px; background: rgba(0,0,0,0.85); padding: 0 20px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; justify-content: center; align-items: center; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.9); transition: opacity 0.2s ease; position: relative; margin-top: 15px; flex-shrink: 0;} 
@@ -583,7 +611,7 @@
                         <div class="mbj-shoe"></div>
                         <div class="mbj-dealer-area" id="mbj-dealer-area">
                             <div class="dealer-timer-text" id="mbj-dealer-timer-text">15</div>
-                            <div style="position:relative;"><div id="mbj-d-score-badge-container"></div><div id="mbj-fs-dealer-hand" class="mbj-hand-container" style="height: 105px;"></div></div>
+                            <div style="position:relative;"><div id="mbj-d-score-badge-container"></div><div id="mbj-fs-dealer-hand" class="mbj-hand-container" style="height: 115px;"></div></div>
                         </div>
                         <div id="mbj-seats-row"></div>
                     </div>
@@ -752,6 +780,7 @@
         }
     }
 
+    // FIXED: POPOVERS - Appends them to the clicked wrapper so they position perfectly
     function toggleCustomDropdown(id, e) { 
         if(e) e.stopPropagation(); 
         document.querySelectorAll('.custom-dropdown').forEach(d => { 
@@ -1076,32 +1105,6 @@
         else { el.style.color = 'var(--danger)'; el.innerText = res.msg; }
     });
 
-    // FIXED: RADIO HUD BEHAVIOR
-    socket.on('radioPlay', (data) => { 
-        const hud = document.getElementById('radio-hud'); 
-        const djText = document.getElementById('radio-dj'); 
-        if(hud && djText && data.url) {
-            djText.innerText = data.requestedBy; 
-            hud.classList.add('show'); 
-        }
-    });
-    
-    socket.on('radioStop', () => { 
-        const hud = document.getElementById('radio-hud'); 
-        if(hud) hud.classList.remove('show'); 
-    });
-    
-    socket.on('radioSync', (data) => { 
-        const hud = document.getElementById('radio-hud'); 
-        const djText = document.getElementById('radio-dj'); 
-        if(hud && djText && data.url) {
-            djText.innerText = data.requestedBy; 
-            hud.classList.add('show'); 
-        } else if (hud) {
-            hud.classList.remove('show');
-        }
-    });
-
     // --- NAVIGATION ---
     function switchView(viewId) { 
         document.querySelectorAll('.main-wrapper > .content > .view-container').forEach(d => d.classList.add('hidden')); 
@@ -1183,10 +1186,8 @@
     // --- GAME ENGINE LOGIC ---
     function getBJScore(hand) { let score = 0, aces = 0; for (let card of hand) { score += card.bjVal; if (card.raw === 'A') aces += 1; } while (score > 21 && aces > 0) { score -= 10; aces -= 1; } return score; }
     function getBacScore(cards) { return cards.reduce((a,b)=>a+b.bacVal, 0) % 10; }
-    function getBetColor(betWord) { if(!betWord) return 'white'; let word = betWord.toString().trim().toUpperCase(); const map = { 'PLAYER': 'var(--ps-glow)', 'BANKER': 'var(--danger)', 'TIE': 'var(--success)', 'DRAGON': 'var(--danger)', 'TIGER': 'var(--credits)', 'SMALL': 'var(--ps-glow)', 'BIG': 'var(--danger)', 'TRIPLE': 'white', 'YELLOW': '#ffcc00', 'WHITE': '#fff', 'PINK': '#ff66b2', 'BLUE': '#00a2ff', 'RED': '#ff3366', 'GREEN': '#00e676', 'BUST!': 'var(--danger)', 'PUSH': 'white', 'DEALER': 'var(--danger)', 'YOU': 'var(--success)', 'HEADS': '#ffb400', 'TAILS': '#ffb400', 'EVEN': 'var(--ps-glow)', 'ODD': 'var(--ps-glow)' }; return map[word] || 'white'; }
-    function colorsToDice(str) { if(str === '-') return '-'; return str.split(',').map(c => { let color = c.trim().toLowerCase(); if(!color) return ''; return `<div class="color-die c-${color}" style="width:14px; height:14px; border-radius:3px; display:inline-block; border:1px solid rgba(255,255,255,0.2); margin:0 1px;"></div>`; }).join(''); }
     
-    // PERFECTED CARD HTML LOGIC
+    // PERFECTED CARD HTML LOGIC (Matches Image Exactly)
     function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, extraClass = '') { 
         let animClass = ''; 
         if(animateIn) animClass = 'anim-deal'; 
@@ -1270,7 +1271,6 @@
     async function renderBJHands(data) { 
         let pHand = document.getElementById('bj-p-hand'); let dHand = document.getElementById('bj-d-hand'); 
         if (data.event === 'deal') { 
-            let pS = 0, dS = 0;
             // FIXED: Dealer Card 1 is Face UP, Card 2 is Face DOWN (Hole Card)
             pHand.innerHTML = generateCardHTML(data.pHand[0], false, true); document.getElementById('bj-p-score').innerText = getBJScore([data.pHand[0]]); await delay(300); 
             dHand.innerHTML = generateCardHTML(data.dHand[0], false, true); document.getElementById('bj-d-score').innerText = getBJScore([data.dHand[0]]); await delay(300); 
@@ -1278,7 +1278,7 @@
             dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[1], true, true)); await delay(400); 
             
             if (data.autoStand) {
-                // FIXED: Solo Blackjack Suspense for Natural 21. Handled by server, wait for resolved event.
+                // Suspense delay on Natural 21. Wait for server resolve.
                 return;
             }
 
@@ -1303,7 +1303,7 @@
                 await delay(600); 
             } 
             
-            // FIXED: Dealer Reveal Animation (First card stays face up, Second card flips face up)
+            // FIXED: Reveal Hole Card
             dHand.innerHTML = generateCardHTML(data.dHand[0], false, false) + generateCardHTML(data.dHand[1], false, false, true); 
             document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, 2)); 
             await delay(600); 
@@ -1469,7 +1469,7 @@
         if (aces > 0 && score < 21) { return `<span style="font-size:0.85rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`; } return `<span>${score}</span>`;
     }
 
-    // PERFECTED CARD HTML LOGIC (Matches Image Exactly)
+    // FIXED: PERFECT MBJ CARD HTML (Matches Reference)
     function generateMBJCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) {
         let animClass = ''; if(animateIn) { animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in'; } if(animateReveal) animClass = 'anim-reveal'; 
         let doubleClass = isDoubled ? 'card-doubled' : ''; let styleStr = `left: ${leftOffset}px;`;
@@ -1495,7 +1495,10 @@
             let s = currentMBJSeats[i]; let isMe = s && s.username === myUsername; if (isMe) localSeatId = i;
 
             // FIXED: HIDE EMPTY SEATS DURING PLAY TO CENTER ACTIVE PLAYERS
-            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { continue; }
+            if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { 
+                htmlBuffer += `<div class="mbj-seat-wrapper seat-hidden" id="mbj-seat-${i}"></div>`;
+                continue; 
+            }
 
             let isMySeatTurn = activeSeatNum == i; let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : ''; let activeClass = isMySeatTurn ? 'active-turn' : ''; let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
             let canSit = !s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername); let clickAction = canSit ? `sitDown(${i})` : ``; 
@@ -1516,7 +1519,7 @@
                         document.getElementById('action-container-split').style.display = (hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1) ? 'flex' : 'none';
                     }
                     
-                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 80 : 80; 
+                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 75 : 75; 
                     html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
                     let previouslyRendered = renderedCardCount[i][hIdx] || 0; let isNewCard = cardCount > previouslyRendered; let delayClassBadge = isNewCard ? 'mbj-delay-badge' : ''; let delayClassPill = isNewCard ? 'mbj-delay-pill' : '';
 
@@ -1531,7 +1534,7 @@
                     html += `</div>`; 
                 });
                 html += `</div>`; renderedCardCount[i] = s.hands.map(h => h.cards.length);
-            } else { renderedCardCount[i] = []; html += `<div class="mbj-hands-wrapper"><div class="mbj-hand-column"><div class="mbj-hand-container" style="width: 80px;"></div></div></div>`; }
+            } else { renderedCardCount[i] = []; html += `<div class="mbj-hands-wrapper"><div class="mbj-hand-column"><div class="mbj-hand-container" style="width: 75px;"></div></div></div>`; }
             
             html += `<div class="mbj-circle-container">`;
             html += `<div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
@@ -1557,7 +1560,6 @@
         if (mbjGameState === 'BETTING') {
             actionsUi.style.display = 'none';
             controlPanel.style.opacity = '1'; 
-            controlPanel.style.pointerEvents = 'auto';
             if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) { bettingUi.style.display = 'flex'; } else { bettingUi.style.display = 'none'; }
         } else {
             bettingUi.style.display = 'none';
@@ -1607,7 +1609,7 @@
             
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
-                dHand.innerHTML = ''; dHand.style.width = '80px'; 
+                dHand.innerHTML = ''; dHand.style.width = '75px'; 
                 const dealSequence = async () => {
                     let activeKeys = Object.keys(targetSeats).filter(k => targetSeats[k] !== null);
                     for (let k of activeKeys) { currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]); currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards); renderMBJSeats(currentMBJSeats, null); await delay(400); }
@@ -1617,7 +1619,7 @@
                     dHand.innerHTML = generateMBJCardHTML(data.dealerHand[0], false, true, false, 0); await delay(400);
                     
                     for (let k of activeKeys) { currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]); currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score; currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status; renderMBJSeats(currentMBJSeats, null); await delay(400); }
-                    dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[1], true, true, false, 20)); dHand.style.width = '100px';
+                    dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[1], true, true, false, 20)); dHand.style.width = '95px';
                 }; 
                 dealSequence();
             } 
@@ -1634,7 +1636,7 @@
                 const drawRemaining = async () => {
                     await delay(800); 
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.style.width = `${(i * 20) + 80}px`; let currentScore = getBJScore(data.dealerHand.slice(0, i+1)); let badge = document.getElementById('mbj-d-score-badge');
+                        dHand.style.width = `${(i * 20) + 75}px`; let currentScore = getBJScore(data.dealerHand.slice(0, i+1)); let badge = document.getElementById('mbj-d-score-badge');
                         if (currentScore > 21) { if(badge) badge.outerHTML = `<div class="mbj-status-pill mbj-pill-bust mbj-delay-pill" id="mbj-d-score-badge">${currentScore} BUST</div>`; } else { if(badge) badge.innerHTML = `<span>${currentScore}</span>`; }
                         dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[i], false, true, false, i * 20)); await delay(800); 
                     }
