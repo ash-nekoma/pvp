@@ -182,7 +182,7 @@ let mbjState = {
     seats: { 1: null, 2: null, 3: null, 4: null, 5: null } 
 };
 
-// FIXED: MASTER VIP BLACKJACK GAME LOOP (Moved Outside Connection Block)
+// MASTER VIP BLACKJACK GAME LOOP
 setInterval(() => {
     try {
         if (mbjState.status === 'BETTING') {
@@ -603,7 +603,7 @@ io.on('connection', (socket) => {
                 socket.emit('d20Result', { roll, payout, bet: data.bet, resStr: `ROLLED ${roll}`, newBalance: { credits: user.credits, playable: user.playableCredits }});
                 setTimeout(() => { gameStats.d20.total++; if (wonAny) gameStats.d20.Win++; else gameStats.d20.Lose++; checkResetStats('d20'); logGlobalResult('d20', `D20: ROLLED ${roll}`); }, 2000);
             } 
-            else if (data.game === 'coinflip') {
+           else if (data.game === 'coinflip') {
                 let result = crypto.randomInt(2) === 0 ? 'Heads' : 'Tails';
                 if (data.choice === result) { payout = formatTC(data.bet * 1.95); if (socket.soloBaseline) socket.soloBaseline.active = false; }
                 user.credits = formatTC(user.credits + payout); await user.save();
@@ -619,14 +619,14 @@ io.on('connection', (socket) => {
                     socket.emit('bjUpdate', { event: 'deal', pHand: socket.bjState.pHand, dHand: socket.bjState.dHand, autoStand: pS === 21 });
                     
                     if(pS === 21) {
-                        setTimeout(() => {
+                        setTimeout(async () => {
                             if(socket.bjState) {
                                 while (getBJScore(socket.bjState.dHand) < 17) { socket.bjState.dHand.push(drawCard()); }
                                 let dS = getBJScore(socket.bjState.dHand); let msg = dS === 21 ? 'Push' : 'Blackjack!';
                                 payout = formatTC(dS === 21 ? socket.bjState.bet : socket.bjState.bet * 2.5);
                                 if (socket.soloBaseline && msg !== 'Push') socket.soloBaseline.active = false;
                                 if (msg === 'Push') { user.playableCredits = formatTC(user.playableCredits + socket.bjState.fromPlayable); user.credits = formatTC(user.credits + socket.bjState.fromMain); } else { user.credits = formatTC(user.credits + payout); }
-                                user.save(); new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(payout - socket.bjState.bet), details: `Blackjack` }).save();
+                                await user.save(); await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(payout - socket.bjState.bet), details: `Blackjack` }).save();
                                 pushAdminData();
                                 socket.emit('bjUpdate', { event: 'resolved', pHand: socket.bjState.pHand, dHand: socket.bjState.dHand, payout, msg, resStr: `${msg.toUpperCase()} (${pS} TO ${dS})`, bet: socket.bjState.bet, newBalance: { credits: user.credits, playable: user.playableCredits } });
                                 socket.bjState = null; setTimeout(() => { gameStats.blackjack.total++; if(msg === 'Blackjack!') gameStats.blackjack.Win++; else gameStats.blackjack.Push++; checkResetStats('blackjack'); }, 2500);
@@ -642,14 +642,14 @@ io.on('connection', (socket) => {
                         socket.bjState = null; setTimeout(() => { gameStats.blackjack.total++; gameStats.blackjack.Lose++; checkResetStats('blackjack'); }, 2500);
                     } else if(pS === 21) {
                         socket.emit('bjUpdate', { event: 'hit', pHand: socket.bjState.pHand });
-                        setTimeout(() => {
+                        setTimeout(async () => {
                             if(socket.bjState) {
                                 while (getBJScore(socket.bjState.dHand) < 17) { socket.bjState.dHand.push(drawCard()); }
                                 let dS = getBJScore(socket.bjState.dHand); let msg = '';
                                 if (dS > 21 || pS > dS) { payout = formatTC(socket.bjState.bet * 2); msg = 'You Win!'; } else if (pS === dS) { payout = formatTC(socket.bjState.bet); msg = 'Push'; } else { msg = 'Dealer Wins'; }
                                 if (msg === 'You Win!' || msg === 'Push') if (socket.soloBaseline) socket.soloBaseline.active = false;
                                 if (msg === 'Push') { user.playableCredits = formatTC(user.playableCredits + socket.bjState.fromPlayable); user.credits = formatTC(user.credits + socket.bjState.fromMain); } else { user.credits = formatTC(user.credits + payout); }
-                                user.save(); new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(payout - socket.bjState.bet), details: `Blackjack` }).save();
+                                await user.save(); await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(payout - socket.bjState.bet), details: `Blackjack` }).save();
                                 pushAdminData();
                                 socket.emit('bjUpdate', { event: 'resolved', pHand: socket.bjState.pHand, dHand: socket.bjState.dHand, payout, msg, resStr: (dS > 21) ? `DEALER BUSTS!` : (msg === 'Push' ? `TIE (${dS} TO ${pS})` : (msg === 'You Win!' ? `PLAYER (${dS} TO ${pS})` : `DEALER (${dS} TO ${pS})`)), bet: socket.bjState.bet, newBalance: { credits: user.credits, playable: user.playableCredits } });
                                 socket.bjState = null; setTimeout(() => { gameStats.blackjack.total++; if (dS > 21 || pS > dS) gameStats.blackjack.Win++; else if (pS === dS) gameStats.blackjack.Push++; else gameStats.blackjack.Lose++; checkResetStats('blackjack'); }, 2500);
@@ -795,7 +795,7 @@ io.on('connection', (socket) => {
         try {
             let amount = formatTC(data.amount); if(isNaN(amount) || amount <= 0) return;
             if (data.type === 'Deposit' && amount < 1000) return socket.emit('localGameError', { msg: 'MIN DEPOSIT IS 1,000 TC', game: 'cashier' });
-            if (data.type === 'Withdrawal' && amount < 10000) return socket.emit('localGameError', { msg: 'MIN WITHDRAWAL IS 10,000 TC ', game: 'cashier' });
+            if (data.type === 'Withdrawal' && amount < 10000) return socket.emit('localGameError', { msg: 'MIN WITHDRAWAL IS 10,000 TC', game: 'cashier' });
             if (data.type === 'Deposit' && amount > 100000) return socket.emit('localGameError', { msg: 'MAX DEPOSIT IS 100,000 TC', game: 'cashier' });
             if (data.type === 'Withdrawal' && amount > 100000) return socket.emit('localGameError', { msg: 'MAX WITHDRAWAL IS 100,000 TC', game: 'cashier' });
 
