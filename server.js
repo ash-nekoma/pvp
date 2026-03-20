@@ -174,12 +174,8 @@ let mbjGlobalShoe = mbjBuildShoe(6);
 function mbjDrawCard() { if(mbjGlobalShoe.length < 52) mbjGlobalShoe = mbjBuildShoe(6); return mbjGlobalShoe.pop(); }
 
 let mbjState = { 
-    status: 'BETTING', 
-    time: 15, 
-    turnTimer: 0, 
-    activeTurn: { seat: null, handIdx: 0 }, 
-    dealer: { hand: [], score: 0 }, 
-    seats: { 1: null, 2: null, 3: null, 4: null, 5: null } 
+    status: 'BETTING', time: 15, turnTimer: 0, activeTurn: { seat: null, handIdx: 0 }, 
+    dealer: { hand: [], score: 0 }, seats: { 1: null, 2: null, 3: null, 4: null, 5: null } 
 };
 
 // MASTER VIP BLACKJACK GAME LOOP
@@ -199,65 +195,37 @@ setInterval(() => {
             
             if (mbjState.time <= 0 && hasBets) {
                 io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets are closed! Dealing...', sys: true });
-                
-                for (let i = 1; i <= 5; i++) { 
-                    if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) { 
-                        mbjState.seats[i] = null; 
-                    } 
-                }
-                
+                for (let i = 1; i <= 5; i++) { if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) { mbjState.seats[i] = null; } }
                 let activeSeats = Object.keys(mbjState.seats).filter(k => mbjState.seats[k] !== null);
                 if (activeSeats.length > 0) {
-                    mbjState.status = 'DEALING'; 
-                    io.to('mbj').emit('mbjUpdate', { event: 'lock_bets', seats: mbjState.seats }); 
-                    
+                    mbjState.status = 'DEALING'; io.to('mbj').emit('mbjUpdate', { event: 'lock_bets', seats: mbjState.seats }); 
                     mbjState.dealer.hand = [mbjDrawCard(), mbjDrawCard()];
-                    
                     activeSeats.forEach(k => {
                         let c1 = mbjDrawCard(), c2 = mbjDrawCard();
-                        mbjState.seats[k].hands[0].cards = [c1, c2]; 
-                        mbjState.seats[k].hands[0].isSplitHand = false; 
-                        mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet;
-                        let score = getBJScore([c1, c2]); 
-                        mbjState.seats[k].hands[0].score = score; 
-                        mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
+                        mbjState.seats[k].hands[0].cards = [c1, c2]; mbjState.seats[k].hands[0].isSplitHand = false; mbjState.seats[k].initialTotalBet = mbjState.seats[k].hands[0].bet;
+                        let score = getBJScore([c1, c2]); mbjState.seats[k].hands[0].score = score; mbjState.seats[k].hands[0].status = score === 21 ? 'BLACKJACK' : 'PLAYING';
                     });
                     
                     let hiddenDealer = [mbjState.dealer.hand[0], { raw: '', suitHtml: ``, bjVal: 0 }];
                     let animTime = ((activeSeats.length * 2) + 2) * 400 + 400; 
-                    
                     io.to('mbj').emit('mbjUpdate', { event: 'deal', seats: mbjState.seats, dealerHand: hiddenDealer });
                     
                     setTimeout(() => {
                         mbjState.activeOrder = activeSeats.filter(k => mbjState.seats[k].hands[0].status === 'PLAYING');
                         if (mbjState.activeOrder.length > 0) {
-                            mbjState.status = 'PLAYER_TURN'; 
-                            mbjState.activeTurn = { seat: mbjState.activeOrder[0], handIdx: 0 }; 
-                            mbjState.turnTimer = 15;
+                            mbjState.status = 'PLAYER_TURN'; mbjState.activeTurn = { seat: mbjState.activeOrder[0], handIdx: 0 }; mbjState.turnTimer = 15;
                             io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
-                        } else { 
-                            mbjResolveDealer(); 
-                        }
+                        } else { mbjResolveDealer(); }
                     }, animTime); 
                 }
-            } else if (mbjState.time <= 0 && !hasBets) {
-                mbjState.time = 15; 
-            }
+            } else if (mbjState.time <= 0 && !hasBets) { mbjState.time = 15; }
         } else if (mbjState.status === 'PLAYER_TURN') {
-            mbjState.turnTimer--; 
-            io.to('mbj').emit('mbjUpdate', { event: 'turn_timer', time: mbjState.turnTimer, activeTurn: mbjState.activeTurn });
-            
+            mbjState.turnTimer--; io.to('mbj').emit('mbjUpdate', { event: 'turn_timer', time: mbjState.turnTimer, activeTurn: mbjState.activeTurn });
             if (mbjState.turnTimer <= 0) { 
-                let seat = mbjState.seats[mbjState.activeTurn.seat]; 
-                if(seat && seat.hands[mbjState.activeTurn.handIdx]) { 
-                    seat.hands[mbjState.activeTurn.handIdx].status = 'STAND'; 
-                } 
-                mbjNextTurn(); 
+                let seat = mbjState.seats[mbjState.activeTurn.seat]; if(seat && seat.hands[mbjState.activeTurn.handIdx]) { seat.hands[mbjState.activeTurn.handIdx].status = 'STAND'; } mbjNextTurn(); 
             }
         }
-    } catch (e) {
-        console.error("MBJ Loop Crash Prevented", e);
-    }
+    } catch (e) { console.error("MBJ Loop Crash Prevented", e); }
 }, 1000);
 
 function mbjNextTurn() {
@@ -265,40 +233,20 @@ function mbjNextTurn() {
     if (seatNum !== null) { 
         let seat = mbjState.seats[seatNum]; 
         if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') { 
-            mbjState.activeTurn.handIdx++; 
-            mbjState.turnTimer = 15; 
-            io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats }); 
-            return; 
+            mbjState.activeTurn.handIdx++; mbjState.turnTimer = 15; io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats }); return; 
         } 
     }
     
     let nextSeatNum = null; let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
-    for (let i = startIdx; i <= 5; i++) { 
-        let s = mbjState.seats[i]; 
-        if (s && s.hands.some(h => h.status === 'PLAYING')) { 
-            nextSeatNum = i; 
-            break; 
-        } 
-    }
+    for (let i = startIdx; i <= 5; i++) { let s = mbjState.seats[i]; if (s && s.hands.some(h => h.status === 'PLAYING')) { nextSeatNum = i; break; } }
     
-    if (nextSeatNum !== null) { 
-        mbjState.activeTurn = { seat: nextSeatNum, handIdx: 0 }; 
-        mbjState.turnTimer = 15; 
-        io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats }); 
-    } else { 
-        mbjResolveDealer(); 
-    }
+    if (nextSeatNum !== null) { mbjState.activeTurn = { seat: nextSeatNum, handIdx: 0 }; mbjState.turnTimer = 15; io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats }); } else { mbjResolveDealer(); }
 }
 
 async function mbjResolveDealer() {
     mbjState.status = 'RESOLVING'; mbjState.activeTurn = { seat: null, handIdx: 0 };
     let playersAlive = false; 
-    
-    for (let i = 1; i <= 5; i++) { 
-        if(mbjState.seats[i]) { 
-            mbjState.seats[i].hands.forEach(h => { if(h.status === 'STAND') playersAlive = true; }); 
-        } 
-    }
+    for (let i = 1; i <= 5; i++) { if(mbjState.seats[i]) { mbjState.seats[i].hands.forEach(h => { if(h.status === 'STAND') playersAlive = true; }); } }
 
     let dScore = getBJScore(mbjState.dealer.hand);
     if (playersAlive) { while (dScore < 17) { mbjState.dealer.hand.push(mbjDrawCard()); dScore = getBJScore(mbjState.dealer.hand); } }
@@ -317,19 +265,12 @@ async function mbjResolveDealer() {
                 let pScore = h.score; let payout = 0, isPush = false, refundAmount = 0;
                 let playerNatural = (h.cards.length === 2 && getBJScore(h.cards) === 21) && !h.isSplitHand;
                 
-                if (dealerNatural) { 
-                    if (playerNatural) isPush = true; 
-                    else { if (dealerUpcardVal === 10 && h.doubledAmount > 0) refundAmount += h.doubledAmount; payout = 0; } 
-                } 
-                else if (playerNatural) { payout = h.bet * 2.5; } 
-                else if (dScore > 21 || pScore > dScore) { payout = h.bet * 2; } 
-                else if (pScore === dScore) { isPush = true; }
+                if (dealerNatural) { if (playerNatural) isPush = true; else { if (dealerUpcardVal === 10 && h.doubledAmount > 0) refundAmount += h.doubledAmount; payout = 0; } } 
+                else if (playerNatural) { payout = h.bet * 2.5; } else if (dScore > 21 || pScore > dScore) { payout = h.bet * 2; } else if (pScore === dScore) { isPush = true; }
                 
                 if (isPush) totalPush += h.bet; else totalWin += (payout + refundAmount);
             });
-            let totalBet = seat.hands.reduce((sum, h) => sum + h.bet, 0); 
-            let netResult = formatTC(totalWin + totalPush - totalBet); 
-            let statusStr = netResult > 0 ? 'WIN' : (netResult < 0 ? 'LOSS' : 'PUSH');
+            let totalBet = seat.hands.reduce((sum, h) => sum + h.bet, 0); let netResult = formatTC(totalWin + totalPush - totalBet); let statusStr = netResult > 0 ? 'WIN' : (netResult < 0 ? 'LOSS' : 'PUSH');
             seatResults[i] = { win: totalWin, push: totalPush, status: statusStr, net: netResult };
         }
     }
@@ -340,125 +281,72 @@ async function mbjResolveDealer() {
         let seat = mbjState.seats[i]; let res = seatResults[i];
         if (seat && res && seat.userId) {
             let totalReturn = formatTC(res.win + res.push);
-            if (totalReturn > 0) { 
-                try { 
-                    let u = await User.findById(seat.userId); 
-                    if (u) { 
-                        u.credits = formatTC((u.credits || 0) + totalReturn); 
-                        await u.save(); 
-                        let targetSocket = connectedUsers[u.username]; 
-                        if (targetSocket) { io.to(targetSocket).emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits }); } 
-                    } 
-                } catch (err) {} 
-            }
-            let totalBet = seat.hands.reduce((sum, h) => sum + h.bet, 0); 
-            let netResult = formatTC(totalReturn - totalBet);
-            
-            if (netResult !== 0) { 
-                try { await new CreditLog({ username: seat.username, action: 'GAME', amount: netResult, details: 'VIP Blackjack' }).save(); } catch (e) {} 
-            }
-            
-            gameStats.mbj.total++; 
-            if (netResult > 0) gameStats.mbj.Win++; 
-            else if (netResult < 0) gameStats.mbj.Lose++; 
-            else gameStats.mbj.Push++; 
-            checkResetStats('mbj');
-            
+            if (totalReturn > 0) { try { let u = await User.findById(seat.userId); if (u) { u.credits = formatTC((u.credits || 0) + totalReturn); await u.save(); let targetSocket = connectedUsers[u.username]; if (targetSocket) { io.to(targetSocket).emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits }); } } } catch (err) {} }
+            let totalBet = seat.hands.reduce((sum, h) => sum + h.bet, 0); let netResult = formatTC(totalReturn - totalBet);
+            if (netResult !== 0) { try { await new CreditLog({ username: seat.username, action: 'GAME', amount: netResult, details: 'VIP Blackjack' }).save(); } catch (e) {} }
+            gameStats.mbj.total++; if (netResult > 0) gameStats.mbj.Win++; else if (netResult < 0) gameStats.mbj.Lose++; else gameStats.mbj.Push++; checkResetStats('mbj');
             logGlobalResult('mbj', `VIP BJ: ${res.status}`);
         }
     }
     
     setTimeout(() => {
-        for (let i = 1; i <= 5; i++) { 
-            if (mbjState.seats[i]) { 
-                if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) { 
-                    mbjState.seats[i] = null; 
-                } else { 
-                    mbjState.seats[i].hands = []; 
-                } 
-            } 
-        }
-        mbjState.dealer.hand = []; 
-        mbjState.time = 15; 
-        mbjState.status = 'BETTING';
+        for (let i = 1; i <= 5; i++) { if (mbjState.seats[i]) { if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) { mbjState.seats[i] = null; } else { mbjState.seats[i].hands = []; } } }
+        mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING';
         io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
         io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true });
     }, 4500); 
 }
-
 
 // --- SHARED TABLES LOOP ---
 setInterval(() => {
     Object.keys(stRooms).forEach(room => {
         let st = stRooms[room];
         if (st.status === 'BETTING') {
-            st.time--;
-            io.to(room).emit('timerUpdate', st.time);
+            st.time--; io.to(room).emit('timerUpdate', st.time);
 
             if (st.time <= 0) {
-                st.status = 'RESOLVING';
-                io.to(room).emit('lockBets');
-                io.to(room).emit('chatMessage', { user: 'System', text: 'Bets are now closed. Good luck!', sys: true });
+                st.status = 'RESOLVING'; io.to(room).emit('lockBets'); io.to(room).emit('chatMessage', { user: 'System', text: 'Bets are now closed. Good luck!', sys: true });
 
                 setTimeout(async () => {
                     try {
                         let roomRes = {}; let delayReset = 5000;
-                        
                         if (room === 'dt') {
-                            let dtD = drawCard(), dtT = drawCard();
-                            let dtWin = dtD.dtVal > dtT.dtVal ? 'Dragon' : (dtT.dtVal > dtD.dtVal ? 'Tiger' : 'Tie');
+                            let dtD = drawCard(), dtT = drawCard(); let dtWin = dtD.dtVal > dtT.dtVal ? 'Dragon' : (dtT.dtVal > dtD.dtVal ? 'Tiger' : 'Tie');
                             let dtResStr = dtWin === 'Tie' ? `TIE (${dtD.raw} TO ${dtT.raw})` : `${dtWin.toUpperCase()} (${dtD.raw} TO ${dtT.raw})`;
                             roomRes = { winner: dtWin, resStr: dtResStr, emit: { room: 'dt', dCard: dtD, tCard: dtT, winner: dtWin, resStr: dtResStr } };
                         } 
                         else if (room === 'sicbo') {
-                            let sbR = [crypto.randomInt(1, 7), crypto.randomInt(1, 7), crypto.randomInt(1, 7)];
-                            let sbSum = sbR[0] + sbR[1] + sbR[2];
-                            let sbTrip = (sbR[0] === sbR[1] && sbR[1] === sbR[2]);
-                            let sbWin = sbTrip ? 'Triple' : (sbSum <= 10 ? 'Small' : 'Big');
-                            let sbResStr = sbTrip ? `TRIPLE (${sbR[0]})` : `${sbWin.toUpperCase()} (${sbSum})`;
+                            let sbR = [crypto.randomInt(1, 7), crypto.randomInt(1, 7), crypto.randomInt(1, 7)]; let sbSum = sbR[0] + sbR[1] + sbR[2]; let sbTrip = (sbR[0] === sbR[1] && sbR[1] === sbR[2]);
+                            let sbWin = sbTrip ? 'Triple' : (sbSum <= 10 ? 'Small' : 'Big'); let sbResStr = sbTrip ? `TRIPLE (${sbR[0]})` : `${sbWin.toUpperCase()} (${sbSum})`;
                             roomRes = { winner: sbWin, resStr: sbResStr, emit: { room: 'sicbo', roll: sbR, sum: sbSum, winner: sbWin, resStr: sbResStr } };
                         }
                         else if (room === 'perya') {
-                            const cols = ['Yellow','White','Pink','Blue','Red','Green'];
-                            let pyR = [cols[crypto.randomInt(6)], cols[crypto.randomInt(6)], cols[crypto.randomInt(6)]];
+                            const cols = ['Yellow','White','Pink','Blue','Red','Green']; let pyR = [cols[crypto.randomInt(6)], cols[crypto.randomInt(6)], cols[crypto.randomInt(6)]];
                             roomRes = { winner: pyR, resStr: pyR.join(','), emit: { room: 'perya', roll: pyR } };
                         }
                         else if (room === 'baccarat') {
-                            let pC = [drawCard(), drawCard()], bC = [drawCard(), drawCard()];
-                            let pS = (pC[0].bacVal + pC[1].bacVal) % 10, bS = (bC[0].bacVal + bC[1].bacVal) % 10;
+                            let pC = [drawCard(), drawCard()], bC = [drawCard(), drawCard()]; let pS = (pC[0].bacVal + pC[1].bacVal) % 10, bS = (bC[0].bacVal + bC[1].bacVal) % 10;
                             let p3Drawn = false, b3Drawn = false;
                             if (pS < 8 && bS < 8) {
-                                let p3Val = -1;
-                                if (pS <= 5) { pC.push(drawCard()); p3Val = pC[2].bacVal; pS = (pS + p3Val) % 10; p3Drawn = true; }
+                                let p3Val = -1; if (pS <= 5) { pC.push(drawCard()); p3Val = pC[2].bacVal; pS = (pS + p3Val) % 10; p3Drawn = true; }
                                 let bDraws = false;
                                 if (pC.length === 2) { if (bS <= 5) bDraws = true; } 
                                 else {
-                                    if (bS <= 2) bDraws = true;
-                                    else if (bS === 3 && p3Val !== 8) bDraws = true;
-                                    else if (bS === 4 && p3Val >= 2 && p3Val <= 7) bDraws = true;
-                                    else if (bS === 5 && p3Val >= 4 && p3Val <= 7) bDraws = true;
-                                    else if (bS === 6 && (p3Val === 6 || p3Val === 7)) bDraws = true;
+                                    if (bS <= 2) bDraws = true; else if (bS === 3 && p3Val !== 8) bDraws = true; else if (bS === 4 && p3Val >= 2 && p3Val <= 7) bDraws = true;
+                                    else if (bS === 5 && p3Val >= 4 && p3Val <= 7) bDraws = true; else if (bS === 6 && (p3Val === 6 || p3Val === 7)) bDraws = true;
                                 }
                                 if (bDraws) { bC.push(drawCard()); bS = (bS + bC[bC.length-1].bacVal) % 10; b3Drawn = true; }
                             }
-                            let bacWin = pS > bS ? 'Player' : (bS > pS ? 'Banker' : 'Tie');
-                            let bacResStr = bacWin === 'Tie' ? `TIE (${pS} TO ${bS})` : `${bacWin.toUpperCase()} (${pS} TO ${bS})`;
-                            delayReset = 7000;
-                            roomRes = { winner: bacWin, resStr: bacResStr, emit: { room: 'baccarat', pCards: pC, bCards: bC, pScore: pS, bScore: bS, winner: bacWin, resStr: bacResStr, p3Drawn: p3Drawn, b3Drawn: b3Drawn } };
+                            let bacWin = pS > bS ? 'Player' : (bS > pS ? 'Banker' : 'Tie'); let bacResStr = bacWin === 'Tie' ? `TIE (${pS} TO ${bS})` : `${bacWin.toUpperCase()} (${pS} TO ${bS})`;
+                            delayReset = 7000; roomRes = { winner: bacWin, resStr: bacResStr, emit: { room: 'baccarat', pCards: pC, bCards: bC, pScore: pS, bScore: bS, winner: bacWin, resStr: bacResStr, p3Drawn: p3Drawn, b3Drawn: b3Drawn } };
                         }
 
                         let playerStats = {}; 
                         st.bets.forEach(b => {
                             let payout = 0;
-                            if (room === 'dt') { 
-                                if (roomRes.winner === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else payout = b.amount; } 
-                                else { if (b.choice === roomRes.winner) payout = b.amount * 2; }
-                            } 
+                            if (room === 'dt') { if (roomRes.winner === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else payout = b.amount; } else { if (b.choice === roomRes.winner) payout = b.amount * 2; } } 
                             else if (room === 'sicbo') { if (b.choice === roomRes.winner) payout = b.amount * 2; } 
-                            else if (room === 'perya') {
-                                let matches = roomRes.winner.filter(c => c === b.choice).length;
-                                if (matches > 0) payout = b.amount + (b.amount * matches);
-                            } 
+                            else if (room === 'perya') { let matches = roomRes.winner.filter(c => c === b.choice).length; if (matches > 0) payout = b.amount + (b.amount * matches); } 
                             else if (room === 'baccarat') {
                                 if (roomRes.winner === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else if (b.choice === 'Player' || b.choice === 'Banker') payout = b.amount; } 
                                 else if (roomRes.winner === 'Player') { if (b.choice === 'Player') payout = b.amount * 2; } 
@@ -471,36 +359,14 @@ setInterval(() => {
                         let roomNames = { 'perya': 'Color Game', 'dt': 'Dragon Tiger', 'sicbo': 'Sic Bo', 'baccarat': 'Baccarat' };
                         for (let userId of Object.keys(playerStats)) {
                             let userStat = playerStats[userId]; 
-                            try {
-                                let user = await User.findById(userId);
-                                if (user) {
-                                    if (userStat.amountWon > 0) { user.credits = formatTC((user.credits || 0) + userStat.amountWon); await user.save(); }
-                                    let net = formatTC(userStat.amountWon - userStat.amountBet);
-                                    if (net !== 0) await new CreditLog({ username: user.username, action: 'GAME', amount: net, details: roomNames[room] }).save();
-                                }
-                            } catch(e) { console.error(e); }
+                            try { let user = await User.findById(userId); if (user) { if (userStat.amountWon > 0) { user.credits = formatTC((user.credits || 0) + userStat.amountWon); await user.save(); } let net = formatTC(userStat.amountWon - userStat.amountBet); if (net !== 0) await new CreditLog({ username: user.username, action: 'GAME', amount: net, details: roomNames[room] }).save(); } } catch(e) { console.error(e); }
                         }
 
                         io.to(room).emit('sharedResults', roomRes.emit);
 
-                        setTimeout(() => { 
-                            logGlobalResult(room, roomRes.resStr); gameStats[room].total++; 
-                            if(room === 'perya') roomRes.winner.forEach(c => gameStats.perya[c]++); else gameStats[room][roomRes.winner]++; 
-                            checkResetStats(room); 
-                        }, delayReset - 2000);
-
-                        setTimeout(() => {
-                            st.time = ROOM_TIMERS[room]; st.status = 'BETTING'; st.bets = [];
-                            io.to(room).emit('newRound'); 
-                            io.to(room).emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true });
-                            pushAdminData();
-                        }, delayReset); 
-
-                    } catch (e) {
-                        console.error(`FATAL ENGINE CRASH CAUGHT IN ROOM ${room}:`, e);
-                        st.time = ROOM_TIMERS[room]; st.status = 'BETTING'; st.bets = [];
-                        io.to(room).emit('newRound');
-                    }
+                        setTimeout(() => { logGlobalResult(room, roomRes.resStr); gameStats[room].total++; if(room === 'perya') roomRes.winner.forEach(c => gameStats.perya[c]++); else gameStats[room][roomRes.winner]++; checkResetStats(room); }, delayReset - 2000);
+                        setTimeout(() => { st.time = ROOM_TIMERS[room]; st.status = 'BETTING'; st.bets = []; io.to(room).emit('newRound'); io.to(room).emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true }); pushAdminData(); }, delayReset); 
+                    } catch (e) { console.error(`FATAL ENGINE CRASH CAUGHT IN ROOM ${room}:`, e); st.time = ROOM_TIMERS[room]; st.status = 'BETTING'; st.bets = []; io.to(room).emit('newRound'); }
                 }, 500);
             }
         }
@@ -511,15 +377,10 @@ async function pushAdminData(targetSocket = null) {
     try {
         const users = await User.find(); const txs = await Transaction.find().sort({ date: -1 }); const gcs = await GiftCode.find().sort({ date: -1 });
         let totalMainCredits = formatTC(users.reduce((a, b) => a + (b.credits || 0), 0)); 
-        let approvedDeposits = txs.filter(t => t.type === 'Deposit' && t.status === 'Approved').reduce((a, b) => a + b.amount, 0);
-        let approvedWithdrawals = txs.filter(t => t.type === 'Withdrawal' && t.status === 'Approved').reduce((a, b) => a + b.amount, 0);
+        let approvedDeposits = txs.filter(t => t.type === 'Deposit' && t.status === 'Approved').reduce((a, b) => a + b.amount, 0); let approvedWithdrawals = txs.filter(t => t.type === 'Withdrawal' && t.status === 'Approved').reduce((a, b) => a + b.amount, 0);
         globalBankVault = formatTC(2000000 + approvedDeposits - approvedWithdrawals - totalMainCredits);
-
-        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        const gameLogs = await CreditLog.find({ action: 'GAME', date: { $gte: oneDayAgo } });
-        let playerNet = gameLogs.reduce((sum, l) => sum + l.amount, 0);
-        let houseProfit24h = formatTC(-playerNet);
-
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000); const gameLogs = await CreditLog.find({ action: 'GAME', date: { $gte: oneDayAgo } });
+        let playerNet = gameLogs.reduce((sum, l) => sum + l.amount, 0); let houseProfit24h = formatTC(-playerNet);
         const adminLogs = await AdminLog.find().sort({ date: -1 }).limit(100);
         let payload = { users, transactions: txs, giftBatches: gcs, adminLogs, stats: { economy: totalMainCredits, approvedDeposits: formatTC(approvedDeposits), limit: globalBankVault, houseProfit: houseProfit24h }, isMaintenance: isMaintenanceMode };
         if(targetSocket) targetSocket.emit('adminDataSync', payload); else io.to('admin_room').emit('adminDataSync', payload);
@@ -603,11 +464,12 @@ io.on('connection', (socket) => {
                 socket.emit('d20Result', { roll, payout, bet: data.bet, resStr: `ROLLED ${roll}`, newBalance: { credits: user.credits, playable: user.playableCredits }});
                 setTimeout(() => { gameStats.d20.total++; if (wonAny) gameStats.d20.Win++; else gameStats.d20.Lose++; checkResetStats('d20'); logGlobalResult('d20', `D20: ROLLED ${roll}`); }, 2000);
             } 
-           else if (data.game === 'coinflip') {
+            else if (data.game === 'coinflip') {
                 let result = crypto.randomInt(2) === 0 ? 'Heads' : 'Tails';
                 if (data.choice === result) { payout = formatTC(data.bet * 1.95); if (socket.soloBaseline) socket.soloBaseline.active = false; }
                 user.credits = formatTC(user.credits + payout); await user.save();
-                await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(payout - data.bet), details: `Coin Flip` }).save();
+                let net = formatTC(payout - data.bet);
+                await new CreditLog({ username: user.username, action: 'GAME', amount: net, details: `Coin Flip` }).save();
                 pushAdminData();
                 socket.emit('coinResult', { result, payout, bet: data.bet, resStr: `${result.toUpperCase()}`, newBalance: { credits: user.credits, playable: user.playableCredits }});
                 setTimeout(() => { gameStats.coinflip.total++; gameStats.coinflip[result]++; checkResetStats('coinflip'); logGlobalResult('coinflip', `FLIP: ${result.toUpperCase()}`); }, 2000);
@@ -962,7 +824,7 @@ io.on('connection', (socket) => {
         pushAdminData();
     });
 
-}); // closes io.on('connection')
+});
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`🚀 Master Backend running on port ${PORT}`));
