@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express'); const http = require('http'); const { Server } = require('socket.io');
 const mongoose = require('mongoose'); const path = require('path'); const crypto = require('crypto');
+
 const app = express(); const server = http.createServer(app); const io = new Server(server, { cors: { origin: "*" } });
 
 let isMaintenanceMode = false; let globalBankVault = 2000000; let currentRadio = { url: null, startTime: 0, requestedBy: null };
@@ -58,13 +59,9 @@ setInterval(() => {
     try {
         if (mbjState.status === 'BETTING') {
             let hasBets = Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0);
-            if (hasBets) { 
-                mbjState.time--; 
-                io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true }); 
-            } else { 
-                mbjState.time = 15; 
-                io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false }); 
-            }
+            if (hasBets) { mbjState.time--; io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true }); } 
+            else { mbjState.time = 15; io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false }); }
+            
             if (mbjState.time <= 0 && hasBets) {
                 io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets closed! Dealing...', sys: true });
                 for (let i=1; i<=5; i++) { if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) mbjState.seats[i] = null; }
@@ -121,7 +118,7 @@ async function mbjResolveDealer() {
             gameStats.mbj.total++; if (netResult > 0) gameStats.mbj.Win++; else if (netResult < 0) gameStats.mbj.Lose++; else gameStats.mbj.Push++; checkResetStats('mbj'); logGlobalResult('mbj', `VIP BJ: ${res.status}`);
         }
     }
-    setTimeout(() => { for (let i=1; i<=5; i++) { if (mbjState.seats[i]) { if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) { mbjState.seats[i] = null; } else { mbjState.seats[i].hands = []; } } } mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING'; io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats }); io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true }); }, 5000); 
+    setTimeout(() => { for (let i=1; i<=5; i++) { if (mbjState.seats[i]) { if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) { mbjState.seats[i] = null; } else { mbjState.seats[i].hands = []; } } } mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING'; io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats }); io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true }); }, 4500); 
 }
 
 // --- SHARED TABLES ENGINE ---
@@ -129,12 +126,12 @@ setInterval(() => {
     Object.keys(stRooms).forEach(room => {
         let st = stRooms[room];
         if (st.status === 'BETTING') {
-            let hasBets = st.bets.length > 0;
-            if (hasBets) { st.time--; } else { st.time = ROOM_TIMERS[room]; }
-            io.to(room).emit('timerUpdate', st.time);
+            st.time--; io.to(room).emit('timerUpdate', st.time);
             
-            if (st.time <= 0 && hasBets) {
+            if (st.time <= 0) {
+                let hasBets = st.bets.length > 0;
                 st.status = 'RESOLVING'; io.to(room).emit('lockBets'); io.to(room).emit('chatMessage', { user: 'System', text: 'Bets closed. Good luck!', sys: true });
+                
                 setTimeout(async () => {
                     try {
                         let roomRes = {}; let delayReset = 5000;
@@ -151,24 +148,27 @@ setInterval(() => {
                             let bacWin = pS > bS ? 'Player' : (bS > pS ? 'Banker' : 'Tie'); let bacResStr = bacWin === 'Tie' ? `TIE (${pS} TO ${bS})` : `${bacWin.toUpperCase()} (${pS} TO ${bS})`; delayReset = 7000; roomRes = { winner: bacWin, resStr: bacResStr, emit: { room: 'baccarat', pCards: pC, bCards: bC, pScore: pS, bScore: bS, winner: bacWin, resStr: bacResStr, p3Drawn: p3Drawn, b3Drawn: b3Drawn } };
                         }
 
-                        let playerStats = {}; 
-                        st.bets.forEach(b => {
-                            let payout = 0;
-                            if (room === 'dt') { if (roomRes.winner === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else payout = b.amount; } else { if (b.choice === roomRes.winner) payout = b.amount * 2; } } 
-                            else if (room === 'sicbo') { if (b.choice === roomRes.winner) payout = b.amount * 2; } 
-                            else if (room === 'perya') { let matches = roomRes.winner.filter(c => c === b.choice).length; if (matches > 0) payout = b.amount + (b.amount * matches); } 
-                            else if (room === 'baccarat') { if (roomRes.winner === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else if (b.choice === 'Player' || b.choice === 'Banker') payout = b.amount; } else if (roomRes.winner === 'Player') { if (b.choice === 'Player') payout = b.amount * 2; } else if (roomRes.winner === 'Banker') { if (b.choice === 'Banker') payout = b.amount * 1.95; } }
-                            if (!playerStats[b.userId]) playerStats[b.userId] = { username: b.username, amountWon: 0, amountBet: 0 };
-                            playerStats[b.userId].amountBet += b.amount; playerStats[b.userId].amountWon += formatTC(payout);
-                        });
+                        if (hasBets) {
+                            let playerStats = {}; 
+                            st.bets.forEach(b => {
+                                let payout = 0;
+                                if (room === 'dt') { if (roomRes.winner === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else payout = b.amount; } else { if (b.choice === roomRes.winner) payout = b.amount * 2; } } 
+                                else if (room === 'sicbo') { if (b.choice === roomRes.winner) payout = b.amount * 2; } 
+                                else if (room === 'perya') { let matches = roomRes.winner.filter(c => c === b.choice).length; if (matches > 0) payout = b.amount + (b.amount * matches); } 
+                                else if (room === 'baccarat') { if (roomRes.winner === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else if (b.choice === 'Player' || b.choice === 'Banker') payout = b.amount; } else if (roomRes.winner === 'Player') { if (b.choice === 'Player') payout = b.amount * 2; } else if (roomRes.winner === 'Banker') { if (b.choice === 'Banker') payout = b.amount * 1.95; } }
+                                if (!playerStats[b.userId]) playerStats[b.userId] = { username: b.username, amountWon: 0, amountBet: 0 };
+                                playerStats[b.userId].amountBet += b.amount; playerStats[b.userId].amountWon += formatTC(payout);
+                            });
 
-                        let roomNames = { 'perya': 'Color Game', 'dt': 'Dragon Tiger', 'sicbo': 'Sic Bo', 'baccarat': 'Baccarat' };
-                        for (let userId of Object.keys(playerStats)) {
-                            let userStat = playerStats[userId]; 
-                            try { let user = await User.findById(userId); if (user) { if (userStat.amountWon > 0) { user.credits = formatTC((user.credits || 0) + userStat.amountWon); await user.save(); } let net = formatTC(userStat.amountWon - userStat.amountBet); if (net !== 0) await new CreditLog({ username: user.username, action: 'GAME', amount: net, details: roomNames[room] }).save(); } } catch(e) {}
+                            let roomNames = { 'perya': 'Color Game', 'dt': 'Dragon Tiger', 'sicbo': 'Sic Bo', 'baccarat': 'Baccarat' };
+                            for (let userId of Object.keys(playerStats)) {
+                                let userStat = playerStats[userId]; 
+                                try { let user = await User.findById(userId); if (user) { if (userStat.amountWon > 0) { user.credits = formatTC((user.credits || 0) + userStat.amountWon); await user.save(); } let net = formatTC(userStat.amountWon - userStat.amountBet); if (net !== 0) await new CreditLog({ username: user.username, action: 'GAME', amount: net, details: roomNames[room] }).save(); } } catch(e) {}
+                            }
                         }
+
                         io.to(room).emit('sharedResults', roomRes.emit);
-                        setTimeout(() => { logGlobalResult(room, roomRes.resStr); gameStats[room].total++; if(room === 'perya') roomRes.winner.forEach(c => gameStats.perya[c]++); else gameStats[room][roomRes.winner]++; checkResetStats(room); }, delayReset - 1000);
+                        setTimeout(() => { logGlobalResult(room, roomRes.resStr); gameStats[room].total++; if(room === 'perya') roomRes.winner.forEach(c => gameStats.perya[c]++); else gameStats[room][roomRes.winner]++; checkResetStats(room); }, delayReset - 2000);
                         setTimeout(() => { st.time = ROOM_TIMERS[room]; st.status = 'BETTING'; st.bets = []; io.to(room).emit('newRound'); io.to(room).emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true }); pushAdminData(); }, delayReset); 
                     } catch (e) { st.time = ROOM_TIMERS[room]; st.status = 'BETTING'; st.bets = []; io.to(room).emit('newRound'); }
                 }, 500);
