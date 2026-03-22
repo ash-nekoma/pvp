@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express'); const http = require('http'); const { Server } = require('socket.io');
 const mongoose = require('mongoose'); const path = require('path'); const crypto = require('crypto');
-
 const app = express(); const server = http.createServer(app); const io = new Server(server, { cors: { origin: "*" } });
 
 let isMaintenanceMode = false; let globalBankVault = 2000000; let currentRadio = { url: null, startTime: 0, requestedBy: null };
@@ -22,7 +21,6 @@ async function deductBet(userId, betAmount) {
         if (updatedUser) return { success: true, fromPlayable, fromMain, user: updatedUser };
     } catch (e) {} return { success: false, error: 'System busy' };
 }
-
 function sendPulse(msg, type='info') { io.to('admin_room').emit('adminPulse', { msg, type, time: Date.now() }); }
 async function processReferralBetCommission(user, betAmount) {
     if (!user.referredBy) return; let comm = formatTC(betAmount * 0.01); if (comm <= 0) return;
@@ -126,11 +124,10 @@ setInterval(() => {
     Object.keys(stRooms).forEach(room => {
         let st = stRooms[room];
         if (st.status === 'BETTING') {
-            let hasBets = st.bets.length > 0;
-            if (hasBets) { st.time--; } else { st.time = ROOM_TIMERS[room]; }
-            io.to(room).emit('timerUpdate', st.time);
+            st.time--; io.to(room).emit('timerUpdate', st.time);
             
-            if (st.time <= 0 && hasBets) {
+            if (st.time <= 0) {
+                let hasBets = st.bets.length > 0;
                 st.status = 'RESOLVING'; io.to(room).emit('lockBets'); io.to(room).emit('chatMessage', { user: 'System', text: 'Bets closed. Good luck!', sys: true });
                 
                 setTimeout(async () => {
@@ -212,6 +209,35 @@ io.on('connection', (socket) => {
 
     socket.on('clearWalletLogs', async () => { if(socket.user) { await CreditLog.deleteMany({ username: socket.user.username }); socket.emit('walletLogsData', { logs: [], dailyProfit: 0 }); } });
     socket.on('fetchUserLogs', async (username) => { if (!socket.rooms.has('admin_room')) return; const logs = await CreditLog.find({ username }).sort({ date: -1 }).limit(100); socket.emit('userLogsData', { username, logs }); });
+
+    socket.on('claimDaily', async () => { 
+        if (!socket.user) return; 
+        try { 
+            let u = await User.findById(socket.user._id); if (!u) return; 
+            let now = new Date(); let canClaim = true; let streak = u.dailyReward.streak || 0; 
+            if (u.dailyReward.lastClaim) { let diff = (now - u.dailyReward.lastClaim) / (1000*60*60); if (diff < 24) canClaim = false; else if (diff > 48) streak = 0; } 
+            if (!canClaim) return socket.emit('localGameError', {msg:'Not ready yet', game:'daily'}); 
+            streak++; let day = ((streak - 1) % 7) + 1; const rw = [100, 250, 500, 750, 1000, 1500, 2000]; let amt = rw[day - 1]; 
+            u.playableCredits = formatTC((u.playableCredits || 0) + amt); u.dailyReward = { streak: streak, lastClaim: now }; await u.save(); 
+            let nextClaim = new Date(now.getTime() + 24*60*60*1000); 
+            socket.emit('dailyClaimed', { newBalance: { credits: u.credits, playable: u.playableCredits }, nextClaim: nextClaim, amt: amt }); 
+            await new CreditLog({ username: u.username, action: 'REWARD', amount: amt, details: `Daily Day ${day}` }).save(); 
+        } catch(e) {} 
+    });
+
+    socket.on('redeemPromo', async (cStr) => { 
+        if (!socket.user) return; 
+        try { 
+            let c = await GiftCode.findOne({ code: cStr.toUpperCase() }); 
+            if (!c) return socket.emit('promoResult', { success: false, msg: 'Invalid or expired code.' }); 
+            if (c.redeemedBy) return socket.emit('promoResult', { success: false, msg: 'Code already redeemed.' }); 
+            c.redeemedBy = socket.user.username; await c.save(); 
+            let u = await User.findById(socket.user._id); 
+            if (c.creditType === 'playable') u.playableCredits = formatTC((u.playableCredits || 0) + c.amount); else u.credits = formatTC((u.credits || 0) + c.amount); await u.save(); 
+            await new CreditLog({ username: u.username, action: 'PROMO', amount: c.amount, details: `Code: ${c.code}` }).save(); 
+            socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits }); socket.emit('promoResult', { success: true, amt: c.amount, type: c.creditType }); 
+        } catch (e) {} 
+    });
 
     socket.on('login', async (data) => {
         if (socket.isAuth) return; socket.isAuth = true;
