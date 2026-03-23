@@ -80,16 +80,34 @@ setInterval(() => {
 
 function mbjNextTurn() {
     let seatNum = mbjState.activeTurn.seat; let handIdx = mbjState.activeTurn.handIdx;
-    if (seatNum !== null) { let seat = mbjState.seats[seatNum]; if (seat && handIdx + 1 < seat.hands.length && seat.hands[handIdx + 1].status === 'PLAYING') { mbjState.activeTurn.handIdx++; mbjState.turnTimer = 15; io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats }); return; } }
+    if (seatNum !== null) { 
+        let seat = mbjState.seats[seatNum]; 
+        if (seat && handIdx + 1 < seat.hands.length) { 
+            if (seat.hands[handIdx + 1].status === 'WAITING') seat.hands[handIdx + 1].status = 'PLAYING';
+            if (seat.hands[handIdx + 1].status === 'PLAYING') { 
+                mbjState.activeTurn.handIdx++; mbjState.turnTimer = 15; 
+                io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats }); return; 
+            } 
+        } 
+    }
     let nextSeatNum = null; let startIdx = seatNum ? parseInt(seatNum) + 1 : 1;
-    for (let i = startIdx; i <= 5; i++) { let s = mbjState.seats[i]; if (s && s.hands.some(h => h.status === 'PLAYING')) { nextSeatNum = i; break; } }
-    if (nextSeatNum !== null) { mbjState.activeTurn = { seat: nextSeatNum, handIdx: 0 }; mbjState.turnTimer = 15; io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats }); } else { mbjResolveDealer(); }
+    for (let i = startIdx; i <= 5; i++) { 
+        let s = mbjState.seats[i]; 
+        if (s && s.hands.some(h => h.status === 'PLAYING' || h.status === 'WAITING')) { nextSeatNum = i; break; } 
+    }
+    if (nextSeatNum !== null) { 
+        if(mbjState.seats[nextSeatNum].hands[0].status === 'WAITING') mbjState.seats[nextSeatNum].hands[0].status = 'PLAYING';
+        mbjState.activeTurn = { seat: nextSeatNum, handIdx: 0 }; mbjState.turnTimer = 15; 
+        io.to('mbj').emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats }); 
+    } else { mbjResolveDealer(); }
 }
 
 async function mbjResolveDealer() {
     mbjState.status = 'RESOLVING'; mbjState.activeTurn = { seat: null, handIdx: 0 };
     let playersAlive = false; for (let i = 1; i <= 5; i++) { if(mbjState.seats[i]) { mbjState.seats[i].hands.forEach(h => { if(h.status === 'STAND') playersAlive = true; }); } }
-    let dScore = getBJScore(mbjState.dealer.hand); if (playersAlive) { while (dScore < 17) { mbjState.dealer.hand.push(mbjDrawCard()); dScore = getBJScore(mbjState.dealer.hand); } } mbjState.dealer.score = dScore;
+    let dScore = getBJScore(mbjState.dealer.hand); 
+    if (playersAlive && mbjState.dealer.hand.length === 2 && getBJScore(mbjState.dealer.hand) !== 21) { while (dScore < 17) { mbjState.dealer.hand.push(mbjDrawCard()); dScore = getBJScore(mbjState.dealer.hand); } } 
+    mbjState.dealer.score = dScore;
     let dealerNatural = (mbjState.dealer.hand.length === 2 && getBJScore(mbjState.dealer.hand) === 21); let dealerUpcardVal = mbjState.dealer.hand[0] ? mbjState.dealer.hand[0].bjVal : 0;
     let seatResults = {}; 
     for (let i = 1; i <= 5; i++) {
@@ -114,6 +132,7 @@ async function mbjResolveDealer() {
             let totalBet = seat.hands.reduce((sum, h) => sum + h.bet, 0); let netResult = formatTC(totalReturn - totalBet);
             if (netResult !== 0) { try { await new CreditLog({ username: seat.username, action: 'GAME', amount: netResult, details: 'VIP Blackjack' }).save(); } catch (e) {} }
             gameStats.mbj.total++; if (netResult > 0) gameStats.mbj.Win++; else if (netResult < 0) gameStats.mbj.Lose++; else gameStats.mbj.Push++; checkResetStats('mbj'); logGlobalResult('mbj', `VIP BJ: ${res.status}`);
+            if (totalReturn >= 10000) io.to('mbj').emit('chatMessage', { user: 'System', text: `🎰 ${seat.username} just won ${fmtTC(totalReturn)} TC in VIP Blackjack!`, sys: true });
         }
     }
     setTimeout(() => { for (let i=1; i<=5; i++) { if (mbjState.seats[i]) { if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) { mbjState.seats[i] = null; } else { mbjState.seats[i].hands = []; } } } mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING'; io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats }); io.to('mbj').emit('chatMessage', { user: 'System', text: 'Bets are now open!', sys: true }); }, 5000); 
@@ -124,10 +143,11 @@ setInterval(() => {
     Object.keys(stRooms).forEach(room => {
         let st = stRooms[room];
         if (st.status === 'BETTING') {
-            st.time--; io.to(room).emit('timerUpdate', st.time);
+            let hasBets = st.bets.length > 0;
+            if (hasBets) { st.time--; } else { st.time = ROOM_TIMERS[room]; }
+            io.to(room).emit('timerUpdate', st.time);
             
-            if (st.time <= 0) {
-                let hasBets = st.bets.length > 0;
+            if (st.time <= 0 && hasBets) {
                 st.status = 'RESOLVING'; io.to(room).emit('lockBets'); io.to(room).emit('chatMessage', { user: 'System', text: 'Bets closed. Good luck!', sys: true });
                 
                 setTimeout(async () => {
@@ -156,6 +176,7 @@ setInterval(() => {
                                 else if (room === 'baccarat') { if (roomRes.winner === 'Tie') { if (b.choice === 'Tie') payout = b.amount * 9; else if (b.choice === 'Player' || b.choice === 'Banker') payout = b.amount; } else if (roomRes.winner === 'Player') { if (b.choice === 'Player') payout = b.amount * 2; } else if (roomRes.winner === 'Banker') { if (b.choice === 'Banker') payout = b.amount * 1.95; } }
                                 if (!playerStats[b.userId]) playerStats[b.userId] = { username: b.username, amountWon: 0, amountBet: 0 };
                                 playerStats[b.userId].amountBet += b.amount; playerStats[b.userId].amountWon += formatTC(payout);
+                                if (payout >= 10000) io.to(room).emit('chatMessage', { user: 'System', text: `🎉 ${b.username} just won ${fmtTC(payout)} TC on ${b.choice}!`, sys: true });
                             });
 
                             let roomNames = { 'perya': 'Color Game', 'dt': 'Dragon Tiger', 'sicbo': 'Sic Bo', 'baccarat': 'Baccarat' };
@@ -193,7 +214,7 @@ io.on('connection', (socket) => {
     socket.emit('maintenanceToggle', isMaintenanceMode); socket.emit('radioSync', currentRadio); 
     socket.isBetting = false; socket.isSharedBetting = false; socket.isCashier = false; socket.isAuth = false;
 
-    socket.on('voiceStream', (data) => { if (socket.currentRoom) socket.to(socket.currentRoom).emit('voiceStream', data); });
+    socket.on('voiceStream', (data) => { if (data.room) socket.to(data.room).emit('voiceStream', data); });
     socket.on('requestBalanceRefresh', async () => { if(socket.user) { let u = await User.findById(socket.user._id); if(u) socket.emit('balanceUpdateData', { credits: formatTC(u.credits), playable: formatTC(u.playableCredits) }); } });
     socket.on('getGlobalResults', (game) => { socket.emit('globalResultsData', { game: game, results: globalResults[game] || [], stats: gameStats[game] }); });
 
@@ -402,7 +423,6 @@ io.on('connection', (socket) => {
         } catch(e) { console.error(e); } finally { socket.isBetting = false; }
     });
 
-    // --- VIP BLACKJACK SOCKET LISTENERS ---
     socket.on('mbjTakeSeat', (seatNum) => {
         if (!socket.user || mbjState.seats[seatNum] || mbjState.status !== 'BETTING') return;
         for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) return; }
@@ -489,7 +509,6 @@ io.on('connection', (socket) => {
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn });
                 socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
 
-                // VITAL FIX: Sequential animation delay for Split
                 setTimeout(() => {
                     hand.cards.push(mbjDrawCard()); hand.score = getBJScore(hand.cards); 
                     if (hand.score === 21) hand.status = 'STAND'; else hand.status = 'PLAYING';
