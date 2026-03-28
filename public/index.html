@@ -6,9 +6,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000814">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
     <title>Stick N' Trade | Casino</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,14 +33,7 @@
             --playable: #b366ff; 
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Outfit', sans-serif; 
-            outline: none; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
 
         body { 
             background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); 
@@ -55,75 +45,37 @@
             overflow: hidden !important; 
             -webkit-user-select: none; 
             user-select: none; 
-            touch-action: manipulation; 
             padding-bottom: env(safe-area-inset-bottom); 
         }
         
-        @keyframes AmbientBG { 
-            0% { background-position: 0% 50%; } 
-            50% { background-position: 100% 50%; } 
-            100% { background-position: 0% 50%; } 
-        }
+        @keyframes AmbientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
-        .chip, .anim-deal, .play-card, .coin, .dice-icon, .mode-card, .game-card { 
-            will-change: transform, opacity; 
-            transform: translateZ(0); 
-            backface-visibility: hidden; 
-        }
-        
+        .chip, .anim-deal, .play-card, .coin, .dice-icon, .mode-card, .game-card { will-change: transform, opacity; transform: translateZ(0); backface-visibility: hidden; }
         button i { pointer-events: none; }
         ::-webkit-scrollbar { display: none; }
         
-        .custom-scroll { 
-            overflow-y: auto; 
-            scrollbar-width: thin; 
-            scrollbar-color: rgba(255,255,255,0.2) transparent; 
-            padding-right: 5px;
-        }
+        .custom-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; padding-right: 5px;}
         .custom-scroll::-webkit-scrollbar { width: 6px; display: block; } 
         .custom-scroll::-webkit-scrollbar-track { background: transparent; } 
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } 
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } 
         input[type="number"] { -moz-appearance: textfield; }
-        
         .hidden { display: none !important; }
         body.modal-open { overflow: hidden !important; }
 
         /* =======================================================
            2. AUTHENTICATION SCREEN
         ======================================================== */
-        #auth-container { 
-            position: fixed; 
-            inset: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 9999999; 
-            background: linear-gradient(rgba(0, 5, 15, 0.8), rgba(0, 5, 15, 0.95)), url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80') center/cover no-repeat; 
-            backdrop-filter: blur(15px); 
-        }
-        .auth-box { 
-            width: 420px; 
-            max-width: 95vw; 
-            background: rgba(0, 5, 15, 0.9); 
-            padding: 2.5rem; 
-            border-radius: 16px; 
-            border: 1px solid rgba(0, 162, 255, 0.4); 
-            border-top: 3px solid var(--ps-glow); 
-            box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 162, 255, 0.1); 
-            text-align: center; 
-            backdrop-filter: blur(25px); 
-        }
-        .auth-title { font-size: 2.2rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; } 
+        #auth-container { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999999; background: linear-gradient(rgba(0, 5, 15, 0.8), rgba(0, 5, 15, 0.95)), url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80') center/cover no-repeat; backdrop-filter: blur(15px); }
+        .auth-box { width: 420px; max-width: 95vw; background: rgba(0, 5, 15, 0.9); padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(0, 162, 255, 0.4); border-top: 3px solid var(--ps-glow); box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 162, 255, 0.1); text-align: center; backdrop-filter: blur(25px); }
+        .auth-title { font-size: 2.2rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;} 
         .auth-sub { color: var(--ps-glow); font-weight: 800; font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; }
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; } 
         .auth-tab { flex: 1; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-muted); font-weight: 900; padding: 10px; cursor: pointer; text-transform: uppercase; transition: 0.2s; font-size: 1rem; } 
         .auth-tab.active { border-bottom-color: var(--ps-glow); color: var(--ps-glow); }
         .auth-msg { font-size: 0.9rem; font-weight: 800; min-height: 20px; margin-bottom: 15px; text-align: center; } 
-        .auth-error { color: var(--danger); } 
-        .auth-success { color: var(--success); }
+        .auth-error { color: var(--danger); } .auth-success { color: var(--success); }
         
         .pwd-input-wrapper { position: relative; width: 100%; display: block; } 
         .pwd-input-wrapper input { width: 100%; text-align: center; padding: 12px; font-family: 'Outfit', sans-serif; font-weight: 600;} 
@@ -133,40 +85,9 @@
         /* =======================================================
            3. GLOBAL BUTTONS & INPUTS
         ======================================================== */
-        .btn-play { 
-            background: rgba(255,255,255,0.1); 
-            color: white; 
-            border: 1px solid var(--glass-border); 
-            padding: 12px 15px; 
-            border-radius: 8px; 
-            font-size: 1rem; 
-            font-weight: 900; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        } 
-        .btn-play:hover:not(:disabled) { 
-            background: white; 
-            color: black; 
-            transform: translateY(-2px); 
-            box-shadow: 0 5px 20px rgba(255,255,255,0.2); 
-            border-color: white;
-        } 
-        .btn-play:disabled { 
-            background: rgba(0,0,0,0.5) !important; 
-            color: var(--text-muted) !important; 
-            cursor: not-allowed !important; 
-            border-color: transparent !important; 
-            opacity: 0.5 !important; 
-            box-shadow: none !important; 
-            transform: none !important; 
-        }
+        .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-size: 1rem; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);} 
+        .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.2); border-color: white;} 
+        .btn-play:disabled { background: rgba(0,0,0,0.5) !important; color: var(--text-muted) !important; cursor: not-allowed !important; border-color: transparent !important; opacity: 0.5 !important; box-shadow:none !important; transform:none !important; }
         
         .input-group label { display: block; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 800; margin-bottom: 8px; text-align: left; } 
         .input-control { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; font-weight: 600; text-align: center; outline: none; transition: 0.2s;} 
@@ -188,7 +109,6 @@
         .brand:hover { background: rgba(255,255,255,0.05); transform: scale(1.02); } 
         .brand-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--ps-glow); box-shadow: 0 0 20px var(--ps-glow); } 
         .brand-title { font-weight: 900; letter-spacing: 2px; text-transform: uppercase; font-size: 1.5rem; color: var(--text-main); line-height: 1; text-shadow: 0 0 10px rgba(0, 162, 255, 0.5); } 
-        .brand-sub { color: var(--ps-glow); font-weight: 800; font-size: 0.9rem; letter-spacing: 3px; margin-top: 2px; text-transform: uppercase; }
         
         .topbar-right { display: flex; flex-direction: row; align-items: center; gap: 15px;} 
         .player-profile { display: flex; align-items: center; gap: 8px; font-weight: 800; color: white; font-size: 1rem; text-transform: uppercase; margin-right: 10px;} 
@@ -206,9 +126,14 @@
         #nav-playable { color: var(--playable); font-family: 'Rajdhani', sans-serif; font-weight: 900; font-size: 1.2rem; line-height: 1; margin-top: 2px; }
         
         .topbar-actions { display: flex; flex-direction: row; align-items: center; gap: 15px; background: rgba(0,0,0,0.8); padding: 8px 20px; border-radius: 50px; border: 1px solid var(--glass-border); width: fit-content; position: relative;} 
+        
+        /* Volume Slider in Topbar */
+        .vol-slider-container { display: flex; align-items: center; justify-content: center; width: 60px; margin-right: 5px; }
+        #vol-slider { width: 100%; cursor: pointer; accent-color: var(--ps-glow); }
+        
         .top-icon-btn { position: relative; cursor: pointer; background: transparent; border: none; font-size: 1.15rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; color: white; width: 20px; } 
         .top-icon-btn i { text-align: center; width: 100%; transition: 0.2s; pointer-events: none;} 
-        .top-icon-btn:hover { transform: scale(1.1); }
+        .top-icon-btn:hover { transform: scale(1.1); color: var(--ps-glow); }
         .desktop-actions { display: flex; gap: 15px; align-items: center; }
         
         .notif-badge { display: none; position: absolute; top: -6px; right: -8px; background: var(--danger); color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 5px; border-radius: 50px; border: 2px solid var(--ps-bg); pointer-events: none; box-shadow: 0 0 10px var(--danger); } 
@@ -262,7 +187,7 @@
         .rules-text strong { color: white; }
 
         /* =======================================================
-           6. RESULTS & CINEMATIC BANNER
+           6. RESULTS & BOARD CINEMATIC BANNER
         ======================================================== */
         .board-cinematic-banner { 
             position: absolute; 
@@ -285,8 +210,8 @@
             pointer-events: none; 
         }
         .board-cinematic-banner.show { transform: translateY(-50%) scaleY(1); opacity: 1; }
-        .bc-title { font-size: 3.5rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 5px; line-height: 1; }
-        .bc-sub { font-size: 1.8rem; font-weight: 900; font-family: 'Rajdhani', sans-serif; line-height: 1; }
+        .bc-title { font-size: 3.5rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 5px; line-height: 1; text-align: center;}
+        .bc-sub { font-size: 1.8rem; font-weight: 900; font-family: 'Rajdhani', sans-serif; line-height: 1; text-align: center;}
 
         .local-flash { 
             position: absolute; 
@@ -384,7 +309,7 @@
             flex-shrink: 0; 
             display: flex; 
             flex-direction: column; 
-            max-height: 100%; /* Fixes growing bug */
+            max-height: 100%; 
             border: 1px solid var(--glass-border); 
             background-color: rgba(0, 10, 25, 0.85); 
             border-radius: 12px;
@@ -398,7 +323,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 8px; 
-            overflow-y: auto; /* Triggers scrollbar */
+            overflow-y: auto; 
         } 
         
         .chat-line { font-size: 0.95rem; margin-bottom: 5px; line-height: 1.4; word-wrap: break-word; } 
@@ -569,9 +494,6 @@
         .mbj-btn-double { background: rgba(255, 204, 0, 0.2); border-color: var(--credits); color: var(--credits); display: none;} 
         .mbj-btn-split { background: rgba(0, 162, 255, 0.2); border-color: var(--ps-glow); color: var(--ps-glow); display: none;}
         
-        .mbj-chat-panel { flex: 1; max-width: 350px; background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.8); overflow: hidden; flex-shrink: 0; max-height: 400px;}
-        .mbj-chat-panel .glass-header { border-radius: 20px 20px 0 0; }
-        
         @media (max-width: 1200px) { 
             .mbj-master-layout { flex-direction: column; height: auto; align-items: center;} 
             .chat-panel { width: 100%; max-width: 1000px; height: 400px; margin-top: 20px;} 
@@ -583,8 +505,7 @@
         }
     </style>
 </head>
-<body>
-    <body onclick="document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.add('hidden'));">
+<body onclick="document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.add('hidden'));">
 
   <div id="auth-container">
       <div class="auth-box">
@@ -637,6 +558,12 @@
             <div class="wallet-pill" id="pill-playable" onclick="openModal('playable-info-modal')"><div class="wallet-main"><i class="fas fa-star" style="color: var(--playable);"></i><span id="nav-playable">0</span><span class="wallet-unit" style="color: var(--playable); opacity: 0.8;">P</span></div></div>
             <div class="wallet-pill" id="pill-credits" onclick="openModal('support-center-modal')" title="Open Cashier"><div class="wallet-main"><i class="fas fa-coins"></i><span id="nav-credits">0</span><span class="wallet-unit">TC</span></div></div>
             <div class="topbar-actions">
+                
+                <div class="vol-slider-container" title="Music Volume">
+                    <i class="fas fa-volume-up" style="color: var(--text-muted); font-size: 0.8rem; margin-right: 5px;"></i>
+                    <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.5" oninput="updateVolume(this.value)">
+                </div>
+
                 <button class="top-icon-btn mobile-menu-btn" onclick="toggleMobileMenu(event)"><i class="fas fa-bars"></i></button>
                 <div class="desktop-actions" id="desktop-nav-actions">
                     <button class="top-icon-btn admin-btn hidden" onclick="window.location.href='/admin.html'" title="Admin Panel" style="color:var(--ps-glow);"><i class="fas fa-user-shield"></i></button>
@@ -931,72 +858,12 @@
   </div>
   
   <audio id="global-radio" style="display:none;"></audio>
-
-    <script>
+  <script>
     const socket = io(); 
-    
-    // Completely Muted Audio System
-    function playTone() { return; } 
-    const sfx = { click: () => {}, tick: () => {}, deal: () => {}, coin: () => {}, win: () => {}, lose: () => {}, lock: () => {} };
 
-    // Close desktop menus when clicking outside
-    document.addEventListener('mousedown', (e) => { 
-        let menu = document.getElementById('desktop-nav-actions'); 
-        let toggleBtn = document.querySelector('.mobile-menu-btn'); 
-        if (menu && toggleBtn) {
-            if (menu.classList.contains('show') && !menu.contains(e.target) && !toggleBtn.contains(e.target)) { 
-                menu.classList.remove('show'); 
-            } 
-        }
-    });
-
-    // Auto-Login on Reconnect
-    socket.on('connect', () => { 
-        const savedUser = localStorage.getItem('snt_user'); 
-        const savedPass = localStorage.getItem('snt_pass'); 
-        if(savedUser && savedPass) { 
-            let authErrLog = document.getElementById('auth-error-login'); 
-            if(authErrLog) {
-                authErrLog.innerHTML = '<span style="color:var(--ps-glow)">Reconnecting session...</span>'; 
-            }
-            socket.emit('login', { username: savedUser, password: savedPass }); 
-        } 
-    });
-
-    // Radio Widget Logic
-    socket.on('radioSync', (data) => {
-        if(data && data.url) {
-            document.getElementById('shared-radio-widget').style.display = 'flex';
-            document.getElementById('mbj-radio-widget').style.display = 'flex';
-            document.getElementById('shared-radio-dj').innerText = data.requestedBy;
-            document.getElementById('mbj-radio-dj').innerText = data.requestedBy;
-            let audio = document.getElementById('global-radio');
-            if (audio.src !== data.url) {
-                audio.src = data.url;
-                audio.play().catch(e=>{});
-            }
-        }
-    }); 
-    
-    socket.on('radioPlay', (data) => { 
-        document.getElementById('shared-radio-widget').style.display = 'flex';
-        document.getElementById('mbj-radio-widget').style.display = 'flex';
-        document.getElementById('shared-radio-dj').innerText = data.requestedBy;
-        document.getElementById('mbj-radio-dj').innerText = data.requestedBy;
-        let audio = document.getElementById('global-radio');
-        audio.src = data.url;
-        audio.play().catch(e=>{});
-    }); 
-    
-    socket.on('radioStop', () => { 
-        document.getElementById('shared-radio-widget').style.display = 'none';
-        document.getElementById('mbj-radio-widget').style.display = 'none';
-        let audio = document.getElementById('global-radio');
-        audio.pause();
-        audio.src = "";
-    });
-
-    // Global Variables
+    // =======================================================
+    // GLOBAL VARIABLES & UTILITIES
+    // =======================================================
     let myUsername = ''; 
     let myCredits = 0; 
     let myPlayable = 0; 
@@ -1024,61 +891,34 @@
         return num % 1 === 0 ? num.toLocaleString() : num.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}); 
     };
 
-    // Helper: Bet Colors for UI
-    function getBetColor(betWord) { 
-        if(!betWord) return 'white'; 
-        let word = betWord.toString().trim().toUpperCase(); 
-        const map = { 
-            'PLAYER': 'var(--ps-glow)', 'BANKER': 'var(--danger)', 'TIE': 'var(--success)', 
-            'DRAGON': 'var(--danger)', 'TIGER': 'var(--credits)', 'SMALL': 'var(--ps-glow)', 
-            'BIG': 'var(--danger)', 'TRIPLE': 'white', 'YELLOW': '#ffcc00', 'WHITE': '#fff', 
-            'PINK': '#ff66b2', 'BLUE': '#00a2ff', 'RED': '#ff3366', 'GREEN': '#00e676', 
-            'BUST!': 'var(--danger)', 'PUSH': 'white', 'DEALER': 'var(--danger)', 
-            'YOU': 'var(--success)', 'HEADS': '#ffb400', 'TAILS': '#e2e8f0', 
-            'EVEN': 'var(--credits)', 'ODD': 'var(--playable)' 
-        }; 
-        return map[word] || 'white'; 
+    function updateVolume(val) { 
+        let audio = document.getElementById('global-radio');
+        if(audio) audio.volume = val;
     }
 
-    // Modal & Dropdown Toggles
-    function openModal(id) { 
-        let el = document.getElementById(id); 
-        if(el) {
-            el.classList.remove('hidden'); 
-            el.style.display = 'flex'; 
-            if (id === 'support-center-modal' || id === 'daily-reward-modal') {
-                document.body.classList.add('modal-open');
-            }
+    document.addEventListener('mousedown', (e) => { 
+        let menu = document.getElementById('desktop-nav-actions'); 
+        let toggleBtn = document.querySelector('.mobile-menu-btn'); 
+        if (menu && toggleBtn) {
+            if (menu.classList.contains('show') && !menu.contains(e.target) && !toggleBtn.contains(e.target)) { 
+                menu.classList.remove('show'); 
+            } 
         }
-    } 
+    });
 
-    function closeModal(id) { 
-        let el = document.getElementById(id); 
-        if(el) {
-            el.classList.add('hidden'); 
-            el.style.display = 'none'; 
-            document.body.classList.remove('modal-open');
-        }
-    } 
+    // =======================================================
+    // AUTHENTICATION & RECONNECT
+    // =======================================================
+    socket.on('connect', () => { 
+        const savedUser = localStorage.getItem('snt_user'); 
+        const savedPass = localStorage.getItem('snt_pass'); 
+        if(savedUser && savedPass) { 
+            let authErrLog = document.getElementById('auth-error-login'); 
+            if(authErrLog) authErrLog.innerHTML = '<span style="color:var(--ps-glow)">Reconnecting session...</span>'; 
+            socket.emit('login', { username: savedUser, password: savedPass }); 
+        } 
+    });
 
-    function toggleCustomDropdown(id, e) { 
-        if(e) e.stopPropagation(); 
-        document.querySelectorAll('.custom-dropdown').forEach(d => { 
-            if(d.id !== id) d.classList.add('hidden'); 
-        }); 
-        let target = document.getElementById(id); 
-        if(target) {
-            target.classList.toggle('hidden'); 
-            if(id === 'notif-dropdown' && !target.classList.contains('hidden')) {
-                renderNotifs(); 
-            }
-            if(id === 'gift-dropdown') {
-                document.getElementById('promo-response').innerText = ''; 
-            }
-        }
-    }
-
-    // Auth Screen Logic
     function switchAuthTab(tab) { 
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active')); 
         if(tab === 'login') { 
@@ -1096,18 +936,11 @@
     
     function toggleInputPwd(inputId, icon) { 
         const input = document.getElementById(inputId); 
-        if (input.type === "password") { 
-            input.type = "text"; 
-            icon.className = "fas fa-eye-slash"; 
-        } else { 
-            input.type = "password"; 
-            icon.className = "fas fa-eye"; 
-        } 
+        if (input.type === "password") { input.type = "text"; icon.className = "fas fa-eye-slash"; } 
+        else { input.type = "password"; icon.className = "fas fa-eye"; } 
     } 
     
-    document.getElementById('login-pass').addEventListener('keypress', function(e) { 
-        if (e.key === 'Enter') submitAuth('login'); 
-    });
+    document.getElementById('login-pass').addEventListener('keypress', function(e) { if (e.key === 'Enter') submitAuth('login'); });
     
     function submitAuth(mode) { 
         const uId = mode === 'login' ? 'login-user' : 'reg-user'; 
@@ -1116,16 +949,8 @@
         const pass = document.getElementById(pId).value; 
         const ref = mode === 'register' ? document.getElementById('reg-ref').value.trim() : null; 
         
-        if(!user || !pass) {
-            document.getElementById(mode === 'login' ? 'auth-error-login' : 'auth-error-register').innerText = "Please fill all fields.";
-            return;
-        } 
-        
-        if (mode === 'login') { 
-            window.tempLoginUser = user; 
-            window.tempLoginPass = pass; 
-        } 
-        
+        if(!user || !pass) { document.getElementById(mode === 'login' ? 'auth-error-login' : 'auth-error-register').innerText = "Please fill all fields."; return; } 
+        if (mode === 'login') { window.tempLoginUser = user; window.tempLoginPass = pass; } 
         socket.emit(mode, { username: user, password: pass, referral: ref }); 
     }
 
@@ -1135,12 +960,12 @@
     }); 
     
     socket.on('registerSuccess', (msg) => { 
-        document.getElementById('auth-error-register').className = 'auth-msg auth-success'; 
-        document.getElementById('auth-error-register').innerText = msg; 
+        let errBox = document.getElementById('auth-error-register');
+        errBox.className = 'auth-msg auth-success'; 
+        errBox.innerText = msg; 
         setTimeout(() => { switchAuthTab('login'); }, 1000); 
     });
-    
-    // --- THE SILENT RECONNECT FIX ---
+
     socket.on('loginSuccess', (data) => { 
         if (window.tempLoginUser && window.tempLoginPass) { 
             localStorage.setItem('snt_user', window.tempLoginUser); 
@@ -1148,13 +973,11 @@
         } 
         
         myUsername = data.username; 
-        myCredits = formatTC(data.credits); 
-        myPlayable = formatTC(data.playable || 0); 
         
         let nameHTML = data.role === 'VIP' ? `<span style="color:var(--playable); text-shadow:0 0 10px var(--playable);"><i class="fas fa-crown" style="margin-right:5px;"></i>${myUsername}</span>` : myUsername; 
         document.getElementById('player-name-display').innerHTML = nameHTML; 
         
-        updateMyBalance({credits: myCredits, playable: myPlayable}); 
+        updateMyBalance({credits: data.credits, playable: data.playable || 0}); 
         
         if(data.role === 'Admin' || data.role === 'Moderator') { 
             let adminBtn = document.querySelector('.admin-btn');
@@ -1169,76 +992,34 @@
         authContainer.style.display = 'none'; 
         document.getElementById('app-container').style.display = 'block'; 
         
-        // If they just logged in for the first time, go to Casino.
-        // If they reconnected, DO NOTHING. Keep them at their table.
-        if (wasAuthVisible) { 
-            switchView('casino'); 
-        }
+        if (wasAuthVisible) { switchView('casino'); }
     });
 
     function confirmLogout() { 
         if(confirm("Are you sure you want to log out?")) { 
-            localStorage.removeItem('snt_user'); 
-            localStorage.removeItem('snt_pass'); 
-            location.reload(); 
+            localStorage.removeItem('snt_user'); localStorage.removeItem('snt_pass'); location.reload(); 
         } 
     } 
 
-    // Balance & Pop Animations
-    function triggerWinAnim() { 
-        let p1 = document.getElementById('pill-credits'); 
-        if (p1) { 
-            p1.classList.remove('anim-pop'); 
-            void p1.offsetWidth; 
-            p1.classList.add('anim-pop'); 
-        } 
+    // =======================================================
+    // UI, MODALS, & CASHIER
+    // =======================================================
+    function openModal(id) { 
+        let el = document.getElementById(id); 
+        if(el) { el.classList.remove('hidden'); el.style.display = 'flex'; if (id === 'support-center-modal' || id === 'daily-reward-modal') document.body.classList.add('modal-open'); }
     } 
-    
-    function triggerBetAnim() { 
-        let p1 = document.getElementById('pill-credits'); 
-        let p2 = document.getElementById('pill-playable'); 
-        if(p1 && p1.style.display !== 'none') { 
-            p1.classList.remove('anim-pop-bet'); 
-            void p1.offsetWidth; 
-            p1.classList.add('anim-pop-bet'); 
-        } 
-        if(p2 && p2.style.display !== 'none') { 
-            p2.classList.remove('anim-pop-bet'); 
-            void p2.offsetWidth; 
-            p2.classList.add('anim-pop-bet'); 
-        } 
-    }
-    
-    function updateMyBalance(data, didWin = false) { 
-        let tc = formatTC(data.credits); 
-        let ptc = formatTC(data.playable || 0); 
-        
-        if(didWin && tc > myCredits) { triggerWinAnim(); } 
-        
-        myCredits = tc; 
-        myPlayable = ptc; 
-        
-        document.getElementById('nav-credits').innerText = fmtTC(tc); 
-        const pillPlayable = document.getElementById('pill-playable'); 
-        const navPlayable = document.getElementById('nav-playable'); 
-        
-        if (myPlayable > 0) { 
-            pillPlayable.style.display = 'flex'; 
-            navPlayable.innerText = fmtTC(ptc); 
-        } else { 
-            pillPlayable.style.display = 'none'; 
-        } 
-        
-        document.querySelectorAll('.cashier-balance-display').forEach(el => {
-            el.innerText = fmtTC(tc) + ' TC';
-        }); 
-    }
-    
-    socket.on('balanceUpdateData', (newBalance) => { 
-        updateMyBalance(newBalance, true); 
-    });
+    function closeModal(id) { 
+        let el = document.getElementById(id); 
+        if(el) { el.classList.add('hidden'); el.style.display = 'none'; document.body.classList.remove('modal-open'); }
+    } 
 
-    // Cashier Logic (Stripped of SNT/Discord bloat)
+    function toggleCustomDropdown(id, e) { 
+        if(e) e.stopPropagation(); 
+        document.querySelectorAll('.custom-dropdown').forEach(d => { if(d.id !== id) d.classList.add('hidden'); }); 
+        let target = document.getElementById(id); 
+        if(target) { target.classList.toggle('hidden'); if(id === 'notif-dropdown' && !target.classList.contains('hidden')) renderNotifs(); if(id === 'gift-dropdown') document.getElementById('promo-response').innerText = ''; }
+    }
+
     function switchSupportCenterTab(tab, btn) {
         document.querySelectorAll('#cashier-tabs-nav .bank-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.bank-section').forEach(s => s.classList.add('hidden'));
@@ -1255,537 +1036,423 @@
 
     function submitDeposit() {
         let amt = document.getElementById('dep-amount').value;
-        if (!amt || isNaN(amt) || amt <= 0) {
-            let msg = document.getElementById('deposit-msg');
-            msg.style.color = "var(--danger)";
-            msg.innerText = "Enter a valid amount.";
-            return;
-        }
+        if (!amt || isNaN(amt) || amt <= 0) { let msg = document.getElementById('deposit-msg'); msg.style.color = "var(--danger)"; msg.innerText = "Enter a valid amount."; return; }
         socket.emit('submitTransaction', { type: 'Deposit', amount: parseFloat(amt) });
         document.getElementById('dep-amount').value = '';
-        let msg = document.getElementById('deposit-msg');
-        msg.style.color = "var(--success)";
-        msg.innerText = "Deposit requested. Pending approval.";
-        setTimeout(() => msg.innerText = "", 3000);
+        let msg = document.getElementById('deposit-msg'); msg.style.color = "var(--success)"; msg.innerText = "Deposit requested. Pending approval."; setTimeout(() => msg.innerText = "", 3000);
     }
 
     function submitWithdrawal() {
         let amt = document.getElementById('wit-amount').value;
-        if (!amt || isNaN(amt) || amt <= 0) {
-            let msg = document.getElementById('withdraw-msg');
-            msg.style.color = "var(--danger)";
-            msg.innerText = "Enter a valid amount.";
-            return;
-        }
+        if (!amt || isNaN(amt) || amt <= 0) { let msg = document.getElementById('withdraw-msg'); msg.style.color = "var(--danger)"; msg.innerText = "Enter a valid amount."; return; }
         socket.emit('submitTransaction', { type: 'Withdrawal', amount: parseFloat(amt) });
         document.getElementById('wit-amount').value = '';
-        let msg = document.getElementById('withdraw-msg');
-        msg.style.color = "var(--success)";
-        msg.innerText = "Withdrawal requested. Pending approval.";
-        setTimeout(() => msg.innerText = "", 3000);
+        let msg = document.getElementById('withdraw-msg'); msg.style.color = "var(--success)"; msg.innerText = "Withdrawal requested. Pending approval."; setTimeout(() => msg.innerText = "", 3000);
     }
 
-    // Promo Code Logic
     function submitPromo() {
         let code = document.getElementById('promo-code').value.trim();
         if (!code) return;
         socket.emit('redeemPromo', code);
     }
-
     socket.on('promoResult', (data) => {
         let resEl = document.getElementById('promo-response');
-        if(data.success) {
-            resEl.style.color = 'var(--success)';
-            let typeLabel = data.type === 'playable' ? 'Playable Credits' : 'TC';
-            resEl.innerText = `Success! +${fmtTC(data.amt)} ${typeLabel}`;
-            document.getElementById('promo-code').value = '';
-        } else {
-            resEl.style.color = 'var(--danger)';
-            resEl.innerText = data.msg;
+        if(data.success) { resEl.style.color = 'var(--success)'; let typeLabel = data.type === 'playable' ? 'Playable Credits' : 'TC'; resEl.innerText = `Success! +${fmtTC(data.amt)} ${typeLabel}`; document.getElementById('promo-code').value = ''; } 
+        else { resEl.style.color = 'var(--danger)'; resEl.innerText = data.msg; }
+    });
+
+    // =======================================================
+    // RADIO WIDGET
+    // =======================================================
+    socket.on('radioSync', (data) => {
+        if(data && data.url) {
+            document.getElementById('shared-radio-widget').style.display = 'flex';
+            document.getElementById('mbj-radio-widget').style.display = 'flex';
+            document.getElementById('shared-radio-dj').innerText = data.requestedBy;
+            document.getElementById('mbj-radio-dj').innerText = data.requestedBy;
+            let audio = document.getElementById('global-radio');
+            if (audio.src !== data.url) { audio.src = data.url; audio.play().catch(e=>{}); }
         }
+    }); 
+    socket.on('radioPlay', (data) => { 
+        document.getElementById('shared-radio-widget').style.display = 'flex'; document.getElementById('mbj-radio-widget').style.display = 'flex';
+        document.getElementById('shared-radio-dj').innerText = data.requestedBy; document.getElementById('mbj-radio-dj').innerText = data.requestedBy;
+        let audio = document.getElementById('global-radio'); audio.src = data.url; audio.play().catch(e=>{});
+    }); 
+    socket.on('radioStop', () => { 
+        document.getElementById('shared-radio-widget').style.display = 'none'; document.getElementById('mbj-radio-widget').style.display = 'none';
+        let audio = document.getElementById('global-radio'); audio.pause(); audio.src = "";
     });
 
-    // Daily Reward UI Logic
-    function setupDailyRewardUI(dailyData) { 
-        const container = document.getElementById('dr-days-container'); 
-        if(!container) return;
-        container.innerHTML = ''; 
-        const rewards = [100, 250, 500, 750, 1000, 1500, 2000]; 
-        
-        for(let i=1; i<=7; i++) { 
-            let statClass = ''; 
-            let boxTitle = `Day ${i}`; 
-            
-            if (!dailyData.canClaim && dailyData.day === 1) { 
-                statClass = 'claimed'; 
-                boxTitle = "CLAIMED"; 
-            } 
-            else if (i < dailyData.day) { 
-                statClass = 'claimed'; 
-                boxTitle = "CLAIMED"; 
-            } 
-            else if (i === dailyData.day && dailyData.canClaim) { 
-                statClass = 'active'; 
-            } 
-            
-            container.insertAdjacentHTML('beforeend', `<div class="dr-day ${statClass}" id="dr-day-${i}"><div class="dr-title">${boxTitle}</div><div class="dr-coin">${rewards[i-1]}<br>Credits</div></div>`); 
-        } 
-        
-        let sc = document.getElementById('dr-status-container'); 
-        if(dailyData.canClaim) { 
-            sc.innerHTML = `<button class="btn-play dr-claim-btn" id="btn-claim-reward" onclick="claimDaily()">CLAIM REWARD</button>`; 
-        } else { 
-            startDailyTimer(dailyData.nextClaim); 
-        } 
-    }
-    
-    function claimDaily() { socket.emit('claimDaily'); } 
-    
-    socket.on('dailyClaimed', (data) => { 
-        let activeEl = document.querySelector('.dr-day.active'); 
-        if (activeEl) { 
-            activeEl.classList.add('active-claimed'); 
-            activeEl.querySelector('.dr-title').innerText = "CLAIMED"; 
-        } 
-        updateMyBalance(data.newBalance, true); 
-        startDailyTimer(data.nextClaim); 
-        showLocalFlash('shared', `+${fmtTC(data.amt)} PLAYABLE`, 'success'); 
-        setTimeout(() => { closeModal('daily-reward-modal'); }, 1500); 
-    });
-    
-    function startDailyTimer(nextClaimDate) { 
-        let sc = document.getElementById('dr-status-container'); 
-        sc.innerHTML = `<div class="dr-status-text" style="margin-top:10px;">COME BACK TOMORROW</div><div class="dr-timer" id="dr-timer-display" style="margin-top:5px;">--:--:--</div>`; 
-        let dest = new Date(nextClaimDate).getTime(); 
-        
-        if(dailyTimerInterval) clearInterval(dailyTimerInterval); 
-        
-        dailyTimerInterval = setInterval(() => { 
-            let now = new Date().getTime(); 
-            let d = dest - now; 
-            
-            if(d <= 0) { 
-                clearInterval(dailyTimerInterval); 
-                sc.innerHTML = `<button class="btn-play dr-claim-btn" onclick="socket.emit('requestBalanceRefresh'); setupDailyRewardUI({canClaim:true, day:1});">REFRESH TO CLAIM</button>`; 
-                return; 
-            } 
-            let h = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); 
-            let m = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60)); 
-            let s = Math.floor((d % (1000 * 60)) / 1000); 
-            
-            h = (h < 10) ? "0" + h : h; 
-            m = (m < 10) ? "0" + m : m; 
-            s = (s < 10) ? "0" + s : s; 
-            
-            document.getElementById('dr-timer-display').innerText = `${h}:${m}:${s}`; 
-        }, 1000); 
+    // =======================================================
+    // GAME ENGINE HELPERS
+    // =======================================================
+    function getBJScore(hand) { 
+        let score = 0, aces = 0; 
+        for (let card of hand) { score += card.bjVal; if (card.raw === 'A') aces += 1; } 
+        while (score > 21 && aces > 0) { score -= 10; aces -= 1; } 
+        return score; 
     }
 
-    // View Navigation Logic
-    function switchView(viewId) { 
-        document.querySelectorAll('.main-wrapper > .content > .view-container').forEach(d => d.classList.add('hidden')); 
-        let v = document.getElementById('view-' + viewId); 
-        if (v) v.classList.remove('hidden'); 
-        
-        let backBtn = document.getElementById('global-back-btn'); 
-        if (viewId === 'casino') { 
-            openLobbyMode('modes'); 
-        } else { 
-            backBtn.classList.remove('hidden'); 
-            document.getElementById('back-btn-text').innerText = 'LEAVE TABLE'; 
-        } 
+    function getBaccaratScore(cards) { 
+        let sum = 0; 
+        for(let c of cards) { let val = parseInt(c.raw); if(isNaN(val)) { if(c.raw === 'A') val = 1; else val = 0; } sum += val; } 
+        return sum % 10; 
     }
 
-    function openLobbyMode(mode) { 
-        ['modes', 'indiv', 'shared'].forEach(m => { 
-            let el = document.getElementById('lobby-' + m); 
-            if(el) el.classList.add('hidden'); 
-        }); 
-        
-        let target = document.getElementById('lobby-' + mode); 
-        if(target) target.classList.remove('hidden'); 
-        
-        let backBtn = document.getElementById('global-back-btn'); 
-        if(mode === 'modes') { 
-            document.querySelector('.casino-title').classList.remove('hidden'); 
-            backBtn.classList.add('hidden'); 
-        } else { 
-            document.querySelector('.casino-title').classList.add('hidden'); 
-            backBtn.classList.remove('hidden'); 
-            document.getElementById('back-btn-text').innerText = 'BACK TO MODES'; 
-        } 
+    function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, extraClass = '') { 
+        let animClass = ''; 
+        if(animateIn) animClass = 'anim-deal'; 
+        if(animateReveal) animClass = 'anim-flip'; 
+        if(isHidden) return `<div class="play-card card-back ${animClass} ${extraClass}">?</div>`; 
+        let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
+        let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : ''; 
+        return `<div class="play-card ${colorClass} ${animClass} ${extraClass}"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`; 
     }
 
-    // Local Flash Messages (Errors)
+    async function playCinematicResult(containerId, title, subtitle, colorVar = 'var(--ps-glow)') {
+        return new Promise(resolve => {
+            let container = document.getElementById(containerId);
+            if (!container) return resolve();
+            let banner = document.createElement('div');
+            banner.className = 'board-cinematic-banner';
+            banner.style.borderTopColor = colorVar; banner.style.borderBottomColor = colorVar;
+            banner.innerHTML = `<div class="bc-title" style="text-shadow: 0 0 25px ${colorVar}">${title}</div>` + (subtitle ? `<div class="bc-sub" style="color: ${colorVar}; text-shadow: 0 0 10px ${colorVar}">${subtitle}</div>` : '');
+            container.appendChild(banner);
+            requestAnimationFrame(() => { banner.classList.add('show'); });
+            setTimeout(() => { banner.classList.remove('show'); setTimeout(() => { banner.remove(); resolve(); }, 400); }, 2000); 
+        });
+    }
+
     let flashTimeout; 
     function showLocalFlash(game, msg, type='error') { 
-        let f = document.getElementById('flash-' + game); 
-        if(!f) { 
-            f = document.getElementById('flash-shared'); 
-        } 
-        if(!f) return; 
-        
-        f.classList.remove('show', 'error', 'success'); 
-        void f.offsetWidth; 
-        f.innerText = msg; 
-        f.classList.add('show'); 
-        
-        if(type === 'error') { 
-            f.classList.add('error'); 
-        } else { 
-            f.classList.add('success'); 
-        } 
-        
-        clearTimeout(flashTimeout); 
-        flashTimeout = setTimeout(() => {
-            f.classList.remove('show');
-        }, 2500); 
+        let f = document.getElementById('flash-' + game); if(!f) { f = document.getElementById('flash-shared'); } if(!f) return; 
+        f.classList.remove('show', 'error', 'success'); void f.offsetWidth; 
+        f.innerText = msg; f.classList.add('show'); 
+        if(type === 'error') { f.classList.add('error'); } else { f.classList.add('success'); } 
+        clearTimeout(flashTimeout); flashTimeout = setTimeout(() => { f.classList.remove('show'); }, 2500); 
     }
 
-        // =======================================================
-    // SOLO GAMES LOGIC (PREMIUM D20 & COINFLIP)
+    // =======================================================
+    // BALANCE & NOTIFICATIONS
+    // =======================================================
+    function triggerWinAnim() { let p1 = document.getElementById('pill-credits'); if (p1) { p1.classList.remove('anim-pop'); void p1.offsetWidth; p1.classList.add('anim-pop'); } } 
+    function triggerBetAnim() { 
+        let p1 = document.getElementById('pill-credits'); let p2 = document.getElementById('pill-playable'); 
+        if(p1 && p1.style.display !== 'none') { p1.classList.remove('anim-pop-bet'); void p1.offsetWidth; p1.classList.add('anim-pop-bet'); } 
+        if(p2 && p2.style.display !== 'none') { p2.classList.remove('anim-pop-bet'); void p2.offsetWidth; p2.classList.add('anim-pop-bet'); } 
+    }
+    function updateMyBalance(data, didWin = false) { 
+        let tc = formatTC(data.credits); let ptc = formatTC(data.playable || 0); 
+        if(didWin && tc > myCredits) { triggerWinAnim(); } 
+        myCredits = tc; myPlayable = ptc; 
+        document.getElementById('nav-credits').innerText = fmtTC(tc); 
+        const pillPlayable = document.getElementById('pill-playable'); const navPlayable = document.getElementById('nav-playable'); 
+        if (myPlayable > 0) { pillPlayable.style.display = 'flex'; navPlayable.innerText = fmtTC(ptc); } else { pillPlayable.style.display = 'none'; } 
+        document.querySelectorAll('.cashier-balance-display').forEach(el => { el.innerText = fmtTC(tc) + ' TC'; }); 
+    }
+    socket.on('balanceUpdateData', (newBalance) => { updateMyBalance(newBalance, true); });
+
+    socket.on('localGameError', (data) => { 
+        showLocalFlash(data.game, data.msg, "error"); 
+        socket.emit('requestBalanceRefresh'); 
+        if (data.game === 'd20') { 
+            if(window.d20AnimCycle) clearInterval(window.d20AnimCycle); 
+            document.getElementById('d20-icon').style.display='inline-block'; document.getElementById('d20-icon').style.opacity='1'; document.getElementById('d20-icon').style.transform='scale(1)'; document.getElementById('d20-num').style.display='none'; document.getElementById('d20-bet').disabled = false; document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false); 
+        } 
+        else if (data.game === 'coinflip') { 
+            document.getElementById('coin-bounce').classList.remove('bounce-anim'); document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false; 
+        } 
+        else if (data.game === 'blackjack') { 
+            bjSt.active = false; document.getElementById('btn-bj-deal').disabled = false; document.getElementById('bj-start-controls').classList.remove('hidden'); document.getElementById('bj-action-controls').classList.add('hidden'); 
+        } 
+        else if (data.game === 'mbj') { 
+            localPendingBet = 0; renderMBJSeats(); 
+        } 
+    });
+
+    // =======================================================
+    // SOLO PLAY LOGIC
     // =======================================================
     function playD20(choice) { 
         let amt = formatTC(document.getElementById('d20-bet').value); 
         if(isNaN(amt) || amt < 10) { showLocalFlash('d20', 'MIN BET 10 TC', 'error'); return; } 
-        
-        triggerBetAnim(); 
-        document.getElementById('d20-bet').disabled = true; 
-        document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = true); 
-        
-        window.currentD20Choice = choice; 
-        socket.emit('playSolo', { game: 'd20', choice: choice, bet: amt }); 
-        mySoloRounds.d20++; 
+        triggerBetAnim(); document.getElementById('d20-bet').disabled = true; document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = true); 
+        window.currentD20Choice = choice; socket.emit('playSolo', { game: 'd20', choice: choice, bet: amt }); mySoloRounds.d20++; 
     }
     
     socket.on('d20Result', async (data) => { 
         let icon = document.getElementById('d20-icon'); 
-        
-        // Reset and trigger shake fade
-        icon.style.animation = 'none'; 
-        void icon.offsetWidth;
-        icon.style.animation = 'd20ShakeFade 1s forwards'; 
-        
-        await delay(1000); 
-        icon.style.display = 'none'; 
-        
-        let n = document.getElementById('d20-num'); 
-        n.style.display = 'block'; 
-        n.style.animation = 'd20NumFade 0.3s ease-out forwards'; 
-        
+        icon.style.animation = 'none'; void icon.offsetWidth; icon.style.animation = 'd20ShakeFade 1s forwards'; 
+        await delay(1000); icon.style.display = 'none'; 
+        let n = document.getElementById('d20-num'); n.style.display = 'block'; n.style.animation = 'd20NumFade 0.3s ease-out forwards'; 
         let count = 0; 
         window.d20AnimCycle = setInterval(() => { 
-            n.innerText = Math.floor(Math.random()*20)+1; 
-            count++; 
-            if(count > 15) { 
-                clearInterval(window.d20AnimCycle); 
-                finalizeD20(data); 
-            } 
+            n.innerText = Math.floor(Math.random()*20)+1; count++; 
+            if(count > 15) { clearInterval(window.d20AnimCycle); finalizeD20(data); } 
         }, 50); 
     });
 
     async function finalizeD20(data) { 
-        let n = document.getElementById('d20-num'); 
-        n.innerText = data.roll; 
-        
-        await delay(500);
-        
+        document.getElementById('d20-num').innerText = data.roll; await delay(500);
         let title = data.payout > 0 ? "WINNER" : "NO LUCK"; 
         let sub = data.payout > 0 ? `+${fmtTC(data.payout)} TC` : ''; 
         let color = data.payout > 0 ? 'var(--success)' : 'var(--danger)';
-        
         await playCinematicResult('d20-board', title, sub, color);
-        
-        logHistory('d20', window.currentD20Choice, data.resStr, data.payout, data.bet); 
-        
-        document.getElementById('d20-bet').disabled = false; 
-        document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false); 
-        updateMyBalance(data.newBalance, data.payout > 0); 
+        document.getElementById('d20-bet').disabled = false; document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false); updateMyBalance(data.newBalance, data.payout > 0); 
     }
 
     function playCoin(choice) { 
         let amt = formatTC(document.getElementById('coin-bet').value); 
         if(isNaN(amt) || amt < 10) { showLocalFlash('coinflip', 'MIN BET 10 TC', 'error'); return; } 
-        
-        triggerBetAnim(); 
-        document.getElementById('btn-heads').disabled = true; 
-        document.getElementById('btn-tails').disabled = true; 
-        
-        window.currentCoinChoice = choice; 
-        socket.emit('playSolo', { game: 'coinflip', choice: choice, bet: amt }); 
-        mySoloRounds.coinflip++; 
+        triggerBetAnim(); document.getElementById('btn-heads').disabled = true; document.getElementById('btn-tails').disabled = true; 
+        window.currentCoinChoice = choice; socket.emit('playSolo', { game: 'coinflip', choice: choice, bet: amt }); mySoloRounds.coinflip++; 
     }
     
     socket.on('coinResult', (data) => { 
-        let coinBounce = document.getElementById('coin-bounce'); 
-        let coinInner = document.getElementById('coin-obj'); 
-        
-        coinInner.style.transition = 'none'; 
-        coinInner.style.transform = 'rotateY(0deg)'; 
-        
-        coinBounce.classList.remove('bounce-anim'); 
-        void coinBounce.offsetWidth; 
-        coinBounce.classList.add('bounce-anim'); 
-        
+        let coinBounce = document.getElementById('coin-bounce'); let coinInner = document.getElementById('coin-obj'); 
+        coinInner.style.transition = 'none'; coinInner.style.transform = 'rotateY(0deg)'; 
+        coinBounce.classList.remove('bounce-anim'); void coinBounce.offsetWidth; coinBounce.classList.add('bounce-anim'); 
         setTimeout(() => { 
             coinInner.style.transition = 'transform 2s cubic-bezier(0.2, 0.8, 0.4, 1)'; 
-            let spins = data.result === 'Heads' ? 2160 : 2340;
-            coinInner.style.transform = `rotateY(${spins}deg)`; 
+            let spins = data.result === 'Heads' ? 2160 : 2340; coinInner.style.transform = `rotateY(${spins}deg)`; 
         }, 50); 
-        
         setTimeout(async () => { 
             await delay(500);
-            
-            let title = data.result.toUpperCase(); 
-            let sub = data.payout > 0 ? `+${fmtTC(data.payout)} TC` : 'LOST'; 
-            let color = data.payout > 0 ? 'var(--success)' : 'var(--danger)';
-            
+            let title = data.result.toUpperCase(); let sub = data.payout > 0 ? `+${fmtTC(data.payout)} TC` : 'LOST'; let color = data.payout > 0 ? 'var(--success)' : 'var(--danger)';
             await playCinematicResult('coinflip-board', title, sub, color);
-            
-            logHistory('coinflip', window.currentCoinChoice, data.resStr, data.payout, data.bet); 
-            
-            document.getElementById('btn-heads').disabled = false; 
-            document.getElementById('btn-tails').disabled = false; 
-            updateMyBalance(data.newBalance, data.payout > 0); 
+            document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false; updateMyBalance(data.newBalance, data.payout > 0); 
         }, 2100); 
     });
 
-    // =======================================================
-    // SOLO BLACKJACK ENGINE
-    // =======================================================
-    function generateCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, extraClass = '') { 
-        let animClass = ''; 
-        if(animateIn) animClass = 'anim-deal'; 
-        if(animateReveal) animClass = 'anim-flip'; 
-        
-        if(isHidden) return `<div class="play-card card-back ${animClass} ${extraClass}">?</div>`; 
-        
-        let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
-        let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : ''; 
-        
-        return `<div class="play-card ${colorClass} ${animClass} ${extraClass}"><div class="val">${c.raw}</div><div class="suit">${c.suitHtml}</div></div>`; 
-    }
-    
     let bjSt = { active: false }; 
-    
     function startBlackjack() { 
         if(bjSt.active) return; 
-        
         let amt = formatTC(document.getElementById('bj-bet').value); 
         if(isNaN(amt) || amt < 10) { showLocalFlash('blackjack', 'MIN BET 10 TC', 'error'); return; } 
-        
-        triggerBetAnim(); 
-        document.getElementById('btn-bj-deal').disabled = true; 
-        bjSt.active = true; 
-        
-        document.getElementById('bj-p-hand').innerHTML = ''; 
-        document.getElementById('bj-d-hand').innerHTML = ''; 
-        document.getElementById('bj-p-score').innerText = '0'; 
-        document.getElementById('bj-d-score').innerText = '0'; 
-        document.getElementById('btn-bj-double').classList.add('hidden'); 
-        
-        socket.emit('playSolo', { game: 'blackjack', action: 'start', bet: amt }); 
-        mySoloRounds.blackjack++; 
+        triggerBetAnim(); document.getElementById('btn-bj-deal').disabled = true; bjSt.active = true; 
+        document.getElementById('bj-p-hand').innerHTML = ''; document.getElementById('bj-d-hand').innerHTML = ''; document.getElementById('bj-p-score').innerText = '0'; document.getElementById('bj-d-score').innerText = '0'; document.getElementById('btn-bj-double').classList.add('hidden'); 
+        socket.emit('playSolo', { game: 'blackjack', action: 'start', bet: amt }); mySoloRounds.blackjack++; 
     }
     
     async function renderBJHands(data) { 
-        let pHand = document.getElementById('bj-p-hand'); 
-        let dHand = document.getElementById('bj-d-hand'); 
-        
+        let pHand = document.getElementById('bj-p-hand'); let dHand = document.getElementById('bj-d-hand'); 
         if (data.event === 'deal') { 
-            // Deal sequential Player -> Dealer -> Player -> Dealer (Face down)
-            pHand.innerHTML = generateCardHTML(data.pHand[0], false, true); 
-            await delay(300); 
-            dHand.innerHTML = generateCardHTML(data.dHand[0], false, true); 
-            await delay(300); 
-            pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pHand[1], false, true)); 
-            await delay(300); 
-            dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[1], true, true)); 
-            await delay(400); 
+            pHand.innerHTML = generateCardHTML(data.pHand[0], false, true); await delay(300); 
+            dHand.innerHTML = generateCardHTML(data.dHand[0], false, true); await delay(300); 
+            pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pHand[1], false, true)); await delay(300); 
+            dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[1], true, true)); await delay(400); 
             
-            document.getElementById('bj-p-score').innerText = getBJScore(data.pHand); 
-            document.getElementById('bj-d-score').innerText = data.dHand[0].bjVal; 
-            
+            document.getElementById('bj-p-score').innerText = getBJScore(data.pHand); document.getElementById('bj-d-score').innerText = data.dHand[0].bjVal; 
             if (!data.naturalBJ) { 
-                document.getElementById('bj-start-controls').classList.add('hidden'); 
-                document.getElementById('bj-action-controls').classList.remove('hidden'); 
-                if (data.pHand.length === 2) { 
-                    document.getElementById('btn-bj-double').classList.remove('hidden'); 
-                } 
-            } else { 
-                finalizeBJ(data); 
-            } 
+                document.getElementById('bj-start-controls').classList.add('hidden'); document.getElementById('bj-action-controls').classList.remove('hidden'); 
+                if (data.pHand.length === 2) document.getElementById('btn-bj-double').classList.remove('hidden'); 
+            } else { finalizeBJ(data); } 
         } 
         else if (data.event === 'hit') { 
             document.getElementById('btn-bj-double').classList.add('hidden'); 
-            let c = data.pHand[data.pHand.length - 1]; 
-            pHand.insertAdjacentHTML('beforeend', generateCardHTML(c, false, true)); 
+            pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pHand[data.pHand.length - 1], false, true)); 
             document.getElementById('bj-p-score').innerText = getBJScore(data.pHand); 
         } 
         else if (data.event === 'resolved') { 
             document.getElementById('bj-action-controls').classList.add('hidden'); 
-            
             dHand.innerHTML = generateCardHTML(data.dHand[0], false, false) + generateCardHTML(data.dHand[1], false, false, true); 
             document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, 2)); 
             
             if (data.pHand.length > pHand.children.length) { 
-                let c = data.pHand[data.pHand.length - 1]; 
-                pHand.insertAdjacentHTML('beforeend', generateCardHTML(c, false, true)); 
+                pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pHand[data.pHand.length - 1], false, true)); 
                 document.getElementById('bj-p-score').innerText = getBJScore(data.pHand); 
             } 
-            
             await delay(500); 
-            
             for (let i = 2; i < data.dHand.length; i++) { 
                 dHand.insertAdjacentHTML('beforeend', generateCardHTML(data.dHand[i], false, true)); 
-                document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, i+1)); 
-                await delay(500); 
+                document.getElementById('bj-d-score').innerText = getBJScore(data.dHand.slice(0, i+1)); await delay(500); 
             } 
-            
             finalizeBJ(data); 
         } 
     }
     
     let isSoloActionTimeout = false; 
-    socket.on('bjUpdate', (data) => { 
-        isSoloActionTimeout = false; 
-        renderBJHands(data); 
-    });
+    socket.on('bjUpdate', (data) => { isSoloActionTimeout = false; renderBJHands(data); });
     
     async function finalizeBJ(data) { 
         let pHand = document.getElementById('bj-p-hand');
-        
-        if (data.msg === 'Blackjack') { 
-            pHand.innerHTML += `<div class="bj-overlay-text bj-overlay-win">BLACKJACK!</div>`; 
-        }
-        else if (data.resStr && data.resStr.includes('BUST')) { 
-            pHand.innerHTML += `<div class="bj-overlay-text bj-overlay-bust">BUST!</div>`; 
-        }
-        
+        if (data.msg === 'Blackjack') pHand.innerHTML += `<div class="bj-overlay-text bj-overlay-win">BLACKJACK!</div>`; 
+        else if (data.resStr && data.resStr.includes('BUST')) pHand.innerHTML += `<div class="bj-overlay-text bj-overlay-bust">BUST!</div>`; 
         await delay(500);
-        let title = data.msg.toUpperCase(); 
-        let sub = data.payout > 0 && data.msg !== 'Push' ? `+${fmtTC(data.payout)} TC` : (data.msg === 'Push' ? 'PUSH' : 'LOST'); 
-        let color = data.payout > 0 ? 'var(--success)' : (data.msg === 'Push' ? 'white' : 'var(--danger)');
+        let title = data.msg.toUpperCase(); let sub = data.payout > 0 && data.msg !== 'Push' ? `+${fmtTC(data.payout)} TC` : (data.msg === 'Push' ? 'PUSH' : 'LOST'); let color = data.payout > 0 ? 'var(--success)' : (data.msg === 'Push' ? 'white' : 'var(--danger)');
         await playCinematicResult('bj-board', title, sub, color);
-
-        logHistory('blackjack', '-', data.resStr, data.payout, data.bet); 
-        
-        document.getElementById('btn-bj-deal').disabled = false; 
-        bjSt.active = false; 
-        document.getElementById('bj-start-controls').classList.remove('hidden'); 
-        
-        updateMyBalance(data.newBalance, data.payout > data.bet);
+        document.getElementById('btn-bj-deal').disabled = false; bjSt.active = false; document.getElementById('bj-start-controls').classList.remove('hidden'); updateMyBalance(data.newBalance, data.payout > data.bet);
     }
     
     function hitBlackjack() { 
-        if(isSoloActionTimeout) return; 
-        isSoloActionTimeout = true; 
-        document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true); 
-        socket.emit('playSolo', { game: 'blackjack', action: 'hit' }); 
-        setTimeout(()=>{ 
-            document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); 
-            isSoloActionTimeout=false; 
-        }, 500); 
+        if(isSoloActionTimeout) return; isSoloActionTimeout = true; 
+        document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true); socket.emit('playSolo', { game: 'blackjack', action: 'hit' }); 
+        setTimeout(()=>{ document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); isSoloActionTimeout=false; }, 500); 
     } 
-    
     function standBlackjack() { 
-        if(isSoloActionTimeout) return; 
-        isSoloActionTimeout = true; 
-        document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true); 
-        socket.emit('playSolo', { game: 'blackjack', action: 'stand' }); 
-        setTimeout(()=>{ 
-            document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); 
-            isSoloActionTimeout=false; 
-        }, 500); 
+        if(isSoloActionTimeout) return; isSoloActionTimeout = true; 
+        document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true); socket.emit('playSolo', { game: 'blackjack', action: 'stand' }); 
+        setTimeout(()=>{ document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); isSoloActionTimeout=false; }, 500); 
     } 
-    
     function doubleBlackjack() { 
-        if(isSoloActionTimeout) return; 
-        isSoloActionTimeout = true; 
-        document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true); 
-        socket.emit('playSolo', { game: 'blackjack', action: 'double' }); 
-        setTimeout(()=>{ 
-            document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); 
-            isSoloActionTimeout=false; 
-        }, 500); 
+        if(isSoloActionTimeout) return; isSoloActionTimeout = true; 
+        document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = true); socket.emit('playSolo', { game: 'blackjack', action: 'double' }); 
+        setTimeout(()=>{ document.querySelectorAll('#bj-action-controls .btn-play').forEach(b => b.disabled = false); isSoloActionTimeout=false; }, 500); 
     }
-        // =======================================================
-    // SHARED TABLES CONFIGURATION & LOBBY LOGIC
+
+    // =======================================================
+    // SHARED GAMES BLUEPRINTS (sConf Restored)
     // =======================================================
     const sConf = {
-        'baccarat': { title: 'Baccarat', setupUI: () => {} },
-        'perya': { title: 'Color Game', setupUI: () => {} },
-        'dt': { title: 'Dragon Tiger', setupUI: () => {} },
-        'sicbo': { title: 'Sic Bo', setupUI: () => {} }
+        'baccarat': { title: 'Baccarat', setupUI: () => {
+            document.getElementById('sg-display').innerHTML = `
+                <div class="blackjack-scores" style="gap:80px; margin-bottom:30px;">
+                    <div class="card-area"><div class="bj-title" style="color:var(--ps-glow);">PLAYER</div><div class="bj-score" id="sg-bac-p-score">0</div><div class="card-hand" id="sg-bac-p-hand" style="gap:-20px;"></div></div>
+                    <div class="card-area"><div class="bj-title" style="color:var(--danger);">BANKER</div><div class="bj-score" id="sg-bac-b-score">0</div><div class="card-hand" id="sg-bac-b-hand" style="gap:-20px;"></div></div>
+                </div>`;
+            document.getElementById('sg-controls-container').innerHTML = `
+                <div class="input-group" style="width:200px;"><label style="text-align:center">BET AMOUNT</label><input type="number" id="sg-bet" class="input-control bet-input" placeholder="10"></div>
+                <div class="bet-grid">
+                    <button class="bet-btn sg-tile" data-choice="Player" onclick="placeSharedBet('Player')" style="border-color:var(--ps-glow); color:var(--ps-glow);">PLAYER <span style="font-size:0.8rem; color:white;">2x</span><div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Tie" onclick="placeSharedBet('Tie')" style="border-color:var(--success); color:var(--success);">TIE <span style="font-size:0.8rem; color:white;">9x</span><div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Banker" onclick="placeSharedBet('Banker')" style="border-color:var(--danger); color:var(--danger);">BANKER <span style="font-size:0.8rem; color:white;">1.95x</span><div class="tile-bet-badge"></div></button>
+                </div>
+                <div style="display:flex; justify-content:center; gap:10px; width:100%; margin-top:10px;">
+                    <button class="btn-play" onclick="undoSharedBet()" style="background:rgba(255,51,102,0.2); color:var(--danger); border:none;"><i class="fas fa-undo"></i> UNDO</button>
+                    <div class="dropdown-wrapper">
+                        <button class="btn-play" onclick="toggleCurrentBets(event)" style="background:rgba(255,180,0,0.2); color:var(--credits); border:none;"><i class="fas fa-list"></i> MY BETS</button>
+                        <div id="current-bets-popover" class="custom-dropdown hidden" style="bottom:50px; top:auto; right:0; padding:15px; width:300px;" onclick="event.stopPropagation()"><div style="font-weight:900; color:white; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:10px; text-align:center;">CURRENT BETS</div><div id="cb-list" class="custom-scroll" style="max-height:200px;"></div></div>
+                    </div>
+                </div>`;
+        }},
+        'perya': { title: 'Color Game', setupUI: () => {
+            document.getElementById('sg-display').innerHTML = `<div class="color-dice-container" id="sg-perya-dice"><div class="color-die c-grey"></div><div class="color-die c-grey"></div><div class="color-die c-grey"></div></div>`;
+            document.getElementById('sg-controls-container').innerHTML = `
+                <div class="input-group" style="width:200px;"><label style="text-align:center">BET AMOUNT</label><input type="number" id="sg-bet" class="input-control bet-input" placeholder="10"></div>
+                <div class="bet-grid perya-grid">
+                    <button class="bet-btn sg-tile" data-choice="Yellow" onclick="placeSharedBet('Yellow')" style="border-color:#ffcc00; color:#ffcc00;">YELLOW<div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="White" onclick="placeSharedBet('White')" style="border-color:#fff; color:#fff;">WHITE<div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Pink" onclick="placeSharedBet('Pink')" style="border-color:#ff66b2; color:#ff66b2;">PINK<div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Blue" onclick="placeSharedBet('Blue')" style="border-color:#00a2ff; color:#00a2ff;">BLUE<div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Red" onclick="placeSharedBet('Red')" style="border-color:#ff3366; color:#ff3366;">RED<div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Green" onclick="placeSharedBet('Green')" style="border-color:#00e676; color:#00e676;">GREEN<div class="tile-bet-badge"></div></button>
+                </div>
+                <div style="display:flex; justify-content:center; gap:10px; width:100%; margin-top:10px;">
+                    <button class="btn-play" onclick="undoSharedBet()" style="background:rgba(255,51,102,0.2); color:var(--danger); border:none;"><i class="fas fa-undo"></i> UNDO</button>
+                    <div class="dropdown-wrapper">
+                        <button class="btn-play" onclick="toggleCurrentBets(event)" style="background:rgba(255,180,0,0.2); color:var(--credits); border:none;"><i class="fas fa-list"></i> MY BETS</button>
+                        <div id="current-bets-popover" class="custom-dropdown hidden" style="bottom:50px; top:auto; right:0; padding:15px; width:300px;" onclick="event.stopPropagation()"><div style="font-weight:900; color:white; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:10px; text-align:center;">CURRENT BETS</div><div id="cb-list" class="custom-scroll" style="max-height:200px;"></div></div>
+                    </div>
+                </div>`;
+        }},
+        'dt': { title: 'Dragon Tiger', setupUI: () => {
+            document.getElementById('sg-display').innerHTML = `
+                <div class="dt-arena">
+                    <div class="dt-side"><div class="dt-label lbl-dragon">DRAGON</div><div id="sg-dt-dragon"><div class="play-card card-back dt-card">?</div></div></div>
+                    <div class="dt-side"><div class="dt-label lbl-tiger">TIGER</div><div id="sg-dt-tiger"><div class="play-card card-back dt-card">?</div></div></div>
+                </div>`;
+            document.getElementById('sg-controls-container').innerHTML = `
+                <div class="input-group" style="width:200px;"><label style="text-align:center">BET AMOUNT</label><input type="number" id="sg-bet" class="input-control bet-input" placeholder="10"></div>
+                <div class="bet-grid">
+                    <button class="bet-btn sg-tile" data-choice="Dragon" onclick="placeSharedBet('Dragon')" style="border-color:var(--danger); color:var(--danger);">DRAGON <span style="font-size:0.8rem; color:white;">2x</span><div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Tie" onclick="placeSharedBet('Tie')" style="border-color:var(--success); color:var(--success);">TIE <span style="font-size:0.8rem; color:white;">9x</span><div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Tiger" onclick="placeSharedBet('Tiger')" style="border-color:var(--credits); color:var(--credits);">TIGER <span style="font-size:0.8rem; color:white;">2x</span><div class="tile-bet-badge"></div></button>
+                </div>
+                <div style="display:flex; justify-content:center; gap:10px; width:100%; margin-top:10px;">
+                    <button class="btn-play" onclick="undoSharedBet()" style="background:rgba(255,51,102,0.2); color:var(--danger); border:none;"><i class="fas fa-undo"></i> UNDO</button>
+                    <div class="dropdown-wrapper">
+                        <button class="btn-play" onclick="toggleCurrentBets(event)" style="background:rgba(255,180,0,0.2); color:var(--credits); border:none;"><i class="fas fa-list"></i> MY BETS</button>
+                        <div id="current-bets-popover" class="custom-dropdown hidden" style="bottom:50px; top:auto; right:0; padding:15px; width:300px;" onclick="event.stopPropagation()"><div style="font-weight:900; color:white; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:10px; text-align:center;">CURRENT BETS</div><div id="cb-list" class="custom-scroll" style="max-height:200px;"></div></div>
+                    </div>
+                </div>`;
+        }},
+        'sicbo': { title: 'Sic Bo', setupUI: () => {
+            document.getElementById('sg-display').innerHTML = `
+                <div class="sicbo-dice" id="sg-sicbo-dice">
+                    <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                    <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                    <div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>
+                </div>`;
+            document.getElementById('sg-controls-container').innerHTML = `
+                <div class="input-group" style="width:200px;"><label style="text-align:center">BET AMOUNT</label><input type="number" id="sg-bet" class="input-control bet-input" placeholder="10"></div>
+                <div class="bet-grid">
+                    <button class="bet-btn sg-tile" data-choice="Small" onclick="placeSharedBet('Small')" style="border-color:var(--ps-glow); color:var(--ps-glow);">SMALL (4-10) <span style="font-size:0.8rem; color:white;">2x</span><div class="tile-bet-badge"></div></button>
+                    <button class="bet-btn sg-tile" data-choice="Big" onclick="placeSharedBet('Big')" style="border-color:var(--danger); color:var(--danger);">BIG (11-17) <span style="font-size:0.8rem; color:white;">2x</span><div class="tile-bet-badge"></div></button>
+                </div>
+                <div style="display:flex; justify-content:center; gap:10px; width:100%; margin-top:10px;">
+                    <button class="btn-play" onclick="undoSharedBet()" style="background:rgba(255,51,102,0.2); color:var(--danger); border:none;"><i class="fas fa-undo"></i> UNDO</button>
+                    <div class="dropdown-wrapper">
+                        <button class="btn-play" onclick="toggleCurrentBets(event)" style="background:rgba(255,180,0,0.2); color:var(--credits); border:none;"><i class="fas fa-list"></i> MY BETS</button>
+                        <div id="current-bets-popover" class="custom-dropdown hidden" style="bottom:50px; top:auto; right:0; padding:15px; width:300px;" onclick="event.stopPropagation()"><div style="font-weight:900; color:white; border-bottom:1px solid var(--glass-border); padding-bottom:10px; margin-bottom:10px; text-align:center;">CURRENT BETS</div><div id="cb-list" class="custom-scroll" style="max-height:200px;"></div></div>
+                    </div>
+                </div>`;
+        }}
     };
-    
     const dIconMap = ['dice-one', 'dice-two', 'dice-three', 'dice-four', 'dice-five', 'dice-six'];
 
-    function fetchActivePlayers(e) { 
-        if(e) e.stopPropagation(); 
-        if(window.activeSharedGame) socket.emit('getRoomPlayers', window.activeSharedGame); 
-        toggleCustomDropdown(window.activeSharedGame === 'mbj' ? 'mbj-ap-popover' : 'ap-popover', null); 
+    function openGame(id) { 
+      switchView('game-' + id); 
+      if(id === 'd20') { 
+          if(window.d20AnimCycle) clearInterval(window.d20AnimCycle); 
+          document.getElementById('d20-icon').style.display='inline-block'; document.getElementById('d20-icon').style.opacity='1'; document.getElementById('d20-icon').style.transform='scale(1) rotate(0deg)'; document.getElementById('d20-icon').style.animation='none'; document.getElementById('d20-num').style.display='none'; document.getElementById('d20-bet').disabled = false; document.querySelectorAll('.d20-toggle').forEach(b => b.disabled = false); 
+      }
+      if(id === 'coinflip') { 
+          document.getElementById('btn-heads').disabled = false; document.getElementById('btn-tails').disabled = false; document.getElementById('coin-bounce').classList.remove('bounce-anim'); 
+      }
+      if(id === 'blackjack') { 
+          document.getElementById('bj-p-hand').innerHTML=''; document.getElementById('bj-d-hand').innerHTML=''; document.getElementById('bj-p-score').innerText='0'; document.getElementById('bj-d-score').innerText='0'; document.getElementById('bj-start-controls').classList.remove('hidden'); document.getElementById('bj-action-controls').classList.add('hidden'); document.getElementById('btn-bj-deal').disabled = false; bjSt.active = false; 
+      }
     }
-    
-    socket.on('roomPlayersList', (players) => { 
-        let listId = window.activeSharedGame === 'mbj' ? 'mbj-ap-list-container' : 'ap-list-container'; 
-        let list = document.getElementById(listId); 
-        if(!list) return; 
-        list.innerHTML = ''; 
-        if(players.length === 0) { list.innerHTML = `<div style="text-align:center; color:var(--text-muted);">No players found.</div>`; return; } 
-        players.forEach(p => { 
-            let color = p === myUsername ? 'var(--ps-glow)' : 'white'; 
-            list.insertAdjacentHTML('beforeend', `<div style="padding: 8px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); margin-bottom: 5px; font-weight: 800; color: ${color};"><i class="fas fa-user" style="margin-right:8px; color:var(--text-muted);"></i> ${p}</div>`); 
-        }); 
-    });
+
+    function openSharedGame(id) { 
+        window.activeSharedGame = id; socket.emit('joinRoom', id); 
+        if (sConf[id] && sConf[id].setupUI) sConf[id].setupUI(); 
+        document.getElementById('sg-title').innerText = sConf[id].title; 
+        document.getElementById('sg-chat').innerHTML = '<div class="chat-line chat-sys sys-info">Connected to server.</div>'; 
+        switchView('shared-game'); 
+    }
+
+    function backToHub() { 
+        let inCasinoView = !document.getElementById('view-casino').classList.contains('hidden'); 
+        if (inCasinoView) { openLobbyMode('modes'); } 
+        else { if (window.activeSharedGame) backToSharedLobby(); else { switchView('casino'); openLobbyMode('indiv'); } } 
+    }
+
+    function backToSharedLobby() { 
+        if (window.activeSharedGame === 'mbj') { 
+            if (localSeatId && currentMBJSeats[localSeatId] && currentMBJSeats[localSeatId].hands.length > 0 && currentMBJSeats[localSeatId].hands[0].bet > 0 && mbjGameState === 'BETTING') { showLocalFlash('mbj', "Wait for round to finish.", "error"); return; } 
+            sitUp(); document.getElementById('view-game-mbj').classList.add('hidden'); socket.emit('leaveRoom', 'mbj'); window.activeSharedGame = null; switchView('casino'); openLobbyMode('shared'); return; 
+        }
+        if (window.activeSharedGame && mySBets && Object.values(mySBets).reduce((a,b)=>a+b,0) > 0 && sState.status === 'BETTING') { showLocalFlash('shared', "Wait for round to finish.", "error"); return; } 
+        document.getElementById('view-shared-game').classList.add('hidden'); socket.emit('leaveRoom', window.activeSharedGame); window.activeSharedGame = null; switchView('casino'); openLobbyMode('shared'); 
+    }
 
     // =======================================================
-    // SHARED TABLES BETTING & TIMERS
+    // SHARED GAMES LOGIC (TIMERS & RESOLUTIONS)
     // =======================================================
     let isBettingTimeout = false;
     function placeSharedBet(choice) { 
-        if (sState.status !== 'BETTING') return; 
-        if (isBettingTimeout) return; 
-        
+        if (sState.status !== 'BETTING' || isBettingTimeout) return; 
         let amt = formatTC(document.getElementById('sg-bet').value); 
         if(isNaN(amt) || amt < 10) { showLocalFlash('shared', 'MIN BET 10 TC', 'error'); return; } 
-        
         let currentTileBet = mySBets[choice] || 0; 
         if (currentTileBet + amt > 50000) { showLocalFlash('shared', "Max 50K TC Per Tile", "error"); return; } 
-        
         if (amt > (myCredits + myPlayable)) { showLocalFlash('shared', "Insufficient TC", "error"); return; } 
         
-        // Debounce spam clicks to prevent double-charging exploits
-        isBettingTimeout = true; 
-        setTimeout(() => { isBettingTimeout = false; }, 250); 
-        triggerBetAnim(); 
+        isBettingTimeout = true; setTimeout(() => { isBettingTimeout = false; }, 250); triggerBetAnim(); 
         
-        if(myPlayable >= amt) { 
-            myPlayable -= amt; 
-        } else { 
-            let rem = amt - myPlayable; 
-            myPlayable = 0; 
-            myCredits -= rem; 
-        } 
+        if(myPlayable >= amt) { myPlayable -= amt; } else { let rem = amt - myPlayable; myPlayable = 0; myCredits -= rem; } 
         updateMyBalance({credits: myCredits, playable: myPlayable}); 
         
-        if(!mySBets[choice]) mySBets[choice] = 0; 
-        mySBets[choice] += amt; 
-        mySBetsStack.push({choice: choice, amount: amt}); 
+        if(!mySBets[choice]) mySBets[choice] = 0; mySBets[choice] += amt; mySBetsStack.push({choice: choice, amount: amt}); 
         
         let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`); 
-        if(btn) { 
-            btn.classList.add('has-bet'); 
-            let badge = btn.querySelector('.tile-bet-badge'); 
-            badge.innerText = fmtTC(mySBets[choice]); 
-            badge.style.display = 'block'; 
-        } 
-        
-        updateCurrentBetsPopover(); 
-        socket.emit('placeSharedBet', { room: window.activeSharedGame, choice: choice, amount: amt }); 
+        if(btn) { btn.classList.add('has-bet'); let badge = btn.querySelector('.tile-bet-badge'); badge.innerText = fmtTC(mySBets[choice]); badge.style.display = 'block'; } 
+        updateCurrentBetsPopover(); socket.emit('placeSharedBet', { room: window.activeSharedGame, choice: choice, amount: amt }); 
     }
 
-    function undoSharedBet(room) { 
+    function undoSharedBet() { 
         if (sState.status !== 'BETTING') return; 
         if (mySBetsStack.length === 0) { showLocalFlash('shared', 'NO BETS TO UNDO', 'error'); return; } 
         socket.emit('undoSharedBet', { room: window.activeSharedGame }); 
@@ -1798,54 +1465,33 @@
             let btn = document.querySelector(`.sg-tile[data-choice="${data.choice}"]`); 
             if(btn) { 
                 let badge = btn.querySelector('.tile-bet-badge'); 
-                if (mySBets[data.choice] > 0) { 
-                    badge.innerText = fmtTC(mySBets[data.choice]); 
-                } else { 
-                    delete mySBets[data.choice]; 
-                    badge.style.display = 'none'; 
-                    btn.classList.remove('has-bet'); 
-                } 
+                if (mySBets[data.choice] > 0) { badge.innerText = fmtTC(mySBets[data.choice]); } 
+                else { delete mySBets[data.choice]; badge.style.display = 'none'; btn.classList.remove('has-bet'); } 
             } 
         } 
-        updateCurrentBetsPopover(); 
-        updateMyBalance(data.newBalance); 
-        showLocalFlash('shared', 'BET UNDONE', 'success'); 
+        updateCurrentBetsPopover(); updateMyBalance(data.newBalance); showLocalFlash('shared', 'BET UNDONE', 'success'); 
     });
 
-    socket.on('sharedBetConfirmed', (data) => { 
-        updateMyBalance(data.newBalance); 
-    });
+    socket.on('sharedBetConfirmed', (data) => { updateMyBalance(data.newBalance); });
 
     function setChatBadge(isOpen) {
         let boxId = window.activeSharedGame === 'mbj' ? 'mbj-chat' : 'sg-chat';
-        let box = document.getElementById(boxId);
-        if(!box) return;
-        
-        if(isOpen) {
-            box.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys sys-open">BETS ARE NOW OPEN</div>`);
-        } else {
-            box.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys sys-closed">BETS ARE CLOSED</div>`);
-        }
+        let box = document.getElementById(boxId); if(!box) return;
+        if(isOpen) box.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys sys-open">BETS ARE NOW OPEN</div>`);
+        else box.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys sys-closed">BETS ARE CLOSED</div>`);
         box.scrollTop = box.scrollHeight;
     }
 
     socket.on('timerUpdate', (t) => { 
         let el = document.getElementById('sg-timer'); if(!el) return; 
-        el.innerText = t; sState.time = t; 
-        let box = document.getElementById('sg-timer-box'); 
+        el.innerText = t; sState.time = t; let box = document.getElementById('sg-timer-box'); 
         if (t <= 5 && t > 0) { box.classList.add('closing'); } else { box.classList.remove('closing'); } 
-        
-        if (t === 0) { 
-            sState.status = 'RESOLVING'; 
-            setChatBadge(false);
-        } else if (t === 15) {
-            setChatBadge(true);
-        }
+        if (t === 0) { sState.status = 'RESOLVING'; setChatBadge(false); } 
+        else if (t === 15) { setChatBadge(true); }
     });
 
     socket.on('lockBets', () => { 
         document.querySelectorAll('.sg-tile').forEach(btn => { btn.disabled = true; }); 
-        
         if (window.activeSharedGame === 'sicbo') { 
             document.getElementById('sg-sicbo-dice').innerHTML = `<div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div><div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div><div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div>`; 
         } else if (window.activeSharedGame === 'perya') { 
@@ -1854,151 +1500,56 @@
     });
 
     socket.on('newRound', () => { 
-        sState.status = 'BETTING'; 
-        mySBets = {}; 
-        mySBetsStack = []; 
-        
-        document.querySelectorAll('.sg-tile').forEach(btn => { 
-            btn.disabled = false; 
-            btn.classList.remove('has-bet'); 
-            let badge = btn.querySelector('.tile-bet-badge'); 
-            if(badge) badge.style.display = 'none'; 
-        }); 
-        
+        sState.status = 'BETTING'; mySBets = {}; mySBetsStack = []; 
+        document.querySelectorAll('.sg-tile').forEach(btn => { btn.disabled = false; btn.classList.remove('has-bet'); let badge = btn.querySelector('.tile-bet-badge'); if(badge) badge.style.display = 'none'; }); 
         updateCurrentBetsPopover(); 
 
         if (window.activeSharedGame === 'baccarat') { 
-            document.getElementById('sg-bac-p-hand').innerHTML = ``; 
-            document.getElementById('sg-bac-b-hand').innerHTML = ``; 
-            document.getElementById('sg-bac-p-score').innerText = '0'; 
-            document.getElementById('sg-bac-b-score').innerText = '0'; 
-        } 
-        else if (window.activeSharedGame === 'perya') { 
+            document.getElementById('sg-bac-p-hand').innerHTML = ``; document.getElementById('sg-bac-b-hand').innerHTML = ``; document.getElementById('sg-bac-p-score').innerText = '0'; document.getElementById('sg-bac-b-score').innerText = '0'; 
+        } else if (window.activeSharedGame === 'perya') { 
             document.getElementById('sg-perya-dice').innerHTML = `<div class="color-die c-grey"><i class="fas fa-question"></i></div><div class="color-die c-grey"><i class="fas fa-question"></i></div><div class="color-die c-grey"><i class="fas fa-question"></i></div>`; 
-        } 
-        else if (window.activeSharedGame === 'dt') { 
-            document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`; 
-            document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`; 
-        } 
-        else if (window.activeSharedGame === 'sicbo') { 
+        } else if (window.activeSharedGame === 'dt') { 
+            document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`; document.getElementById('sg-dt-tiger').innerHTML = `<div class="play-card card-back dt-card">?</div>`; 
+        } else if (window.activeSharedGame === 'sicbo') { 
             document.getElementById('sg-sicbo-dice').innerHTML = `<div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div><div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div><div class="color-die c-grey s-die" style="width:80px; height:80px; font-size:3rem;"><i class="fas fa-question"></i></div>`; 
         } 
     });
 
-    // =======================================================
-    // SHARED TABLES RESOLUTIONS & ANIMATIONS
-    // =======================================================
     socket.on('sharedResults', async (data) => {
         if (data.room !== window.activeSharedGame) return;
-        let totalBet = Object.values(mySBets).reduce((a,b)=>a+b, 0); 
-        let myWin = 0; 
-        let net = 0;
+        let totalBet = Object.values(mySBets).reduce((a,b)=>a+b, 0); let myWin = 0; let net = 0;
 
         if (data.room === 'dt') { 
-            document.getElementById('sg-dt-dragon').innerHTML = generateCardHTML(data.dCard, false, false, true, 'dt-card'); 
-            await delay(800); 
+            document.getElementById('sg-dt-dragon').innerHTML = generateCardHTML(data.dCard, false, false, true, 'dt-card'); await delay(800); 
             document.getElementById('sg-dt-tiger').innerHTML = generateCardHTML(data.tCard, false, false, true, 'dt-card'); 
-            
-            if (data.winner === 'Tie') { 
-                if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; 
-                else if(mySBets['Dragon'] || mySBets['Tiger']) myWin = (mySBets['Dragon']||0) + (mySBets['Tiger']||0); 
-            } else { 
-                if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2; 
-            } 
+            if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; else if(mySBets['Dragon'] || mySBets['Tiger']) myWin = (mySBets['Dragon']||0) + (mySBets['Tiger']||0); } else { if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2; } 
         } 
         else if (data.room === 'sicbo') { 
-            let dc = document.getElementById('sg-sicbo-dice'); 
-            await delay(1000); 
-            dc.innerHTML = ''; 
-            for(let i=0; i<3; i++) { 
-                dc.innerHTML += `<i class="fas fa-${dIconMap[data.roll[i]-1]} s-die" style="font-size: 6rem; color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8);"></i>`; 
-            } 
-            await delay(500); 
-            
+            let dc = document.getElementById('sg-sicbo-dice'); await delay(1000); dc.innerHTML = ''; 
+            for(let i=0; i<3; i++) { dc.innerHTML += `<i class="fas fa-${dIconMap[data.roll[i]-1]} s-die" style="font-size: 6rem; color: white; text-shadow: 0 10px 20px rgba(0,0,0,0.8);"></i>`; } await delay(500); 
             if (mySBets[data.winner]) myWin = mySBets[data.winner] * 2; 
         } 
         else if (data.room === 'perya') { 
-            let dc = document.getElementById('sg-perya-dice'); 
-            let diceEls = dc.querySelectorAll('.color-die'); 
-            const cols = ['Yellow', 'White', 'Pink', 'Blue', 'Red', 'Green']; 
-            
-            let flashInt = setInterval(() => { 
-                diceEls.forEach(el => { 
-                    let randomCol = cols[Math.floor(Math.random() * cols.length)].toLowerCase(); 
-                    el.className = `color-die c-${randomCol}`; 
-                }); 
-            }, 100); 
-            
-            await delay(1500); 
-            clearInterval(flashInt); 
-            
-            for(let i=0; i<3; i++) { 
-                diceEls[i].className = `color-die c-${data.roll[i].toLowerCase()} anim-pop`; 
-                await delay(200); 
-            } 
-            
-            Object.keys(mySBets).forEach(choice => { 
-                let matches = data.roll.filter(c => c === choice).length; 
-                if(matches > 0) myWin += mySBets[choice] + (mySBets[choice] * matches); 
-            }); 
+            let dc = document.getElementById('sg-perya-dice'); let diceEls = dc.querySelectorAll('.color-die'); const cols = ['Yellow', 'White', 'Pink', 'Blue', 'Red', 'Green']; 
+            let flashInt = setInterval(() => { diceEls.forEach(el => { let randomCol = cols[Math.floor(Math.random() * cols.length)].toLowerCase(); el.className = `color-die c-${randomCol}`; }); }, 100); 
+            await delay(1500); clearInterval(flashInt); 
+            for(let i=0; i<3; i++) { diceEls[i].className = `color-die c-${data.roll[i].toLowerCase()} anim-pop`; await delay(200); } 
+            Object.keys(mySBets).forEach(choice => { let matches = data.roll.filter(c => c === choice).length; if(matches > 0) myWin += mySBets[choice] + (mySBets[choice] * matches); }); 
         }
         else if (data.room === 'baccarat') { 
-            let pHand = document.getElementById('sg-bac-p-hand'); 
-            let bHand = document.getElementById('sg-bac-b-hand'); 
-            let pCardsArr = []; let bCardsArr = [];
-            
-            pCardsArr.push(data.pCards[0]); 
-            document.getElementById('sg-bac-p-score').innerText = getBaccaratScore(pCardsArr); 
-            pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[0], false, false, true)); 
-            await delay(500);
-            
-            bCardsArr.push(data.bCards[0]); 
-            document.getElementById('sg-bac-b-score').innerText = getBaccaratScore(bCardsArr); 
-            bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[0], false, false, true)); 
-            await delay(500);
-            
-            pCardsArr.push(data.pCards[1]); 
-            document.getElementById('sg-bac-p-score').innerText = getBaccaratScore(pCardsArr); 
-            pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[1], false, false, true)); 
-            await delay(500);
-            
-            bCardsArr.push(data.bCards[1]); 
-            document.getElementById('sg-bac-b-score').innerText = getBaccaratScore(bCardsArr); 
-            bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[1], false, false, true)); 
-            await delay(800);
+            let pHand = document.getElementById('sg-bac-p-hand'); let bHand = document.getElementById('sg-bac-b-hand'); let pCardsArr = []; let bCardsArr = [];
+            pCardsArr.push(data.pCards[0]); document.getElementById('sg-bac-p-score').innerText = getBaccaratScore(pCardsArr); pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[0], false, false, true)); await delay(500);
+            bCardsArr.push(data.bCards[0]); document.getElementById('sg-bac-b-score').innerText = getBaccaratScore(bCardsArr); bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[0], false, false, true)); await delay(500);
+            pCardsArr.push(data.pCards[1]); document.getElementById('sg-bac-p-score').innerText = getBaccaratScore(pCardsArr); pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[1], false, false, true)); await delay(500);
+            bCardsArr.push(data.bCards[1]); document.getElementById('sg-bac-b-score').innerText = getBaccaratScore(bCardsArr); bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[1], false, false, true)); await delay(800);
 
             let centerMsg = document.getElementById('bac-center-msg');
-            if (data.p3Drawn) { 
-                centerMsg.innerText = 'DRAWING 3RD CARD FOR PLAYER...'; 
-                centerMsg.style.opacity = '1'; 
-                await delay(800); 
-                centerMsg.style.opacity = '0'; 
-                
-                pCardsArr.push(data.pCards[2]); 
-                document.getElementById('sg-bac-p-score').innerText = getBaccaratScore(pCardsArr); 
-                pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[2], false, true)); 
-                await delay(800); 
-            }
-            if (data.b3Drawn) { 
-                centerMsg.innerText = 'DRAWING 3RD CARD FOR BANKER...'; 
-                centerMsg.style.opacity = '1'; 
-                await delay(800); 
-                centerMsg.style.opacity = '0'; 
-                
-                bCardsArr.push(data.bCards[2]); 
-                document.getElementById('sg-bac-b-score').innerText = getBaccaratScore(bCardsArr); 
-                bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[2], false, true)); 
-                await delay(800); 
-            }
+            if (data.p3Drawn) { centerMsg.innerText = 'DRAWING 3RD CARD FOR PLAYER...'; centerMsg.style.opacity = '1'; await delay(800); centerMsg.style.opacity = '0'; pCardsArr.push(data.pCards[2]); document.getElementById('sg-bac-p-score').innerText = getBaccaratScore(pCardsArr); pHand.insertAdjacentHTML('beforeend', generateCardHTML(data.pCards[2], false, true)); await delay(800); }
+            if (data.b3Drawn) { centerMsg.innerText = 'DRAWING 3RD CARD FOR BANKER...'; centerMsg.style.opacity = '1'; await delay(800); centerMsg.style.opacity = '0'; bCardsArr.push(data.bCards[2]); document.getElementById('sg-bac-b-score').innerText = getBaccaratScore(bCardsArr); bHand.insertAdjacentHTML('beforeend', generateCardHTML(data.bCards[2], false, true)); await delay(800); }
 
-            if (data.winner === 'Tie') { 
-                if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; 
-                else if(mySBets['Player'] || mySBets['Banker']) myWin = (mySBets['Player']||0) + (mySBets['Banker']||0); 
-            } else if (data.winner === 'Player') { 
-                if (mySBets['Player']) myWin = mySBets['Player'] * 2; 
-            } else if (data.winner === 'Banker') { 
-                if (mySBets['Banker']) myWin = mySBets['Banker'] * 1.95; 
-            } 
+            if (data.winner === 'Tie') { if (mySBets['Tie']) myWin = mySBets['Tie'] * 9; else if(mySBets['Player'] || mySBets['Banker']) myWin = (mySBets['Player']||0) + (mySBets['Banker']||0); } 
+            else if (data.winner === 'Player') { if (mySBets['Player']) myWin = mySBets['Player'] * 2; } 
+            else if (data.winner === 'Banker') { if (mySBets['Banker']) myWin = mySBets['Banker'] * 1.95; } 
         }
 
         net = formatTC(myWin - totalBet); 
@@ -2006,10 +1557,7 @@
         logHistory(data.room, myBetStrs, data.resStr, myWin, totalBet, totalBet > 0);
         
         await delay(500);
-        let title = data.resStr.split(' ')[0]; 
-        let sub = net > 0 ? `+${fmtTC(net)} TC` : (net < 0 ? 'LOST' : 'PUSH'); 
-        let color = net > 0 ? 'var(--success)' : (net < 0 ? 'var(--danger)' : 'white');
-        
+        let title = data.resStr.split(' ')[0]; let sub = net > 0 ? `+${fmtTC(net)} TC` : (net < 0 ? 'LOST' : 'PUSH'); let color = net > 0 ? 'var(--success)' : (net < 0 ? 'var(--danger)' : 'white');
         await playCinematicResult('sg-board', title, sub, color);
 
         if (totalBet > 0) {
@@ -2018,21 +1566,11 @@
                 for(let choice of losses) { 
                     let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`); 
                     if(btn) { 
-                        let bRect = btn.getBoundingClientRect(); 
-                        let coin = document.createElement('div'); 
-                        coin.className = 'animated-chip'; 
+                        let bRect = btn.getBoundingClientRect(); let coin = document.createElement('div'); coin.className = 'animated-chip'; 
                         coin.style.cssText = `background: var(--danger); color: white; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999; transition: all 0.5s ease-in;`; 
-                        coin.innerText = `-${fmtTC(mySBets[choice])}`; 
-                        document.body.appendChild(coin); 
-                        
-                        requestAnimationFrame(() => {
-                            coin.style.top = '100px'; 
-                            coin.style.opacity = '0';
-                            coin.style.transform = 'translateX(-50%) scale(0.5)';
-                        });
-                        
-                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); 
-                        await delay(300); 
+                        coin.innerText = `-${fmtTC(mySBets[choice])}`; document.body.appendChild(coin); 
+                        requestAnimationFrame(() => { coin.style.top = '100px'; coin.style.opacity = '0'; coin.style.transform = 'translateX(-50%) scale(0.5)'; });
+                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); await delay(300); 
                     } 
                 }
                 
@@ -2040,146 +1578,76 @@
                 for(let choice of wins) { 
                     let btn = document.querySelector(`.sg-tile[data-choice="${choice}"]`); 
                     if(btn) { 
-                        let bRect = btn.getBoundingClientRect(); 
-                        let wAmt = data.winner === 'Tie' && choice === 'Tie' ? mySBets[choice] * 9 : (data.winner === 'Tie' ? mySBets[choice] : mySBets[choice] * (data.room === 'baccarat' && choice === 'Banker' ? 1.95 : 2)); 
-                        let coin = document.createElement('div'); 
-                        coin.className = 'animated-chip'; 
+                        let bRect = btn.getBoundingClientRect(); let wAmt = data.winner === 'Tie' && choice === 'Tie' ? mySBets[choice] * 9 : (data.winner === 'Tie' ? mySBets[choice] : mySBets[choice] * (data.room === 'baccarat' && choice === 'Banker' ? 1.95 : 2)); 
+                        let coin = document.createElement('div'); coin.className = 'animated-chip'; 
                         coin.style.cssText = `background: var(--success); color: black; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999; box-shadow: 0 0 15px var(--success); transition: all 0.5s ease-out;`; 
-                        coin.innerText = `+${fmtTC(wAmt)}`; 
-                        document.body.appendChild(coin); 
-                        
-                        requestAnimationFrame(() => {
-                            coin.style.top = '10px'; 
-                            coin.style.opacity = '0'; 
-                        });
-                        
-                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); 
-                        await delay(300); 
+                        coin.innerText = `+${fmtTC(wAmt)}`; document.body.appendChild(coin); 
+                        requestAnimationFrame(() => { coin.style.top = '10px'; coin.style.opacity = '0'; });
+                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); await delay(300); 
                     } 
                 }
             };
-            
-            await payoutAnim();
-            setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1000);
+            await payoutAnim(); setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1000);
         }
     });
 
     // =======================================================
-    // VIP BLACKJACK ENGINE
+    // VIP BLACKJACK ENGINE (Dynamic Centering & Timing)
     // =======================================================
-    let mbjGameState = 'BETTING'; 
-    let localPendingBet = 0; 
-    let localSeatId = null; 
-    let renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; 
-    let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
+    let mbjGameState = 'BETTING'; let localPendingBet = 0; let localSeatId = null; let renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; let currentMBJSeats = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
     function openMBJ() { 
-        window.activeSharedGame = 'mbj'; 
-        socket.emit('joinRoom', 'mbj'); 
-        renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; 
-        renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null }); 
-        document.getElementById('mbj-chat').innerHTML = '<div class="chat-line chat-sys sys-info">Welcome to VIP Premium.</div>'; 
-        switchView('game-mbj'); 
+        window.activeSharedGame = 'mbj'; socket.emit('joinRoom', 'mbj'); renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; renderMBJSeats({ 1:null, 2:null, 3:null, 4:null, 5:null }); 
+        document.getElementById('mbj-chat').innerHTML = '<div class="chat-line chat-sys sys-info">Welcome to VIP Premium.</div>'; switchView('game-mbj'); 
     }
     
     function getMBJDisplayScore(handCards) { 
-        let score = 0, aces = 0; 
-        for (let c of handCards) { 
-            score += c.bjVal; 
-            if (c.raw === 'A') aces++; 
-        } 
-        while (score > 21 && aces > 0) { 
-            score -= 10; 
-            aces--; 
-        } 
-        if (aces > 0 && score < 21) { 
-            return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`; 
-        } 
-        return `<span style="font-size:1.05rem;">${score}</span>`; 
+        let score = 0, aces = 0; for (let c of handCards) { score += c.bjVal; if (c.raw === 'A') aces++; } while (score > 21 && aces > 0) { score -= 10; aces--; } 
+        if (aces > 0 && score < 21) { return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`; } return `<span style="font-size:1.05rem;">${score}</span>`; 
     }
     
     function generateMBJCardHTML(c, isHidden = false, animateIn = true, animateReveal = false, leftOffset = 0, isDoubled = false) { 
-        let animClass = ''; 
-        if(animateIn) { animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in'; } 
-        if(animateReveal) animClass = 'anim-reveal'; 
-        
-        let doubleClass = isDoubled ? 'card-doubled' : ''; 
-        let styleStr = `left: ${leftOffset}px;`; 
-        
+        let animClass = ''; if(animateIn) { animClass = isDoubled ? 'anim-fly-in-doubled' : 'anim-fly-in'; } if(animateReveal) animClass = 'anim-reveal'; 
+        let doubleClass = isDoubled ? 'card-doubled' : ''; let styleStr = `left: ${leftOffset}px;`; 
         if(isHidden) return `<div class="mbj-card card-back ${animClass} ${doubleClass}" style="${styleStr}"></div>`; 
-        
-        let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); 
-        let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black'; 
-        
+        let cleanSuit = c.suitHtml.replace(/<[^>]*>?/gm, ''); let colorClass = (cleanSuit === '♥' || cleanSuit === '♦') ? 'card-red' : 'card-black'; 
         return `<div class="mbj-card ${colorClass} ${animClass} ${doubleClass}" style="${styleStr}"><div class="card-tl"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div><div class="card-br"><div>${c.raw}</div><div style="font-size:1.1rem; margin-top:-2px;">${cleanSuit}</div></div></div>`; 
     }
     
     let isMbjActionTimeout = false;
     function sendMBJAction(type) { 
-        if(isMbjActionTimeout) return; 
-        isMbjActionTimeout = true; 
-        document.querySelectorAll('#mbj-actions-ui button').forEach(b => b.style.pointerEvents = 'none');
+        if(isMbjActionTimeout) return; isMbjActionTimeout = true; 
+        document.querySelectorAll('#mbj-actions-ui button').forEach(b => { b.style.pointerEvents = 'none'; b.style.opacity = '0.5'; });
         socket.emit('mbjAction', { type: type }); 
-        setTimeout(() => { 
-            isMbjActionTimeout = false; 
-            document.querySelectorAll('#mbj-actions-ui button').forEach(b => b.style.pointerEvents = 'auto');
-        }, 500); 
+        setTimeout(() => { isMbjActionTimeout = false; document.querySelectorAll('#mbj-actions-ui button').forEach(b => { b.style.pointerEvents = 'auto'; b.style.opacity = '1'; }); }, 500); 
     }
     
-    function sitDown(seatNum) { 
-        socket.emit('mbjTakeSeat', seatNum); 
-        currentMBJSeats[seatNum] = { username: myUsername, hands: [] }; 
-        renderMBJSeats(); 
-    }
-    
-    function sitUp() { 
-        socket.emit('mbjLeaveSeat'); 
-        if(localSeatId) currentMBJSeats[localSeatId] = null; 
-        localSeatId = null; 
-        renderMBJSeats(); 
-    }
+    function sitDown(seatNum) { socket.emit('mbjTakeSeat', seatNum); currentMBJSeats[seatNum] = { username: myUsername, hands: [] }; renderMBJSeats(); }
+    function sitUp() { socket.emit('mbjLeaveSeat'); if(localSeatId) currentMBJSeats[localSeatId] = null; localSeatId = null; renderMBJSeats(); }
 
     function renderMBJSeats(seats, activeTurnObj = null) {
-        currentMBJSeats = seats || currentMBJSeats; 
-        let cont = document.getElementById('mbj-seats-row'); 
-        if(!cont) return; 
-        
-        let htmlBuffer = ''; 
-        let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null; 
-        let activeHandIdx = activeTurnObj ? activeTurnObj.handIdx : 0; 
-        localSeatId = null;
+        currentMBJSeats = seats || currentMBJSeats; let cont = document.getElementById('mbj-seats-row'); if(!cont) return; 
+        let htmlBuffer = ''; let activeSeatNum = activeTurnObj ? activeTurnObj.seat : null; let activeHandIdx = activeTurnObj ? activeTurnObj.handIdx : 0; localSeatId = null;
 
         for(let i=1; i<=5; i++) {
-            let s = currentMBJSeats[i]; 
-            let isMe = s && s.username === myUsername; 
-            if (isMe) localSeatId = i;
+            let s = currentMBJSeats[i]; let isMe = s && s.username === myUsername; if (isMe) localSeatId = i;
             
+            // Dynamically hide empty seats during play to perfectly center active players via flexbox
             if (mbjGameState !== 'BETTING' && (!s || !s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { continue; }
 
-            let isMySeatTurn = activeSeatNum == i; 
-            let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : ''; 
-            let activeClass = isMySeatTurn ? 'active-turn' : ''; 
-            let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`;
-            
-            let canSit = !s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername); 
+            let isMySeatTurn = activeSeatNum == i; let dimClass = (mbjGameState === 'PLAYER_TURN' && !isMySeatTurn && s) ? 'dimmed' : ''; let activeClass = isMySeatTurn ? 'active-turn' : ''; 
+            let boxClass = `mbj-seat-circle ${s ? 'occupied' : ''}`; let canSit = !s && mbjGameState === 'BETTING' && !Object.values(currentMBJSeats).some(st => st && st.username === myUsername); 
             let clickAction = canSit ? `sitDown(${i})` : ``; 
             
             let html = `<div class="mbj-seat-wrapper ${activeClass} ${dimClass}" id="mbj-seat-${i}">`;
             let displayBet = s && s.hands && s.hands.length > 0 ? s.hands[0].bet : 0;
-            
-            if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) {
-                displayBet = localPendingBet;
-            }
+            if (isMe && mbjGameState === 'BETTING' && localPendingBet > 0 && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0)) { displayBet = localPendingBet; }
 
             if (s && s.hands && s.hands.length > 0) {
-                if (!renderedCardCount[i]) renderedCardCount[i] = [];
-                html += `<div class="mbj-hands-wrapper">`;
+                if (!renderedCardCount[i]) renderedCardCount[i] = []; html += `<div class="mbj-hands-wrapper">`;
                 
                 s.hands.forEach((hand, hIdx) => {
-                    let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx; 
-                    let cardCount = hand.cards.length; 
-                    let splitClass = s.hands.length > 1 ? (hIdx === 0 ? 'mbj-hand-split-0' : 'mbj-hand-split-1') : '';
-                    
+                    let isThisHandActive = isMySeatTurn && activeHandIdx === hIdx; let cardCount = hand.cards.length; let splitClass = s.hands.length > 1 ? (hIdx === 0 ? 'mbj-hand-split-0' : 'mbj-hand-split-1') : '';
                     html += `<div class="mbj-hand-column ${splitClass}">`;
                     
                     if (isThisHandActive && mbjGameState === 'PLAYER_TURN' && isMe) { 
@@ -2188,98 +1656,46 @@
                         document.getElementById('mbj-btn-split').style.display = (hand.cards.length === 2 && (hand.cards[0].bjVal === hand.cards[1].bjVal) && s.hands.length === 1) ? 'flex' : 'none'; 
                     }
                     
-                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; 
-                    html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
-                    
-                    let previouslyRendered = renderedCardCount[i][hIdx] || 0; 
-                    let isNewCard = cardCount > previouslyRendered; 
-                    let delayClassBadge = isNewCard ? 'mbj-delay-badge' : ''; 
-                    let delayClassPill = isNewCard ? 'mbj-delay-pill' : '';
+                    let containerWidth = cardCount > 0 ? ((cardCount - 1) * 20) + 70 : 70; html += `<div class="mbj-hand-container" style="width: ${containerWidth}px;">`;
+                    let previouslyRendered = renderedCardCount[i][hIdx] || 0; let isNewCard = cardCount > previouslyRendered; let delayClassBadge = isNewCard ? 'mbj-delay-badge' : ''; let delayClassPill = isNewCard ? 'mbj-delay-pill' : '';
 
                     if(hand.cards.length > 0 && hand.status !== 'BUST') { 
-                        if(hand.status === 'BLACKJACK') { 
-                            html += `<div class="mbj-status-pill mbj-pill-bj ${delayClassPill}">BLACKJACK</div>`; 
-                        } else { 
-                            let badgeClass = isThisHandActive ? 'mbj-score-active' : 'mbj-score-inactive'; 
-                            html += `<div class="mbj-score-badge ${badgeClass} ${delayClassBadge}">${getMBJDisplayScore(hand.cards)}</div>`; 
-                        }
-                    } else if (hand.status === 'BUST') { 
-                        html += `<div class="mbj-status-pill mbj-pill-bust ${delayClassPill}">${hand.score} BUST</div>`; 
-                    }
+                        if(hand.status === 'BLACKJACK') { html += `<div class="mbj-status-pill mbj-pill-bj ${delayClassPill}">BLACKJACK</div>`; } 
+                        else { let badgeClass = isThisHandActive ? 'mbj-score-active' : 'mbj-score-inactive'; html += `<div class="mbj-score-badge ${badgeClass} ${delayClassBadge}">${getMBJDisplayScore(hand.cards)}</div>`; }
+                    } else if (hand.status === 'BUST') { html += `<div class="mbj-status-pill mbj-pill-bust ${delayClassPill}">${hand.score} BUST</div>`; }
 
-                    hand.cards.forEach((c, cIdx) => { 
-                        let animateThisCard = cIdx >= previouslyRendered; 
-                        let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1); 
-                        html += generateMBJCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard); 
-                    });
-                    
+                    hand.cards.forEach((c, cIdx) => { let animateThisCard = cIdx >= previouslyRendered; let isDoubledCard = (hand.doubledAmount > 0 && cIdx === hand.cards.length - 1); html += generateMBJCardHTML(c, false, animateThisCard, false, cIdx * 20, isDoubledCard); });
                     html += `</div>`;
-                    
-                    if(hand.bet > 0 && mbjGameState !== 'BETTING') { 
-                        html += `<div class="bet-pill" style="font-size:0.8rem; margin-top:0;">${fmtTC(hand.bet)}</div>`; 
-                    }
+                    if(hand.bet > 0 && mbjGameState !== 'BETTING') { html += `<div class="bet-pill" style="font-size:0.8rem; margin-top:0;">${fmtTC(hand.bet)}</div>`; }
                     html += `</div>`; 
                 });
                 
-                html += `</div>`; 
-                renderedCardCount[i] = s.hands.map(h => h.cards.length);
-                
-            } else { 
-                renderedCardCount[i] = []; 
-                html += `<div class="mbj-hands-wrapper"><div class="mbj-hand-column" style="position: relative;"><div class="mbj-hand-container" style="width: 70px;"></div></div></div>`; 
-            }
+                html += `</div>`; renderedCardCount[i] = s.hands.map(h => h.cards.length);
+            } else { renderedCardCount[i] = []; html += `<div class="mbj-hands-wrapper"><div class="mbj-hand-column" style="position: relative;"><div class="mbj-hand-container" style="width: 70px;"></div></div></div>`; }
             
             html += `<div class="mbj-circle-container" id="mbj-circle-${i}-0"><div class="${boxClass}" ${clickAction ? `onclick="${clickAction}"` : ''} style="${canSit ? 'cursor:pointer;' : 'cursor:default;'}">`;
-            if (displayBet === 0) { 
-                html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`; 
-            }
+            if (displayBet === 0) { html += `<i class="fas fa-plus" style="font-size:1.5rem; opacity:${mbjGameState==='BETTING' ? 0.7 : 0.1}; color: white;"></i>`; }
             html += `</div></div>`; 
 
-            if (displayBet > 0 && mbjGameState === 'BETTING') {
-                html += `<div class="bet-pill">${fmtTC(displayBet)} TC</div>`;
-            }
+            if (displayBet > 0 && mbjGameState === 'BETTING') { html += `<div class="bet-pill">${fmtTC(displayBet)} TC</div>`; }
             
-            let nameHTML = s ? s.username : 'EMPTY'; 
-            html += `<div class="mbj-seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${s || mbjGameState==='BETTING' ? 1 : 0.3};" id="mbj-seat-name-${i}">${nameHTML}</div>`;
+            let nameHTML = s ? s.username : 'EMPTY'; html += `<div class="mbj-seat-name" style="color: ${isMe ? 'var(--ps-glow)' : (s ? 'white' : 'var(--text-muted)')}; opacity:${s || mbjGameState==='BETTING' ? 1 : 0.3};" id="mbj-seat-name-${i}">${nameHTML}</div>`;
+            if (isMySeatTurn && mbjGameState === 'PLAYER_TURN') { html += `<div class="player-timer-track"><div class="player-timer-fill" id="mbj-timer-fill-${i}"></div></div>`; }
+            if (isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') { html += `<div style="margin-top:5px;"><button class="btn-play" onclick="sitUp();" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`; }
             
-            if (isMySeatTurn && mbjGameState === 'PLAYER_TURN') { 
-                html += `<div class="player-timer-track"><div class="player-timer-fill" id="mbj-timer-fill-${i}"></div></div>`; 
-            }
-            
-            if (isMe && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) && mbjGameState === 'BETTING') { 
-                html += `<div style="margin-top:5px;"><button class="btn-play" onclick="sitUp();" style="padding:4px 10px; font-size:0.7rem; background:rgba(255,51,102,0.2); border-color:var(--danger);">LEAVE</button></div>`; 
-            }
-            
-            html += `</div>`; 
-            htmlBuffer += html;
+            html += `</div>`; htmlBuffer += html;
         }
         cont.innerHTML = htmlBuffer;
         
-        let bettingUi = document.getElementById('mbj-betting-ui'); 
-        let actionsUi = document.getElementById('mbj-actions-ui'); 
-        let cp = document.getElementById('mbj-control-panel');
-        
+        let bettingUi = document.getElementById('mbj-betting-ui'); let actionsUi = document.getElementById('mbj-actions-ui'); let cp = document.getElementById('mbj-control-panel');
         if (mbjGameState === 'BETTING') { 
-            actionsUi.style.display = 'none'; 
-            cp.style.opacity = '1'; 
-            cp.style.pointerEvents = 'auto';
-            
-            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) { 
-                bettingUi.style.display = 'flex'; 
-            } else { 
-                bettingUi.style.display = 'none'; 
-            } 
+            actionsUi.style.display = 'none'; cp.style.opacity = '1'; cp.style.pointerEvents = 'auto';
+            if (localSeatId && currentMBJSeats[localSeatId] && (!currentMBJSeats[localSeatId].hands || currentMBJSeats[localSeatId].hands.length === 0 || currentMBJSeats[localSeatId].hands[0].bet === 0)) { bettingUi.style.display = 'flex'; } else { bettingUi.style.display = 'none'; } 
         } 
         else { 
             bettingUi.style.display = 'none'; 
-            if (mbjGameState !== 'PLAYER_TURN' || !activeSeatNum || currentMBJSeats[activeSeatNum].username !== myUsername) { 
-                actionsUi.style.display = 'none'; 
-                cp.style.opacity = '0.3'; 
-                cp.style.pointerEvents = 'none';
-            } else { 
-                cp.style.opacity = '1'; 
-                cp.style.pointerEvents = 'auto';
-            }
+            if (mbjGameState !== 'PLAYER_TURN' || !activeSeatNum || currentMBJSeats[activeSeatNum].username !== myUsername) { actionsUi.style.display = 'none'; cp.style.opacity = '0.3'; cp.style.pointerEvents = 'none'; } 
+            else { cp.style.opacity = '1'; cp.style.pointerEvents = 'auto'; }
             localPendingBet = 0; 
         }
     }
@@ -2287,42 +1703,24 @@
     let isMBJBettingTimeout = false;
     function mbjConfirmLocalBet() {
         if (isMBJBettingTimeout) return; 
-        
-        let customInput = document.getElementById('mbj-custom-bet').value; 
-        let v = parseInt(customInput);
-        
+        let customInput = document.getElementById('mbj-custom-bet').value; let v = parseInt(customInput);
         if (!isNaN(v) && v > 0) { 
             if (v > 50000) { showLocalFlash('mbj', 'Max Bet 50K TC', 'error'); return; } 
             if (v > (myCredits + myPlayable)) { showLocalFlash('mbj', 'Insufficient TC', 'error'); return; } 
-            localPendingBet = v; 
-            document.getElementById('mbj-custom-bet').value = ''; 
+            localPendingBet = v; document.getElementById('mbj-custom-bet').value = ''; 
         }
-        
         if(localPendingBet < 10) return showLocalFlash('mbj', 'Min Bet 10 TC');
         
-        isMBJBettingTimeout = true; 
-        setTimeout(() => { isMBJBettingTimeout = false; }, 250);
-        
-        if(myPlayable >= localPendingBet) { 
-            myPlayable -= localPendingBet; 
-        } else { 
-            let rem = localPendingBet - myPlayable; 
-            myPlayable = 0; 
-            myCredits -= rem; 
-        }
-        
+        isMBJBettingTimeout = true; setTimeout(() => { isMBJBettingTimeout = false; }, 250);
+        if(myPlayable >= localPendingBet) { myPlayable -= localPendingBet; } else { let rem = localPendingBet - myPlayable; myPlayable = 0; myCredits -= rem; }
         updateMyBalance({credits: myCredits, playable: myPlayable});
         
         if (localSeatId && currentMBJSeats[localSeatId]) { 
-            let s = currentMBJSeats[localSeatId]; 
-            if (!s.hands) s.hands = []; 
+            let s = currentMBJSeats[localSeatId]; if (!s.hands) s.hands = []; 
             if (s.hands.length === 0) { s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false, fromPlayable: 0, fromMain: 0 }); } 
             s.hands[0].bet += localPendingBet; 
         }
-        
-        socket.emit('mbjPlaceBet', localPendingBet); 
-        localPendingBet = 0; 
-        renderMBJSeats(); 
+        socket.emit('mbjPlaceBet', localPendingBet); localPendingBet = 0; renderMBJSeats(); 
     }
 
     socket.on('mbjUpdate', async (data) => {
@@ -2330,297 +1728,146 @@
         let dTimerText = document.getElementById('mbj-dealer-timer-text');
 
         if(data.event === 'timer') {
-            mbjGameState = 'BETTING'; 
-            if(data.active) { 
-                dTimerText.style.display = 'block'; 
-                dTimerText.innerText = data.time; 
-            } else { 
-                dTimerText.style.display = 'none'; 
-            }
+            mbjGameState = 'BETTING'; if(data.active) { dTimerText.style.display = 'block'; dTimerText.innerText = data.time; } else { dTimerText.style.display = 'none'; }
             setChatBadge(true);
         } 
-        else if (data.event === 'sync_seats') { 
-            renderMBJSeats(data.seats, data.activeTurn); 
-        } 
+        else if (data.event === 'sync_seats') { renderMBJSeats(data.seats, data.activeTurn); } 
         else if (data.event === 'lock_bets') { 
-            mbjGameState = 'DEALING'; 
-            dTimerText.style.display = 'block'; 
-            dTimerText.innerText = '0'; // Keeps timer visible at zero during deal
-            renderMBJSeats(data.seats, null); 
-            setChatBadge(false);
+            mbjGameState = 'DEALING'; dTimerText.style.display = 'block'; dTimerText.innerText = '0'; renderMBJSeats(data.seats, null); setChatBadge(false);
         } 
         else if (data.event === 'deal') {
-            mbjGameState = 'DEALING'; 
-            dTimerText.style.display = 'none'; 
-            
+            mbjGameState = 'DEALING'; dTimerText.style.display = 'none'; 
             let targetSeats = JSON.parse(JSON.stringify(data.seats));
-            
-            for (let i = 1; i <= 5; i++) { 
-                if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) { 
-                    currentMBJSeats[i].hands[0].cards = []; 
-                    currentMBJSeats[i].hands[0].score = 0; 
-                    currentMBJSeats[i].hands[0].status = 'WAITING'; 
-                } 
-            }
-            
-            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; 
-            renderMBJSeats(currentMBJSeats, null); 
+            for (let i = 1; i <= 5; i++) { if (currentMBJSeats[i] && currentMBJSeats[i].hands && currentMBJSeats[i].hands.length > 0) { currentMBJSeats[i].hands[0].cards = []; currentMBJSeats[i].hands[0].score = 0; currentMBJSeats[i].hands[0].status = 'WAITING'; } }
+            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; renderMBJSeats(currentMBJSeats, null); 
             
             let dHand = document.getElementById('mbj-fs-dealer-hand');
             if(dHand) { 
                 dHand.innerHTML = ''; dHand.style.width = '70px'; 
-                
                 const dealSequence = async () => {
                     let activeKeys = Object.keys(targetSeats).filter(k => targetSeats[k] !== null);
-                    
-                    for (let k of activeKeys) { 
-                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]); 
-                        currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards); 
-                        renderMBJSeats(currentMBJSeats, null); 
-                        await delay(400); 
-                    }
+                    for (let k of activeKeys) { currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[0]); currentMBJSeats[k].hands[0].score = getBJScore(currentMBJSeats[k].hands[0].cards); renderMBJSeats(currentMBJSeats, null); await delay(400); }
                     
                     let html = `<div class="mbj-score-badge mbj-score-inactive mbj-delay-badge" id="mbj-d-score-badge"><span>${data.dealerHand[0].bjVal}</span></div>`; 
-                    html += generateMBJCardHTML(data.dealerHand[0], false, true, false, 0); 
+                    document.getElementById('mbj-d-score-badge-container').innerHTML = html; dHand.innerHTML = generateMBJCardHTML(data.dealerHand[0], false, true, false, 0); await delay(400);
                     
-                    document.getElementById('mbj-d-score-badge-container').innerHTML = html; 
-                    dHand.innerHTML = generateMBJCardHTML(data.dealerHand[0], false, true, false, 0); 
-                    await delay(400);
+                    for (let k of activeKeys) { currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]); currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score; currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status; renderMBJSeats(currentMBJSeats, null); await delay(400); }
                     
-                    for (let k of activeKeys) { 
-                        currentMBJSeats[k].hands[0].cards.push(targetSeats[k].hands[0].cards[1]); 
-                        currentMBJSeats[k].hands[0].score = targetSeats[k].hands[0].score; 
-                        currentMBJSeats[k].hands[0].status = targetSeats[k].hands[0].status; 
-                        renderMBJSeats(currentMBJSeats, null); 
-                        await delay(400); 
-                    }
-                    
-                    dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[1], true, true, false, 20)); 
-                    dHand.style.width = '90px';
+                    dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[1], true, true, false, 20)); dHand.style.width = '90px';
                 }; 
                 dealSequence();
             } 
         } 
         else if (data.event === 'turn') { 
-            mbjGameState = 'PLAYER_TURN'; 
-            renderMBJSeats(data.seats, data.activeTurn); 
-            
-            setTimeout(() => { 
-                if (data.activeTurn && data.activeTurn.seat) { 
-                    let bar = document.getElementById(`mbj-timer-fill-${data.activeTurn.seat}`); 
-                    if (bar) bar.style.width = ((data.time / 15) * 100) + '%'; 
-                } 
-            }, 10); 
+            mbjGameState = 'PLAYER_TURN'; renderMBJSeats(data.seats, data.activeTurn); 
+            setTimeout(() => { if (data.activeTurn && data.activeTurn.seat) { let bar = document.getElementById(`mbj-timer-fill-${data.activeTurn.seat}`); if (bar) bar.style.width = ((data.time / 15) * 100) + '%'; } }, 10); 
         } 
         else if (data.event === 'turn_timer') { 
-            if (data.activeTurn && data.activeTurn.seat) { 
-                let bar = document.getElementById(`mbj-timer-fill-${data.activeTurn.seat}`); 
-                if (bar) { 
-                    bar.style.transition = 'width 1s linear'; 
-                    bar.style.width = ((data.time / 15) * 100) + '%'; 
-                } 
-            } 
+            if (data.activeTurn && data.activeTurn.seat) { let bar = document.getElementById(`mbj-timer-fill-${data.activeTurn.seat}`); if (bar) { bar.style.transition = 'width 1s linear'; bar.style.width = ((data.time / 15) * 100) + '%'; } } 
         }
         else if (data.event === 'dealer_resolved') {
-            mbjGameState = 'RESOLVING'; 
-            renderMBJSeats(data.seats); 
-            
-            let dHand = document.getElementById('mbj-fs-dealer-hand'); 
-            let badgeCont = document.getElementById('mbj-d-score-badge-container');
-            
+            mbjGameState = 'RESOLVING'; renderMBJSeats(data.seats); 
+            let dHand = document.getElementById('mbj-fs-dealer-hand'); let badgeCont = document.getElementById('mbj-d-score-badge-container');
             if(dHand && badgeCont) {
-                let initialDScore = getBJScore(data.dealerHand.slice(0,2)); 
-                let isBlackjack = (initialDScore === 21 && data.dealerHand.length === 2);
-                
-                if (isBlackjack) {
-                    badgeCont.innerHTML = `<div class="mbj-status-pill mbj-pill-bj mbj-delay-pill" id="mbj-d-score-badge">BLACKJACK</div>`; 
-                } else {
-                    badgeCont.innerHTML = `<div class="mbj-score-badge mbj-score-inactive mbj-delay-badge" id="mbj-d-score-badge"><span>${initialDScore}</span></div>`;
-                }
+                let initialDScore = getBJScore(data.dealerHand.slice(0,2)); let isBlackjack = (initialDScore === 21 && data.dealerHand.length === 2);
+                if (isBlackjack) { badgeCont.innerHTML = `<div class="mbj-status-pill mbj-pill-bj mbj-delay-pill" id="mbj-d-score-badge">BLACKJACK</div>`; } else { badgeCont.innerHTML = `<div class="mbj-score-badge mbj-score-inactive mbj-delay-badge" id="mbj-d-score-badge"><span>${initialDScore}</span></div>`; }
                 
                 dHand.innerHTML = generateMBJCardHTML(data.dealerHand[0], false, false, false, 0) + generateMBJCardHTML(data.dealerHand[1], false, false, true, 20); 
                 
                 const drawRemaining = async () => {
                     await delay(800); 
-                    
                     for(let i=2; i<data.dealerHand.length; i++) { 
-                        dHand.style.width = `${(i * 20) + 70}px`; 
-                        let currentScore = getBJScore(data.dealerHand.slice(0, i+1)); 
-                        let badge = document.getElementById('mbj-d-score-badge'); 
-                        
-                        if (currentScore > 21) { 
-                            if(badge) badge.outerHTML = `<div class="mbj-status-pill mbj-pill-bust mbj-delay-pill" id="mbj-d-score-badge">${currentScore} BUST</div>`; 
-                        } else { 
-                            if(badge) badge.innerHTML = `<span>${currentScore}</span>`; 
-                        } 
-                        
-                        dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[i], false, true, false, i * 20)); 
-                        await delay(800); 
+                        dHand.style.width = `${(i * 20) + 70}px`; let currentScore = getBJScore(data.dealerHand.slice(0, i+1)); let badge = document.getElementById('mbj-d-score-badge'); 
+                        if (currentScore > 21) { if(badge) badge.outerHTML = `<div class="mbj-status-pill mbj-pill-bust mbj-delay-pill" id="mbj-d-score-badge">${currentScore} BUST</div>`; } else { if(badge) badge.innerHTML = `<span>${currentScore}</span>`; } 
+                        dHand.insertAdjacentHTML('beforeend', generateMBJCardHTML(data.dealerHand[i], false, true, false, i * 20)); await delay(800); 
                     }
                     
                     await delay(600);
-                    
                     const payoutAnim = async () => {
                         for(let i = 1; i <= 5; i++) {
-                            let seat = data.seats[i]; 
-                            let res = data.results && data.results[i];
-                            
+                            let seat = data.seats[i]; let res = data.results && data.results[i];
                             if (seat && res) {
                                 if (res.status === 'LOSS') {
-                                    // Animate chip flying to dealer tray
-                                    let btn = document.getElementById(`mbj-circle-${i}-0`);
-                                    let dArea = document.getElementById('mbj-dealer-area');
+                                    let btn = document.getElementById(`mbj-circle-${i}-0`); let dArea = document.getElementById('mbj-dealer-area');
                                     if(btn && dArea) {
-                                        let bRect = btn.getBoundingClientRect(); 
-                                        let dRect = dArea.getBoundingClientRect();
-                                        let coin = document.createElement('div'); 
-                                        coin.className = 'animated-chip'; 
+                                        let bRect = btn.getBoundingClientRect(); let dRect = dArea.getBoundingClientRect(); let coin = document.createElement('div'); coin.className = 'animated-chip'; 
                                         coin.style.cssText = `background: var(--danger); color: white; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999; transition: all 0.5s ease-in;`; 
-                                        coin.innerText = `-${fmtTC(seat.hands[0].bet)}`; 
-                                        document.body.appendChild(coin); 
-                                        
-                                        requestAnimationFrame(() => {
-                                            coin.style.left = `${dRect.left + (dRect.width/2)}px`;
-                                            coin.style.top = `${dRect.top}px`;
-                                            coin.style.opacity = '0';
-                                            coin.style.transform = 'translateX(-50%) scale(0.5)';
-                                        });
-                                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); 
-                                        await delay(300); 
+                                        coin.innerText = `-${fmtTC(seat.hands[0].bet)}`; document.body.appendChild(coin); 
+                                        requestAnimationFrame(() => { coin.style.left = `${dRect.left + (dRect.width/2)}px`; coin.style.top = `${dRect.top}px`; coin.style.opacity = '0'; coin.style.transform = 'translateX(-50%) scale(0.5)'; });
+                                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); await delay(300); 
                                     }
                                 }
                                 else if (res.status === 'WIN') {
                                     let btn = document.getElementById(`mbj-circle-${i}-0`);
                                     if(btn) { 
-                                        let bRect = btn.getBoundingClientRect(); 
-                                        let coin = document.createElement('div'); 
-                                        coin.className = 'animated-chip'; 
+                                        let bRect = btn.getBoundingClientRect(); let coin = document.createElement('div'); coin.className = 'animated-chip'; 
                                         coin.style.cssText = `background: var(--success); color: black; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999; box-shadow: 0 0 15px var(--success); transition: all 0.5s ease-out;`; 
-                                        coin.innerText = `+${fmtTC(res.win)}`; 
-                                        document.body.appendChild(coin); 
-                                        
-                                        requestAnimationFrame(() => {
-                                            coin.style.top = '10px'; 
-                                            coin.style.opacity = '0'; 
-                                        });
-                                        
-                                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); 
-                                        await delay(300); 
+                                        coin.innerText = `+${fmtTC(res.win)}`; document.body.appendChild(coin); 
+                                        requestAnimationFrame(() => { coin.style.top = '10px'; coin.style.opacity = '0'; });
+                                        setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); await delay(300); 
                                     }
-                                } 
-                                await delay(300); 
+                                } await delay(300); 
                             }
                         }
                     };
-                    
-                    await payoutAnim();
-                    
-                    setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1000);
+                    await payoutAnim(); setTimeout(() => { socket.emit('requestBalanceRefresh'); }, 1000);
                 }; 
                 drawRemaining();
             }
         } 
         else if (data.event === 'new_round') {
-            mbjGameState = 'BETTING'; 
-            document.getElementById('mbj-fs-dealer-hand').innerHTML = ''; 
-            document.getElementById('mbj-d-score-badge-container').innerHTML = '';
-            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; 
-            renderMBJSeats(data.seats); 
-            setChatBadge(true);
+            mbjGameState = 'BETTING'; document.getElementById('mbj-fs-dealer-hand').innerHTML = ''; document.getElementById('mbj-d-score-badge-container').innerHTML = '';
+            renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; renderMBJSeats(data.seats); setChatBadge(true);
         }
     });
 
     // =======================================================
-    // PUSH-TO-TALK (VOICE CHAT)
+    // CHAT & VOICE (PTT)
     // =======================================================
     function sendChat(isMbj = false) {
-        let inputId = isMbj ? 'mbj-chat-input' : 'chat-input'; 
-        let boxId = isMbj ? 'mbj-chat' : 'sg-chat';
-        let input = document.getElementById(inputId); 
-        let msg = input.value.trim();
-        
+        let inputId = isMbj ? 'mbj-chat-input' : 'chat-input'; let boxId = isMbj ? 'mbj-chat' : 'sg-chat'; let input = document.getElementById(inputId); let msg = input.value.trim();
         if(msg.length > 0) { 
-            let box = document.getElementById(boxId); 
-            box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--ps-glow); font-weight:900;">You:</span> <span class="c-msg" style="color:white;">${msg}</span></div>`); 
-            box.scrollTop = box.scrollHeight; 
-            socket.emit('sendChat', { msg: msg }); 
-            input.value = ''; 
+            let box = document.getElementById(boxId); box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--ps-glow); font-weight:900;">You:</span> <span class="c-msg" style="color:white;">${msg}</span></div>`); box.scrollTop = box.scrollHeight; 
+            socket.emit('sendChat', { msg: msg }); input.value = ''; 
         }
     }
     
-    function sendMBJChat() { 
-        sendChat(true); 
-    }
+    function sendMBJChat() { sendChat(true); }
 
     socket.on('chatMessage', (data) => {
-        let boxId = window.activeSharedGame === 'mbj' ? 'mbj-chat' : 'sg-chat';
-        let box = document.getElementById(boxId);
-        
+        let boxId = window.activeSharedGame === 'mbj' ? 'mbj-chat' : 'sg-chat'; let box = document.getElementById(boxId);
         if (box && window.activeSharedGame) { 
             let sysClass = data.sys ? 'chat-sys sys-info' : ''; 
-            if (data.sys) { 
-                box.insertAdjacentHTML('beforeend', `<div class="chat-line ${sysClass}">${data.text}</div>`); 
-            } else { 
-                box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--text-muted); font-weight:900;">${data.user}:</span> <span class="c-msg" style="color:white;">${data.text}</span></div>`); 
-            } 
+            if (data.sys) { box.insertAdjacentHTML('beforeend', `<div class="chat-line ${sysClass}">${data.text}</div>`); } 
+            else { box.insertAdjacentHTML('beforeend', `<div class="chat-line"><span class="c-name" style="color:var(--text-muted); font-weight:900;">${data.user}:</span> <span class="c-msg" style="color:white;">${data.text}</span></div>`); } 
             box.scrollTop = box.scrollHeight; 
         }
     });
 
-    let mediaRecorder; 
-    let audioChunks = []; 
-    let isRecording = false;
-
+    let mediaRecorder; let audioChunks = []; let isRecording = false;
     async function initAudio() {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-                mediaRecorder.onstop = () => {
-                    if (audioChunks.length > 0) {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const reader = new FileReader(); 
-                        reader.readAsDataURL(audioBlob);
-                        reader.onloadend = () => { socket.emit('voiceStream', { audio: reader.result, user: myUsername }); };
-                        audioChunks = [];
-                    }
-                };
+                mediaRecorder.onstop = () => { if (audioChunks.length > 0) { const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); const reader = new FileReader(); reader.readAsDataURL(audioBlob); reader.onloadend = () => { socket.emit('voiceStream', { audio: reader.result, user: myUsername }); }; audioChunks = []; } };
             } catch (err) {}
         }
     }
-    
     document.getElementById('auth-container').addEventListener('click', initAudio, { once: true });
 
     function startPTT(btnId) {
         if (!mediaRecorder || mediaRecorder.state === 'recording') return;
-        isRecording = true; 
-        audioChunks = [];
-        try { 
-            mediaRecorder.start(); 
-            let btn = document.getElementById(btnId); 
-            if(btn) { btn.classList.add('recording'); } 
-        } catch(e) {}
+        isRecording = true; audioChunks = [];
+        try { mediaRecorder.start(); let btn = document.getElementById(btnId); if(btn) { btn.classList.add('recording'); } } catch(e) {}
     }
-
     function stopPTT(btnId) {
         if (!isRecording || !mediaRecorder || mediaRecorder.state !== 'recording') return;
         isRecording = false;
-        try { 
-            mediaRecorder.stop(); 
-            let btn = document.getElementById(btnId); 
-            if(btn) btn.classList.remove('recording'); 
-        } catch(e) {}
+        try { mediaRecorder.stop(); let btn = document.getElementById(btnId); if(btn) btn.classList.remove('recording'); } catch(e) {}
     }
+    socket.on('voiceStream', (data) => { fetch(data.audio).then(res => res.blob()).then(blob => { const audioUrl = URL.createObjectURL(blob); const audio = new Audio(audioUrl); audio.play().catch(e => {}); }).catch(err => {}); });
 
-    socket.on('voiceStream', (data) => {
-        fetch(data.audio).then(res => res.blob()).then(blob => {
-            const audioUrl = URL.createObjectURL(blob); 
-            const audio = new Audio(audioUrl); 
-            audio.play().catch(e => {});
-        }).catch(err => {});
-    });
 </script>
 </body>
 </html>
-        
