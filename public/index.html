@@ -19,10 +19,9 @@
     <script src="/socket.io/socket.io.js"></script>
     
     <style>
-        /* CSS VARIABLES & RESET */
         :root { --ps-bg: #000814; --ps-blue: #00439c; --ps-glow: #00a2ff; --glass-bg: rgba(0, 10, 25, 0.75); --glass-border: rgba(255, 255, 255, 0.15); --danger: #ff3366; --success: #00e676; --credits: #ffb400; --text-main: #f8fafc; --text-muted: #8c9eb5; --playable: #b366ff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); background-size: 200% 200%; animation: AmbientBG 15s ease infinite; color: var(--text-main); height: 100vh !important; width: 100vw !important; overflow: hidden !important; -webkit-user-select: none; user-select: none; touch-action: manipulation; padding-bottom: env(safe-area-inset-bottom); }
+        body { background: linear-gradient(135deg, #000a1f 0%, #001f4d 50%, #000000 100%); background-size: 200% 200%; animation: AmbientBG 15s ease infinite; color: var(--text-main); height: 100vh !important; width: 100vw !important; overflow: hidden !important; -webkit-user-select: none; user-select: none; padding-bottom: env(safe-area-inset-bottom); }
         @keyframes AmbientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
         .chip, .anim-deal, .play-card, .coin, .dice-icon, .mode-card, .game-card { will-change: transform, opacity; transform: translateZ(0); backface-visibility: hidden; }
@@ -36,7 +35,6 @@
         input[type="number"] { -moz-appearance: textfield; }
         .hidden { display: none !important; }
 
-        /* AUTHENTICATION */
         #auth-container { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 9999999; background: linear-gradient(rgba(0, 5, 15, 0.8), rgba(0, 5, 15, 0.95)), url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&q=80') center/cover no-repeat; backdrop-filter: blur(15px); }
         .auth-box { width: 420px; max-width: 95vw; background: rgba(0, 5, 15, 0.9); padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(0, 162, 255, 0.4); border-top: 3px solid var(--ps-glow); box-shadow: 0 25px 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 162, 255, 0.1); text-align: center; backdrop-filter: blur(25px); }
         .auth-title { font-size: 2.2rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;} 
@@ -51,7 +49,6 @@
         .pwd-input-wrapper i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 1.1rem; z-index: 2; transition: 0.2s; } 
         .pwd-input-wrapper i:hover { color: white; }
 
-        /* BUTTONS & INPUTS */
         .btn-play { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 12px 15px; border-radius: 8px; font-size: 1rem; font-weight: 900; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);} 
         .btn-play:hover:not(:disabled) { background: white; color: black; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,255,255,0.2); border-color: white;} 
         .btn-play:disabled { background: rgba(0,0,0,0.5) !important; color: var(--text-muted) !important; cursor: not-allowed !important; border-color: transparent !important; opacity: 0.5 !important; box-shadow:none !important; transform:none !important; }
@@ -63,7 +60,6 @@
         .btn-rules { background: rgba(0,0,0,0.5); color: var(--text-muted); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0;} 
         .btn-rules:hover { background: rgba(255,255,255,0.1); color: white; border-color: white; transform: scale(1.05); }
 
-        /* TOPBAR & HUD */
         #app-container { display: none; height: 100vh; width: 100vw; overflow: hidden;}
         .topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 99999; background: rgba(0, 5, 15, 0.95); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(20px); padding: 12px 25px; height: 75px; display: flex; align-items: center; padding-top: calc(12px + env(safe-area-inset-top));} 
         .topbar-inner { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
@@ -95,7 +91,6 @@
         .notif-badge.pulse { animation: pulseBadge 1.5s infinite; } 
         @keyframes pulseBadge { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(255, 51, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); } }
 
-        /* DROPDOWNS & MODALS */
         .dropdown-wrapper { position: relative; display: inline-block; } 
         .custom-dropdown { position: absolute; top: 45px; right: -10px; width: 350px; background: rgba(0,5,15,0.95); border: 1px solid var(--glass-border); border-top: 3px solid var(--ps-glow); border-radius: 8px; backdrop-filter: blur(20px); display: flex; flex-direction: column; z-index: 999999 !important; box-shadow: 0 25px 50px rgba(0,0,0,0.9); cursor: default;}
         .notif-header, .popover-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--glass-border); font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0;} 
@@ -155,10 +150,8 @@
         @keyframes flashAnimSubtle { 0% { opacity: 0; transform: translateY(20px); } 15% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } } 
-        @keyframes popBalance { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); } 100% { transform: scale(1); } } 
-        .anim-pop { animation: popBalance 0.6s ease-out; } 
-        @keyframes popBet { 0% { transform: scale(1); } 50% { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.5); } 100% { transform: scale(1); } } 
-        .anim-pop-bet { animation: popBet 0.3s ease-out; } 
+        @keyframes popBalance { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: rgba(0, 230, 118, 0.3); border-color: var(--success); } 100% { transform: scale(1); } } .anim-pop { animation: popBalance 0.6s ease-out; } 
+        @keyframes popBet { 0% { transform: scale(1); } 50% { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.5); } 100% { transform: scale(1); } } .anim-pop-bet { animation: popBet 0.3s ease-out; } 
         .shake-anim { animation: shakeIt 0.1s infinite; } 
         @keyframes shakeIt { 0% { transform: rotate(0deg) translate(0,0); } 25% { transform: rotate(5deg) translate(3px,-3px); } 50% { transform: rotate(0deg) translate(0,0); } 75% { transform: rotate(-5deg) translate(-3px,3px); } 100% { transform: rotate(0deg) translate(0,0); } }
 
@@ -214,6 +207,7 @@
         .chat-line .c-name { font-weight: 900; color: var(--ps-glow); margin-right: 5px; text-transform: uppercase; } 
         .chat-line .c-msg { color: white; font-weight: 500;} 
         
+        /* Chat Status System Messages */
         .chat-sys { font-weight: 600; padding: 10px; border-radius: 6px; margin-bottom: 5px; text-align: center; }
         .chat-sys.sys-open { background: rgba(0, 230, 118, 0.15); color: var(--success); border-left: 4px solid var(--success); }
         .chat-sys.sys-closed { background: rgba(255, 51, 102, 0.15); color: var(--danger); border-left: 4px solid var(--danger); }
@@ -231,7 +225,7 @@
         .bet-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; border-color: var(--glass-border) !important; color: var(--text-muted) !important; text-shadow: none !important;} 
         .tile-bet-badge { position: absolute; top: -10px; right: -10px; background: var(--credits); color: black; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 900; padding: 4px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.9); pointer-events: none; display: none; z-index: 10; letter-spacing: 1px;}
 
-        /* GAME ASSETS */
+        /* GAME ASSETS & CARDS */
         .blackjack-scores { display: flex; justify-content: center; gap: 40px; width: 100%; align-items: flex-start; } 
         .card-area { min-width: 200px; width: fit-content; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 240px; position: relative;} 
         .bj-title { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; } 
@@ -245,6 +239,8 @@
         
         .anim-deal { animation: dealCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform-origin: center; } 
         @keyframes dealCard { 0% { opacity: 0; transform: translate(0, -200px) scale(0.5) rotateY(180deg); } 100% { opacity: 1; transform: translate(0, 0) scale(1) rotateY(0deg); } } 
+        .anim-flip { animation: flipCard 0.4s ease-in-out forwards; } 
+        @keyframes flipCard { 0% { transform: rotateY(180deg); } 50% { transform: rotateY(90deg); color: transparent; } 51% { color: inherit; background: white; } 100% { transform: rotateY(0deg); background: white; color: black; } }
         
         .bj-overlay-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-5deg); font-size:2.2rem; font-weight:900; z-index:20; white-space:nowrap; pointer-events:none; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .bj-overlay-win { color:var(--playable); text-shadow:0 0 10px black, 0 0 20px var(--playable); }
@@ -531,7 +527,7 @@
                   </div>
                   <div class="glass-panel chat-panel" id="sg-chat-panel">
                     <div class="glass-header">
-                        <div style="display:flex; align-items:center;">LIVE CHAT <span class="chat-status-badge" style="margin-left: 10px; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 900; display: none;"></span></div>
+                        <div style="display:flex; align-items:center; gap:10px;">LIVE CHAT</div>
                         <div style="display:flex; align-items:center; gap:10px; font-size: 0.95rem; font-weight:800;">
                             <div class="dropdown-wrapper">
                                 <div style="display:flex; align-items:center; gap:6px; color:var(--success); cursor: pointer;" onclick="fetchActivePlayers(event)"><i class="fas fa-users"></i> <span id="sg-active-players">0</span></div>
@@ -539,7 +535,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="chat-body custom-scroll" id="sg-chat"><div class="chat-line chat-sys sys-info">Connected to server.</div></div>
+                    <div class="chat-body custom-scroll" id="sg-chat"></div>
                     <div class="chat-input-area" style="padding:15px; border-top:1px solid var(--glass-border); flex-shrink: 0; display:flex; gap:8px; align-items:center;">
                         <input type="text" id="chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter'){sendChat();}">
                         <button class="mbj-chat-send-btn ptt-btn" style="background:var(--ps-glow); color:black;" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
@@ -568,7 +564,7 @@
                 </div>
                 <div class="glass-panel chat-panel" id="mbj-chat-panel">
                     <div class="glass-header">
-                        <div style="display:flex; align-items:center;">LIVE CHAT <span class="chat-status-badge" style="margin-left: 10px; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 900; display: none;"></span></div>
+                        <div style="display:flex; align-items:center; gap:10px;">LIVE CHAT</div>
                         <div style="display:flex; align-items:center; gap:10px; font-size: 0.95rem; font-weight:800;">
                             <div class="dropdown-wrapper">
                                 <div style="display:flex; align-items:center; gap:6px; color:var(--success); cursor: pointer;" onclick="fetchActivePlayers(event)"><i class="fas fa-users"></i> <span id="mbj-active-players">0</span></div>
@@ -576,7 +572,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="chat-body custom-scroll" id="mbj-chat"><div class="chat-line chat-sys sys-info">Connected to server.</div></div>
+                    <div class="chat-body custom-scroll" id="mbj-chat"></div>
                     <div class="chat-input-area" style="padding:15px; border-top:1px solid var(--glass-border); flex-shrink: 0; display:flex; gap:8px; align-items:center;">
                         <input type="text" id="mbj-chat-input" class="input-control" style="flex:1;" placeholder="Say something..." onkeypress="if(event.key==='Enter') sendMBJChat();">
                         <button class="mbj-chat-send-btn ptt-btn" style="background:var(--ps-glow); color:black;" onclick="sendMBJChat()"><i class="fas fa-paper-plane"></i></button>
@@ -1058,7 +1054,6 @@
         setTimeout(() => { switchAuthTab('login'); }, 1000); 
     });
     
-    // --- CONNECTION RECONNECT BUG FIX ---
     socket.on('loginSuccess', (data) => { 
         if (window.tempLoginUser && window.tempLoginPass) { 
             localStorage.setItem('snt_user', window.tempLoginUser); 
@@ -1395,7 +1390,10 @@
         socket.emit('joinRoom', id); 
         if (sConf[id] && sConf[id].setupUI) sConf[id].setupUI(); 
         document.getElementById('sg-title').innerText = sConf[id].title; 
-        document.getElementById('sg-chat').innerHTML = '<div class="chat-line chat-sys sys-info">Connected to server.</div>'; 
+        
+        let sysClass = 'chat-sys sys-info';
+        document.getElementById('sg-chat').innerHTML = `<div class="chat-line ${sysClass}">Connected to server.</div>`; 
+        
         switchView('shared-game'); 
     }
 
@@ -1705,55 +1703,28 @@
         }, 500); 
     }
 
-    function setChatBadge(isOpen) {
-        document.querySelectorAll('.chat-status-badge').forEach(b => {
-            b.innerText = isOpen ? 'OPEN' : 'CLOSED';
-            b.style.display = 'inline-block';
-            b.style.background = isOpen ? 'var(--success)' : 'var(--danger)';
-            b.style.color = isOpen ? 'black' : 'white';
-        });
+    // =======================================================
+    // SHARED TABLES LOGIC
+    // =======================================================
+    
+    function fetchActivePlayers(e) { 
+        if(e) e.stopPropagation(); 
+        if(window.activeSharedGame) socket.emit('getRoomPlayers', window.activeSharedGame); 
+        toggleCustomDropdown(window.activeSharedGame === 'mbj' ? 'mbj-ap-popover' : 'ap-popover', null); 
     }
-
-    function notifyChatStatus(isOpen) {
-        let boxId = window.activeSharedGame === 'mbj' ? 'mbj-chat' : 'sg-chat';
-        let box = document.getElementById(boxId);
-        if(!box) return;
-        
-        if(isOpen) {
-            box.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys sys-open">BETS ARE NOW OPEN</div>`);
-        } else {
-            box.insertAdjacentHTML('beforeend', `<div class="chat-line chat-sys sys-closed">BETS ARE CLOSED</div>`);
-        }
-        box.scrollTop = box.scrollHeight;
-    }
-
-    socket.on('timerUpdate', (t) => { 
-        let el = document.getElementById('sg-timer'); if(!el) return; 
-        el.innerText = t; sState.time = t; 
-        let box = document.getElementById('sg-timer-box'); 
-        if (t <= 5 && t > 0) { box.classList.add('closing'); } else { box.classList.remove('closing'); } 
-        
-        if (t === 0) { 
-            sState.status = 'RESOLVING'; 
-            setChatBadge(false);
-            notifyChatStatus(false); 
-        } else {
-            setChatBadge(true);
-        }
+    
+    socket.on('roomPlayersList', (players) => { 
+        let listId = window.activeSharedGame === 'mbj' ? 'mbj-ap-list-container' : 'ap-list-container'; 
+        let list = document.getElementById(listId); 
+        if(!list) return; 
+        list.innerHTML = ''; 
+        if(players.length === 0) { list.innerHTML = `<div style="text-align:center; color:var(--text-muted);">No players found.</div>`; return; } 
+        players.forEach(p => { 
+            let color = p === myUsername ? 'var(--ps-glow)' : 'white'; 
+            list.insertAdjacentHTML('beforeend', `<div style="padding: 8px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); margin-bottom: 5px; font-weight: 800; color: ${color};"><i class="fas fa-user" style="margin-right:8px; color:var(--text-muted);"></i> ${p}</div>`); 
+        }); 
     });
 
-    socket.on('lockBets', () => { 
-        document.querySelectorAll('.sg-tile').forEach(btn => { btn.disabled = true; }); 
-        setChatBadge(false);
-        
-        if (window.activeSharedGame === 'sicbo') { 
-            document.getElementById('sg-sicbo-dice').innerHTML = `<div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div><div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div><div class="color-die c-grey s-die shake-anim" style="width:80px; height:80px; font-size:3rem;"></div>`; 
-        } else if (window.activeSharedGame === 'perya') { 
-            document.getElementById('sg-perya-dice').innerHTML = `<div class="color-die c-grey"></div><div class="color-die c-grey"></div><div class="color-die c-grey"></div>`; 
-        } 
-    });
-
-    let isBettingTimeout = false;
     function placeSharedBet(choice) { 
         if (sState.status !== 'BETTING') return; 
         if (isBettingTimeout) return; 
@@ -1830,7 +1801,6 @@
         sState.status = 'BETTING'; 
         mySBets = {}; 
         mySBetsStack = []; 
-        setChatBadge(true);
         notifyChatStatus(true);
         
         document.querySelectorAll('.sg-tile').forEach(btn => { 
@@ -1849,7 +1819,7 @@
             document.getElementById('sg-bac-b-score').innerText = '0'; 
         } 
         else if (window.activeSharedGame === 'perya') { 
-            document.getElementById('sg-perya-dice').innerHTML = `<div class="color-die c-grey"><i class="fas fa-question"></i></div><div class="color-die c-grey"><i class="fas fa-question"></i></div><div class="color-die c-grey"><i class="fas fa-question"></i></div>`; 
+            document.getElementById('sg-perya-dice').innerHTML = `<div class="color-die c-grey"></div><div class="color-die c-grey"></div><div class="color-die c-grey"></div>`; 
         } 
         else if (window.activeSharedGame === 'dt') { 
             document.getElementById('sg-dt-dragon').innerHTML = `<div class="play-card card-back dt-card">?</div>`; 
@@ -1999,6 +1969,7 @@
                         coin.style.cssText = `background: var(--danger); color: white; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999;`; 
                         coin.innerText = `-${fmtTC(mySBets[choice])}`; 
                         document.body.appendChild(coin); 
+                        
                         setTimeout(() => { coin.style.top = '100px'; coin.style.opacity = '0'; }, 30); 
                         setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); 
                         await delay(300); 
@@ -2016,6 +1987,7 @@
                         coin.style.cssText = `background: var(--success); color: black; width: auto; padding: 5px 10px; border-radius: 8px; font-weight: 900; position: absolute; left: ${bRect.left + (bRect.width/2)}px; top: ${bRect.top}px; transform: translateX(-50%); z-index: 9999; box-shadow: 0 0 15px var(--success);`; 
                         coin.innerText = `+${fmtTC(wAmt)}`; 
                         document.body.appendChild(coin); 
+                        
                         setTimeout(() => { coin.style.top = '10px'; coin.style.opacity = '0'; }, 30); 
                         setTimeout(() => { if(coin.parentNode) coin.remove(); }, 500); 
                         await delay(300); 
@@ -2112,17 +2084,9 @@
     
     function getMBJDisplayScore(handCards) { 
         let score = 0, aces = 0; 
-        for (let c of handCards) { 
-            score += c.bjVal; 
-            if (c.raw === 'A') aces++; 
-        } 
-        while (score > 21 && aces > 0) { 
-            score -= 10; 
-            aces--; 
-        } 
-        if (aces > 0 && score < 21) { 
-            return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`; 
-        } 
+        for (let c of handCards) { score += c.bjVal; if (c.raw === 'A') aces++; } 
+        while (score > 21 && aces > 0) { score -= 10; aces--; } 
+        if (aces > 0 && score < 21) { return `<span style="font-size:0.75rem; letter-spacing:-0.5px;">${score - 10}/${score}</span>`; } 
         return `<span style="font-size:1.05rem;">${score}</span>`; 
     }
     
@@ -2358,7 +2322,6 @@
             } else { 
                 dTimerText.style.display = 'none'; 
             }
-            setChatBadge(true);
             notifyChatStatus(true);
         } 
         else if (data.event === 'sync_seats') { 
@@ -2366,10 +2329,9 @@
         } 
         else if (data.event === 'lock_bets') { 
             mbjGameState = 'DEALING'; 
-            dTimerText.style.display = 'block'; // KEEP TIMER VISIBLE AT 0
+            dTimerText.style.display = 'block'; // TIMER VISIBLE AT 0
             dTimerText.innerText = '0';
             renderMBJSeats(data.seats, null); 
-            setChatBadge(false);
             notifyChatStatus(false);
         } 
         else if (data.event === 'deal') {
@@ -2522,7 +2484,7 @@
             document.getElementById('mbj-d-score-badge-container').innerHTML = '';
             renderedCardCount = { 1:[], 2:[], 3:[], 4:[], 5:[] }; 
             renderMBJSeats(data.seats); 
-            setChatBadge(true);
+            notifyChatStatus(true);
         }
     });
 
