@@ -104,7 +104,6 @@ const AdminLog = mongoose.model('AdminLog', adminLogSchema);
 let connectedUsers = {};
 let globalResults = { baccarat: [], perya: [], dt: [], sicbo: [] };
 
-// INDEPENDENT TIMERS
 let sharedTables = {
     baccarat: { time: 15, maxTime: 15, status: 'BETTING', bets: [] },
     perya: { time: 15, maxTime: 15, status: 'BETTING', bets: [] },
@@ -124,7 +123,12 @@ function logGlobalResult(game, resultStr) {
         if (globalResults[game].length > 5) globalResults[game].pop();
     }
 }
-function checkResetStats(game) { if (gameStats[game].total >= 100) { Object.keys(gameStats[game]).forEach(key => { gameStats[game][key] = 0; }); } }
+
+function checkResetStats(game) { 
+    if (gameStats[game].total >= 100) { 
+        Object.keys(gameStats[game]).forEach(key => { gameStats[game][key] = 0; }); 
+    } 
+}
 
 function drawCard() {
     const vs = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
@@ -144,7 +148,6 @@ function getBJScore(hand) {
     return score;
 }
 
-// SHARED TABLE RESOLUTION
 async function resolveSharedRoom(room, table) {
     let resData = {}, winnerStr = '', resStr = '', playerStats = {};
 
@@ -232,7 +235,6 @@ async function resolveSharedRoom(room, table) {
     }, 2500);
 }
 
-// SHARED LOOP
 setInterval(() => {
     Object.keys(sharedTables).forEach(room => {
         let table = sharedTables[room];
@@ -244,7 +246,8 @@ setInterval(() => {
                 table.status = 'RESOLVING';
                 io.to(room).emit('lockBets');
                 setTimeout(async () => { await resolveSharedRoom(room, table); }, 500);
-                setTimeout(() => { table.time = table.maxTime; table.status = 'BETTING'; table.bets = []; io.to(room).emit('newRound'); pushAdminData(); }, 9000); 
+                // Delay reset to accommodate cinematic UI banners
+                setTimeout(() => { table.time = table.maxTime; table.status = 'BETTING'; table.bets = []; io.to(room).emit('newRound'); pushAdminData(); }, 10000); 
             }
         }
     });
@@ -291,7 +294,6 @@ io.on('connection', (socket) => {
     socket.isCashier = false;
     socket.isAuth = false;
 
-    // LOGIN BLOCK (RESTORED)
     socket.on('login', async (data) => {
         if (socket.isAuth) return;
         socket.isAuth = true;
@@ -323,7 +325,6 @@ io.on('connection', (socket) => {
         } catch(e) { socket.emit('authError', 'System Error: ' + e.message); } finally { socket.isAuth = false; }
     });
 
-    // REGISTER BLOCK (RESTORED)
     socket.on('register', async (data) => {
         if (socket.isAuth) return;
         socket.isAuth = true;
@@ -363,7 +364,6 @@ io.on('connection', (socket) => {
         } catch(e) { socket.emit('authError', 'System Error: ' + e.message); } finally { socket.isAuth = false; }
     });
 
-    // DAILY REWARD BLOCK (RESTORED)
     socket.on('claimDaily', async () => {
         if (!socket.user) return;
         const user = await User.findById(socket.user._id);
@@ -383,7 +383,6 @@ io.on('connection', (socket) => {
         socket.emit('dailyClaimed', { amt, newBalance: { credits: user.credits, playable: user.playableCredits }, nextClaim: new Date(now.getTime() + 24 * 60 * 60 * 1000) });
     });
 
-    // PROMO BLOCK (RESTORED)
     socket.on('redeemPromo', async (code) => {
         if (!socket.user) return;
         try {
@@ -438,7 +437,7 @@ io.on('connection', (socket) => {
         socket.emit('userLogsData', { username, logs });
     });
 
-    // SOLO PLAY (1.5S RESET TIMERS)
+    // SOLO PLAY
     socket.on('playSolo', async (data) => {
         if (isMaintenanceMode) return socket.emit('localGameError', { msg: 'SYSTEM UNDER MAINTENANCE', game: data.game });
         if (!socket.user) return;
@@ -544,7 +543,6 @@ io.on('connection', (socket) => {
                         socket.bjState = null;
                         setTimeout(() => { gameStats.blackjack.total++; gameStats.blackjack.Lose++; checkResetStats('blackjack'); }, 1500);
                     } else if (pS === 21) {
-                        // Auto-stand on 21
                         while (getBJScore(socket.bjState.dHand) < 17) { socket.bjState.dHand.push(drawCard()); }
                         let dS = getBJScore(socket.bjState.dHand);
                         let msg = '';
@@ -759,7 +757,7 @@ io.on('connection', (socket) => {
         setTimeout(() => {
             for (let i = 1; i <= 5; i++) { if (mbjState.seats[i]) { if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) { mbjState.seats[i] = null; } else { mbjState.seats[i].hands = []; } } }
             mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING'; io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-        }, 7000); 
+        }, 10000); // 10 second delay for cinematic banners and chip animations
     }
 
     setInterval(() => {
@@ -796,7 +794,13 @@ io.on('connection', (socket) => {
             }
         } else if (mbjState.status === 'PLAYER_TURN') {
             mbjState.turnTimer--; io.to('mbj').emit('mbjUpdate', { event: 'turn_timer', time: mbjState.turnTimer, activeTurn: mbjState.activeTurn });
-            if (mbjState.turnTimer <= 0) { let seat = mbjState.seats[mbjState.activeTurn.seat]; if(seat && seat.hands[mbjState.activeTurn.handIdx]) { seat.hands[mbjState.activeTurn.handIdx].status = 'STAND'; } mbjNextTurn(); }
+            if (mbjState.turnTimer <= 0) { 
+                let seat = mbjState.seats[mbjState.activeTurn.seat]; 
+                if(seat && seat.hands[mbjState.activeTurn.handIdx]) { 
+                    seat.hands[mbjState.activeTurn.handIdx].status = 'STAND'; 
+                } 
+                mbjNextTurn(); 
+            }
         }
     }, 1000);
 
@@ -867,7 +871,7 @@ io.on('connection', (socket) => {
             }
             await User.findByIdAndUpdate(socket.user._id, { status: 'Offline' }); delete connectedUsers[socket.user.username];
         }
-        if(socket.currentRoom && rooms[socket.currentRoom] > 0) { rooms[socket.currentRoom]--; io.emit('playerCount', rooms); }
+        if(socket.currentRoom && roomsCount[socket.currentRoom] > 0) { roomsCount[socket.currentRoom]--; io.emit('playerCount', roomsCount); }
     });
 });
 
