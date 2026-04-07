@@ -13,21 +13,19 @@
         #login-screen input { padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 100%; border-radius: 8px; border: none; }
         #login-screen button { padding: 12px 20px; font-size: 1.2rem; cursor: pointer; background: #00a2ff; color: black; font-weight: bold; border: none; border-radius: 8px; width: 100%; }
 
-        #main-layout { display: none; display: flex; gap: 20px; width: 100%; max-width: 1400px; height: 750px; justify-content: center; }
+        #main-layout { display: none; display: flex; gap: 20px; width: 100%; max-width: 1450px; height: 700px; justify-content: center; }
         
-        /* COLUMN FOR PERFECT SYMMETRY BETWEEN BOARD AND CONTROLS */
-        .game-column { display: flex; flex-direction: column; gap: 20px; width: 1000px; max-width: 1000px; flex-shrink: 0; }
+        .game-column { display: flex; flex-direction: column; gap: 20px; width: 1100px; max-width: 1100px; flex-shrink: 0; }
 
-        /* GAME BOARD */
-        #game-screen { flex: 1; width: 100%; background: radial-gradient(circle, #0f5132 0%, #062c19 100%); border-radius: 20px; border: 15px solid #3e2723; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        /* PREMIUM GAME BOARD */
+        #game-screen { flex: 1; width: 100%; background: radial-gradient(circle at center, #0e5b32 0%, #042412 100%); border-radius: 20px; border: 12px solid #2a1a14; box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; }
         
         /* TABLE WATERMARK */
         .table-logo { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.15; pointer-events: none; z-index: 1; width: 100%; }
         .table-logo h1 { font-size: 4.5rem; letter-spacing: 15px; margin: 0 0 10px 0; color: #fff; }
         .table-logo p { font-weight: bold; font-size: 1.2rem; letter-spacing: 3px; color: #fff; margin: 5px 0; }
 
-        /* SLEEK TOP-RIGHT TIMER */
-        #timer-display { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 20px; font-size: 1.5rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); transition: opacity 0.3s; z-index: 20; color: white; display: flex; gap: 8px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        #timer-display { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 50px; font-size: 1.5rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); transition: opacity 0.3s; z-index: 20; color: white; display: flex; gap: 8px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
 
         .dealer-area { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
         
@@ -44,15 +42,13 @@
         .card-red { color: #ff3366; }
         .card-hidden { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid white; color: transparent; }
         
-        /* DYNAMIC CENTERED SEATS */
         .seats-container { position: absolute; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; align-items: flex-end; gap: 20px; padding: 0 10px; transition: all 0.5s ease; z-index: 10; }
         .seat { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; transition: all 0.5s ease; min-width: 100px; }
         
         .hands-wrapper { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 5px; }
         .single-hand-container { display: flex; flex-direction: column; align-items: center; position: relative; justify-content: flex-end; }
 
-        /* MOVED BET PILL */
-        .seat-bet { background: rgba(0,0,0,0.8); color: #ffb400; padding: 4px 12px; border-radius: 12px; font-weight: bold; font-size: 0.9rem; border: 1px solid rgba(255, 180, 0, 0.4); margin-top: 10px; margin-bottom: 5px; z-index: 5; box-shadow: 0 2px 5px black;}
+        .seat-bet { background: rgba(0,0,0,0.8); color: #ffb400; padding: 4px 15px; border-radius: 50px; font-weight: bold; font-size: 0.95rem; border: 1px solid rgba(255, 180, 0, 0.5); margin-top: 10px; margin-bottom: 5px; z-index: 5; box-shadow: 0 2px 5px black;}
 
         .seat-circle { width: 60px; height: 60px; border: 2px dashed rgba(255,255,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.4); margin-bottom: 5px;}
         .seat-circle:hover { background: rgba(255,255,255,0.2); border-color: white; }
@@ -60,53 +56,59 @@
         
         .seat-name { margin-top: 5px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; text-shadow: 0 2px 4px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; text-align: center; letter-spacing: 1px;}
         
-        /* PLAYER TIMER BAR */
-        .player-timer-track { width: 90%; height: 6px; background: rgba(0,0,0,0.8); border-radius: 3px; margin-top: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-        .player-timer-fill { height: 100%; background: #00e676; width: 0%; transition: width 1s linear; box-shadow: 0 0 10px #00e676; }
+        /* TICKING PLAYER TIMER BAR */
+        .player-timer-track { width: 100%; height: 8px; background: rgba(0,0,0,0.8); border-radius: 50px; margin-top: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 2px 5px rgba(0,0,0,0.9); }
+        .player-timer-fill { height: 100%; background: linear-gradient(90deg, #00e676, #00b359); width: 100%; transition: width 1s linear; box-shadow: 0 0 10px #00e676; border-radius: 50px; }
 
-        /* RELOCATED SCORE BADGE (LEFT SIDE) */
-        .seat-score { position: absolute; top: 50%; left: -45px; transform: translateY(-50%); background: #333; border: 2px solid black; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-weight: bold; z-index: 20; box-shadow: 2px 2px 5px black; font-size: 1rem; }
-        .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba); color: black; box-shadow: 0 0 15px rgba(255,180,0,0.5), 2px 2px 5px black; }
-        .score-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); color: white; width: auto; height: auto; padding: 4px 8px; border-radius: 8px; font-size: 0.8rem; }
-        .score-bj { background: linear-gradient(to bottom, #00b359, #008040); color: white; width: auto; height: auto; padding: 4px 8px; border-radius: 8px; font-size: 0.8rem; letter-spacing: 1px; }
+        /* UNIFORM SCORE BADGES (MIDDLE-LEFT) */
+        .seat-score { position: absolute; top: 50%; left: -45px; transform: translateY(-50%); background: #222; border: 2px solid rgba(255,255,255,0.3); width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 50px; font-weight: bold; z-index: 20; box-shadow: 0 4px 10px rgba(0,0,0,0.8); font-size: 1rem; color: white; }
+        .score-active { background: linear-gradient(135deg, #ffd700, #ffb400); color: black; box-shadow: 0 0 15px rgba(255,180,0,0.6); border-color: white; }
+        .score-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); color: white; width: auto; height: 35px; padding: 0 12px; border-radius: 50px; font-size: 0.85rem; border: 2px solid #ff3366; }
+        .score-bj { background: linear-gradient(to bottom, #00b359, #008040); color: white; width: auto; height: 35px; padding: 0 12px; border-radius: 50px; font-size: 0.85rem; letter-spacing: 1px; border: 2px solid #00e676; }
         
-        /* CINEMATIC RESULT PLAQUE */
-        .hand-result { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; font-weight: 900; padding: 6px 15px; border-radius: 8px; z-index: 50; box-shadow: 0 10px 20px rgba(0,0,0,0.8); text-transform: uppercase; letter-spacing: 2px; border: 2px solid rgba(255,255,255,0.2); text-shadow: 0 2px 5px rgba(0,0,0,0.5);}
-        .res-win { background: #00e676; color: black; text-shadow: none; border-color: white;}
-        .res-loss { background: #ff3366; color: white; }
-        .res-push { background: #555; color: white; }
+        /* CIRCULAR RESULT PILLS */
+        .hand-result { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; font-weight: 900; padding: 8px 20px; border-radius: 50px; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.9); text-transform: uppercase; letter-spacing: 2px; border: 2px solid rgba(255,255,255,0.3); text-shadow: 0 2px 5px rgba(0,0,0,0.5);}
+        .res-win { background: linear-gradient(to bottom, #00e676, #00b359); color: black; text-shadow: none; border-color: white; box-shadow: 0 0 20px rgba(0,230,118,0.5), 0 10px 30px rgba(0,0,0,0.9);}
+        .res-loss { background: linear-gradient(to bottom, #ff3366, #cc0033); color: white; border-color: #ff6688; }
+        .res-push { background: linear-gradient(to bottom, #777, #444); color: white; }
 
-        /* PERFECTLY ALIGNED CONTROLS */
-        #controls { display: flex; gap: 15px; height: 75px; justify-content: center; align-items: center; width: 100%; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;}
+        /* PREMIUM CONTROLS */
+        #controls { display: flex; gap: 15px; height: 75px; justify-content: center; align-items: center; width: 100%; background: rgba(0,0,0,0.85); padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #controls-msg { font-weight: 900; font-size: 1.2rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 2px; }
         
-        .btn-action { padding: 0 25px; font-size: 1.05rem; font-weight: bold; cursor: pointer; border-radius: 8px; border: none; text-transform: uppercase; display: none; height: 100%; transition: 0.2s; letter-spacing: 1px; }
-        #bet-input { padding: 0 20px; font-size: 1.2rem; text-align: center; width: 180px; display: none; height: 100%; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; font-weight: bold; }
+        .btn-action { padding: 0 25px; font-size: 1.05rem; font-weight: 900; cursor: pointer; border-radius: 50px; border: none; text-transform: uppercase; display: none; height: 100%; transition: all 0.2s ease; letter-spacing: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); }
         
-        #btn-leave { background: rgba(255,51,102,0.2); color: #ff3366; }
-        #btn-leave:hover { background: #ff3366; color: white; }
-        #btn-bet { background: #00e676; color: black; box-shadow: 0 0 15px rgba(0,230,118,0.4); }
-        #btn-bet:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,230,118,0.6); }
+        #bet-input { padding: 0 20px; font-size: 1.2rem; text-align: center; width: 180px; display: none; height: 100%; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white; font-weight: bold; }
         
-        #btn-hit { background: rgba(0,230,118,0.2); color: #00e676; border: 1px solid #00e676; }
-        #btn-hit:hover { background: #00e676; color: black; }
-        #btn-stand { background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid #ff3366; }
-        #btn-stand:hover { background: #ff3366; color: white; }
-        #btn-double { background: rgba(255,180,0,0.2); color: #ffb400; border: 1px solid #ffb400; }
-        #btn-double:hover { background: #ffb400; color: black; }
-        #btn-split { background: rgba(0,162,255,0.2); color: #00a2ff; border: 1px solid #00a2ff; }
-        #btn-split:hover { background: #00a2ff; color: black; }
+        #btn-leave { background: linear-gradient(to bottom, #ff3366, #cc0033); color: white; border: 1px solid #ff6688; }
+        #btn-leave:hover { box-shadow: 0 5px 15px rgba(255,51,102,0.5); }
+        
+        #btn-bet { background: linear-gradient(to bottom, #00e676, #00b359); color: black; border: 1px solid #33ff99; text-shadow: none; }
+        #btn-bet:hover { box-shadow: 0 5px 20px rgba(0,230,118,0.6); }
+        
+        #btn-hit { background: linear-gradient(to bottom, #00e676, #00b359); color: black; border: 1px solid #33ff99; text-shadow: none; }
+        #btn-hit:hover { box-shadow: 0 5px 15px rgba(0,230,118,0.5); }
+        
+        #btn-stand { background: linear-gradient(to bottom, #ff3366, #cc0033); color: white; border: 1px solid #ff6688; }
+        #btn-stand:hover { box-shadow: 0 5px 15px rgba(255,51,102,0.5); }
+        
+        #btn-double { background: linear-gradient(to bottom, #ffd700, #ffb400); color: black; border: 1px solid #ffe666; text-shadow: none; }
+        #btn-double:hover { box-shadow: 0 5px 15px rgba(255,180,0,0.5); }
+        
+        #btn-split { background: linear-gradient(to bottom, #00a2ff, #0077cc); color: white; border: 1px solid #66c2ff; }
+        #btn-split:hover { box-shadow: 0 5px 15px rgba(0,162,255,0.5); }
 
         /* LIVE CHAT */
-        .chat-panel { width: 320px; height: 100%; display: flex; flex-direction: column; background: rgba(0, 10, 25, 0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+        .chat-panel { width: 320px; height: 100%; display: flex; flex-direction: column; background: rgba(0, 10, 25, 0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; overflow: hidden; flex-shrink: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .chat-header { padding: 15px; background: rgba(0,0,0,0.7); font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); letter-spacing: 1px; }
         .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .chat-line { font-size: 0.95rem; line-height: 1.4; text-align: left; }
         .chat-line .name { color: #00a2ff; font-weight: bold; margin-right: 5px; }
         .chat-input-area { display: flex; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); gap: 10px; }
-        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white; text-align: left; }
-        .chat-input-area button { width: 44px; height: 44px; background: #00a2ff; border: none; border-radius: 8px; cursor: pointer; color: black; }
-        .chat-input-area button:hover { transform: scale(1.05); }
+        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white; text-align: left; }
+        .chat-input-area button { width: 44px; height: 44px; background: linear-gradient(to bottom, #00a2ff, #0077cc); border: 1px solid #66c2ff; border-radius: 50px; cursor: pointer; color: white; transition: 0.2s;}
+        .chat-input-area button:hover { transform: scale(1.05); box-shadow: 0 0 10px rgba(0,162,255,0.5);}
     </style>
 </head>
 <body>
@@ -117,51 +119,53 @@
         <button onclick="joinSandbox()">ENTER CASINO</button>
     </div>
 
-    <div id="main-layout">
-        
-        <div class="game-column">
-            <div id="game-screen">
-                
-                <div class="table-logo">
-                    <h1>BLACKJACK</h1>
-                    <p>BLACKJACK PAYS 3 TO 2</p>
-                    <p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
-                </div>
-
-                <div id="timer-display"><i class="fas fa-stopwatch"></i> <span id="timer-val">15</span></div>
-
-                <div class="dealer-area">
-                    <div id="dealer-score" class="seat-score" style="display:none; left: -45px;">0</div>
-                    <div id="dealer-hand" class="hand"></div>
-                </div>
-
-                <div class="seats-container" id="seats-container">
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <div id="main-layout">
+            
+            <div class="game-column">
+                <div id="game-screen">
+                    
+                    <div class="table-logo">
+                        <h1>BLACKJACK</h1>
+                        <p>BLACKJACK PAYS 3 TO 2</p>
+                        <p>DEALER MUST DRAW TO 16 AND STAND ON ALL 17s</p>
                     </div>
+
+                    <div id="timer-display"><i class="fas fa-stopwatch"></i> <span id="timer-val">15</span></div>
+
+                    <div class="dealer-area">
+                        <div id="dealer-score" class="seat-score" style="display:none;">0</div>
+                        <div id="dealer-hand" class="hand"></div>
+                    </div>
+
+                    <div class="seats-container" id="seats-container">
+                        </div>
+                </div>
+
+                <div id="controls">
+                    <div id="controls-msg">TAKE A SEAT TO PLAY</div>
+                    <button class="btn-action" id="btn-leave" onclick="leaveSeat()">LEAVE</button>
+                    <input type="number" id="bet-input" placeholder="Amount">
+                    <button class="btn-action" id="btn-bet" onclick="placeBet()">PLACE BET</button>
+                    <button class="btn-action" id="btn-hit" onclick="sendAction('hit')">HIT</button>
+                    <button class="btn-action" id="btn-stand" onclick="sendAction('stand')">STAND</button>
+                    <button class="btn-action" id="btn-double" onclick="sendAction('double')">DOUBLE</button>
+                    <button class="btn-action" id="btn-split" onclick="sendAction('split')">SPLIT</button>
+                </div>
             </div>
 
-            <div id="controls">
-                <div id="controls-msg">TAKE A SEAT TO PLAY</div>
-                <button class="btn-action" id="btn-leave" onclick="leaveSeat()">LEAVE</button>
-                <input type="number" id="bet-input" placeholder="Amount">
-                <button class="btn-action" id="btn-bet" onclick="placeBet()">PLACE BET</button>
-                <button class="btn-action" id="btn-hit" onclick="sendAction('hit')">HIT</button>
-                <button class="btn-action" id="btn-stand" onclick="sendAction('stand')">STAND</button>
-                <button class="btn-action" id="btn-double" onclick="sendAction('double')">DOUBLE</button>
-                <button class="btn-action" id="btn-split" onclick="sendAction('split')">SPLIT</button>
+            <div class="chat-panel">
+                <div class="chat-header">LIVE CHAT</div>
+                <div class="chat-body" id="chat-box">
+                    <div class="chat-line" style="color: #00a2ff; text-align: center; font-weight: bold;">Connected to table.</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Chat here..." onkeypress="if(event.key==='Enter') sendChat();">
+                    <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
+
         </div>
-
-        <div class="chat-panel">
-            <div class="chat-header">LIVE CHAT</div>
-            <div class="chat-body" id="chat-box">
-                <div class="chat-line" style="color: #00a2ff; text-align: center; font-weight: bold;">Connected to table.</div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Chat here..." onkeypress="if(event.key==='Enter') sendChat();">
-                <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-
     </div>
 
     <script>
@@ -207,6 +211,7 @@
         socket.on('timerTick', (timeData) => {
             let timerEl = document.getElementById('timer-display');
             let timerVal = document.getElementById('timer-val');
+            
             if (timeData.status === 'BETTING') {
                 timerVal.innerText = timeData.timer;
                 timerEl.style.opacity = timeData.hasBets ? '1' : '0';
@@ -214,7 +219,7 @@
                 timerEl.style.opacity = '0'; 
             }
 
-            // Sync the player progress bar smoothly
+            // Sync the active player's ticking timer bar
             if (timeData.status === 'PLAYER_TURN' && timeData.activeTurn && timeData.activeTurn.seat) {
                 let bar = document.getElementById(`timer-bar-${timeData.activeTurn.seat}`);
                 if (bar) {
@@ -294,12 +299,12 @@
 
                         handsHtml += `
                         <div class="single-hand-container">
+                            ${hand.bet > 0 ? `<div class="seat-bet">${hand.bet}</div>` : ''}
                             <div class="seat-score ${badgeClass}" style="display:${hand.score > 0 ? 'flex' : 'none'}">${badgeText}</div>
                             <div class="hand">
                                 ${resHtml}
                                 ${cardsHtml}
                             </div>
-                            ${hand.bet > 0 ? `<div class="seat-bet">${hand.bet}</div>` : ''}
                         </div>`;
                     });
 
@@ -314,7 +319,7 @@
                         <div class="seat-name" style="color:${seat.name === myName ? '#00a2ff' : 'white'};">${seat.name}</div>
                         ${state.status !== 'BETTING' ? `
                             <div class="player-timer-track" style="opacity: ${isMySeatTurn ? 1 : 0};">
-                                <div class="player-timer-fill" id="timer-bar-${i}" style="width: 0%;"></div>
+                                <div class="player-timer-fill" id="timer-bar-${i}" style="width: 100%;"></div>
                             </div>
                         ` : ''}
                     </div>`;
@@ -351,7 +356,6 @@
             let canSplit = isMyTurn && activeHandObj.cards.length === 2 && s.hands.length === 1 && (activeHandObj.cards[0].bjVal === activeHandObj.cards[1].bjVal);
             btnSplit.style.display = canSplit ? 'block' : 'none';
 
-            // Determine if rack is completely empty
             let isRackEmpty = (!isSeatedNoBet && !isMyTurn);
             
             if (isRackEmpty) {
