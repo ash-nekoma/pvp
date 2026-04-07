@@ -12,7 +12,15 @@ const io = new Server(server, { cors: { origin: "*" } });
 
 let isMaintenanceMode = false;
 let globalBankVault = 2000000;
-let currentRadio = { url: null, startTime: 0, requestedBy: null };
+
+// Per-Room Radio Tracking
+let roomRadios = {
+    'baccarat': { url: null, requestedBy: null },
+    'perya': { url: null, requestedBy: null },
+    'dt': { url: null, requestedBy: null },
+    'sicbo': { url: null, requestedBy: null },
+    'mbj': { url: null, requestedBy: null }
+};
 
 // Global Transaction Lock to prevent double-spend / multi-tab exploits
 const activeLocks = new Set();
@@ -292,7 +300,6 @@ function getRoomPlayers(room) {
 
 io.on('connection', (socket) => {
     socket.emit('maintenanceToggle', isMaintenanceMode); 
-    socket.emit('radioSync', currentRadio); 
     socket.isAuth = false;
 
     socket.on('login', async (data) => {
@@ -374,7 +381,6 @@ io.on('connection', (socket) => {
             if (data.type === 'ban') {
                 await User.findByIdAndUpdate(data.id, { status: 'Banned' });
                 const targetUser = await User.findById(data.id);
-                // Force Disconnect the banned user immediately
                 if (targetUser && connectedUsers[targetUser.username]) {
                     const targetSocket = io.sockets.sockets.get(connectedUsers[targetUser.username]);
                     if (targetSocket) {
@@ -486,13 +492,7 @@ io.on('connection', (socket) => {
             let dailyProfit = 0;
             todayLogs.forEach(l => { if (l.action === 'GAME') dailyProfit += l.amount; });
             socket.emit('walletLogsData', { logs, dailyProfit: formatTC(dailyProfit) });
-        }
-    });
-
-    socket.on('clearWalletLogs', async () => {
-        if(socket.user) {
-            await CreditLog.deleteMany({ username: socket.user.username });
-            socket.emit('walletLogsData', { logs: [], dailyProfit: 0 });
+            socket.emit('transactionsData', await Transaction.find({ username: socket.user.username }).sort({ date: -1 }));
         }
     });
 
@@ -668,6 +668,13 @@ io.on('connection', (socket) => {
         pCount[room] = getRoomPlayers(room).length;
         io.emit('playerCount', pCount); 
 
+        // Send current radio if active
+        if (roomRadios[room] && roomRadios[room].url) {
+            socket.emit('radioSync', roomRadios[room]);
+        } else {
+            socket.emit('radioStop');
+        }
+
         if (room === 'mbj') {
             socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
             if (mbjState.status === 'PLAYER_TURN') socket.emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
@@ -694,8 +701,28 @@ io.on('connection', (socket) => {
     });
     
     socket.on('sendChat', (data) => { 
-        if (!socket.user) return;
-        if (socket.currentRoom) { socket.broadcast.to(socket.currentRoom).emit('chatMessage', { user: socket.user.username, text: data.msg, sys: false }); } 
+        if (!socket.user || !socket.currentRoom) return;
+        
+        let msg = data.msg.trim();
+        
+        // DJ MUSIC COMMAND INTERCEPTION
+        if (msg.startsWith('/play ')) {
+            let url = msg.substring(6).trim();
+            if (url) {
+                roomRadios[socket.currentRoom] = { url: url, requestedBy: socket.user.username };
+                io.to(socket.currentRoom).emit('radioPlay', roomRadios[socket.currentRoom]);
+                io.to(socket.currentRoom).emit('chatMessage', { user: 'SYSTEM', text: `🎵 ${socket.user.username} started playing music.`, sys: true });
+            }
+            return;
+        } else if (msg === '/stop') {
+            roomRadios[socket.currentRoom] = { url: null, requestedBy: null };
+            io.to(socket.currentRoom).emit('radioStop');
+            io.to(socket.currentRoom).emit('chatMessage', { user: 'SYSTEM', text: `🔇 Music stopped by ${socket.user.username}.`, sys: true });
+            return;
+        }
+
+        // Standard Chat Broadcasting
+        socket.broadcast.to(socket.currentRoom).emit('chatMessage', { user: socket.user.username, text: msg, sys: false }); 
     });
     
     socket.on('getRoomPlayers', (room) => { socket.emit('roomPlayersList', getRoomPlayers(room)); });
