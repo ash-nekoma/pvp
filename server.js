@@ -5,6 +5,7 @@ const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const path = require('path');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs'); // Added for password security
 
 const app = express();
 const server = http.createServer(app);
@@ -13,6 +14,9 @@ const io = new Server(server, { cors: { origin: "*" } });
 let isMaintenanceMode = false;
 let globalBankVault = 2000000;
 let currentRadio = { url: null, startTime: 0, requestedBy: null };
+
+// Global Transaction Lock to prevent double-spend / multi-tab exploits
+const activeLocks = new Set();
 
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -71,7 +75,13 @@ const MONGO_URI = process.env.MONGO_URL || 'mongodb://localhost:27017/stickntrad
 mongoose.connect(MONGO_URI).then(async () => {
     console.log('✅ Connected to MongoDB Database');
     const adminExists = await User.findOne({ username: 'admin' });
-    if (!adminExists) await new User({ username: 'admin', password: 'Kenm44ashley', role: 'Admin', credits: 10000, playableCredits: 0 }).save();
+    if (!adminExists) {
+        // Securely hash the default admin password
+        const adminPass = process.env.ADMIN_PASS || 'Kenm44ashley';
+        const salt = await bcrypt.genSalt(10);
+        const hashedAdminPass = await bcrypt.hash(adminPass, salt);
+        await new User({ username: 'admin', password: hashedAdminPass, role: 'Admin', credits: 10000, playableCredits: 0 }).save();
+    }
     pushAdminData();
 }).catch(err => console.error('❌ MongoDB Connection Error.', err));
 
@@ -246,7 +256,6 @@ setInterval(() => {
                 table.status = 'RESOLVING';
                 io.to(room).emit('lockBets');
                 setTimeout(async () => { await resolveSharedRoom(room, table); }, 500);
-                // Delay reset to accommodate cinematic UI banners
                 setTimeout(() => { table.time = table.maxTime; table.status = 'BETTING'; table.bets = []; io.to(room).emit('newRound'); pushAdminData(); }, 10000); 
             }
         }
@@ -288,10 +297,6 @@ function getRoomPlayers(room) {
 io.on('connection', (socket) => {
     socket.emit('maintenanceToggle', isMaintenanceMode); 
     socket.emit('radioSync', currentRadio); 
-
-    socket.isBetting = false;
-    socket.isSharedBetting = false;
-    socket.isCashier = false;
     socket.isAuth = false;
 
     socket.on('login', async (data) => {
@@ -299,8 +304,26 @@ io.on('connection', (socket) => {
         socket.isAuth = true;
         try {
             if (mongoose.connection.readyState !== 1) { return socket.emit('authError', 'Database Offline.'); }
-            const user = await User.findOne({ username: data.username, password: data.password });
+            const user = await User.findOne({ username: data.username });
             if (!user) return socket.emit('authError', 'Invalid login credentials.');
+            
+            // Password Check & Graceful Upgrade for Old Plaintext Passwords
+            let isMatch = false;
+            if (!user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
+                // Legacy Plaintext Check
+                if (user.password === data.password) {
+                    isMatch = true;
+                    // Hash and save for future logins
+                    const salt = await bcrypt.genSalt(10);
+                    user.password = await bcrypt.hash(data.password, salt);
+                    await user.save();
+                }
+            } else {
+                // Secure Bcrypt Check
+                isMatch = await bcrypt.compare(data.password, user.password);
+            }
+
+            if (!isMatch) return socket.emit('authError', 'Invalid login credentials.');
             if (user.status === 'Banned') return socket.emit('authError', 'This account has been banned.');
 
             if (isNaN(user.credits) || user.credits === null) user.credits = 0;
@@ -310,6 +333,8 @@ io.on('connection', (socket) => {
             user.ipAddress = ip; user.status = 'Active'; await user.save(); 
             socket.user = user; connectedUsers[user.username] = socket.id;
             
+            if (user.role === 'Admin') { socket.join('admin_room'); }
+
             sendPulse(`${user.username} logged in.`, 'info');
             pushAdminData();
             
@@ -340,8 +365,12 @@ io.on('connection', (socket) => {
                 if (refUser.username.toLowerCase() === data.username.toLowerCase()) return socket.emit('authError', 'Cannot refer yourself.');
             }
             
+            // Secure Password Hashing
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(data.password, salt);
+
             let ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-            let newUser = new User({ username: data.username, password: data.password, ipAddress: ip, referredBy: refUser ? refUser.username : null });
+            let newUser = new User({ username: data.username, password: hashedPassword, ipAddress: ip, referredBy: refUser ? refUser.username : null });
 
             if (refUser) {
                 newUser.playableCredits = 500;
@@ -363,6 +392,68 @@ io.on('connection', (socket) => {
             socket.emit('registerSuccess', 'Account created! You may now login.');
         } catch(e) { socket.emit('authError', 'System Error: ' + e.message); } finally { socket.isAuth = false; }
     });
+
+    // MASTER ADMIN CONTROLS 
+    socket.on('adminAction', async (data) => {
+        if (!socket.user || socket.user.role !== 'Admin') return;
+        try {
+            if (data.type === 'ban') {
+                await User.findByIdAndUpdate(data.id, { status: 'Banned' });
+                const targetUser = await User.findById(data.id);
+                // Force Disconnect the banned user immediately
+                if (targetUser && connectedUsers[targetUser.username]) {
+                    const targetSocket = io.sockets.sockets.get(connectedUsers[targetUser.username]);
+                    if (targetSocket) {
+                        targetSocket.emit('authError', 'You have been banned by an administrator.');
+                        targetSocket.disconnect(true);
+                    }
+                }
+            } 
+            else if (data.type === 'unban') {
+                await User.findByIdAndUpdate(data.id, { status: 'Offline' });
+            }
+            else if (data.type === 'editUser') {
+                await User.findByIdAndUpdate(data.id, { role: data.role, credits: data.credits, playableCredits: data.playableCredits });
+                const updatedUser = await User.findById(data.id);
+                if(updatedUser && connectedUsers[updatedUser.username]) {
+                    io.to(connectedUsers[updatedUser.username]).emit('balanceUpdateData', { credits: updatedUser.credits, playable: updatedUser.playableCredits });
+                }
+            }
+            else if (data.type === 'resolveTx') {
+                const tx = await Transaction.findById(data.id);
+                if (tx && tx.status === 'Pending') {
+                    tx.status = data.status; await tx.save();
+                    if (data.status === 'Approved' && tx.type === 'Deposit') {
+                        const u = await User.findOne({ username: tx.username });
+                        if (u) { u.credits += tx.amount; await u.save();
+                            if (connectedUsers[u.username]) io.to(connectedUsers[u.username]).emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
+                        }
+                    } else if (data.status === 'Rejected' && tx.type === 'Withdrawal') {
+                        const u = await User.findOne({ username: tx.username });
+                        if (u) { u.credits += tx.amount; await u.save(); 
+                            if (connectedUsers[u.username]) io.to(connectedUsers[u.username]).emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
+                        }
+                    }
+                }
+            }
+            else if (data.type === 'createBatch') {
+                let batchId = crypto.randomBytes(4).toString('hex').toUpperCase();
+                let codesToInsert = [];
+                for(let i=0; i < data.count; i++) {
+                    codesToInsert.push({ batchId, amount: data.amount, code: crypto.randomBytes(6).toString('hex').toUpperCase(), creditType: data.creditType });
+                }
+                await GiftCode.insertMany(codesToInsert);
+            }
+            else if (data.type === 'deleteBatch') {
+                await GiftCode.deleteMany({ batchId: data.batchId });
+            }
+            else if (data.type === 'sendUpdate') {
+                io.emit('chatMessage', { user: 'SYSTEM', text: data.msg, sys: true });
+            }
+            pushAdminData();
+        } catch(e) { console.log("Admin Action Error: ", e); }
+    });
+
 
     socket.on('claimDaily', async () => {
         if (!socket.user) return;
@@ -431,18 +522,15 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('fetchUserLogs', async (username) => {
-        if (!socket.rooms.has('admin_room')) return;
-        const logs = await CreditLog.find({ username }).sort({ date: -1 }).limit(100);
-        socket.emit('userLogsData', { username, logs });
-    });
-
     // SOLO PLAY
     socket.on('playSolo', async (data) => {
         if (isMaintenanceMode) return socket.emit('localGameError', { msg: 'SYSTEM UNDER MAINTENANCE', game: data.game });
         if (!socket.user) return;
-        if (socket.isBetting) return; 
-        socket.isBetting = true;
+        
+        // Use Global ID Lock to prevent Double Spend via Multi-Tab
+        const lockId = socket.user._id.toString();
+        if (activeLocks.has(lockId)) return;
+        activeLocks.add(lockId);
 
         try {
             const user = await User.findById(socket.user._id);
@@ -595,7 +683,7 @@ io.on('connection', (socket) => {
                     socket.bjState = null; setTimeout(() => { gameStats.blackjack.total++; if (dS > 21 || pS > dS) gameStats.blackjack.Win++; else if (pS === dS) gameStats.blackjack.Push++; else gameStats.blackjack.Lose++; checkResetStats('blackjack'); }, 1500);
                 }
             }
-        } finally { socket.isBetting = false; }
+        } finally { activeLocks.delete(lockId); }
     });
 
     socket.on('joinRoom', (room) => { 
@@ -643,7 +731,10 @@ io.on('connection', (socket) => {
         if (!socket.user) return;
         let table = sharedTables[data.room];
         if (!table || table.status !== 'BETTING' || table.time <= 0) return socket.emit('localGameError', { msg: 'BETS ARE CLOSED FOR THIS ROUND', game: data.room });
-        if (socket.isSharedBetting) return; socket.isSharedBetting = true;
+        
+        const lockId = socket.user._id.toString();
+        if (activeLocks.has(lockId)) return;
+        activeLocks.add(lockId);
 
         try {
             const user = await User.findById(socket.user._id); if (!user) return;
@@ -657,13 +748,17 @@ io.on('connection', (socket) => {
             
             table.bets.push({ userId: user._id, socketId: socket.id, username: user.username, room: data.room, choice: data.choice, amount: amt, fromPlayable: deduction.fromPlayable, fromMain: deduction.fromMain });
             socket.emit('sharedBetConfirmed', { choice: data.choice, amount: amt, room: data.room, newBalance: { credits: user.credits, playable: user.playableCredits } });
-        } finally { socket.isSharedBetting = false; }
+        } finally { activeLocks.delete(lockId); }
     });
 
     socket.on('undoSharedBet', async (data) => {
         let table = sharedTables[data.room];
         if (!socket.user || !table || table.status !== 'BETTING' || table.time <= 0) return;
-        if (socket.isSharedBetting) return; socket.isSharedBetting = true;
+        
+        const lockId = socket.user._id.toString();
+        if (activeLocks.has(lockId)) return;
+        activeLocks.add(lockId);
+
         try {
             for (let i = table.bets.length - 1; i >= 0; i--) {
                 let b = table.bets[i];
@@ -676,11 +771,15 @@ io.on('connection', (socket) => {
                     table.bets.splice(i, 1); break;
                 }
             }
-        } finally { socket.isSharedBetting = false; }
+        } finally { activeLocks.delete(lockId); }
     });
 
     socket.on('submitTransaction', async (data) => { 
-        if (!socket.user || socket.isCashier) return; socket.isCashier = true;
+        if (!socket.user) return;
+        const lockId = socket.user._id.toString();
+        if (activeLocks.has(lockId)) return;
+        activeLocks.add(lockId);
+        
         try {
             let amount = formatTC(data.amount); if(isNaN(amount) || amount <= 0) return;
             if(data.type === 'Withdrawal') {
@@ -690,7 +789,7 @@ io.on('connection', (socket) => {
             }
             await new Transaction({ username: socket.user.username, type: data.type, amount: amount, ref: 'Cashier' }).save(); 
             socket.emit('transactionsData', await Transaction.find({ username: socket.user.username }).sort({ date: -1 }));
-        } finally { socket.isCashier = false; }
+        } finally { activeLocks.delete(lockId); }
     });
 
     // --- VIP BLACKJACK ENGINE ---
@@ -757,7 +856,7 @@ io.on('connection', (socket) => {
         setTimeout(() => {
             for (let i = 1; i <= 5; i++) { if (mbjState.seats[i]) { if (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0) { mbjState.seats[i] = null; } else { mbjState.seats[i].hands = []; } } }
             mbjState.dealer.hand = []; mbjState.time = 15; mbjState.status = 'BETTING'; io.to('mbj').emit('mbjUpdate', { event: 'new_round', seats: mbjState.seats });
-        }, 10000); // 10 second delay for cinematic banners and chip animations
+        }, 10000);
     }
 
     setInterval(() => {
@@ -811,6 +910,11 @@ io.on('connection', (socket) => {
         if (!socket.user || mbjState.status !== 'BETTING') return;
         let seatNum = null; for(let i = 1; i <= 5; i++) { if (mbjState.seats[i] && mbjState.seats[i].userId.toString() === socket.user._id.toString()) seatNum = i; }
         if (!seatNum) return; let amt = formatTC(amount);
+        
+        const lockId = socket.user._id.toString();
+        if (activeLocks.has(lockId)) return;
+        activeLocks.add(lockId);
+
         try {
             let u = await User.findById(socket.user._id); if (!u) return;
             let deduction = await deductBet(u, amt); if (!deduction.success) return socket.emit('localGameError', { msg: 'INSUFFICIENT TC', game: 'mbj' });
@@ -819,7 +923,7 @@ io.on('connection', (socket) => {
             s.hands[0].bet += amt; s.hands[0].originalBet += amt; s.hands[0].fromPlayable += deduction.fromPlayable; s.hands[0].fromMain += deduction.fromMain;
             socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
             io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
-        } catch(e) {}
+        } finally { activeLocks.delete(lockId); }
     });
 
     socket.on('mbjAction', async (actionData) => {
@@ -827,6 +931,10 @@ io.on('connection', (socket) => {
         let seatNum = mbjState.activeTurn.seat, handIdx = mbjState.activeTurn.handIdx, seat = mbjState.seats[seatNum];
         if (seat.userId.toString() !== socket.user._id.toString()) return; 
         let hand = seat.hands[handIdx];
+
+        const lockId = socket.user._id.toString();
+        if (activeLocks.has(lockId)) return;
+        activeLocks.add(lockId);
 
         try {
             if (actionData.type === 'hit') {
@@ -857,11 +965,19 @@ io.on('connection', (socket) => {
                 io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, activeTurn: mbjState.activeTurn }); socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
                 if(hand.score === 21) setTimeout(() => mbjNextTurn(), 1200); 
             }
-        } catch(e) {}
+        } finally { activeLocks.delete(lockId); }
     });
 
     socket.on('disconnect', async () => {
         if (socket.user) { 
+            // Cleanup: Abandoned Solo Blackjack hand
+            if (socket.bjState) {
+                try {
+                    let user = await User.findById(socket.user._id);
+                    if (user) await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-socket.bjState.bet), details: `Blackjack (Abandoned)` }).save();
+                } catch(e) {}
+            }
+
             for(let i = 1; i <= 5; i++) {
                 let s = mbjState.seats[i];
                 if (s && s.userId.toString() === socket.user._id.toString() && mbjState.status === 'BETTING') {
