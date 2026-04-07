@@ -434,7 +434,6 @@ io.on('connection', (socket) => {
         } catch(e) { console.log("Admin Action Error: ", e); }
     });
 
-
     socket.on('claimDaily', async () => {
         if (!socket.user) return;
         const user = await User.findById(socket.user._id);
@@ -469,12 +468,6 @@ io.on('connection', (socket) => {
             socket.emit('promoResult', { success: true, amt: gc.amount, type: gc.creditType });
             socket.emit('balanceUpdateData', { credits: user.credits, playable: user.playableCredits });
         } catch(e) { socket.emit('promoResult', { success: false, msg: 'Server error' }); }
-    });
-
-    socket.on('voiceStream', (data) => {
-        if (socket.currentRoom) {
-            socket.to(socket.currentRoom).emit('voiceStream', data);
-        }
     });
 
     socket.on('requestBalanceRefresh', async () => {
@@ -679,7 +672,10 @@ io.on('connection', (socket) => {
             socket.emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0) });
             if (mbjState.status === 'PLAYER_TURN') socket.emit('mbjUpdate', { event: 'turn', activeTurn: mbjState.activeTurn, time: mbjState.turnTimer, seats: mbjState.seats });
         } else {
-            if(sharedTables[room]) socket.emit('timerUpdate', sharedTables[room].time);
+            if(sharedTables[room]) {
+                // Instantly sync the timer for late joiners
+                socket.emit('timerUpdate', sharedTables[room].time);
+            }
         }
     });
     
@@ -700,6 +696,9 @@ io.on('connection', (socket) => {
         io.emit('playerCount', pCount); 
     });
     
+    // =====================================
+    // CHAT, RADIO & VOICE ROUTING
+    // =====================================
     socket.on('sendChat', (data) => { 
         if (!socket.user || !socket.currentRoom) return;
         
@@ -723,6 +722,18 @@ io.on('connection', (socket) => {
 
         // Standard Chat Broadcasting
         socket.broadcast.to(socket.currentRoom).emit('chatMessage', { user: socket.user.username, text: msg, sys: false }); 
+    });
+
+    socket.on('voiceStream', (data) => {
+        if (socket.currentRoom) {
+            socket.to(socket.currentRoom).emit('voiceStream', data);
+        }
+    });
+
+    socket.on('pttActive', (isActive) => {
+        if (socket.currentRoom && socket.user) {
+            socket.to(socket.currentRoom).emit('pttUpdate', { user: socket.user.username, active: isActive });
+        }
     });
     
     socket.on('getRoomPlayers', (room) => { socket.emit('roomPlayersList', getRoomPlayers(room)); });
@@ -772,24 +783,6 @@ io.on('connection', (socket) => {
                     table.bets.splice(i, 1); break;
                 }
             }
-        } finally { activeLocks.delete(lockId); }
-    });
-
-    socket.on('submitTransaction', async (data) => { 
-        if (!socket.user) return;
-        const lockId = socket.user._id.toString();
-        if (activeLocks.has(lockId)) return;
-        activeLocks.add(lockId);
-        
-        try {
-            let amount = formatTC(data.amount); if(isNaN(amount) || amount <= 0) return;
-            if(data.type === 'Withdrawal') {
-                const user = await User.findOneAndUpdate({ _id: socket.user._id, credits: { $gte: amount } }, { $inc: { credits: -amount } }, { new: true });
-                if (!user) return socket.emit('localGameError', { msg: 'Insufficient TC.', game: 'cashier' });
-                socket.emit('balanceUpdateData', { credits: user.credits, playable: user.playableCredits });
-            }
-            await new Transaction({ username: socket.user.username, type: data.type, amount: amount, ref: 'Cashier' }).save(); 
-            socket.emit('transactionsData', await Transaction.find({ username: socket.user.username }).sort({ date: -1 }));
         } finally { activeLocks.delete(lockId); }
     });
 
