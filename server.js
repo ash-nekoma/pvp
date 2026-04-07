@@ -5,7 +5,6 @@ const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const path = require('path');
 const crypto = require('crypto');
-const bcrypt = require('bcryptjs'); // Added for password security
 
 const app = express();
 const server = http.createServer(app);
@@ -76,11 +75,8 @@ mongoose.connect(MONGO_URI).then(async () => {
     console.log('✅ Connected to MongoDB Database');
     const adminExists = await User.findOne({ username: 'admin' });
     if (!adminExists) {
-        // Securely hash the default admin password
         const adminPass = process.env.ADMIN_PASS || 'Kenm44ashley';
-        const salt = await bcrypt.genSalt(10);
-        const hashedAdminPass = await bcrypt.hash(adminPass, salt);
-        await new User({ username: 'admin', password: hashedAdminPass, role: 'Admin', credits: 10000, playableCredits: 0 }).save();
+        await new User({ username: 'admin', password: adminPass, role: 'Admin', credits: 10000, playableCredits: 0 }).save();
     }
     pushAdminData();
 }).catch(err => console.error('❌ MongoDB Connection Error.', err));
@@ -304,26 +300,8 @@ io.on('connection', (socket) => {
         socket.isAuth = true;
         try {
             if (mongoose.connection.readyState !== 1) { return socket.emit('authError', 'Database Offline.'); }
-            const user = await User.findOne({ username: data.username });
+            const user = await User.findOne({ username: data.username, password: data.password });
             if (!user) return socket.emit('authError', 'Invalid login credentials.');
-            
-            // Password Check & Graceful Upgrade for Old Plaintext Passwords
-            let isMatch = false;
-            if (!user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
-                // Legacy Plaintext Check
-                if (user.password === data.password) {
-                    isMatch = true;
-                    // Hash and save for future logins
-                    const salt = await bcrypt.genSalt(10);
-                    user.password = await bcrypt.hash(data.password, salt);
-                    await user.save();
-                }
-            } else {
-                // Secure Bcrypt Check
-                isMatch = await bcrypt.compare(data.password, user.password);
-            }
-
-            if (!isMatch) return socket.emit('authError', 'Invalid login credentials.');
             if (user.status === 'Banned') return socket.emit('authError', 'This account has been banned.');
 
             if (isNaN(user.credits) || user.credits === null) user.credits = 0;
@@ -365,12 +343,8 @@ io.on('connection', (socket) => {
                 if (refUser.username.toLowerCase() === data.username.toLowerCase()) return socket.emit('authError', 'Cannot refer yourself.');
             }
             
-            // Secure Password Hashing
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(data.password, salt);
-
             let ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-            let newUser = new User({ username: data.username, password: hashedPassword, ipAddress: ip, referredBy: refUser ? refUser.username : null });
+            let newUser = new User({ username: data.username, password: data.password, ipAddress: ip, referredBy: refUser ? refUser.username : null });
 
             if (refUser) {
                 newUser.playableCredits = 500;
