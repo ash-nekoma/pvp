@@ -2,77 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>VIP Blackjack Simulator</title>
+    <title>VIP Blackjack Sandbox</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        * { box-sizing: border-box; font-family: sans-serif; outline: none; }
+        body { background: #000814; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
         
-        #login-screen { text-align: center; }
-        #login-screen input { padding: 10px; font-size: 1.2rem; text-align: center; }
-        #login-screen button { padding: 10px 20px; font-size: 1.2rem; cursor: pointer; }
+        #login-screen { text-align: center; background: rgba(0, 10, 25, 0.9); padding: 40px; border-radius: 12px; border: 1px solid #00a2ff; }
+        #login-screen input { padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 100%; border-radius: 8px; border: none; }
+        #login-screen button { padding: 12px 20px; font-size: 1.2rem; cursor: pointer; background: #00a2ff; color: black; font-weight: bold; border: none; border-radius: 8px; width: 100%; }
 
-        #game-screen { display: none; width: 1000px; height: 700px; background: radial-gradient(circle, #0f5132 0%, #062c19 100%); border-radius: 200px / 100px; border: 15px solid #3e2723; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; }
+        #main-layout { display: none; display: flex; gap: 20px; width: 100%; max-width: 1400px; height: 700px; }
         
-        .dealer-area { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
-        .hand { display: flex; gap: 5px; min-height: 100px; margin-top: 10px;}
-        .card { width: 70px; height: 100px; background: white; color: black; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; border: 1px solid #ccc; }
-        .card-red { color: red; }
-        .card-hidden { background: #001f4d; color: transparent; border: 2px solid white; }
+        /* GAME BOARD */
+        #game-screen { flex: 1; height: 100%; background: radial-gradient(circle, #0f5132 0%, #062c19 100%); border-radius: 20px; border: 15px solid #3e2723; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; }
         
-        #timer-display { position: absolute; top: 150px; left: 50%; transform: translateX(-50%); font-size: 3rem; font-weight: bold; opacity: 0.5; pointer-events: none; }
-        #status-display { position: absolute; top: 200px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; font-weight: bold; color: #ffb400; text-transform: uppercase; }
+        .dealer-area { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        .hand { display: flex; gap: -20px; justify-content: center; min-height: 100px; margin-top: 10px; }
+        .card { width: 70px; height: 100px; background: white; color: black; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 5px; font-weight: bold; font-size: 1rem; border: 1px solid #ccc; box-shadow: -2px 2px 5px rgba(0,0,0,0.5); }
+        .card-red { color: #ff3366; }
+        .card-hidden { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid white; color: transparent; }
+        
+        #timer-display { position: absolute; top: 150px; left: 50%; transform: translateX(-50%); font-size: 4rem; font-weight: bold; text-shadow: 0 5px 15px black; color: white; pointer-events: none; transition: opacity 0.3s;}
+        
+        /* DYNAMIC CENTERED SEATS */
+        .seats-container { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: center; gap: 30px; padding: 0 20px; transition: all 0.5s ease; }
+        .seat { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 120px; position: relative; transition: all 0.5s ease; }
+        .seat-circle { width: 60px; height: 60px; border: 2px dashed rgba(255,255,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.4); }
+        .seat-circle:hover { background: rgba(255,255,255,0.2); border-color: white; }
+        .seat.occupied .seat-circle { border: 2px solid transparent; cursor: default; background: transparent; }
+        .seat.active-turn .seat-circle { box-shadow: 0 0 20px #00e676; border: 2px solid #00e676; background: rgba(0, 230, 118, 0.2); }
+        
+        .seat-name { margin-top: 10px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px black; }
+        .seat-bet { background: rgba(0,0,0,0.8); color: #ffb400; padding: 2px 10px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; border: 1px solid rgba(255, 180, 0, 0.4); margin-top: 5px; }
+        .seat-score { position: absolute; top: 30px; left: -10px; background: #333; border: 2px solid black; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-weight: bold; z-index: 20; box-shadow: 2px 2px 5px black; }
+        .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba); color: black; }
+        
+        #controls { margin-top: 20px; display: flex; gap: 10px; height: 54px; justify-content: center; width: 1000px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 12px; }
+        #controls button { padding: 0 20px; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 5px; border: none; text-transform: uppercase; display: none; height: 100%; transition: 0.2s; }
+        #controls input { padding: 0 20px; font-size: 1.2rem; text-align: center; width: 180px; display: none; height: 100%; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; font-weight: bold; }
+        
+        #btn-leave { background: rgba(255,51,102,0.2); color: #ff3366; }
+        #btn-bet { background: #00e676; color: black; }
+        #btn-hit { background: rgba(0,230,118,0.2); color: #00e676; border: 1px solid #00e676; }
+        #btn-stand { background: rgba(255,51,102,0.2); color: #ff3366; border: 1px solid #ff3366; }
+        #btn-double { background: rgba(255,180,0,0.2); color: #ffb400; border: 1px solid #ffb400; }
 
-        .seats-container { position: absolute; bottom: 40px; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0 40px; }
-        .seat { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-height: 200px; position: relative; }
-        .seat-circle { width: 60px; height: 60px; border: 2px dashed rgba(255,255,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        .seat-circle:hover { background: rgba(255,255,255,0.1); }
-        .seat.occupied .seat-circle { border: 2px solid #ffb400; cursor: default; background: rgba(0,0,0,0.5); }
-        .seat.active-turn .seat-circle { border-color: #00e676; box-shadow: 0 0 15px #00e676; }
-        
-        .seat-name { margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
-        .seat-bet { color: #ffb400; font-weight: bold; }
-        .seat-score { background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 10px; margin-bottom: 5px; font-size: 0.9rem; }
-        
-        #controls { margin-top: 20px; display: flex; gap: 10px; height: 50px; }
-        #controls button { padding: 10px 20px; font-size: 1.2rem; font-weight: bold; cursor: pointer; border-radius: 5px; border: none; text-transform: uppercase; display: none; }
-        #controls input { padding: 10px; font-size: 1.2rem; text-align: center; width: 150px; display: none; }
-        
-        #btn-sit { background: #00a2ff; color: white; display: none; }
-        #btn-leave { background: #ff3366; color: white; display: none; }
-        #btn-bet { background: #ffb400; color: black; display: none; }
-        #btn-hit { background: #00e676; color: black; display: none; }
-        #btn-stand { background: #ff3366; color: white; display: none; }
-        #btn-double { background: #ffb400; color: black; display: none; }
+        /* LIVE CHAT */
+        .chat-panel { width: 320px; height: 700px; display: flex; flex-direction: column; background: rgba(0, 10, 25, 0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; overflow: hidden; }
+        .chat-header { padding: 15px; background: rgba(0,0,0,0.7); font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .chat-line { font-size: 0.95rem; line-height: 1.4; text-align: left; }
+        .chat-line .name { color: #00a2ff; font-weight: bold; margin-right: 5px; }
+        .chat-input-area { display: flex; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); gap: 10px; }
+        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white; text-align: left; }
+        .chat-input-area input::placeholder { text-align: left; color: rgba(255,255,255,0.4); }
+        .chat-input-area button { width: 44px; height: 44px; background: #00a2ff; border: none; border-radius: 8px; cursor: pointer; color: black; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <h2>Enter Sandbox</h2>
-        <input type="text" id="username" placeholder="Enter a fake name">
-        <button onclick="joinSandbox()">JOIN TABLE</button>
+        <h2>Enter VIP Sandbox</h2>
+        <input type="text" id="username" placeholder="Enter your name">
+        <button onclick="joinSandbox()">ENTER CASINO</button>
     </div>
 
-    <div id="game-screen">
-        <div class="dealer-area">
-            <div id="dealer-score" class="seat-score" style="display:none;">0</div>
-            <div id="dealer-hand" class="hand"></div>
-        </div>
-        
-        <div id="timer-display">15</div>
-        <div id="status-display">WAITING FOR BETS</div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <div id="main-layout">
+            <div id="game-screen">
+                <div class="dealer-area">
+                    <div id="dealer-score" class="seat-score" style="display:none; left: -40px;">0</div>
+                    <div id="dealer-hand" class="hand"></div>
+                </div>
+                
+                <div id="timer-display">15</div>
 
-        <div class="seats-container" id="seats-container">
+                <div class="seats-container" id="seats-container">
+                    </div>
             </div>
-    </div>
 
-    <div id="controls">
-        <button id="btn-leave" onclick="leaveSeat()">Leave Seat</button>
-        <input type="number" id="bet-input" placeholder="Bet Amount">
-        <button id="btn-bet" onclick="placeBet()">Place Bet</button>
-        <button id="btn-hit" onclick="sendAction('hit')">Hit</button>
-        <button id="btn-stand" onclick="sendAction('stand')">Stand</button>
-        <button id="btn-double" onclick="sendAction('double')">Double</button>
+            <div class="chat-panel">
+                <div class="chat-header">LIVE CHAT</div>
+                <div class="chat-body custom-scroll" id="chat-box">
+                    <div class="chat-line" style="color: #00a2ff; text-align: center; font-weight: bold;">Connected to table.</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Chat here..." onkeypress="if(event.key==='Enter') sendChat();">
+                    <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="controls">
+            <button id="btn-leave" onclick="leaveSeat()">LEAVE</button>
+            <input type="number" id="bet-input" placeholder="Amount">
+            <button id="btn-bet" onclick="placeBet()">PLACE BET</button>
+            <button id="btn-hit" onclick="sendAction('hit')">HIT</button>
+            <button id="btn-stand" onclick="sendAction('stand')">STAND</button>
+            <button id="btn-double" onclick="sendAction('double')">DOUBLE</button>
+        </div>
     </div>
 
     <script>
@@ -86,7 +115,7 @@
             myName = name;
             socket.emit('join', myName);
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'block';
+            document.getElementById('main-layout').style.display = 'flex';
         }
 
         function takeSeat(seatNum) { socket.emit('takeSeat', seatNum); }
@@ -99,28 +128,51 @@
         }
         function sendAction(action) { socket.emit('playerAction', action); }
 
-        socket.on('stateUpdate', (state) => {
-            // 1. Update Timer & Status
-            document.getElementById('timer-display').innerText = state.timer;
-            document.getElementById('status-display').innerText = state.status.replace('_', ' ');
+        // CHAT FUNCTIONS
+        function sendChat() {
+            let input = document.getElementById('chat-input');
+            let msg = input.value.trim();
+            if (msg) {
+                socket.emit('sendChat', msg);
+                input.value = '';
+            }
+        }
+        socket.on('chatMessage', (data) => {
+            let box = document.getElementById('chat-box');
+            box.innerHTML += `<div class="chat-line"><span class="name">${data.name}:</span> ${data.msg}</div>`;
+            box.scrollTop = box.scrollHeight;
+        });
 
-            // 2. Render Dealer
-            let dHand = document.getElementById('dealer-hand');
-            dHand.innerHTML = '';
-            state.dealer.cards.forEach(c => {
-                if (c === 'hidden') dHand.innerHTML += `<div class="card card-hidden">?</div>`;
-                else dHand.innerHTML += `<div class="card ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}">${c.val}${c.suit}</div>`;
-            });
-            if (state.dealer.score > 0) {
-                document.getElementById('dealer-score').style.display = 'block';
-                document.getElementById('dealer-score').innerText = state.dealer.score;
+        // GAME RENDERER
+        socket.on('stateUpdate', (state) => {
+            let timerEl = document.getElementById('timer-display');
+            if (state.status === 'BETTING') {
+                let hasBets = Object.values(state.seats).some(s => s !== null && s.bet > 0);
+                timerEl.innerText = state.timer;
+                timerEl.style.opacity = hasBets ? '1' : '0.2';
             } else {
-                document.getElementById('dealer-score').style.display = 'none';
+                timerEl.style.opacity = '0'; // Hide timer during deal/play
             }
 
-            // 3. Render Seats
+            // Render Dealer
+            let dHand = document.getElementById('dealer-hand');
+            dHand.innerHTML = '';
+            state.dealer.cards.forEach((c, idx) => {
+                if (c === 'hidden') dHand.innerHTML += `<div class="card card-hidden" style="margin-left: ${idx > 0 ? '-40px' : '0'};">?</div>`;
+                else dHand.innerHTML += `<div class="card ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="margin-left: ${idx > 0 ? '-40px' : '0'};">
+                    <div style="font-size:0.8rem">${c.val}</div>
+                    <div style="font-size:1.5rem; text-align:center; margin-top:10px;">${c.suit}</div>
+                </div>`;
+            });
+            let dScoreEl = document.getElementById('dealer-score');
+            if (state.dealer.score > 0) {
+                dScoreEl.style.display = 'flex'; dScoreEl.innerText = state.dealer.score;
+            } else { dScoreEl.style.display = 'none'; }
+
+            // Render Seats with DYNAMIC CENTERING
             let seatsHtml = '';
             mySeat = null;
+            
             for(let i=1; i<=5; i++) {
                 let seat = state.seats[i];
                 let isActiveTurn = state.activeSeat === i;
@@ -128,32 +180,44 @@
                 if (seat) {
                     if (seat.name === myName) mySeat = i;
                     
+                    // If round is running and this seat didn't bet, HIDE THEM so flex centers the rest
+                    if (state.status !== 'BETTING' && seat.bet === 0) {
+                        continue; 
+                    }
+
                     let cardsHtml = '';
-                    seat.cards.forEach(c => {
-                        cardsHtml += `<div class="card ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}">${c.val}${c.suit}</div>`;
+                    seat.cards.forEach((c, idx) => {
+                        cardsHtml += `<div class="card ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="margin-left: ${idx > 0 ? '-40px' : '0'}; z-index: ${idx};">
+                            <div style="font-size:0.8rem">${c.val}</div>
+                            <div style="font-size:1.5rem; text-align:center; margin-top:10px;">${c.suit}</div>
+                        </div>`;
                     });
 
                     seatsHtml += `
                     <div class="seat occupied ${isActiveTurn ? 'active-turn' : ''}">
-                        ${seat.result ? `<div style="color:white; font-weight:bold; font-size:1.2rem; text-shadow:0 0 10px black; margin-bottom:5px;">${seat.result}</div>` : ''}
-                        <div class="seat-score" style="display:${seat.score > 0 ? 'block' : 'none'}">${seat.score}</div>
+                        ${seat.result ? `<div style="position:absolute; top:-40px; color:${seat.result==='WIN'?'#00e676':(seat.result==='PUSH'?'white':'#ff3366')}; font-weight:bold; font-size:1.2rem; text-shadow:0 0 10px black; z-index:50;">${seat.result}</div>` : ''}
+                        <div class="seat-score ${isActiveTurn ? 'score-active' : ''}" style="display:${seat.score > 0 ? 'flex' : 'none'}">${seat.score}</div>
                         <div class="hand">${cardsHtml}</div>
                         <div class="seat-circle">
-                            ${seat.bet > 0 ? `<div class="seat-bet">${seat.bet}</div>` : 'WAIT'}
+                            ${seat.bet > 0 ? `<i class="fas fa-check" style="color: #00e676; font-size: 1.5rem;"></i>` : '<i class="fas fa-user" style="color: white; opacity:0.5;"></i>'}
                         </div>
-                        <div class="seat-name">${seat.name}</div>
+                        ${seat.bet > 0 ? `<div class="seat-bet">${seat.bet}</div>` : ''}
+                        <div class="seat-name" style="color:${seat.name === myName ? '#00a2ff' : 'white'};">${seat.name}</div>
                     </div>`;
                 } else {
-                    seatsHtml += `
-                    <div class="seat">
-                        <div class="seat-circle" onclick="takeSeat(${i})">SIT</div>
-                    </div>`;
+                    // Empty seats ALSO disappear during active rounds to force centering
+                    if (state.status === 'BETTING') {
+                        seatsHtml += `
+                        <div class="seat">
+                            <div class="seat-circle" onclick="takeSeat(${i})"><i class="fas fa-plus" style="color:white; opacity:0.3;"></i></div>
+                        </div>`;
+                    }
                 }
             }
             document.getElementById('seats-container').innerHTML = seatsHtml;
 
-            // 4. Update Controls based on State
-            document.getElementById('btn-leave').style.display = (mySeat !== null && state.status === 'BETTING') ? 'block' : 'none';
+            // Update Controls
+            document.getElementById('btn-leave').style.display = (mySeat !== null && state.status === 'BETTING' && state.seats[mySeat].bet === 0) ? 'block' : 'none';
             
             let canBet = mySeat !== null && state.status === 'BETTING' && state.seats[mySeat].bet === 0;
             document.getElementById('bet-input').style.display = canBet ? 'block' : 'none';
