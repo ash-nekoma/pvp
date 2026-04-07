@@ -856,8 +856,15 @@ io.on('connection', (socket) => {
     setInterval(() => {
         if (mbjState.status === 'BETTING') {
             let hasBets = Object.values(mbjState.seats).some(s => s && s.hands.length > 0 && s.hands[0].bet > 0);
-            if (hasBets) { mbjState.time--; io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true }); } 
-            else { mbjState.time = 15; io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false }); }
+            
+            // NEW LOGIC: Only count down if someone has actually placed a bet
+            if (hasBets) { 
+                mbjState.time--; 
+                io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: true }); 
+            } else { 
+                mbjState.time = 15; 
+                io.to('mbj').emit('mbjUpdate', { event: 'timer', time: mbjState.time, active: false }); 
+            }
             
             if (mbjState.time <= 0 && hasBets) {
                 for (let i = 1; i <= 5; i++) { if (mbjState.seats[i] && (mbjState.seats[i].hands.length === 0 || mbjState.seats[i].hands[0].bet === 0)) { mbjState.seats[i] = null; } }
@@ -916,6 +923,9 @@ io.on('connection', (socket) => {
             let s = mbjState.seats[seatNum]; if (s.hands.length === 0) s.hands.push({ bet: 0, originalBet: 0, doubledAmount: 0, cards: [], score: 0, status: 'WAITING', isSplitHand: false, fromPlayable: 0, fromMain: 0 });
             s.hands[0].bet += amt; s.hands[0].originalBet += amt; s.hands[0].fromPlayable += deduction.fromPlayable; s.hands[0].fromMain += deduction.fromMain;
             socket.emit('balanceUpdateData', { credits: u.credits, playable: u.playableCredits });
+            
+            // INSTANT TIMER RESET FOR OTHERS TO JOIN
+            mbjState.time = 15;
             io.to('mbj').emit('mbjUpdate', { event: 'sync_seats', seats: mbjState.seats, active: true });
         } finally { activeLocks.delete(lockId); }
     });
@@ -964,14 +974,9 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', async () => {
         if (socket.user) { 
-            // Cleanup: Abandoned Solo Blackjack hand
             if (socket.bjState) {
-                try {
-                    let user = await User.findById(socket.user._id);
-                    if (user) await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-socket.bjState.bet), details: `Blackjack (Abandoned)` }).save();
-                } catch(e) {}
+                try { let user = await User.findById(socket.user._id); if (user) await new CreditLog({ username: user.username, action: 'GAME', amount: formatTC(-socket.bjState.bet), details: `Blackjack (Abandoned)` }).save(); } catch(e) {}
             }
-
             for(let i = 1; i <= 5; i++) {
                 let s = mbjState.seats[i];
                 if (s && s.userId.toString() === socket.user._id.toString() && mbjState.status === 'BETTING') {
