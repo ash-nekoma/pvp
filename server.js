@@ -38,7 +38,7 @@ function drawCard() { if(shoe.length < 52) shoe = buildShoe(); return shoe.pop()
 let state = {
     status: 'BETTING', // BETTING, DEALING, PLAYER_TURN, DEALER_TURN, RESOLVED
     timer: 15,
-    activeSeat: null,
+    activeTurn: { seat: null, handIdx: 0 },
     dealer: { cards: [], score: 0 },
     seats: {
         1: null, 2: null, 3: null, 4: null, 5: null
@@ -46,8 +46,8 @@ let state = {
 };
 
 function broadcastState() {
-    // Hide dealer's second card if it's not their turn yet
     let payload = JSON.parse(JSON.stringify(state));
+    // Hide dealer's downcard
     if (payload.status !== 'DEALER_TURN' && payload.status !== 'RESOLVED' && payload.dealer.cards.length === 2) {
         payload.dealer.cards[1] = 'hidden';
         payload.dealer.score = payload.dealer.cards[0].bjVal;
@@ -55,26 +55,48 @@ function broadcastState() {
     io.emit('stateUpdate', payload);
 }
 
+// Send timer independently so cards don't constantly flash/re-render
+function broadcastTimer() {
+    let hasBets = Object.values(state.seats).some(s => s && s.hands && s.hands.length > 0 && s.hands[0].bet > 0);
+    io.emit('timerTick', { status: state.status, timer: state.timer, hasBets: hasBets });
+}
+
 function nextTurn() {
-    let activeKeys = Object.keys(state.seats).filter(k => state.seats[k] !== null && state.seats[k].bet > 0 && state.seats[k].status === 'PLAYING');
-    
-    // Find who is currently active, and move to the next one
-    if (state.activeSeat === null && activeKeys.length > 0) {
-        state.activeSeat = parseInt(activeKeys[0]);
-    } else {
-        let currentIndex = activeKeys.indexOf(state.activeSeat.toString());
-        if (currentIndex !== -1 && currentIndex + 1 < activeKeys.length) {
-            state.activeSeat = parseInt(activeKeys[currentIndex + 1]);
-        } else {
-            // No more players. Dealer turn.
-            state.activeSeat = null;
-            resolveDealer();
-            return;
+    let startSeat = state.activeTurn.seat === null ? 1 : state.activeTurn.seat;
+    let startHand = state.activeTurn.seat === null ? 0 : state.activeTurn.handIdx;
+
+    // Check current seat's next hands first
+    if (state.activeTurn.seat !== null) {
+        let seat = state.seats[startSeat];
+        if (seat && startHand + 1 < seat.hands.length) {
+            if (seat.hands[startHand + 1].status === 'PLAYING') {
+                state.activeTurn.handIdx++;
+                state.timer = 15;
+                broadcastState();
+                return;
+            }
         }
     }
-    
-    state.timer = 15;
-    broadcastState();
+
+    // Move to subsequent seats
+    let nextSeatNum = startSeat + (state.activeTurn.seat === null ? 0 : 1);
+    for (let i = nextSeatNum; i <= 5; i++) {
+        let s = state.seats[i];
+        if (s && s.hands) {
+            for(let h=0; h<s.hands.length; h++) {
+                if (s.hands[h].status === 'PLAYING') {
+                    state.activeTurn = { seat: i, handIdx: h };
+                    state.timer = 15;
+                    broadcastState();
+                    return;
+                }
+            }
+        }
+    }
+
+    // No more active players. Dealer's Turn.
+    state.activeTurn = { seat: null, handIdx: 0 };
+    resolveDealer();
 }
 
 function resolveDealer() {
@@ -91,7 +113,7 @@ function resolveDealer() {
             clearInterval(dealerInterval);
             finishRound();
         }
-    }, 1000);
+    }, 1000); // 1-second suspense per dealer draw
 }
 
 function finishRound() {
@@ -101,38 +123,38 @@ function finishRound() {
     
     for(let i=1; i<=5; i++) {
         let s = state.seats[i];
-        if (s && s.bet > 0) {
-            let playerNatural = (s.cards.length === 2 && s.score === 21);
-            if (s.status === 'BUST') { s.result = 'LOSS'; }
-            else if (dealerNatural && !playerNatural) { s.result = 'LOSS'; }
-            else if (playerNatural && !dealerNatural) { s.result = 'WIN'; } // Blackjack
-            else if (dScore > 21 || s.score > dScore) { s.result = 'WIN'; }
-            else if (s.score === dScore) { s.result = 'PUSH'; }
-            else { s.result = 'LOSS'; }
+        if (s && s.hands) {
+            s.hands.forEach(h => {
+                let playerNatural = (h.cards.length === 2 && h.score === 21 && !h.isSplit);
+                
+                if (h.status === 'BUST') { h.result = 'LOSS'; }
+                else if (dealerNatural && !playerNatural) { h.result = 'LOSS'; }
+                else if (playerNatural && !dealerNatural) { h.result = 'WIN'; } // BJ 1.5x
+                else if (dScore > 21 || h.score > dScore) { h.result = 'WIN'; }
+                else if (h.score === dScore) { h.result = 'PUSH'; }
+                else { h.result = 'LOSS'; }
+            });
         }
     }
     
     broadcastState();
 
-    // Reset after 5 seconds
+    // Reset Table
     setTimeout(() => {
         state.dealer = { cards: [], score: 0 };
         for(let i=1; i<=5; i++) {
             let s = state.seats[i];
             if (s) {
-                if (s.bet === 0) { state.seats[i] = null; } // Kick idlers
-                else {
-                    s.cards = [];
-                    s.score = 0;
-                    s.bet = 0; // Reset bet for next round
-                    s.status = 'WAITING';
-                    s.result = null;
+                if (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0) {
+                    state.seats[i] = null; // Kick idlers
+                } else {
+                    s.hands = []; // Clear hands, await new bets
                 }
             }
         }
         state.status = 'BETTING';
         state.timer = 15;
-        state.activeSeat = null;
+        state.activeTurn = { seat: null, handIdx: 0 };
         broadcastState();
     }, 5000);
 }
@@ -140,41 +162,43 @@ function finishRound() {
 // MAIN ENGINE LOOP
 setInterval(() => {
     if (state.status === 'BETTING') {
-        let hasBets = Object.values(state.seats).some(s => s && s.bet > 0);
+        let hasBets = Object.values(state.seats).some(s => s && s.hands && s.hands.length > 0 && s.hands[0].bet > 0);
         if (hasBets) {
             state.timer--;
             if (state.timer <= 0) {
                 state.status = 'DEALING';
                 broadcastState();
                 
-                // Deal sequence
-                let activeSeats = Object.keys(state.seats).filter(k => state.seats[k] !== null && state.seats[k].bet > 0);
+                let activeSeats = Object.keys(state.seats).filter(k => state.seats[k] !== null && state.seats[k].hands && state.seats[k].hands.length > 0 && state.seats[k].hands[0].bet > 0);
                 
-                activeSeats.forEach(k => { state.seats[k].cards = [drawCard(), drawCard()]; state.seats[k].score = getScore(state.seats[k].cards); state.seats[k].status = state.seats[k].score === 21 ? 'STAND' : 'PLAYING'; });
+                // Initial Deal
+                activeSeats.forEach(k => { 
+                    let score = getScore(state.seats[k].hands[0].cards);
+                    state.seats[k].hands[0].cards = [drawCard(), drawCard()]; 
+                    state.seats[k].hands[0].score = getScore(state.seats[k].hands[0].cards); 
+                    state.seats[k].hands[0].status = state.seats[k].hands[0].score === 21 ? 'BLACKJACK' : 'PLAYING'; 
+                });
                 state.dealer.cards = [drawCard(), drawCard()];
                 state.dealer.score = getScore(state.dealer.cards);
                 
-                setTimeout(() => {
-                    state.status = 'PLAYER_TURN';
-                    nextTurn();
-                }, 2000);
+                // Jump to Player turns
+                setTimeout(() => { state.status = 'PLAYER_TURN'; nextTurn(); }, 1000);
                 return;
             }
         } else {
-            state.timer = 15; // Reset if no bets
+            state.timer = 15;
         }
-        broadcastState();
+        broadcastTimer(); // Emit silent tick
     } 
     else if (state.status === 'PLAYER_TURN') {
         state.timer--;
         if (state.timer <= 0) {
-            // Auto-stand if time runs out
-            if (state.activeSeat && state.seats[state.activeSeat]) {
-                state.seats[state.activeSeat].status = 'STAND';
+            if (state.activeTurn.seat !== null) {
+                state.seats[state.activeTurn.seat].hands[state.activeTurn.handIdx].status = 'STAND';
                 nextTurn();
             }
         } else {
-            broadcastState();
+            broadcastTimer();
         }
     }
 }, 1000);
@@ -183,6 +207,7 @@ io.on('connection', (socket) => {
     socket.on('join', (name) => {
         socket.playerName = name;
         broadcastState();
+        broadcastTimer();
     });
 
     socket.on('sendChat', (msg) => {
@@ -191,15 +216,14 @@ io.on('connection', (socket) => {
 
     socket.on('takeSeat', (seatNum) => {
         if (!socket.playerName || state.seats[seatNum] || state.status !== 'BETTING') return;
-        // Prevent sitting twice
         for(let i=1; i<=5; i++) { if(state.seats[i] && state.seats[i].name === socket.playerName) return; }
         
-        state.seats[seatNum] = { name: socket.playerName, socketId: socket.id, bet: 0, cards: [], score: 0, status: 'WAITING' };
+        state.seats[seatNum] = { name: socket.playerName, socketId: socket.id, hands: [] };
         broadcastState();
     });
 
     socket.on('leaveSeat', () => {
-        if (state.status !== 'BETTING') return; // Can only leave during betting
+        if (state.status !== 'BETTING') return; 
         for(let i=1; i<=5; i++) {
             if(state.seats[i] && state.seats[i].socketId === socket.id) {
                 state.seats[i] = null;
@@ -213,56 +237,80 @@ io.on('connection', (socket) => {
         if (state.status !== 'BETTING') return;
         for(let i=1; i<=5; i++) {
             let s = state.seats[i];
-            if (s && s.socketId === socket.id && s.bet === 0) {
-                s.bet = amt;
-                state.timer = 15; // Reset timer when someone bets to allow others
-                broadcastState();
-                break;
+            if (s && s.socketId === socket.id) {
+                if (s.hands.length === 0) s.hands.push({ bet: 0, cards: [], score: 0, status: 'WAITING', isSplit: false });
+                if (s.hands[0].bet === 0) {
+                    s.hands[0].bet = amt;
+                    state.timer = 15; // Instantly reset timer for others to join
+                    broadcastState();
+                    break;
+                }
             }
         }
     });
 
     socket.on('playerAction', (action) => {
-        if (state.status !== 'PLAYER_TURN' || !state.activeSeat) return;
-        let seat = state.seats[state.activeSeat];
-        if (!seat || seat.socketId !== socket.id) return; // Not their turn
+        if (state.status !== 'PLAYER_TURN' || state.activeTurn.seat === null) return;
+        let seat = state.seats[state.activeTurn.seat];
+        if (!seat || seat.socketId !== socket.id) return; 
+        let hand = seat.hands[state.activeTurn.handIdx];
 
         if (action === 'hit') {
-            seat.cards.push(drawCard());
-            seat.score = getScore(seat.cards);
+            hand.cards.push(drawCard());
+            hand.score = getScore(hand.cards);
             state.timer = 15;
-            if (seat.score >= 21) {
-                seat.status = seat.score > 21 ? 'BUST' : 'STAND';
+            if (hand.score >= 21) {
+                hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 nextTurn();
             } else {
                 broadcastState();
             }
         } 
         else if (action === 'stand') {
-            seat.status = 'STAND';
+            hand.status = 'STAND';
             nextTurn();
         }
         else if (action === 'double') {
-            if (seat.cards.length === 2) {
-                seat.bet *= 2;
-                seat.cards.push(drawCard());
-                seat.score = getScore(seat.cards);
-                seat.status = seat.score > 21 ? 'BUST' : 'STAND';
+            if (hand.cards.length === 2) {
+                hand.bet *= 2;
+                hand.cards.push(drawCard());
+                hand.score = getScore(hand.cards);
+                hand.status = hand.score > 21 ? 'BUST' : 'STAND';
                 nextTurn();
+            }
+        }
+        else if (action === 'split') {
+            if (hand.cards.length === 2 && seat.hands.length === 1 && hand.cards[0].bjVal === hand.cards[1].bjVal) {
+                let splitCard = hand.cards.pop();
+                
+                // Hand 1 (Original)
+                hand.cards.push(drawCard());
+                hand.score = getScore(hand.cards);
+                hand.isSplit = true;
+                if (hand.score === 21) hand.status = 'STAND'; // Auto-stand on 21
+
+                // Hand 2 (New)
+                let newHand = { bet: hand.bet, cards: [splitCard, drawCard()], score: 0, status: 'PLAYING', isSplit: true };
+                newHand.score = getScore(newHand.cards);
+                if (newHand.score === 21) newHand.status = 'STAND';
+                
+                seat.hands.push(newHand);
+                state.timer = 15;
+
+                if (hand.status === 'STAND') nextTurn(); // If hand 1 got 21, move to hand 2 immediately
+                else broadcastState();
             }
         }
     });
 
     socket.on('disconnect', () => {
-        // Find if they are in a seat
         for(let i=1; i<=5; i++) {
             if(state.seats[i] && state.seats[i].socketId === socket.id) {
-                if (state.status === 'BETTING') {
-                    state.seats[i] = null;
-                } else {
-                    // If game is running, auto-stand them and they will be kicked next round
-                    state.seats[i].status = 'STAND';
-                    if (state.activeSeat === i) nextTurn();
+                if (state.status === 'BETTING') { state.seats[i] = null; } 
+                else { 
+                    // Auto-stand all their hands
+                    if(state.seats[i].hands) state.seats[i].hands.forEach(h => h.status = 'STAND'); 
+                    if (state.activeTurn.seat === i) nextTurn(); 
                 }
                 broadcastState();
                 break;
