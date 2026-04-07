@@ -13,31 +13,34 @@
         #login-screen input { padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 100%; border-radius: 8px; border: none; }
         #login-screen button { padding: 12px 20px; font-size: 1.2rem; cursor: pointer; background: #00a2ff; color: black; font-weight: bold; border: none; border-radius: 8px; width: 100%; }
 
-        #main-layout { display: none; display: flex; gap: 20px; width: 100%; max-width: 1400px; height: 700px; }
+        #main-layout { display: none; display: flex; gap: 20px; width: 100%; max-width: 1600px; height: 750px; }
         
-        /* GAME BOARD */
-        #game-screen { flex: 1; height: 100%; background: radial-gradient(circle, #0f5132 0%, #062c19 100%); border-radius: 20px; border: 15px solid #3e2723; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        /* EXPANDED GAME BOARD */
+        #game-screen { flex: 1; height: 100%; background: radial-gradient(circle, #0f5132 0%, #062c19 100%); border-radius: 20px; border: 15px solid #3e2723; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; min-width: 1100px; }
         
         .dealer-area { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
         
-        /* CARD ANIMATIONS */
         @keyframes dealFly {
             0% { transform: translate(100px, -200px) scale(0.5); opacity: 0; }
             100% { transform: translate(0, 0) scale(1); opacity: 1; }
         }
 
+        /* TIGHTER DEALER OVERLAP */
         .hand { display: flex; gap: -30px; justify-content: center; min-height: 100px; margin-top: 15px; position: relative;}
-        .card { width: 75px; height: 110px; background: white; color: black; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 5px; font-weight: bold; font-size: 1.1rem; border: 1px solid #ccc; box-shadow: -4px 4px 10px rgba(0,0,0,0.6); animation: dealFly 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        /* SLIGHTLY NARROWER CARDS */
+        .card { width: 70px; height: 105px; background: white; color: black; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 5px; font-weight: bold; font-size: 1.1rem; border: 1px solid #ccc; box-shadow: -4px 4px 10px rgba(0,0,0,0.6); animation: dealFly 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .card-red { color: #ff3366; }
         .card-hidden { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid white; color: transparent; }
         
         #timer-display { position: absolute; top: 150px; left: 50%; transform: translateX(-50%); font-size: 4rem; font-weight: bold; text-shadow: 0 5px 15px black; color: white; pointer-events: none; transition: opacity 0.3s;}
         
-        /* DYNAMIC CENTERED SEATS */
-        .seats-container { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: center; align-items: flex-end; gap: 40px; padding: 0 20px; transition: all 0.5s ease; }
-        .seat { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; transition: all 0.5s ease; }
+        /* DYNAMIC CENTERED SEATS - REDUCED GAP */
+        .seats-container { position: absolute; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; align-items: flex-end; gap: 15px; padding: 0 10px; transition: all 0.5s ease; }
+        .seat { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; transition: all 0.5s ease; min-width: 100px; }
         
-        .hands-wrapper { display: flex; gap: 20px; align-items: flex-end; margin-bottom: 10px; }
+        /* TIGHTER SPLIT GAP */
+        .hands-wrapper { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 10px; }
         .single-hand-container { display: flex; flex-direction: column; align-items: center; position: relative; }
 
         .seat-circle { width: 60px; height: 60px; border: 2px dashed rgba(255,255,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.4); margin-top: 10px;}
@@ -45,16 +48,15 @@
         .seat.occupied .seat-circle { border: 2px solid transparent; cursor: default; background: transparent; }
         .seat.active-turn .seat-circle { box-shadow: 0 0 20px #00e676; border: 2px solid #00e676; background: rgba(0, 230, 118, 0.2); }
         
-        .seat-name { margin-top: 10px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px black; }
+        .seat-name { margin-top: 5px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; text-shadow: 0 2px 4px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; text-align: center;}
         .seat-bet { background: rgba(0,0,0,0.8); color: #ffb400; padding: 2px 10px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; border: 1px solid rgba(255, 180, 0, 0.4); margin-top: 5px; }
         
-        /* FIXED BADGE PLACEMENT */
         .seat-score { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #333; border: 2px solid black; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-weight: bold; z-index: 20; box-shadow: 2px 2px 5px black; font-size: 1rem; }
         .score-active { background: linear-gradient(to bottom, #bf953f, #fcf6ba); color: black; }
         .score-bust { background: linear-gradient(to bottom, #cc0033, #9b0022); color: white; width: auto; padding: 0 10px; border-radius: 10px; }
         .score-bj { background: linear-gradient(to bottom, #00b359, #008040); color: white; width: auto; padding: 0 10px; border-radius: 10px; font-size: 0.8rem; }
         
-        #controls { margin-top: 20px; display: flex; gap: 10px; height: 54px; justify-content: center; width: 1000px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 12px; }
+        #controls { margin-top: 20px; display: flex; gap: 10px; height: 54px; justify-content: center; width: 100%; max-width: 1100px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 12px; }
         #controls button { padding: 0 20px; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 5px; border: none; text-transform: uppercase; display: none; height: 100%; transition: 0.2s; }
         #controls input { padding: 0 20px; font-size: 1.2rem; text-align: center; width: 180px; display: none; height: 100%; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white; font-weight: bold; }
         
@@ -66,7 +68,7 @@
         #btn-split { background: rgba(0,162,255,0.2); color: #00a2ff; border: 1px solid #00a2ff; }
 
         /* LIVE CHAT */
-        .chat-panel { width: 320px; height: 700px; display: flex; flex-direction: column; background: rgba(0, 10, 25, 0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; overflow: hidden; }
+        .chat-panel { width: 320px; height: 100%; display: flex; flex-direction: column; background: rgba(0, 10, 25, 0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; overflow: hidden; }
         .chat-header { padding: 15px; background: rgba(0,0,0,0.7); font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .chat-line { font-size: 0.95rem; line-height: 1.4; text-align: left; }
@@ -84,7 +86,7 @@
         <button onclick="joinSandbox()">ENTER CASINO</button>
     </div>
 
-    <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <div id="main-layout">
             <div id="game-screen">
                 <div class="dealer-area">
@@ -159,7 +161,6 @@
             box.scrollTop = box.scrollHeight;
         });
 
-        // Dedicated Timer Listener (Prevents Cards from Re-animating)
         socket.on('timerTick', (timeData) => {
             let timerEl = document.getElementById('timer-display');
             if (timeData.status === 'BETTING') {
@@ -170,14 +171,13 @@
             }
         });
 
-        // Full State Renderer (Only fires when cards/state actually changes)
         socket.on('stateUpdate', (state) => {
-            // Render Dealer
             let dHand = document.getElementById('dealer-hand');
             dHand.innerHTML = '';
             state.dealer.cards.forEach((c, idx) => {
-                if (c === 'hidden') dHand.innerHTML += `<div class="card card-hidden" style="margin-left: ${idx > 0 ? '10px' : '0'};">?</div>`;
-                else dHand.innerHTML += `<div class="card ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="margin-left: ${idx > 0 ? '10px' : '0'}; z-index: ${idx};">
+                // DEALER OVERLAP SET TO -45px
+                if (c === 'hidden') dHand.innerHTML += `<div class="card card-hidden" style="margin-left: ${idx > 0 ? '-45px' : '0'};">?</div>`;
+                else dHand.innerHTML += `<div class="card ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="margin-left: ${idx > 0 ? '-45px' : '0'}; z-index: ${idx};">
                     <div>${c.val}</div>
                     <div style="font-size:1.8rem; text-align:center; margin-top:5px;">${c.suit}</div>
                 </div>`;
@@ -185,10 +185,9 @@
             let dScoreEl = document.getElementById('dealer-score');
             if (state.dealer.score > 0) { dScoreEl.style.display = 'flex'; dScoreEl.innerText = state.dealer.score; } else { dScoreEl.style.display = 'none'; }
 
-            // Render Seats
             let seatsHtml = '';
             mySeat = null;
-            let activeHandObj = null; // Track to check UI controls
+            let activeHandObj = null; 
             
             for(let i=1; i<=5; i++) {
                 let seat = state.seats[i];
@@ -197,24 +196,23 @@
                 if (seat) {
                     if (seat.name === myName) mySeat = i;
                     
-                    // Hide idle players during an active round
                     let isIdle = seat.hands.length === 0 || seat.hands[0].bet === 0;
                     if (state.status !== 'BETTING' && isIdle) continue; 
 
                     let handsHtml = '';
                     seat.hands.forEach((hand, hIdx) => {
                         let isHandActive = isMySeatTurn && state.activeTurn.handIdx === hIdx;
-                        if (isHandActive && seat.name === myName) activeHandObj = hand; // Save for buttons
+                        if (isHandActive && seat.name === myName) activeHandObj = hand; 
 
                         let cardsHtml = '';
                         hand.cards.forEach((c, cIdx) => {
-                            cardsHtml += `<div class="card ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="margin-left: ${cIdx > 0 ? '-45px' : '0'}; z-index: ${cIdx};">
+                            // TIGHTER CARD OVERLAP FOR PLAYERS (-50px)
+                            cardsHtml += `<div class="card ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="margin-left: ${cIdx > 0 ? '-50px' : '0'}; z-index: ${cIdx};">
                                 <div>${c.val}</div>
                                 <div style="font-size:1.8rem; text-align:center; margin-top:5px;">${c.suit}</div>
                             </div>`;
                         });
 
-                        // Badge Styling
                         let badgeClass = isHandActive ? 'score-active' : '';
                         let badgeText = hand.score;
                         if (hand.status === 'BUST') { badgeClass = 'score-bust'; badgeText = 'BUST'; }
@@ -245,7 +243,6 @@
             }
             document.getElementById('seats-container').innerHTML = seatsHtml;
 
-            // UI Controls Visibility
             let s = mySeat ? state.seats[mySeat] : null;
             let isSeatedNoBet = mySeat !== null && state.status === 'BETTING' && (!s.hands || s.hands.length === 0 || s.hands[0].bet === 0);
             
@@ -256,11 +253,8 @@
             let isMyTurn = activeHandObj !== null;
             document.getElementById('btn-hit').style.display = isMyTurn ? 'block' : 'none';
             document.getElementById('btn-stand').style.display = isMyTurn ? 'block' : 'none';
-            
-            // Double only allowed on 2 cards
             document.getElementById('btn-double').style.display = (isMyTurn && activeHandObj.cards.length === 2) ? 'block' : 'none';
             
-            // Split only allowed on first hand, 2 cards, matching values
             let canSplit = isMyTurn && activeHandObj.cards.length === 2 && s.hands.length === 1 && (activeHandObj.cards[0].bjVal === activeHandObj.cards[1].bjVal);
             document.getElementById('btn-split').style.display = canSplit ? 'block' : 'none';
         });
