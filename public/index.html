@@ -593,6 +593,37 @@
     function stopPTT(btnId) { if (!isRecording || !mediaRecorder || mediaRecorder.state !== 'recording') return; isRecording = false; try { mediaRecorder.stop(); let btn = document.getElementById(btnId); if(btn) btn.classList.remove('recording'); } catch(e) {} }
     socket.on('voiceStream', (data) => { fetch(data.audio).then(res => res.blob()).then(blob => { const audioUrl = URL.createObjectURL(blob); const audio = new Audio(audioUrl); audio.play().catch(e => {}); }).catch(err => {}); });
 
+    // --- MISSING DAILY REWARD LOGIC ---
+    function setupDailyRewardUI(daily) {
+        let daysHtml = '';
+        const rewards = [100, 250, 500, 750, 1000, 1500, 2000];
+        
+        for(let i=1; i<=7; i++) {
+            let status = i < daily.day ? 'claimed' : (i === daily.day ? 'current' : 'locked');
+            let opacity = status === 'locked' ? '0.4' : '1';
+            let border = status === 'current' ? 'border: 2px solid var(--credits);' : 'border: 1px solid var(--glass-border);';
+            let bg = status === 'claimed' ? 'background: rgba(0, 230, 118, 0.2);' : 'background: rgba(255,255,255,0.05);';
+            daysHtml += `<div style="flex:1; padding: 15px 5px; border-radius: 8px; text-align: center; ${bg} ${border} opacity: ${opacity};"><div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:5px;">DAY ${i}</div><div style="font-weight:900; color:var(--credits); font-size:1.1rem;">${rewards[i-1]}</div></div>`;
+        }
+        
+        let drDays = document.getElementById('dr-days-container');
+        if(drDays) drDays.innerHTML = `<div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 25px;">${daysHtml}</div>`;
+
+        let statusContainer = document.getElementById('dr-status-container');
+        if(statusContainer) {
+            if (daily.canClaim) {
+                statusContainer.innerHTML = `<button class="btn-play" style="width: 100%; padding: 15px; border-color: var(--credits); color: var(--credits); font-size: 1.2rem;" onclick="socket.emit('claimDaily'); this.disabled=true;">CLAIM REWARD</button>`;
+            } else {
+                statusContainer.innerHTML = `<button class="btn-play" style="width: 100%; padding: 15px;" disabled>REWARD ALREADY CLAIMED</button>`;
+            }
+        }
+    }
+
+    socket.on('dailyClaimed', (data) => {
+        closeModal('daily-reward-modal');
+        updateMyBalance(data.newBalance, true);
+    });
+
 </script>
 </body>
 </html>
