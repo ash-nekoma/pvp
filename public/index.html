@@ -18,28 +18,30 @@
         
         .game-column { display: flex; flex-direction: column; gap: 20px; width: 1100px; max-width: 1100px; flex-shrink: 0; }
 
-        /* SEMI-CIRCULAR GAME BOARD */
+        /* WIDER, FLATTER ARC TABLE */
         #game-screen { 
             flex: 1; 
             width: 100%; 
-            background: radial-gradient(circle at center top, #0e5b32 0%, #042412 100%); 
-            /* Creates the D-Shape: Flat top, heavily rounded bottom */
-            border-radius: 20px 20px 550px 550px; 
+            background: radial-gradient(ellipse at center top, #0e5b32 0%, #042412 100%); 
+            /* Flatter curve: strong rounding only on bottom corners */
+            border-radius: 20px 20px 300px 300px; 
             border: 16px solid #3e2723; 
-            border-top: 10px solid #3e2723; /* Thinner top border */
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 20px 50px rgba(0,0,0,0.8); 
+            border-top: 10px solid #3e2723; 
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 20px 50px rgba(0,0,0,0.8); 
             position: relative; 
             overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
         }
         
         /* TABLE WATERMARK */
-        .table-logo { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.15; pointer-events: none; z-index: 1; width: 100%; }
+        .table-logo { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.15; pointer-events: none; z-index: 1; width: 100%; }
         .table-logo h1 { font-size: 4.5rem; letter-spacing: 15px; margin: 0 0 10px 0; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .table-logo p { font-weight: bold; font-size: 1.2rem; letter-spacing: 3px; color: #fff; margin: 5px 0; }
 
-        #timer-display { position: absolute; top: 20px; right: 40px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 50px; font-size: 1.5rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); transition: opacity 0.3s; z-index: 20; color: white; display: flex; gap: 8px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        #timer-display { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 50px; font-size: 1.5rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); transition: opacity 0.3s; z-index: 20; color: white; display: flex; gap: 8px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
 
-        .dealer-area { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        .dealer-area { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
         
         @keyframes dealFly {
             0% { transform: translate(100px, -200px) scale(0.5); opacity: 0; }
@@ -54,41 +56,40 @@
         .card-red { color: #ff3366; }
         .card-hidden { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); color: transparent; }
         
-        /* SEATING AREA - Absolute positioning for the curve */
+        /* SEATING AREA - Adjusted for wider arc */
         .seats-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
         .seat { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; transform: translateX(-50%); transition: all 0.5s ease; min-width: 110px; pointer-events: auto; }
         
         .hands-wrapper { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 10px; }
         .single-hand-container { display: flex; flex-direction: column; align-items: center; position: relative; justify-content: flex-end; }
 
-        /* BET PILL */
-        .seat-bet { padding: 4px 15px; border-radius: 50px; font-weight: 900; font-size: 0.95rem; margin-bottom: 5px; z-index: 25; box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: all 0.4s ease; border: 1px solid rgba(255, 180, 0, 0.5); background: rgba(0,0,0,0.8); color: #ffb400; letter-spacing: 1px; min-width: 60px; text-align: center;}
-        
-        .bet-win { background: linear-gradient(to bottom, #00e676, #00b359); color: black; border: none; box-shadow: 0 0 20px rgba(0,230,118,0.6), 0 5px 15px rgba(0,0,0,0.8); }
-        .bet-loss { background: linear-gradient(to bottom, #ff3366, #cc0033); color: white; border: none; box-shadow: 0 0 20px rgba(255,51,102,0.4), 0 5px 15px rgba(0,0,0,0.8);}
-        .bet-bj { background: linear-gradient(to bottom, #00a2ff, #0077cc); color: white; border: none; box-shadow: 0 0 20px rgba(0,162,255,0.6), 0 5px 15px rgba(0,0,0,0.8); }
-        .bet-push { background: linear-gradient(to bottom, #777, #444); color: white; border: none; }
+        /* MERGED BET / RESULT PILL */
+        .seat-bet { padding: 4px 18px; border-radius: 50px; font-weight: 900; font-size: 1rem; margin-bottom: 8px; z-index: 25; box-shadow: 0 4px 10px rgba(0,0,0,0.8); transition: all 0.4s ease; border: 1px solid rgba(255, 180, 0, 0.5); background: rgba(0,0,0,0.8); color: #ffb400; display: flex; align-items: center; gap: 5px; letter-spacing: 1px;}
+        .bet-win { background: linear-gradient(to bottom, #00e676, #00b359); color: black; border-color: transparent; box-shadow: 0 0 20px rgba(0,230,118,0.6); }
+        .bet-loss { background: linear-gradient(to bottom, #ff3366, #cc0033); color: white; border-color: transparent; box-shadow: 0 0 20px rgba(255,51,102,0.4);}
+        .bet-bj { background: linear-gradient(to bottom, #00a2ff, #0077cc); color: white; border-color: transparent; box-shadow: 0 0 20px rgba(0,162,255,0.6); }
+        .bet-push { background: linear-gradient(to bottom, #777, #444); color: white; border-color: transparent; }
 
         .seat-circle { width: 60px; height: 60px; border: 2px dashed rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.4); margin-bottom: 5px;}
         .seat-circle:hover { background: rgba(255,255,255,0.2); border-color: white; }
-        .seat.occupied .seat-circle { border: 2px solid transparent; cursor: default; background: transparent; }
         
         .seat-name { margin-top: 5px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; text-shadow: 0 2px 4px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; text-align: center; letter-spacing: 1px;}
         
-        /* TICKING PLAYER TIMER BAR */
+        /* FIXED LENGTH TIMER BAR */
         .player-timer-track { width: 100px; height: 6px; background: rgba(0,0,0,0.8); border-radius: 50px; margin-top: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 2px 5px rgba(0,0,0,0.9); }
         .player-timer-fill { height: 100%; background: linear-gradient(90deg, #00e676, #00b359); width: 100%; transition: width 1s linear; box-shadow: 0 0 10px #00e676; border-radius: 50px; }
 
-        /* UNIFORM SCORE BADGES (Top Left) */
-        .seat-score { position: absolute; top: -15px; left: -15px; background: #222; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-weight: bold; z-index: 20; box-shadow: 0 4px 10px rgba(0,0,0,0.8); font-size: 1rem; color: white; border: none; }
-        .score-active { background: linear-gradient(135deg, #FFDF00, #D4AF37); color: black; box-shadow: 0 2px 10px rgba(218,165,32,0.6); border: none; }
+        /* DEAD CENTER VALUE BADGE (NO OUTLINE) */
+        .seat-score { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 50px; font-weight: 900; z-index: 30; box-shadow: 0 4px 15px rgba(0,0,0,0.9); font-size: 1rem; color: white; border: none; backdrop-filter: blur(2px); transition: 0.3s;}
+        .score-active { background: linear-gradient(135deg, #FFDF00, #D4AF37); color: black; box-shadow: 0 0 20px rgba(255,223,0,0.8), 0 4px 10px rgba(0,0,0,0.8); text-shadow: 0 1px 2px rgba(255,255,255,0.5); }
 
-        /* CIRCULAR BUTTON CONTROLS */
+        /* PERFECT CIRCULAR BUTTON CONTROLS (PS THEME) */
         #controls { display: flex; gap: 20px; height: 110px; justify-content: center; align-items: center; width: 100%; background: #00060f; padding: 15px 20px; border-radius: 0 0 20px 20px; border-top: 1px solid rgba(0,162,255,0.2); flex-shrink: 0;}
         #controls-msg { font-weight: 900; font-size: 1.2rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 2px; }
         
-        .btn-circle { width: 75px; height: 75px; border-radius: 50%; border: 2px solid transparent; background: #0a0e17; color: white; display: none; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5); transition: 0.2s; text-align: center; line-height: 1.1; letter-spacing: 1px;}
+        .btn-circle { width: 75px; height: 75px; border-radius: 50%; border: 2px solid transparent; background: #0a0e17; color: white; display: none; flex-direction: column; justify-content: center; align-items: center; font-size: 0.8rem; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5); transition: 0.2s; text-align: center; line-height: 1.1; letter-spacing: 1px;}
         .btn-circle:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .btn-circle:active { transform: scale(0.95); }
         
         #bet-input { padding: 0 20px; font-size: 1.4rem; text-align: center; width: 160px; display: none; height: 60px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.8); color: #ffb400; font-weight: 900; box-shadow: inset 0 2px 10px rgba(0,0,0,0.9); }
         
@@ -196,13 +197,13 @@
         let cardRenderMemory = { dealer: 0, seats: { 1:[], 2:[], 3:[], 4:[], 5:[] } };
         let animatedPills = new Set(); 
 
-        // SEAT POSITIONS FOR SEMI-CIRCLE
+        // SEAT POSITIONS FOR WIDER ARC
         const seatPositions = {
-            1: { left: '15%', bottom: '35%' },
-            2: { left: '30%', bottom: '15%' },
+            1: { left: '15%', bottom: '25%' },
+            2: { left: '32.5%', bottom: '10%' },
             3: { left: '50%', bottom: '5%' },
-            4: { left: '70%', bottom: '15%' },
-            5: { left: '85%', bottom: '35%' }
+            4: { left: '67.5%', bottom: '10%' },
+            5: { left: '85%', bottom: '25%' }
         };
 
         function joinSandbox() {
@@ -269,7 +270,9 @@
 
             if (timeData.status === 'PLAYER_TURN' && timeData.activeTurn && timeData.activeTurn.seat) {
                 let bar = document.getElementById(`timer-bar-${timeData.activeTurn.seat}`);
-                if (bar) bar.style.width = (timeData.timer / 15) * 100 + '%';
+                if (bar) {
+                    bar.style.width = (timeData.timer / 15) * 100 + '%';
+                }
             }
         });
 
@@ -369,12 +372,6 @@
                         <div class="hands-wrapper">${handsHtml}</div>
                         ${totalSeatBet > 0 ? `<div class="seat-bet ${betClass}" id="bet-pill-${i}-total" data-end="${targetValue !== null ? targetValue : totalSeatBet}">${displayValue}</div>` : ''}
                         
-                        ${state.status === 'BETTING' && isIdle ? `
-                            <div class="seat-circle">
-                                <i class="fas fa-user" style="color: white; opacity:0.3;"></i>
-                            </div>
-                        ` : ''}
-                        
                         <div class="seat-name" style="color:${seat.name === myName ? '#00a2ff' : 'white'};">${seat.name}</div>
                         
                         ${state.status !== 'BETTING' && !isIdle ? `
@@ -432,7 +429,7 @@
             btnStand.style.display = isMyTurn ? 'flex' : 'none';
             btnDouble.style.display = (isMyTurn && activeHandObj.cards.length === 2) ? 'flex' : 'none';
             
-            let canSplit = isMyTurn && activeHandObj.cards.length === 2 && s.hands.length === 1 && (activeHandObj.cards[0].bjVal === activeHandObj.cards[1].bjVal);
+            let canSplit = isMyTurn && activeHandObj.cards.length === 2 && s.hands.length === 1 && (activeHandObj.cards[0].val === activeHandObj.cards[1].val);
             btnSplit.style.display = canSplit ? 'flex' : 'none';
 
             let isRackEmpty = (!isSeatedNoBet && !isMyTurn);
