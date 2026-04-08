@@ -13,18 +13,35 @@
     <style>
         :root { 
             --ps-bg: #00050d; 
-            --ps-blue: #2e6db4; /* PS Blue */
-            --ps-red: #df0024;  /* PS Red */
-            --ps-green: #00a651; /* PS Green */
-            --ps-pink: #d95b96;  /* PS Pink */
-            --glass-bg: rgba(0, 10, 25, 0.85); 
+            --ps-blue: #00439c; 
+            --ps-glow: #00a2ff; 
+            --glass-bg: rgba(0, 10, 25, 0.75); 
             --glass-border: rgba(255, 255, 255, 0.15); 
+            --danger: #ff3366; 
+            --success: #00e676; 
             --credits: #ffb400; 
             --text-main: #f8fafc; 
+            
+            /* PlayStation Colors for Solid Buttons */
+            --ps-triangle: #41e6a6; /* Green */
+            --ps-circle: #f37370;   /* Red */
+            --ps-cross: #8dafe5;    /* Blue */
+            --ps-square: #f591cc;   /* Pink */
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--ps-bg); color: var(--text-main); height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        /* Setup body for perfect centering */
+        body { 
+            background: var(--ps-bg); 
+            color: var(--text-main); 
+            height: 100vh; 
+            width: 100vw; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+        }
         
         ::-webkit-scrollbar { display: none; }
         .custom-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; padding-right: 5px;}
@@ -34,98 +51,155 @@
         #login-screen { position: absolute; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--glass-bg); padding: 40px; border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.8); backdrop-filter: blur(10px); top: 50%; left: 50%; transform: translate(-50%, -50%);}
         #login-screen h2 { margin-top:0; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
         #login-screen input { padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 100%; border-radius: 8px; border: none; font-weight: bold; background: rgba(0,0,0,0.5); color: white; }
-        #login-screen button { padding: 12px 20px; font-size: 1.2rem; cursor: pointer; background: linear-gradient(to bottom, var(--ps-blue), #004380); color: white; font-weight: bold; border: none; border-radius: 8px; width: 100%; box-shadow: 0 4px 15px rgba(46, 109, 180, 0.4); transition: 0.2s; }
-        #login-screen button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46, 109, 180, 0.6); }
+        #login-screen button { padding: 12px 20px; font-size: 1.2rem; cursor: pointer; background: linear-gradient(to bottom, #00a2ff, #0077cc); color: white; font-weight: bold; border: none; border-radius: 8px; width: 100%; box-shadow: 0 4px 15px rgba(0,162,255,0.4); transition: 0.2s; }
+        #login-screen button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,162,255,0.6); }
 
-        /* LAYOUT */
-        #main-layout { display: none; gap: 20px; width: 100%; max-width: 1450px; height: 720px; justify-content: center; align-items: stretch; padding: 20px; }
-        
-        .game-column { display: flex; flex-direction: column; gap: 20px; width: 1100px; max-width: 1100px; flex-shrink: 0; }
+        /* LAYOUT - Centered */
+        #main-layout { 
+            display: none; 
+            gap: 20px; 
+            width: 100%; 
+            max-width: 1450px; 
+            height: 750px; 
+            justify-content: center; 
+            align-items: stretch; 
+            padding: 20px; 
+        }
+        .game-column { display: flex; flex-direction: column; gap: 20px; width: 1100px; max-width: 1100px; flex-shrink: 0; height: 100%;}
 
-        /* RESTORED PREMIUM WOOD GAME BOARD */
-        #game-screen { flex: 1; width: 100%; background: radial-gradient(circle at center, #0e5b32 0%, #042412 100%); border-radius: 20px; border: 16px solid #3e2723; box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        /* GAME BOARD - Clean Green with Brown Border */
+        #game-screen { flex: 1; width: 100%; background: radial-gradient(circle at center, #0e5b32 0%, #042412 100%); border-radius: 12px; border: 12px solid #3e2723; box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 15px 35px rgba(0,0,0,0.6); position: relative; overflow: hidden; display: flex; flex-direction: column; }
         
         /* TABLE WATERMARK */
         .table-logo { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0.15; pointer-events: none; z-index: 1; width: 100%; }
-        .table-logo h1 { font-size: 4.5rem; letter-spacing: 15px; margin: 0 0 10px 0; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .table-logo h1 { font-size: 4.5rem; letter-spacing: 15px; margin: 0 0 10px 0; color: #fff; font-family: 'Rajdhani', sans-serif; text-shadow: 0 4px 10px rgba(0,0,0,0.5);}
         .table-logo p { font-weight: bold; font-size: 1.2rem; letter-spacing: 3px; color: #fff; margin: 5px 0; }
 
-        #timer-display { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 50px; font-size: 1.5rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); transition: opacity 0.3s; z-index: 20; color: white; display: flex; gap: 8px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        /* TOP RIGHT TIMER */
+        #timer-display { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 50px; font-size: 1.5rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); transition: opacity 0.3s; z-index: 20; color: white; display: flex; gap: 8px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-family: 'Rajdhani', sans-serif;}
 
+        /* DEALER AREA */
         .dealer-area { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 10; }
         
-        @keyframes dealFly {
-            0% { transform: translate(100px, -200px) scale(0.5); opacity: 0; }
-            100% { transform: translate(0, 0) scale(1); opacity: 1; }
-        }
-
-        .hand { display: flex; gap: -50px; justify-content: center; min-height: 105px; position: relative;}
+        /* CARDS */
+        @keyframes dealFly { 0% { transform: translate(100px, -200px) scale(0.5); opacity: 0; } 100% { transform: translate(0, 0) scale(1); opacity: 1; } }
         
-        .card { width: 70px; height: 105px; background: white; color: black; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 5px; font-weight: bold; font-size: 1.1rem; border: 1px solid #ccc; box-shadow: -4px 4px 10px rgba(0,0,0,0.6); }
+        /* HAND CONTAINER */
+        .hand { display: flex; justify-content: flex-start; min-height: 105px; position: relative;}
+        
+        .card { width: 70px; height: 105px; background: white; color: black; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 5px; font-weight: bold; font-size: 1.1rem; border: 1px solid #ccc; box-shadow: -2px 2px 8px rgba(0,0,0,0.6); position: absolute; top: 0;}
         .anim-card { animation: dealFly 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        
-        .card-red { color: #ff3366; }
+        .card-red { color: var(--danger); }
         .card-hidden { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); color: transparent; }
         
+        /* SEATING AREA */
         .seats-container { position: absolute; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; align-items: flex-end; gap: 20px; padding: 0 10px; transition: all 0.5s ease; z-index: 10; }
-        .seat { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; transition: all 0.5s ease; min-width: 110px; }
+        .seat { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; transition: all 0.5s ease; min-width: 120px; }
         
-        .hands-wrapper { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 8px; }
-        .single-hand-container { display: flex; flex-direction: column; align-items: center; position: relative; justify-content: flex-end; }
+        /* HAND CONTAINER */
+        .hands-wrapper { display: flex; flex-direction: row; gap: 25px; align-items: flex-end; margin-bottom: 5px; height: 140px;}
+        .single-hand-container { display: flex; flex-direction: column; align-items: center; position: relative; justify-content: flex-end; height: 100%;}
 
-        /* MORPHING BET PILL (ABOVE NAME) */
-        .seat-bet { padding: 4px 15px; border-radius: 50px; font-weight: 900; font-size: 1rem; margin-bottom: 10px; z-index: 25; box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: all 0.4s ease; border: 1px solid rgba(255, 180, 0, 0.4); background: rgba(0,0,0,0.8); color: #ffb400; letter-spacing: 1px; min-width: 60px; text-align: center;}
-        
-        .bet-win { background: linear-gradient(to bottom, #00e676, #00b359); color: black; border: none; box-shadow: 0 0 20px rgba(0,230,118,0.6), 0 5px 15px rgba(0,0,0,0.8); }
-        .bet-loss { background: linear-gradient(to bottom, #ff3366, #cc0033); color: white; border: none; box-shadow: 0 0 20px rgba(255,51,102,0.4), 0 5px 15px rgba(0,0,0,0.8);}
-        .bet-bj { background: linear-gradient(to bottom, #00a2ff, #0077cc); color: white; border: none; box-shadow: 0 0 20px rgba(0,162,255,0.6), 0 5px 15px rgba(0,0,0,0.8); }
-        .bet-push { background: linear-gradient(to bottom, #777, #444); color: white; border: none; }
-
-        /* DASHED CIRCLE (ONLY VISIBLE WHEN EMPTY) */
+        /* EMPTY SEAT CIRCLE */
         .seat-circle { width: 60px; height: 60px; border: 2px dashed rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; background: rgba(0,0,0,0.2); margin-bottom: 5px;}
         .seat-circle:hover { background: rgba(255,255,255,0.2); border-color: white; }
         
-        .seat-name { margin-top: 5px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; text-shadow: 0 2px 4px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; text-align: center; letter-spacing: 1px;}
+        /* PLAYER INFO (NAME, BET, TIMER) */
+        .seat-name { margin-top: 5px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; text-shadow: 0 2px 4px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; text-align: center; letter-spacing: 1px;}
         
-        /* FIXED LENGTH TIMER BAR */
-        .player-timer-track { width: 90px; height: 6px; background: rgba(0,0,0,0.8); border-radius: 50px; margin-top: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.9); }
-        .player-timer-fill { height: 100%; background: linear-gradient(90deg, #00e676, #00b359); width: 100%; transition: width 1s linear; box-shadow: 0 0 10px #00e676; border-radius: 50px; }
+        /* MORPHING BET PILL (Above Name, Below Cards) */
+        .seat-bet { padding: 4px 15px; border-radius: 50px; font-weight: 900; font-size: 0.95rem; margin-bottom: 5px; z-index: 25; box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: all 0.4s ease; border: 1px solid rgba(255, 180, 0, 0.4); background: rgba(0,0,0,0.8); color: var(--credits); font-family: 'Rajdhani', sans-serif; text-align: center; min-width: 60px;}
+        
+        /* Morphing Colors */
+        .bet-win { background: var(--success); color: black; border: none; box-shadow: 0 0 15px rgba(0,230,118,0.5); }
+        .bet-loss { background: var(--danger); color: white; border: none; box-shadow: 0 0 15px rgba(255,51,102,0.3);}
+        .bet-bj { background: var(--ps-glow); color: white; border: none; box-shadow: 0 0 15px rgba(0,162,255,0.5); }
+        .bet-push { background: #555; color: white; border: none; }
 
-        /* VALUE BADGE (Top Left) */
-        .seat-score { position: absolute; top: -15px; left: -15px; background: rgba(0,0,0,0.8); width: 34px; height: 34px; display: flex; justify-content: center; align-items: center; border-radius: 50px; font-weight: 900; z-index: 30; box-shadow: 0 4px 10px rgba(0,0,0,0.8); font-size: 1rem; color: white; border: none; transition: 0.3s; backdrop-filter: blur(2px);}
-        .score-active { background: linear-gradient(135deg, #FFDF00, #D4AF37); color: black; box-shadow: 0 0 20px rgba(255,223,0,0.8), 0 4px 10px rgba(0,0,0,0.8); text-shadow: 0 1px 2px rgba(255,255,255,0.5); }
+        /* TICKING PLAYER TIMER BAR - FIXED WIDTH */
+        .player-timer-track { width: 100px; height: 6px; background: rgba(0,0,0,0.8); border-radius: 50px; margin-top: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.9); }
+        .player-timer-fill { height: 100%; width: 100%; transition: width 1s linear, background 0.3s ease; border-radius: 50px; }
+        .timer-green { background: linear-gradient(90deg, #00e676, #00b359); box-shadow: 0 0 10px #00e676; }
+        .timer-red { background: linear-gradient(90deg, #ff3366, #cc0033); box-shadow: 0 0 10px #ff3366; }
 
-        /* RESTORED PREMIUM SOLID CONTROLS */
-        #controls { display: flex; gap: 15px; height: 85px; justify-content: center; align-items: center; width: 100%; background: rgba(0, 5, 15, 0.95); padding: 15px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.8); border-top: 2px solid rgba(0,162,255,0.3);}
-        #controls-msg { font-weight: 900; font-size: 1.2rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 5px black;}
+        /* VALUE BADGE (Uniform Left Center, No Outline) */
+        .seat-score { 
+            position: absolute; 
+            top: 52px; /* Half of 105px card height */
+            left: -20px; 
+            transform: translateY(-50%);
+            background: #222; 
+            width: 32px; 
+            height: 32px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            border-radius: 50%; 
+            font-weight: 900; 
+            z-index: 30; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8); 
+            font-size: 1rem; 
+            color: white; 
+            border: none; 
+            font-family: 'Rajdhani', sans-serif;
+            transition: 0.3s;
+        }
+        .score-active { background: linear-gradient(135deg, #FFDF00, #D4AF37); color: black; box-shadow: 0 0 15px rgba(255,223,0,0.6); }
+
+        /* RESULT TEXT (Plain text above cards) */
+        .hand-result { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.9rem; font-weight: 900; z-index: 50; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px black; white-space: nowrap;}
+        .res-win { color: #00e676; }
+        .res-loss { color: #ff3366; }
+        .res-push { color: #aaa; }
+        .res-bj { color: #00a2ff; }
+
+        /* UNIFIED CONTROLS BAR */
+        #controls { display: flex; gap: 20px; height: 110px; justify-content: center; align-items: center; width: 100%; background: var(--glass-bg); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--glass-border); flex-shrink: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #controls-msg { font-weight: 900; font-size: 1.2rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 2px; }
         
-        .btn-action { padding: 0 25px; font-size: 1.05rem; font-weight: 900; cursor: pointer; border-radius: 50px; border: none; text-transform: uppercase; display: none; height: 54px; transition: all 0.2s ease; letter-spacing: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.4); align-items: center; justify-content: center; color: white;}
-        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
-        .btn-action:active { transform: translateY(1px); }
+        /* SOLID CIRCULAR BUTTONS (PlayStation Theme) */
+        .btn-circle { width: 65px; height: 65px; border-radius: 50%; border: none; color: white; display: none; flex-direction: column; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: all 0.2s ease; letter-spacing: 1px; line-height: 1.2; text-align: center; font-family: 'Outfit', sans-serif;}
+        .btn-circle:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .btn-circle:active { transform: scale(0.95); }
         
-        /* SLEEK TEXT INPUT FOR BETTING */
-        #bet-input { padding: 0 20px; font-size: 1.4rem; text-align: center; width: 180px; display: none; height: 54px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.7); color: #ffb400; font-weight: 900; box-shadow: inset 0 2px 10px rgba(0,0,0,0.9); }
-        #bet-input::placeholder { color: rgba(255,180,0,0.3); font-size: 1rem;}
+        /* PlayStation Solid Colors */
+        #btn-rebet { background: var(--ps-cross); } /* Blue */
+        #btn-rebet:hover { box-shadow: 0 5px 20px rgba(141, 175, 229, 0.6); }
         
-        #btn-leave { background: linear-gradient(to bottom, #ff3366, #cc0033); }
-        #btn-bet { background: linear-gradient(to bottom, #00e676, #00b359); color: black; text-shadow: none;}
-        #btn-rebet { background: linear-gradient(to bottom, #00a2ff, #0077cc); }
+        #btn-leave { background: var(--ps-circle); } /* Red */
+        #btn-leave:hover { box-shadow: 0 5px 20px rgba(243, 115, 112, 0.6); }
         
-        #btn-hit { background: linear-gradient(to bottom, #00e676, #00b359); color: black; text-shadow: none; }
-        #btn-stand { background: linear-gradient(to bottom, #ff3366, #cc0033); }
-        #btn-double { background: linear-gradient(to bottom, #ffd700, #ffb400); color: black; text-shadow: none; }
-        #btn-split { background: linear-gradient(to bottom, #00a2ff, #0077cc); }
+        #btn-bet { background: var(--ps-triangle); color: black;} /* Green */
+        #btn-bet:hover { box-shadow: 0 5px 20px rgba(65, 230, 166, 0.6); }
+
+        #btn-hit { background: var(--ps-cross); } /* Blue */
+        #btn-hit:hover { box-shadow: 0 5px 20px rgba(141, 175, 229, 0.6); }
+        
+        #btn-stand { background: var(--ps-circle); } /* Red */
+        #btn-stand:hover { box-shadow: 0 5px 20px rgba(243, 115, 112, 0.6); }
+        
+        #btn-double { background: var(--ps-square); color: black; } /* Pink */
+        #btn-double:hover { box-shadow: 0 5px 20px rgba(245, 145, 204, 0.6); }
+        
+        #btn-split { background: var(--ps-triangle); color: black;} /* Green */
+        #btn-split:hover { box-shadow: 0 5px 20px rgba(65, 230, 166, 0.6); }
+
+        /* Betting Input Field (Text input to remove arrows) */
+        #bet-input { padding: 0 20px; font-size: 1.4rem; text-align: center; width: 140px; display: none; height: 65px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.8); color: var(--credits); font-weight: 900; box-shadow: inset 0 2px 10px rgba(0,0,0,0.9); font-family: 'Rajdhani', sans-serif;}
+        #bet-input::placeholder { color: rgba(255,180,0,0.3); font-size: 1rem; font-family: 'Outfit', sans-serif;}
 
         /* LIVE CHAT */
-        .chat-panel { width: 320px; height: 100%; display: flex; flex-direction: column; background: rgba(0, 10, 25, 0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; overflow: hidden; flex-shrink: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
-        .chat-header { padding: 15px; background: rgba(0,0,0,0.7); font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); letter-spacing: 1px; color: white;}
+        .chat-panel { width: 320px; height: 100%; display: flex; flex-direction: column; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; flex-shrink: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
+        .chat-header { padding: 15px; background: rgba(0,0,0,0.7); font-weight: bold; text-align: center; border-bottom: 1px solid var(--glass-border); letter-spacing: 1px; color: white;}
         .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .chat-line { font-size: 0.95rem; line-height: 1.4; text-align: left; }
-        .chat-line .name { color: #00a2ff; font-weight: bold; margin-right: 5px; }
-        .chat-input-area { display: flex; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); gap: 10px; background: rgba(0,0,0,0.4);}
-        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.6); color: white; text-align: left; font-weight: bold;}
+        .chat-line .name { color: var(--ps-glow); font-weight: bold; margin-right: 5px; }
+        .chat-input-area { display: flex; padding: 15px; border-top: 1px solid var(--glass-border); gap: 10px; background: rgba(0,0,0,0.4);}
+        .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 50px; border: 1px solid rgba(0,162,255,0.3); background: rgba(0,0,0,0.8); color: white; text-align: left; font-weight: bold;}
         .chat-input-area button { width: 44px; height: 44px; background: linear-gradient(to bottom, #00a2ff, #0077cc); border: none; border-radius: 50px; cursor: pointer; color: white; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
         .chat-input-area button:hover { transform: scale(1.05); filter: brightness(1.1);}
+        
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -136,7 +210,7 @@
         <button onclick="joinSandbox()">ENTER CASINO</button>
     </div>
 
-    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%;">
         <div id="main-layout">
             
             <div class="game-column">
@@ -151,7 +225,7 @@
                     <div id="timer-display"><i class="fas fa-stopwatch"></i> <span id="timer-val">15</span></div>
 
                     <div class="dealer-area">
-                        <div class="single-hand-container">
+                        <div class="single-hand-container" style="width: 70px;">
                             <div id="dealer-score" class="seat-score" style="display:none;">0</div>
                             <div id="dealer-hand" class="hand" style="margin-top:0;"></div>
                         </div>
@@ -164,22 +238,22 @@
                 <div id="controls">
                     <div id="controls-msg">TAKE A SEAT TO PLAY</div>
                     
-                    <button class="btn-action" id="btn-rebet" onclick="rebet()">REBET</button>
+                    <button class="btn-circle" id="btn-rebet" onclick="rebet()" style="display:none;">REBET</button>
                     <input type="text" id="bet-input" placeholder="Amount" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <button class="btn-action" id="btn-bet" onclick="placeBet()">PLACE BET</button>
-                    <button class="btn-action" id="btn-leave" onclick="leaveSeat()">LEAVE</button>
+                    <button class="btn-circle" id="btn-bet" onclick="placeBet()" style="display:none;">PLACE<br>BET</button>
+                    <button class="btn-circle" id="btn-leave" onclick="leaveSeat()" style="display:none;">LEAVE</button>
                     
-                    <button class="btn-action" id="btn-hit" onclick="sendAction('hit')">HIT</button>
-                    <button class="btn-action" id="btn-stand" onclick="sendAction('stand')">STAND</button>
-                    <button class="btn-action" id="btn-double" onclick="sendAction('double')">DOUBLE</button>
-                    <button class="btn-action" id="btn-split" onclick="sendAction('split')">SPLIT</button>
+                    <button class="btn-circle" id="btn-hit" onclick="sendAction('hit')">HIT</button>
+                    <button class="btn-circle" id="btn-stand" onclick="sendAction('stand')">STAND</button>
+                    <button class="btn-circle" id="btn-double" onclick="sendAction('double')">DOUBLE</button>
+                    <button class="btn-circle" id="btn-split" onclick="sendAction('split')">SPLIT</button>
                 </div>
             </div>
 
             <div class="chat-panel">
                 <div class="chat-header">LIVE CHAT</div>
-                <div class="chat-body" id="chat-box">
-                    <div class="chat-line" style="color: #00a2ff; text-align: center; font-weight: bold;">Connected to table.</div>
+                <div class="chat-body custom-scroll" id="chat-box">
+                    <div class="chat-line" style="color: var(--ps-glow); text-align: center; font-weight: bold;">Connected to table.</div>
                 </div>
                 <div class="chat-input-area">
                     <input type="text" id="chat-input" placeholder="Chat here..." onkeypress="if(event.key==='Enter') sendChat();">
@@ -196,6 +270,7 @@
         let mySeat = null;
         let lastBetAmount = 0; 
         
+        // Tracks rendered cards to prevent re-animating existing cards
         let cardRenderMemory = { dealer: 0, seats: { 1:[], 2:[], 3:[], 4:[], 5:[] } };
         let animatedPills = new Set(); 
 
@@ -254,6 +329,7 @@
             window.requestAnimationFrame(step);
         }
 
+        // Timer Updates
         socket.on('timerTick', (timeData) => {
             let timerEl = document.getElementById('timer-display');
             let timerVal = document.getElementById('timer-val');
@@ -265,16 +341,27 @@
                 timerEl.style.opacity = '0'; 
             }
 
+            // Sync the active player's shrinking timer bar
             if (timeData.status === 'PLAYER_TURN' && timeData.activeTurn && timeData.activeTurn.seat) {
                 let bar = document.getElementById(`timer-bar-${timeData.activeTurn.seat}`);
                 if (bar) {
-                    bar.style.width = (timeData.timer / 15) * 100 + '%';
+                    let percent = (timeData.timer / 15) * 100;
+                    bar.style.width = percent + '%';
+                    
+                    // Change color to red when 5 seconds or less remain
+                    if (timeData.timer <= 5) {
+                        bar.className = 'player-timer-fill timer-red';
+                    } else {
+                        bar.className = 'player-timer-fill timer-green';
+                    }
                 }
             }
         });
 
+        // Main State Update
         socket.on('stateUpdate', (state) => {
             if (state.status === 'BETTING') {
+                // Reset animation memory for new round
                 cardRenderMemory = { dealer: 0, seats: { 1:[], 2:[], 3:[], 4:[], 5:[] } };
                 animatedPills.clear();
             }
@@ -285,16 +372,20 @@
             state.dealer.cards.forEach((c, idx) => {
                 let isNew = idx >= cardRenderMemory.dealer;
                 let animClass = isNew ? 'anim-card' : '';
+                // 30px offset for subsequent cards
+                let leftOffset = idx * 30; 
                 
                 if (c === 'hidden') {
-                    dHand.innerHTML += `<div class="card card-hidden ${animClass}" style="margin-left: ${idx > 0 ? '-50px' : '0'}; z-index: 0;">?</div>`;
+                    dHand.innerHTML += `<div class="card card-hidden ${animClass}" style="position: absolute; left: ${leftOffset}px; z-index: 0;">?</div>`;
                 } else {
-                    dHand.innerHTML += `<div class="card ${animClass} ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="margin-left: ${idx > 0 ? '-50px' : '0'}; z-index: ${idx};">
+                    dHand.innerHTML += `<div class="card ${animClass} ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="position: absolute; left: ${leftOffset}px; z-index: ${idx};">
                         <div>${c.val}</div>
                         <div style="font-size:1.8rem; text-align:center; margin-top:5px;">${c.suit}</div>
                     </div>`;
                 }
             });
+            // Update container width to fit absolutely positioned cards
+            dHand.style.width = state.dealer.cards.length > 0 ? `${70 + ((state.dealer.cards.length - 1) * 30)}px` : '70px';
             cardRenderMemory.dealer = state.dealer.cards.length;
 
             let dScoreEl = document.getElementById('dealer-score');
@@ -312,79 +403,102 @@
                 if (seat) {
                     if (seat.name === myName) mySeat = i;
                     
+                    // Hide idle players during an active round
                     let isIdle = seat.hands.length === 0 || seat.hands[0].bet === 0;
                     if (state.status !== 'BETTING' && isIdle) continue; 
 
                     if (!cardRenderMemory.seats[i]) cardRenderMemory.seats[i] = [];
 
                     let handsHtml = '';
+                    let totalSeatBet = 0; 
                     
                     seat.hands.forEach((hand, hIdx) => {
+                        totalSeatBet += hand.bet;
                         let isHandActive = isMySeatTurn && state.activeTurn.handIdx === hIdx;
                         if (isHandActive && seat.name === myName) activeHandObj = hand; 
 
                         let prevCardCount = cardRenderMemory.seats[i][hIdx] || 0;
                         let cardsHtml = '';
+                        
                         hand.cards.forEach((c, cIdx) => {
                             let isNew = cIdx >= prevCardCount;
                             let animClass = isNew ? 'anim-card' : '';
+                            // 30px offset for player cards too
+                            let leftOffset = cIdx * 30;
 
-                            cardsHtml += `<div class="card ${animClass} ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="margin-left: ${cIdx > 0 ? '-50px' : '0'}; z-index: ${cIdx};">
+                            cardsHtml += `<div class="card ${animClass} ${c.suit === '♥' || c.suit === '♦' ? 'card-red' : ''}" style="position: absolute; left: ${leftOffset}px; z-index: ${cIdx};">
                                 <div>${c.val}</div>
                                 <div style="font-size:1.8rem; text-align:center; margin-top:5px;">${c.suit}</div>
                             </div>`;
                         });
                         cardRenderMemory.seats[i][hIdx] = hand.cards.length;
+                        
+                        // Container width calculation for absolutely positioned cards
+                        let handWidth = hand.cards.length > 0 ? 70 + ((hand.cards.length - 1) * 30) : 70;
 
-                        // Value Badge (Top Left)
+                        // Value Badge (Middle Left of Cards)
                         let badgeClass = isHandActive ? 'score-active' : '';
                         let badgeText = hand.score;
 
-                        // MORPHING BET PILL LOGIC (Replaces WIN/LOSS separate text)
-                        let betClass = '';
-                        let displayValue = hand.bet;
-                        let targetValue = null;
-
+                        // Result Text (Above cards, centered)
+                        let resHtml = '';
                         if (hand.result) {
-                            if (hand.result === 'WIN') { betClass = 'bet-win'; targetValue = hand.bet * 2; }
-                            else if (hand.result === 'BLACKJACK') { betClass = 'bet-bj'; targetValue = hand.bet * 2.5; }
-                            else if (hand.result === 'LOSS' || hand.status === 'BUST') { betClass = 'bet-loss'; targetValue = 0; }
-                            else if (hand.result === 'PUSH') { betClass = 'bet-push'; targetValue = hand.bet; }
-
-                            if (targetValue !== null && !animatedPills.has(`${i}-${hIdx}`)) {
-                                displayValue = hand.bet;
-                            } else if (targetValue !== null) {
-                                displayValue = targetValue;
-                            }
+                            let rClass = 'res-push'; 
+                            let rText = 'PUSH';
+                            if (hand.result === 'WIN') { rClass = 'res-win'; rText = 'WIN'; }
+                            else if (hand.result === 'BLACKJACK') { rClass = 'res-bj'; rText = 'BLACKJACK'; }
+                            else if (hand.result === 'LOSS' || hand.status === 'BUST') { rClass = 'res-loss'; rText = hand.status === 'BUST' ? 'BUST' : 'LOST'; }
+                            
+                            resHtml = `<div class="hand-result ${rClass}">${rText}</div>`;
                         }
 
                         // Container for each hand stack allows proper positioning of results and scores.
                         handsHtml += `
-                        <div class="single-hand-container">
-                            <div class="seat-score ${badgeClass}" style="display:${hand.score > 0 ? 'flex' : 'none'}; z-index: 50;">${badgeText}</div>
-                            <div class="hand" style="margin-top: 0;">
+                        <div class="single-hand-container" style="width: ${handWidth}px; height: 105px;">
+                            ${resHtml}
+                            <div class="seat-score ${badgeClass}" style="display:${hand.score > 0 ? 'flex' : 'none'};">${badgeText}</div>
+                            <div class="hand" style="margin-top: 0; width: 100%; height: 100%;">
                                 ${cardsHtml}
                             </div>
-                            ${hand.bet > 0 ? `<div class="seat-bet ${betClass}" id="bet-pill-${i}-${hIdx}" data-end="${targetValue !== null ? targetValue : hand.bet}">${displayValue}</div>` : ''}
                         </div>`;
                     });
+
+                    // MORPHING BET PILL LOGIC (Applies to the total bet above the name)
+                    let betClass = '';
+                    let displayValue = totalSeatBet;
+                    let targetValue = null;
+
+                    if (seat.hands[0] && seat.hands[0].result) {
+                        // For UI simplicity, we use the primary hand's result to color the total bet pill
+                        let primaryResult = seat.hands[0].result;
+                        if (primaryResult === 'WIN') { betClass = 'bet-win'; targetValue = totalSeatBet * 2; }
+                        else if (primaryResult === 'BLACKJACK') { betClass = 'bet-bj'; targetValue = totalSeatBet * 2.5; }
+                        else if (primaryResult === 'LOSS' || seat.hands[0].status === 'BUST') { betClass = 'bet-loss'; targetValue = 0; }
+                        else if (primaryResult === 'PUSH') { betClass = 'bet-push'; targetValue = totalSeatBet; }
+
+                        // If not animated yet, keep start value and trigger script later
+                        if (targetValue !== null && !animatedPills.has(`${i}-total`)) {
+                            displayValue = totalSeatBet;
+                        } else if (targetValue !== null) {
+                            displayValue = targetValue;
+                        }
+                    }
 
                     seatsHtml += `
                     <div class="seat occupied">
                         <div class="hands-wrapper">${handsHtml}</div>
-                        ${state.status === 'BETTING' && isIdle ? `
-                            <div class="seat-circle">
-                                <i class="fas fa-user" style="color: white; opacity:0.3;"></i>
-                            </div>
-                        ` : ''}
                         
-                        <div class="seat-name" style="color:${seat.name === myName ? '#00a2ff' : 'white'};">${seat.name}</div>
-                        
-                        ${state.status !== 'BETTING' && !isIdle ? `
-                            <div class="player-timer-track" style="opacity: ${isMySeatTurn ? 1 : 0.2};">
-                                <div class="player-timer-fill" id="timer-bar-${i}" style="width: 100%;"></div>
-                            </div>
-                        ` : ''}
+                        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 10px;">
+                            ${totalSeatBet > 0 ? `<div class="seat-bet ${betClass}" id="bet-pill-${i}-total" data-end="${targetValue !== null ? targetValue : totalSeatBet}">${displayValue}</div>` : ''}
+                            
+                            <div class="seat-name" style="color:${seat.name === myName ? '#00a2ff' : 'white'};">${seat.name}</div>
+                            
+                            ${state.status !== 'BETTING' && !isIdle ? `
+                                <div class="player-timer-track" style="opacity: ${isMySeatTurn ? 1 : 0.2};">
+                                    <div class="player-timer-fill timer-green" id="timer-bar-${i}"></div>
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>`;
                 } else {
                     if (state.status === 'BETTING') {
@@ -399,20 +513,16 @@
             }
             document.getElementById('seats-container').innerHTML = seatsHtml;
 
-            // Trigger Roll-Up Animations for Bet Pills
+            // Trigger Roll-Up Animations for Total Bet Pills
             for(let i=1; i<=5; i++) {
                 let seat = state.seats[i];
-                if(seat) {
-                     seat.hands.forEach((hand, hIdx) => {
-                        if(hand.result && !animatedPills.has(`${i}-${hIdx}`)) {
-                            animatedPills.add(`${i}-${hIdx}`);
-                            let el = document.getElementById(`bet-pill-${i}-${hIdx}`);
-                            let target = parseInt(el.getAttribute('data-end'));
-                            if (el && target !== null) {
-                                setTimeout(() => { animateValue(el, hand.bet, target, 1000); }, 500);
-                            }
-                        }
-                     });
+                if(seat && seat.hands[0] && seat.hands[0].result && !animatedPills.has(`${i}-total`)) {
+                    animatedPills.add(`${i}-total`);
+                    let el = document.getElementById(`bet-pill-${i}-total`);
+                    let target = parseInt(el.getAttribute('data-end'));
+                    if (el && target !== null) {
+                        setTimeout(() => { animateValue(el, seat.hands[0].bet, target, 1000); }, 500);
+                    }
                 }
             }
 
@@ -447,6 +557,7 @@
             btnSplit.style.display = canSplit ? 'flex' : 'none';
 
             let isRackEmpty = (!isSeatedNoBet && !isMyTurn);
+            
             if (isRackEmpty) {
                 msgEl.style.display = 'block';
                 if (state.status === 'BETTING') msgEl.innerText = "TAKE A SEAT TO PLAY";
@@ -458,5 +569,10 @@
         });
 
     </script>
+    <style>
+        /* ADDING THE TIMER STYLES BACK IN JUST IN CASE THEY WERE LOST IN THE COPY PASTE */
+        .timer-green { background: linear-gradient(90deg, #00e676, #00b359); box-shadow: 0 0 10px #00e676; }
+        .timer-red { background: linear-gradient(90deg, #ff3366, #cc0033); box-shadow: 0 0 10px #ff3366; }
+    </style>
 </body>
 </html>
