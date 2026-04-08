@@ -6,17 +6,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000814">
-    <title>Stick N' Trade | Premium Casino</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VIP Blackjack | Premium</title>
     <script src="/socket.io/socket.io.js"></script>
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@600;700;900&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --ps-bg: #000814; 
+            --ps-bg: #00050d; 
             --ps-blue: #00439c; 
             --ps-glow: #00a2ff; 
             --glass-bg: rgba(0, 10, 25, 0.75); 
@@ -36,7 +32,17 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--ps-bg); color: var(--text-main); height: 100vh !important; width: 100vw !important; overflow: hidden !important; user-select: none; }
+        /* Setup body for perfect centering */
+        body { 
+            background: var(--ps-bg); 
+            color: var(--text-main); 
+            height: 100vh !important; 
+            width: 100vw !important; 
+            overflow: hidden !important; 
+            user-select: none; 
+            display: flex;
+            flex-direction: column;
+        }
         
         ::-webkit-scrollbar { display: none; }
         .custom-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; padding-right: 5px;}
@@ -44,15 +50,36 @@
         .hidden { display: none !important; }
 
         /* AUTH SCREEN */
-        #login-screen { position: absolute; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 10, 25, 0.85); padding: 40px; border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        #login-screen { position: absolute; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 10, 25, 0.85); padding: 40px; border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.8); backdrop-filter: blur(10px); top: 50%; left: 50%; transform: translate(-50%, -50%);}
         #login-screen h2 { margin-top:0; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
         #login-screen input { padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 100%; border-radius: 8px; border: none; font-weight: bold; background: rgba(0,0,0,0.5); color: white; }
         #login-screen button { padding: 12px 20px; font-size: 1.2rem; cursor: pointer; background: linear-gradient(to bottom, #00a2ff, #0077cc); color: white; font-weight: bold; border: none; border-radius: 8px; width: 100%; box-shadow: 0 4px 15px rgba(0,162,255,0.4); transition: 0.2s; }
         #login-screen button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,162,255,0.6); }
 
-        /* LAYOUT */
-        #main-layout { display: none; gap: 20px; width: 100%; max-width: 1450px; height: 750px; justify-content: center; align-items: stretch; padding: 20px; }
-        .game-column { display: flex; flex-direction: column; gap: 20px; width: 1100px; max-width: 1100px; flex-shrink: 0; }
+        /* MAIN WRAPPER - Takes up remaining height below topbar and centers content */
+        .main-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; /* Center vertically */
+            flex: 1; /* Take up all available space */
+            width: 100vw; 
+            position: relative; 
+        }
+
+        /* LAYOUT - Centered horizontally and vertically */
+        #main-layout { 
+            display: none; /* Changed by JS */
+            gap: 20px; 
+            width: 100%; 
+            max-width: 1450px; 
+            height: 750px; 
+            justify-content: center; 
+            align-items: center; /* Center items within layout */
+            padding: 20px; 
+        }
+        
+        .game-column { display: flex; flex-direction: column; gap: 20px; width: 1100px; max-width: 1100px; flex-shrink: 0; height: 100%;}
 
         /* GAME BOARD */
         #game-screen { flex: 1; width: 100%; background: radial-gradient(circle at center, #0e5b32 0%, #042412 100%); border-radius: 12px; border: 1px solid #3e2723; box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 15px 35px rgba(0,0,0,0.6); position: relative; overflow: hidden; display: flex; flex-direction: column; }
@@ -70,10 +97,35 @@
         
         /* CARDS */
         @keyframes dealFly { 0% { transform: translate(100px, -200px) scale(0.5); opacity: 0; } 100% { transform: translate(0, 0) scale(1); opacity: 1; } }
-        .hand { display: flex; justify-content: center; min-height: 105px; position: relative;}
-        .card { width: 70px; height: 105px; background: white; color: black; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 5px; font-weight: bold; font-size: 1.1rem; border: 1px solid #ccc; box-shadow: -2px 2px 8px rgba(0,0,0,0.6); position: absolute; top: 0;}
+        
+        /* The container for all cards in a hand */
+        .hand { 
+            display: flex; 
+            justify-content: flex-start; /* Align from left */
+            min-height: 105px; 
+            position: relative;
+            margin-top: 0;
+        }
+        
+        .card { 
+            width: 70px; 
+            height: 105px; 
+            background: white; 
+            color: black; 
+            border-radius: 6px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            padding: 5px; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            border: 1px solid #ccc; 
+            box-shadow: -2px 2px 8px rgba(0,0,0,0.6); 
+            position: absolute; 
+            top: 0;
+        }
         .anim-card { animation: dealFly 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .card-red { color: var(--accent-red); }
+        .card-red { color: var(--danger); }
         .card-hidden { background: repeating-linear-gradient(45deg, #001f4d, #001f4d 10px, #000a1f 10px, #000a1f 20px); border: 2px solid rgba(255,255,255,0.8); color: transparent; }
         
         /* SEATING AREA */
@@ -81,7 +133,7 @@
         .seat { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; transition: all 0.5s ease; min-width: 120px; }
         
         /* HAND CONTAINER */
-        .hands-wrapper { display: flex; gap: 20px; align-items: flex-end; margin-bottom: 5px; height: 120px;}
+        .hands-wrapper { display: flex; gap: 20px; align-items: flex-end; margin-bottom: 5px; height: 130px; /* Taller to fit badges/results */}
         .single-hand-container { display: flex; flex-direction: column; align-items: center; position: relative; justify-content: flex-end; height: 100%;}
 
         /* EMPTY SEAT CIRCLE */
@@ -89,26 +141,78 @@
         .seat-circle:hover { background: rgba(255,255,255,0.2); border-color: white; }
         
         /* PLAYER INFO (NAME, BET, TIMER) */
-        .player-info-container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
-        .seat-name { font-weight: bold; font-size: 0.9rem; text-transform: uppercase; text-shadow: 0 2px 4px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; text-align: center; letter-spacing: 1px; margin-bottom: 3px;}
+        .seat-name { margin-top: 5px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; text-shadow: 0 2px 4px black; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; text-align: center; letter-spacing: 1px;}
         
-        /* MORPHING BET PILL (Now below cards, above name) */
+        /* BET PILL (Above Name) */
         .seat-bet { padding: 4px 15px; border-radius: 50px; font-weight: 900; font-size: 0.95rem; margin-bottom: 5px; z-index: 25; box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: all 0.4s ease; border: 1px solid rgba(255, 180, 0, 0.4); background: rgba(0,0,0,0.8); color: var(--credits); font-family: 'Rajdhani', sans-serif; text-align: center; min-width: 60px;}
-        .bet-win { background: linear-gradient(to bottom, #00e676, #00b359); color: black; border: none; box-shadow: 0 0 20px rgba(0,230,118,0.6); }
-        .bet-loss { background: linear-gradient(to bottom, #ff3366, #cc0033); color: white; border: none; box-shadow: 0 0 20px rgba(255,51,102,0.4);}
-        .bet-bj { background: linear-gradient(to bottom, #00a2ff, #0077cc); color: white; border: none; box-shadow: 0 0 20px rgba(0,162,255,0.6); }
-        .bet-push { background: linear-gradient(to bottom, #777, #444); color: white; border: none; }
 
         /* PLAYER TIMER BAR */
         .player-timer-track { width: 80%; height: 6px; background: rgba(0,0,0,0.8); border-radius: 50px; margin-top: 2px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.9); }
         .player-timer-fill { height: 100%; background: linear-gradient(90deg, #00e676, #00b359); width: 0%; transition: width 1s linear; box-shadow: 0 0 10px #00e676; border-radius: 50px; }
 
-        /* VALUE BADGE (Left side, overlapping cards) */
-        .seat-score { position: absolute; top: 15%; left: -15px; background: #222; width: 34px; height: 34px; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-weight: 900; z-index: 30; box-shadow: 0 4px 10px rgba(0,0,0,0.8); font-size: 1rem; color: white; border: none; font-family: 'Rajdhani', sans-serif;}
+        /* VALUE BADGE (Bottom Left of Cards) */
+        .seat-score { 
+            position: absolute; 
+            bottom: 10px; /* Positioned near the bottom */
+            left: -15px;  /* Hanging off the left edge */
+            background: #222; 
+            width: 34px; 
+            height: 34px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            border-radius: 50%; 
+            font-weight: 900; 
+            z-index: 30; /* Above cards */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8); 
+            font-size: 1rem; 
+            color: white; 
+            border: none; 
+            font-family: 'Rajdhani', sans-serif;
+        }
         .score-active { background: linear-gradient(135deg, #FFDF00, #D4AF37); color: black; box-shadow: 0 0 15px rgba(255,223,0,0.6); }
 
+        /* RESULT PILL (Below Cards, Above Bet) */
+        .hand-result { 
+            position: absolute; 
+            bottom: -25px; /* Positioned below the cards */
+            left: 50%; 
+            transform: translateX(-50%); 
+            font-size: 0.85rem; 
+            font-weight: 900; 
+            padding: 4px 12px; 
+            border-radius: 50px; /* Pill shape */
+            z-index: 50; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.9); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            white-space: nowrap;
+        }
+        .res-win { background: linear-gradient(to bottom, #00e676, #00b359); color: black; text-shadow: none; box-shadow: 0 0 15px rgba(0,230,118,0.5);}
+        .res-loss { background: linear-gradient(to bottom, #333, #111); color: white; border: 1px solid #555;} /* Darker for loss */
+        .res-push { background: linear-gradient(to bottom, #777, #444); color: white; }
+        .res-bj { background: linear-gradient(to bottom, #00a2ff, #0077cc); color: white; box-shadow: 0 0 15px rgba(0,162,255,0.5);}
+
+        /* OVERLAY BUST PILL (Center of Cards) */
+        .bust-pill {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(to bottom, #ff3366, #cc0033);
+            color: white;
+            font-weight: 900;
+            font-size: 0.9rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            z-index: 40; /* Above cards, below result */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            letter-spacing: 1px;
+        }
+
         /* CONTROLS BAR (Matches Live Chat style) */
-        #controls { display: flex; gap: 20px; height: 110px; justify-content: center; align-items: center; width: 100%; background: rgba(0, 10, 25, 0.85); padding: 15px 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15); flex-shrink: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        #controls { display: flex; gap: 20px; height: 110px; justify-content: center; align-items: center; width: 100%; background: var(--panel-bg); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--glass-border); flex-shrink: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
         #controls-msg { font-weight: 900; font-size: 1.2rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 2px; }
         
         /* CIRCULAR BUTTONS */
@@ -116,20 +220,7 @@
         .btn-circle:hover { transform: scale(1.05); filter: brightness(1.2); }
         .btn-circle:active { transform: scale(0.95); }
         
-        /* Input Field */
-        #bet-input { padding: 0 20px; font-size: 1.4rem; text-align: center; width: 160px; display: none; height: 60px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.8); color: var(--credits); font-weight: 900; box-shadow: inset 0 2px 10px rgba(0,0,0,0.9); font-family: 'Rajdhani', sans-serif;}
-        #bet-input::placeholder { color: rgba(255,180,0,0.3); font-size: 1rem; font-family: 'Outfit', sans-serif;}
-        
-        /* PlayStation Button Colors */
-        #btn-leave { border-color: var(--ps-circle); color: var(--ps-circle); }   
-        #btn-leave:hover { box-shadow: 0 0 15px var(--ps-circle), inset 0 0 10px var(--ps-circle); }
-        
-        #btn-bet { border-color: var(--ps-triangle); color: var(--ps-triangle); } 
-        #btn-bet:hover { box-shadow: 0 0 15px var(--ps-triangle), inset 0 0 10px var(--ps-triangle); }
-
-        #btn-rebet { border-color: var(--ps-cross); color: var(--ps-cross); } 
-        #btn-rebet:hover { box-shadow: 0 0 15px var(--ps-cross), inset 0 0 10px var(--ps-cross); }
-        
+        /* PlayStation Colors */
         #btn-hit { border-color: var(--ps-cross); color: var(--ps-cross); }    
         #btn-hit:hover { box-shadow: 0 0 15px var(--ps-cross), inset 0 0 10px var(--ps-cross); }
         
@@ -142,8 +233,22 @@
         #btn-split { border-color: var(--ps-triangle); color: var(--ps-triangle); } 
         #btn-split:hover { box-shadow: 0 0 15px var(--ps-triangle), inset 0 0 10px var(--ps-triangle); }
 
+        #btn-leave { border-color: var(--ps-circle); color: var(--ps-circle); }   
+        #btn-leave:hover { box-shadow: 0 0 15px var(--ps-circle), inset 0 0 10px var(--ps-circle); }
+        
+        #btn-bet { border-color: var(--ps-triangle); color: var(--ps-triangle); } 
+        #btn-bet:hover { box-shadow: 0 0 15px var(--ps-triangle), inset 0 0 10px var(--ps-triangle); }
+
+        #btn-rebet { border-color: var(--ps-cross); color: var(--ps-cross); } 
+        #btn-rebet:hover { box-shadow: 0 0 15px var(--ps-cross), inset 0 0 10px var(--ps-cross); }
+
+        /* Betting Input Field */
+        #bet-input { padding: 0 20px; font-size: 1.4rem; text-align: center; width: 160px; display: none; height: 60px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.8); color: var(--credits); font-weight: 900; box-shadow: inset 0 2px 10px rgba(0,0,0,0.9); font-family: 'Rajdhani', sans-serif;}
+        #bet-input::placeholder { color: rgba(255,180,0,0.3); font-size: 1rem; font-family: 'Outfit', sans-serif;}
+        
+
         /* LIVE CHAT */
-        .chat-panel { width: 320px; height: 100%; display: flex; flex-direction: column; background: rgba(0, 10, 25, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; overflow: hidden; flex-shrink: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
+        .chat-panel { width: 320px; height: 100%; display: flex; flex-direction: column; background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; flex-shrink: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
         .chat-header { padding: 15px; background: rgba(0,0,0,0.7); font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); letter-spacing: 1px; color: white;}
         .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         .chat-line { font-size: 0.95rem; line-height: 1.4; text-align: left; }
@@ -152,8 +257,7 @@
         .chat-input-area input { flex: 1; padding: 10px 15px; border-radius: 50px; border: 1px solid rgba(0,162,255,0.3); background: rgba(0,0,0,0.8); color: white; text-align: left; font-weight: bold;}
         .chat-input-area button { width: 44px; height: 44px; background: linear-gradient(to bottom, #00a2ff, #0077cc); border: none; border-radius: 50px; cursor: pointer; color: white; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5);}
         .chat-input-area button:hover { transform: scale(1.05); filter: brightness(1.1);}
-
-        /* Hide scrollbar for chat */
+        
         .chat-body::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -165,11 +269,12 @@
         <button onclick="joinSandbox()">ENTER CASINO</button>
     </div>
 
-    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+    <div class="main-wrapper" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <div id="main-layout">
             
             <div class="game-column">
                 <div id="game-screen">
+                    
                     <div class="table-logo">
                         <h1>BLACKJACK</h1>
                         <p>BLACKJACK PAYS 3 TO 2</p>
@@ -180,7 +285,7 @@
 
                     <div class="dealer-area">
                         <div class="single-hand-container" style="width: 70px;">
-                            <div id="dealer-score" class="seat-score" style="display:none;">0</div>
+                            <div id="dealer-score" class="seat-score" style="display:none; bottom: 10px; top: auto; left: -15px; transform: none;">0</div>
                             <div id="dealer-hand" class="hand" style="margin-top:0;"></div>
                         </div>
                     </div>
@@ -206,7 +311,7 @@
 
             <div class="chat-panel">
                 <div class="chat-header">LIVE CHAT</div>
-                <div class="chat-body" id="chat-box">
+                <div class="chat-body custom-scroll" id="chat-box">
                     <div class="chat-line" style="color: var(--ps-glow); text-align: center; font-weight: bold;">Connected to table.</div>
                 </div>
                 <div class="chat-input-area">
@@ -226,7 +331,6 @@
         
         // Tracks rendered cards to prevent re-animating existing cards
         let cardRenderMemory = { dealer: 0, seats: { 1:[], 2:[], 3:[], 4:[], 5:[] } };
-        let animatedPills = new Set(); // Tracks morphing pills to run animation once
 
         function joinSandbox() {
             let name = document.getElementById('username').value.trim();
@@ -271,18 +375,6 @@
             box.scrollTop = box.scrollHeight;
         });
 
-        // Smart Number Rollup Animation
-        function animateValue(obj, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start);
-                if (progress < 1) { window.requestAnimationFrame(step); }
-            };
-            window.requestAnimationFrame(step);
-        }
-
         // Timer Updates
         socket.on('timerTick', (timeData) => {
             let timerEl = document.getElementById('timer-display');
@@ -310,7 +402,6 @@
             if (state.status === 'BETTING') {
                 // Reset animation memory for new round
                 cardRenderMemory = { dealer: 0, seats: { 1:[], 2:[], 3:[], 4:[], 5:[] } };
-                animatedPills.clear();
             }
 
             // 1. RENDER DEALER
@@ -383,54 +474,46 @@
                         // Container width calculation for absolutely positioned cards
                         let handWidth = hand.cards.length > 0 ? 70 + ((hand.cards.length - 1) * 30) : 70;
 
+                        // VALUE BADGE (Bottom Left of Cards)
                         let badgeClass = isHandActive ? 'score-active' : '';
                         let badgeText = hand.score;
-                        if (hand.status === 'BUST') { badgeClass = 'score-bust'; badgeText = 'BUST'; }
-                        else if (hand.status === 'BLACKJACK') { badgeClass = 'score-bj'; badgeText = 'BLACKJACK'; }
+
+                        // RESULT PILL (Below Cards, Above Bet)
+                        let resHtml = '';
+                        if (hand.result) {
+                            let rClass = 'res-push'; // Default to grey
+                            let rText = 'PUSH';
+                            if (hand.result === 'WIN') { rClass = 'res-win'; rText = 'WIN'; }
+                            else if (hand.result === 'BLACKJACK') { rClass = 'res-bj'; rText = 'BLACKJACK'; }
+                            else if (hand.result === 'LOSS') { rClass = 'res-loss'; rText = 'LOST'; }
+                            
+                            resHtml = `<div class="hand-result ${rClass}">${rText}</div>`;
+                        }
+
+                        // BUST PILL (Center of Cards)
+                        let bustHtml = '';
+                        if (hand.status === 'BUST') {
+                            bustHtml = `<div class="bust-pill">BUST</div>`;
+                        }
 
                         // Container for each hand stack allows proper positioning of results and scores.
                         handsHtml += `
                         <div class="single-hand-container" style="width: ${handWidth}px; height: 105px;">
-                            <div class="seat-score ${badgeClass}" style="display:${hand.score > 0 ? 'flex' : 'none'}; z-index: 50;">${badgeText}</div>
+                            <div class="seat-score ${badgeClass}" style="display:${hand.score > 0 ? 'flex' : 'none'}; z-index: 50; bottom: 10px; top: auto; left: -15px; transform: none;">${badgeText}</div>
+                            ${bustHtml}
                             <div class="hand" style="margin-top: 0; width: 100%; height: 100%;">
+                                ${resHtml}
                                 ${cardsHtml}
                             </div>
                         </div>`;
                     });
-
-                    // MORPHING BET PILL LOGIC (Applies to the total bet above the name)
-                    let betClass = '';
-                    let displayValue = totalSeatBet;
-                    let targetValue = null;
-
-                    if (seat.hands[0] && seat.hands[0].result) {
-                        // For UI simplicity, we use the primary hand's result to color the total bet pill
-                        let primaryResult = seat.hands[0].result;
-                        if (primaryResult === 'WIN' || primaryResult === 'BLACKJACK') {
-                            betClass = primaryResult === 'BLACKJACK' ? 'bet-bj' : 'bet-win';
-                            targetValue = primaryResult === 'BLACKJACK' ? totalSeatBet * 2.5 : totalSeatBet * 2;
-                        } else if (primaryResult === 'LOSS' || seat.hands[0].status === 'BUST') {
-                            betClass = 'bet-loss';
-                            targetValue = 0;
-                        } else if (primaryResult === 'PUSH') {
-                            betClass = 'bet-push';
-                            targetValue = totalSeatBet;
-                        }
-
-                        // If not animated yet, keep start value and trigger script later
-                        if (targetValue !== null && !animatedPills.has(`${i}-total`)) {
-                            displayValue = totalSeatBet;
-                        } else if (targetValue !== null) {
-                            displayValue = targetValue;
-                        }
-                    }
 
                     seatsHtml += `
                     <div class="seat occupied ${isMySeatTurn ? 'active-turn' : ''}">
                         <div class="hands-wrapper">${handsHtml}</div>
                         
                         <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 10px;">
-                            ${totalSeatBet > 0 ? `<div class="seat-bet ${betClass}" id="bet-pill-${i}-total" data-end="${targetValue !== null ? targetValue : totalSeatBet}">${displayValue}</div>` : ''}
+                            ${totalSeatBet > 0 ? `<div class="seat-bet">${totalSeatBet}</div>` : ''}
                             
                             <div class="seat-name" style="color:${seat.name === myName ? '#00a2ff' : 'white'};">${seat.name}</div>
                             
@@ -453,19 +536,6 @@
                 }
             }
             document.getElementById('seats-container').innerHTML = seatsHtml;
-
-            // Trigger Roll-Up Animations for Total Bet Pills
-            for(let i=1; i<=5; i++) {
-                let seat = state.seats[i];
-                if(seat && seat.hands[0] && seat.hands[0].result && !animatedPills.has(`${i}-total`)) {
-                    animatedPills.add(`${i}-total`);
-                    let el = document.getElementById(`bet-pill-${i}-total`);
-                    let target = parseInt(el.getAttribute('data-end'));
-                    if (el && target !== null) {
-                        setTimeout(() => { animateValue(el, seat.hands[0].bet, target, 1000); }, 500);
-                    }
-                }
-            }
 
             // 3. Update Controls Visibility
             let s = mySeat ? state.seats[mySeat] : null;
